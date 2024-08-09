@@ -1,5 +1,5 @@
 services:
-  backend-library-service:
+  backend-finance-service:
     image: 'mouralucas/rolf-services:finance'
     build: .
     environment:
