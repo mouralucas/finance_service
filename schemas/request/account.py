@@ -12,4 +12,4 @@ class CreateAccountRequest(BaseModel):
     number: str = Field(None, alias="number", description="The number of the account")
     open_date: datetime.date = Field(None, alias="openDate", description="The open date of the account")
     close_date: datetime.date = Field(None, alias="closeDate", description="The close date of the account")
-    type: uuid.UUID = Field(..., alias='accountType', description="The type of the account")
+    type_id: uuid.UUID = Field(..., alias='accountTypeId', description="The type of the account")

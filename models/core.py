@@ -5,7 +5,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import String, SmallInteger
 
 
-class Currency(SQLModel):
+class CurrencyModel(SQLModel):
     __tablename__ = 'currency'
 
     id: Mapped[str] = mapped_column('id', String(3), primary_key=True)
@@ -13,7 +13,7 @@ class Currency(SQLModel):
     symbol: Mapped[str] = mapped_column('symbol', String(10))
 
 
-class Category(SQLModel):
+class CategoryModel(SQLModel):
     __tablename__ = 'category'
 
     name: Mapped[str] = mapped_column('name', String(250))
@@ -25,7 +25,7 @@ class Category(SQLModel):
     # more necessary fields
 
 
-class Bank(SQLModel):
+class BankModel(SQLModel):
     __tablename__ = 'bank'
 
     name: Mapped[str] = mapped_column('name', String(250))
