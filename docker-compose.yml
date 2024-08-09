@@ -25,7 +25,7 @@ services:
         max-size: "10m"
         max-file: "1"
 
-  pg_library_service:
+  pg_finance_service:
     container_name: 'pg_finance_service'
     image: postgres:15-alpine
     restart: always
@@ -34,7 +34,7 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: finance_dev_db
     ports:
-      - "5034:5432"
+      - "5434:5432"
     volumes:
       - db-data:/var/lib/postgresql/data:cached
 

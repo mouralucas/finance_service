@@ -30,7 +30,7 @@ target_metadata = rolf_common.models.Base.metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 def get_url():
-    return settings.library_database_url
+    return settings.finance_database_url
 
 
 def run_migrations_offline() -> None:
