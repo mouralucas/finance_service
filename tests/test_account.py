@@ -29,4 +29,17 @@ async def test_create_account(client, create_bank, create_account_type):
     assert response.status_code == status.HTTP_201_CREATED
 
     data = response.json()
+    assert 'account' in data
 
+    assert 'bankId' in data['account']
+    assert data['account']['bankId'] == str(bank_id)
+    assert 'nickname' in data['account']
+    assert data['account']['nickname'] == nickname
+    assert 'branch' in data['account']
+    assert data['account']['branch'] == branch
+    assert 'number' in data['account']
+    assert data['account']['number'] == number
+    assert 'openDate' in data['account']
+    assert data['account']['openDate'] == open_date
+    assert 'typeId' in data['account']
+    assert data['account']['typeId'] == str(type_id)

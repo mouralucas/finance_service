@@ -5,7 +5,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from backend.database import db_session
-from models.account import AccountModel
 from schemas.request.account import CreateAccountRequest
 from schemas.response.account import CreateAccountResponse, GetAccountResponse
 from services.account import AccountService

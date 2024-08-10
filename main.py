@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 from backend.settings import settings
-from routers import account
+from routers import account, credit_card
 
 app = FastAPI(
     title=settings.project_name,
@@ -14,3 +14,4 @@ app = FastAPI(
 
 # Include all routers
 app.include_router(account.router)
+app.include_router(credit_card.router)
