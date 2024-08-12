@@ -32,5 +32,15 @@ class BankModel(SQLModel):
     code: Mapped[int] = mapped_column('code', SmallInteger)
 
 
+class IndexModel(SQLModel):
+    __tablename__ = 'index'
+
+    name: Mapped[str] = mapped_column('name', String(250))
+    description: Mapped[str] = mapped_column('description', String(500), nullable=True)
 
 
+class LiquidityModel(SQLModel):
+    __tablename__ = 'liquidity'
+
+    name: Mapped[str] = mapped_column('name', String(250))
+    description: Mapped[str] = mapped_column('description', String(500), nullable=True)
