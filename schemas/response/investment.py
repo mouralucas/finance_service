@@ -11,3 +11,15 @@ class CreateInvestmentResponse(SuccessResponseBase):
 class GetInvestmentResponse(SuccessResponseBase):
     quantity: int = Field(..., description='The total number of investment returned')
     investments: list[InvestmentSchema] = Field(..., description='The list of investments')
+
+
+class LiquidateInvestmentResponse(SuccessResponseBase):
+    pass
+
+
+class CreateStatementResponse(SuccessResponseBase):
+    pass
+
+
+class GetStatementResponse(SuccessResponseBase):
+    pass

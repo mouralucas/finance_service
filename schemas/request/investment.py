@@ -37,3 +37,11 @@ class LiquidateInvestmentRequest(BaseModel):
     id: uuid.UUID = Field(..., alias='investmentId', description='The unique identifier of the investment')
     liquidation_date: datetime.date = Field(None, alias='liquidationDate', description='The date that the investment was liquidated')
     liquidation_amount: float = Field(None, alias='liquidationAmount', description='The amount liquidated, after tax')
+
+
+class CreateStatementRequest(BaseModel):
+    pass
+
+
+class GetStatementRequest(BaseModel):
+    pass
