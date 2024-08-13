@@ -37,4 +37,6 @@ class InvestmentService(BaseService):
         return response
 
     async def liquidate_investment(self, params: LiquidateInvestmentRequest):
+        current_investment = InvestmentManager(self.session).get_investment_by_id(params.investment_id)
+
         pass
