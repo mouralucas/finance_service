@@ -44,3 +44,47 @@ async def test_create_investment(client, create_open_account, create_investment_
     response = await client.post('/investment', json=payload)
 
     assert response.status_code == status.HTTP_201_CREATED
+
+    data = response.json()
+
+    assert 'investment' in data
+
+    assert 'investmentId' in data['investment']
+
+    assert 'accountId' in data['investment']
+    assert data['investment']['accountId'] == str(account.id)
+
+    assert 'name' in data['investment']
+    assert data['investment']['name'] == name
+
+    assert 'typeId' in data['investment']
+    assert data['investment']['typeId'] == str(type_id)
+
+    assert 'transactionDate' in data['investment']
+    assert data['investment']['transactionDate'] == transaction_date
+
+    assert 'maturityDate' in data['investment']
+    assert data['investment']['maturityDate'] == maturity_date
+
+    assert 'quantity' in data['investment']
+    assert data['investment']['quantity'] == quantity
+
+    assert 'price' in data['investment']
+    assert data['investment']['price'] == price
+
+    assert 'amount' in data['investment']
+    assert data['investment']['amount'] == amount
+
+    assert 'indexTypeId' in data['investment']
+    assert data['investment']['indexTypeId'] == str(index_type_id)
+
+    assert 'indexId' in data['investment']
+    assert data['investment']['indexId'] == str(index_id)
+
+    assert 'liquidityId' in data['investment']
+    assert data['investment']['liquidityId'] == str(liquidity_id)
+
+    assert 'currencyId' in data['investment']
+    assert data['investment']['currencyId'] == str(currency_id)
+
+

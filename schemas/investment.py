@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field, ConfigDict
 class InvestmentSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: uuid.UUID = Field(..., description='Unique identifier of the investment')
+    id: uuid.UUID = Field(..., serialization_alias='investmentId', description='Unique identifier of the investment')
     custodian_id: uuid.UUID = Field(..., serialization_alias='custodianId', description='The id of the custodian bank')
     account_id: uuid.UUID = Field(..., serialization_alias='accountId', description='The id of the account')
     name: str = Field(..., description='The name of the investment')
