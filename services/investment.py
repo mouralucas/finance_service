@@ -5,8 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from managers.investment import InvestmentManager
 from models.investment import InvestmentModel
 from schemas.investment import InvestmentSchema
-from schemas.request.investment import CreateInvestmentRequest
-from schemas.response.investment import CreateInvestmentResponse
+from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, LiquidateInvestmentRequest
+from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse
 
 
 class InvestmentService(BaseService):
@@ -17,7 +17,7 @@ class InvestmentService(BaseService):
     async def create_investment(self, investment: CreateInvestmentRequest) -> CreateInvestmentResponse:
         new_investment = InvestmentModel(**investment.model_dump())
         new_investment.owner_id = self.user['user_id']
-
+        # TODO: if liquidation date <= today and liquidation amount set is_liquidated to true
         new_investment = await InvestmentManager(session=self.session).create_investment(new_investment)
 
         response = CreateInvestmentResponse(
@@ -25,3 +25,16 @@ class InvestmentService(BaseService):
         )
 
         return response
+
+    async def get_investments(self, params: GetInvestmentRequest) -> GetInvestmentResponse:
+        investments = await InvestmentManager(self.session).get_investments(params.model_dump())
+
+        response = GetInvestmentResponse(
+            quantity=len(investments),
+            investments=InvestmentSchema.model_validate(investments),
+        )
+
+        return response
+
+    async def liquidate_investment(self, params: LiquidateInvestmentRequest):
+        pass

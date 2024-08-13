@@ -5,8 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from backend.database import db_session
-from schemas.request.investment import CreateInvestmentRequest
-from schemas.response.investment import CreateInvestmentResponse
+from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest
+from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse
 from services.investment import InvestmentService
 
 router = APIRouter(prefix="/investment", tags=['Investments'])
@@ -22,3 +22,8 @@ async def create_investment(
     response = await InvestmentService(session=session, user=user).create_investment(investment)
 
     return response
+
+
+@router.get('', summary='Get investments', description='Get investment base on filters')
+async def get_investments(params: GetInvestmentRequest) -> GetInvestmentResponse:
+    pass

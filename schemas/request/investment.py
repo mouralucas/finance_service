@@ -24,3 +24,16 @@ class CreateInvestmentRequest(BaseModel):
     liquidation_date: datetime.date = Field(None, alias='liquidationDate', description='The date that the investment was liquidated')
     liquidation_amount: float = Field(None, alias='liquidationAmount', description='The amount liquidated, after tax')
 
+
+class GetInvestmentRequest(BaseModel):
+    id: uuid.UUID = Field(None, alias='investmentId', description='The id of the investment')
+    owner_id: uuid.UUID = Field(None, alias='ownerId', description='The id of the owner of the investment')
+    start_date: datetime.date = Field(None, alias='startDate', description='The start date of the filter')
+    end_date: datetime.date = Field(None, alias='end_date', description='The end date of the filter')
+    # other fields...
+
+
+class LiquidateInvestmentRequest(BaseModel):
+    id: uuid.UUID = Field(..., alias='investmentId', description='The unique identifier of the investment')
+    liquidation_date: datetime.date = Field(None, alias='liquidationDate', description='The date that the investment was liquidated')
+    liquidation_amount: float = Field(None, alias='liquidationAmount', description='The amount liquidated, after tax')
