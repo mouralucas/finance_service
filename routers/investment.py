@@ -39,7 +39,9 @@ async def liquidate(
         session: AsyncSession = Depends(db_session),
         user: RequiredUser = Security(get_user)
 ) -> LiquidateInvestmentResponse:
-    pass
+    response = await InvestmentService(session=session, user=user).liquidate_investment(investment)
+
+    return response
 
 
 @router.post('/statement', status_code=status.HTTP_201_CREATED,

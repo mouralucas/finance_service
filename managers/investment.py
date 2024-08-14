@@ -44,7 +44,7 @@ class InvestmentManager(BaseDataManager):
 
         return investments
 
-    async def update_investment(self, investment: InvestmentModel, fields: dict[str, Any]) -> SQLModel:
+    async def update_investment(self, investment: SQLModel, fields: dict[str, Any]) -> SQLModel:
         stmt = (
             update(InvestmentModel)
             .where(InvestmentModel.id == investment.id)

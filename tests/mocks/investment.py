@@ -1,8 +1,11 @@
+import datetime
+import uuid
+
 import pytest_asyncio
 from rolf_common.managers import BaseDataManager
 
 from models.core import IndexTypeModel, IndexModel, LiquidityModel
-from models.investment import InvestmentTypeModel
+from models.investment import InvestmentTypeModel, InvestmentModel
 
 
 @pytest_asyncio.fixture
@@ -71,3 +74,38 @@ async def create_liquidity(create_test_session):
     liquidity_list.append(liquidity_2)
 
     return liquidity_list
+
+
+@pytest_asyncio.fixture
+async def create_investment(create_test_session, create_open_account, create_investment_type, create_index_type,
+                            create_index, create_liquidity, create_currency) -> list:
+    investment_list = []
+
+    accounts = create_open_account
+    account = accounts[0]
+    investment_types = create_investment_type
+    index_types = create_index_type
+    indexes = create_index
+    liquidity = create_liquidity
+    currencies = create_currency
+
+    investment = InvestmentModel(owner_id=uuid.UUID("adf52a1e-7a19-11ed-a1eb-0242ac120002"),
+                                 custodian_id=account.bank_id,
+                                 account_id=account.id,
+                                 name="Test Investment",
+                                 description="Test Investment",
+                                 type_id=investment_types[0].id,
+                                 transaction_date=datetime.date(2024, 8, 12),
+                                 maturity_date=datetime.date(2025, 8, 12),
+                                 quantity=1.02,
+                                 price=150.65,
+                                 amount=1.02 * 150.65,
+                                 currency_id=currencies[0].id,
+                                 index_type_id=index_types[0].id,
+                                 index_id=indexes[0].id,
+                                 liquidity_id=liquidity[0].id)
+    investment_1 = await BaseDataManager(session=create_test_session).add_one(investment)
+
+    investment_list.append(investment_1)
+
+    return investment_list

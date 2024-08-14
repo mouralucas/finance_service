@@ -88,3 +88,29 @@ async def test_create_investment(client, create_open_account, create_investment_
     assert data['investment']['currencyId'] == str(currency_id)
 
 
+@pytest.mark.asyncio
+async def test_liquidate_investment(client, create_investment):
+    investments = create_investment
+
+    investment_id = investments[0].id
+    liquidation_date = '2025-08-09'
+    liquidation_amount = 250.32
+
+    payload = {
+        'investmentId': str(investment_id),
+        'liquidationDate': liquidation_date,
+        'liquidationAmount': liquidation_amount
+    }
+    response = await client.post('/investment/liquidate', json=payload)
+
+    assert response.status_code == status.HTTP_200_OK
+
+    data = response.json()
+
+    assert 'investment' in data
+    assert 'isLiquidated' in data['investment']
+    assert data['investment']['isLiquidated'] is True
+    assert 'liquidationDate' in data['investment']
+    assert data['investment']['liquidationDate'] == liquidation_date
+    assert 'liquidationAmount' in data['investment']
+    assert data['investment']['liquidationAmount'] == liquidation_amount

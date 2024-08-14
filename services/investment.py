@@ -6,7 +6,7 @@ from managers.investment import InvestmentManager
 from models.investment import InvestmentModel
 from schemas.investment import InvestmentSchema
 from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, LiquidateInvestmentRequest
-from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse
+from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, LiquidateInvestmentResponse
 
 
 class InvestmentService(BaseService):
@@ -36,7 +36,16 @@ class InvestmentService(BaseService):
 
         return response
 
-    async def liquidate_investment(self, params: LiquidateInvestmentRequest):
-        current_investment = InvestmentManager(self.session).get_investment_by_id(params.investment_id)
+    async def liquidate_investment(self, investment: LiquidateInvestmentRequest) -> LiquidateInvestmentResponse:
+        current_investment = await InvestmentManager(self.session).get_investment_by_id(investment.id)
 
-        pass
+        fields = investment.model_dump()
+        fields['is_liquidated'] = True
+
+        liquidated_investment = await InvestmentManager(session=self.session).update_investment(current_investment, fields)
+
+        response = LiquidateInvestmentResponse(
+            investment=InvestmentSchema.model_validate(liquidated_investment),
+        )
+
+        return response

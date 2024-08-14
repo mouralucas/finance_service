@@ -13,7 +13,8 @@ class GetInvestmentResponse(SuccessResponseBase):
     investments: list[InvestmentSchema] = Field(..., description='The list of investments')
 
 
-class LiquidateInvestmentResponse(SuccessResponseBase):
+class LiquidateInvestmentResponse(CreateInvestmentResponse):
+    # It implements exactly the same data as CreateInvestment. A new class is created to maintain the pattern every router has its response
     pass
 
 

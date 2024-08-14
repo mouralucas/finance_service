@@ -23,5 +23,6 @@ class InvestmentSchema(BaseModel):
 
     index_id: uuid.UUID = Field(..., serialization_alias='indexId', description='The id of the investment index')
     liquidity_id: uuid.UUID = Field(..., serialization_alias='liquidityId', description='The id of investment liquidity')
+    is_liquidated: bool = Field(None, serialization_alias='isLiquidated', description='Whether the investment is liquidated')
     liquidation_date: datetime.date | None = Field(None, serialization_alias='liquidationDate', description='The date that the investment was liquidated')
     liquidation_amount: float | None = Field(None, serialization_alias='liquidationAmount', description='The amount liquidated, after tax')
