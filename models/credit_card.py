@@ -17,6 +17,8 @@ class CreditCardModel(SQLModel):
     cancellation_date: Mapped[datetime.date] = mapped_column('cancellation_date', nullable=True)
     due_day: Mapped[int] = mapped_column('due_day', SmallInteger, nullable=True)
     close_day: Mapped[int] = mapped_column('close_day', SmallInteger, nullable=True)
+    currency_id: Mapped[str] = mapped_column(ForeignKey('currency.id')) # Default currency
+    currency: Mapped['CurrencyModel'] = relationship(foreign_keys=[currency_id], lazy='subquery')
 
 
 class CreditCardBillModel(SQLModel):
@@ -41,7 +43,7 @@ class CreditCardBillModel(SQLModel):
     # This fields only required when transaction currency is different from the bill currency
     # In the front-end put a check-box "compra internacional" then open a box with this info
     dollar_exchange_rate: Mapped[float] = mapped_column('dollar_exchange_rate', nullable=True)  # the dollar rate with the currency on the bill
-    transaction_currency_dollar_ex_rate: Mapped[float] = mapped_column('transaction_currency_dollar_ex_rate', nullable=True)  # The rate between transaction currency and dollar
+    currency_dollar_exchange_rate: Mapped[float] = mapped_column('transaction_currency_dollar_ex_rate', nullable=True)  # The rate between transaction currency and dollar
     total_tax: Mapped[float] = mapped_column('total_tax', nullable=True)
     tax_details: Mapped[dict] = mapped_column('tax_details', JSON, nullable=True)
 
