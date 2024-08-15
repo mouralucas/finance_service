@@ -1,7 +1,7 @@
 import pytest_asyncio
 from rolf_common.managers import BaseDataManager
 
-from models.core import BankModel, CurrencyModel
+from models.core import BankModel, CurrencyModel, CategoryModel
 
 
 @pytest_asyncio.fixture
@@ -34,3 +34,19 @@ async def create_currency(create_test_session) -> list:
     currency_list.append(currency_2)
 
     return currency_list
+
+
+@pytest_asyncio.fixture
+async def create_category(create_test_session) -> list:
+    category_list = []
+
+    category = CategoryModel(name='Test category', description='This is a test category')
+    category_1 = await BaseDataManager(session=create_test_session).add_one(category)
+
+    category = CategoryModel(name='Second test category', description='This is another test category')
+    category_2 = await BaseDataManager(session=create_test_session).add_one(category)
+
+    category_list.append(category_1)
+    category_list.append(category_2)
+
+    return category_list

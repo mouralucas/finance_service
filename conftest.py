@@ -12,6 +12,7 @@ from rolf_common.models import Base
 
 from tests.mocks.core import *
 from tests.mocks.account import *
+from tests.mocks.credit_card import *
 from tests.mocks.investment import *
 
 

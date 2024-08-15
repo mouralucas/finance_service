@@ -38,6 +38,8 @@ class CreditCardBillModel(SQLModel):
     transaction_currency: Mapped['CurrencyModel'] = relationship(foreign_keys=[transaction_currency_id], lazy='subquery')  # The currency of transaction
     transaction_amount: Mapped[float] = mapped_column('transaction_amount')
 
+    # This fields only required when transaction currency is different from the bill currency
+    # In the front-end put a check-box "compra internacional" then open a box with this info
     dollar_exchange_rate: Mapped[float] = mapped_column('dollar_exchange_rate', nullable=True)  # the dollar rate with the currency on the bill
     transaction_currency_dollar_ex_rate: Mapped[float] = mapped_column('transaction_currency_dollar_ex_rate', nullable=True)  # The rate between transaction currency and dollar
     total_tax: Mapped[float] = mapped_column('total_tax', nullable=True)

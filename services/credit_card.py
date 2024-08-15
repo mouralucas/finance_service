@@ -1,3 +1,5 @@
+import datetime
+
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import BaseService
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -25,3 +27,30 @@ class CreditCardService(BaseService):
         )
 
         return response
+
+    @staticmethod
+    def set_due_date(transaction_date: datetime.date, close_day: int, due_day: int, return_str: bool = True) -> datetime.date | str:
+        # Get the month and year of transaction
+        month = transaction_date.month
+        year = transaction_date.year
+
+        if transaction_date.day >= close_day:
+            # If bill is already closed, the charge will be set in next month
+            month += 1
+            if month > 12:
+                month = 1
+                year += 1
+
+        if close_day > due_day:
+            # Se o fechamento é após o vencimento, o vencimento será no mês subsequente
+            month += 1
+            if month > 12:
+                month = 1
+                year += 1
+
+        due_date = datetime.datetime(year, month, due_day)
+
+        if return_str:
+            return due_date.strftime("%Y-%m-%d")
+
+        return due_date
