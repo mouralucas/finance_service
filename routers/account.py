@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from backend.database import db_session
-from schemas.request.account import CreateAccountRequest
+from schemas.request.account import CreateAccountRequest, GetAccountRequest
 from schemas.response.account import CreateAccountResponse, GetAccountResponse
 from services.account import AccountService
 
@@ -26,7 +26,8 @@ async def create_account(
 
 @router.get('', summary='List all accounts', description='Get user accounts base on filters chosen')
 async def get_accounts(
+        params: GetAccountRequest = Depends(),
         session: AsyncSession = Depends(db_session),
         user: RequiredUser = Security(get_user)
 ) -> GetAccountResponse:
-    return GetAccountResponse()
+    return await AccountService(session=session, user=user).get_accounts(params=params)

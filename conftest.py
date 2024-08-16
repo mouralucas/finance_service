@@ -44,7 +44,8 @@ def override_db_session(create_test_session):
 
 def get_mock_user():
     return RequiredUser(
-        user_id=uuid.uuid4(),
+        # user_id=uuid.uuid4(),
+        user_id=uuid.UUID("adf52a1e-7a19-11ed-a1eb-0242ac120002")
     )
 
 

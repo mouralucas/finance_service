@@ -43,3 +43,22 @@ async def test_create_account(client, create_bank, create_account_type):
     assert data['account']['openDate'] == open_date
     assert 'typeId' in data['account']
     assert data['account']['typeId'] == str(type_id)
+
+
+@pytest.mark.asyncio
+async def test_get_account(client, create_open_account):
+    accounts = create_open_account
+
+    response = await client.get('/account')
+
+    assert response.status_code == status.HTTP_200_OK
+
+    data = response.json()
+
+    assert 'accounts' in data
+    assert type(data['accounts']) is list
+    assert 'quantity' in data
+    assert data['quantity'] > 0
+
+    assert 'accountId' in data['accounts'][0]
+    assert 'bankId' in data['accounts'][0]

@@ -41,7 +41,14 @@ async def create_open_account(create_test_session, create_account_type, create_b
                            type_id=account_types[1].id)
     account_2 = await BaseDataManager(session=create_test_session).add_one(account)
 
+    account = AccountModel(owner_id=uuid.uuid4(), bank_id=banks[0].id, nickname='Account from another user',
+                           description='This account should not appear in tests for the user', branch='1212-1',
+                           number='7549653', open_date=datetime.date(2014, 9, 27),
+                           type_id=account_types[0].id)
+    account_3 = await BaseDataManager(session=create_test_session).add_one(account)
+
     account_list.append(account_1)
     account_list.append(account_2)
+    account_list.append(account_3)
 
     return account_list

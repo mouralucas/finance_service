@@ -5,8 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from managers.account import AccountManager
 from models.account import AccountModel
 from schemas.account import AccountSchema
-from schemas.request.account import CreateAccountRequest
-from schemas.response.account import CreateAccountResponse
+from schemas.request.account import CreateAccountRequest, GetAccountRequest
+from schemas.response.account import CreateAccountResponse, GetAccountResponse
 
 
 class AccountService(BaseService):
@@ -22,6 +22,19 @@ class AccountService(BaseService):
 
         response = CreateAccountResponse(
             account=AccountSchema.model_validate(new_account),
+        )
+
+        return response
+
+    async def get_accounts(self, params: GetAccountRequest) -> GetAccountResponse:
+        params = params.model_dump()
+        params['owner_id'] = self.user['user_id']
+
+        accounts = await AccountManager(session=self.session).get_accounts(params=params)
+
+        response = GetAccountResponse(
+            quantity=len(accounts) if accounts else 0,
+            accounts=accounts
         )
 
         return response

@@ -32,13 +32,13 @@ class CreateBillEntryRequest(BaseModel):
     total_tax: float = Field(None, alias='totalTax', description='The tax amount of the transaction')
     tax_detail: dict = Field(None, alias='taxDetail', description='The tax detail of the transaction')
 
-    installment: int = Field(None, description='The current installment', default=1)
-    tot_installment: int = Field(None, alias='totInstallment', description='The total installment of the card', default=1)
+    installment: int = Field(1, description='The current installment')
+    tot_installment: int = Field(1, alias='totInstallment', description='The total installment of the card')
     parent_id: uuid.UUID = Field(None, alias="parentId", description='The id of the parent transaction when installments. Usually the first installment')
 
     description: str = Field(None, alias='description', description='The description of the transaction')
 
-    origin: str = Field(None, alias='origin', description='The origin of the transaction', default='SYSTEM')
+    origin: str = Field('SYSTEM', alias='origin', description='The origin of the transaction')
 
     @model_validator(mode='before')
     def validate_international_transaction(cls, data: dict[str: Any]) -> dict[str, Any]:
