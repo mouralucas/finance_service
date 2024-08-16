@@ -30,8 +30,12 @@ async def create_currency(create_test_session) -> list:
     currency = CurrencyModel(id='USD', name='Dollar', symbol='$')
     currency_2 = await BaseDataManager(session=create_test_session).add_one(currency)
 
+    currency = CurrencyModel(id='EUR', name='Euro', symbol='$')
+    currency_3 = await BaseDataManager(session=create_test_session).add_one(currency)
+
     currency_list.append(currency_1)
     currency_list.append(currency_2)
+    currency_list.append(currency_3)
 
     return currency_list
 

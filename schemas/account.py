@@ -17,3 +17,4 @@ class AccountSchema(BaseModel):
     open_date: datetime.date = Field(..., serialization_alias="openDate", description="Account open date")
     close_date: datetime.date | None = Field(None, serialization_alias="closeDate", description="Account close date")
     type_id: uuid.UUID = Field(..., serialization_alias="typeId", description="Account type")
+    currency_id: str = Field(..., serialization_alias='currencyId', description="Account currency")

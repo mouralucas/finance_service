@@ -30,7 +30,7 @@ class CreditCardBillModel(SQLModel):
     period: Mapped[int] = mapped_column('period', Integer)
     due_date: Mapped[datetime.date] = mapped_column('due_date')
     transaction_date: Mapped[datetime.date] = mapped_column('transaction_date')
-    amount: Mapped[float] = mapped_column('amount', nullable=True)
+    amount: Mapped[float] = mapped_column('amount')
     category_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('category.id'), nullable=True)
     category: Mapped['CategoryModel'] = relationship(foreign_keys=[category_id], lazy='subquery')
     currency_id: Mapped[str] = mapped_column(ForeignKey('currency.id'))
@@ -55,5 +55,5 @@ class CreditCardBillModel(SQLModel):
     description: Mapped[str] = mapped_column('description', String(500))
     operation_type: Mapped[str] = mapped_column('operation_type', String(15))  # whether is incoming or outgoing
 
-    origin: Mapped[str] = mapped_column('origin', String(30))
+    origin: Mapped[str] = mapped_column('origin', String(10))
     is_validated: Mapped[bool] = mapped_column('is_validated', default=False)
