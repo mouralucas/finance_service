@@ -17,11 +17,11 @@ class CategoryModel(SQLModel):
     __tablename__ = 'category'
 
     name: Mapped[str] = mapped_column('name', String(250))
-    description: Mapped[str] = mapped_column('description', String(500))
-    comment: Mapped[str] = mapped_column('comment', String(500))
+    description: Mapped[str] = mapped_column('description', String(500), nullable=True)
+    comment: Mapped[str] = mapped_column('comment', String(500), nullable=True)
     # parent_id: Mapped[uuid.UUID] =
     # parent: Mapped[Category]...
-    order: Mapped[int] = mapped_column('order', SmallInteger)
+    order: Mapped[int] = mapped_column('order', SmallInteger, nullable=True)
     # more necessary fields
 
 

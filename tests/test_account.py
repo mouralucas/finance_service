@@ -67,3 +67,59 @@ async def test_get_account(client, create_open_account):
 
     assert 'accountId' in data['accounts'][0]
     assert 'bankId' in data['accounts'][0]
+
+
+@pytest.mark.asyncio
+async def test_create_statement(client, create_open_account, create_category, create_currency):
+    accounts = create_open_account
+    categories = create_category
+    currencies = create_currency
+
+    # Data only for local transaction, that means in the same currency as the account
+    user_account = accounts[0]
+    currency_id = currencies[0].id
+    amount = 12.37
+    transaction_date = '2024-08-15'
+    category_id = categories[0].id
+    description = 'My transaction that I made'
+    operation_type = 'INCOMING'
+
+    payload = {
+        'accountId': str(user_account.id),
+        'currencyId': str(currency_id),
+        'amount': amount,
+        'transactionDate': transaction_date,
+        'categoryId': str(category_id),
+        'description': description,
+        'operationType': operation_type,
+    }
+    response = await client.post('/account/statement', json=payload)
+
+    assert response.status_code == status.HTTP_201_CREATED
+
+    data = response.json()
+
+    assert 'accountStatementEntry' in data
+    assert 'statementEntryId' in data['accountStatementEntry']
+    assert 'ownerId' in data['accountStatementEntry']
+
+    assert 'accountId' in data['accountStatementEntry']
+    assert data['accountStatementEntry']['accountId'] == str(user_account.id)
+    assert 'period' in data['accountStatementEntry']
+    assert data['accountStatementEntry']['period'] == 202408  # add function to calc period
+    assert 'currencyId' in data['accountStatementEntry']
+    assert data['accountStatementEntry']['currencyId'] == str(currency_id)
+    assert 'amount' in data['accountStatementEntry']
+    assert data['accountStatementEntry']['amount'] == amount
+    assert 'transactionDate' in data['accountStatementEntry']
+    assert data['accountStatementEntry']['transactionDate'] == transaction_date
+    assert 'categoryId' in data['accountStatementEntry']
+    assert data['accountStatementEntry']['categoryId'] == str(category_id)
+    assert 'description' in data['accountStatementEntry']
+    assert data['accountStatementEntry']['description'] == description
+
+    # The transaction currency and amount must be the same in local transactions
+    assert 'transactionCurrencyId' in data['accountStatementEntry']
+    assert data['accountStatementEntry']['transactionCurrencyId'] == str(currency_id)
+    assert 'transactionAmount' in data['accountStatementEntry']
+    assert data['accountStatementEntry']['transactionAmount'] == amount

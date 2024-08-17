@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from backend.database import db_session
-from schemas.request.account import CreateAccountRequest, GetAccountRequest
+from schemas.request.account import CreateAccountRequest, GetAccountRequest, CreateStatementRequest
 from schemas.response.account import CreateAccountResponse, GetAccountResponse
 from services.account import AccountService
 
@@ -31,3 +31,11 @@ async def get_accounts(
         user: RequiredUser = Security(get_user)
 ) -> GetAccountResponse:
     return await AccountService(session=session, user=user).get_accounts(params=params)
+
+
+@router.post('/statement', status_code=status.HTTP_201_CREATED,
+             summary='Create a statement entry', description='Create a statement entry for an account')
+async def create_statement(statement_entry: CreateStatementRequest,
+                           session: AsyncSession = Depends(db_session),
+                           user: RequiredUser = Security(get_user)):
+    return await AccountService(session=session, user=user).create_statement(statement_entry=statement_entry)

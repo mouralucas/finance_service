@@ -1,12 +1,15 @@
+import datetime
+
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import BaseService
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from managers.account import AccountManager
-from models.account import AccountModel
-from schemas.account import AccountSchema
-from schemas.request.account import CreateAccountRequest, GetAccountRequest
+from models.account import AccountModel, AccountStatementModel
+from schemas.account import AccountSchema, StatementSchema
+from schemas.request.account import CreateAccountRequest, GetAccountRequest, CreateStatementRequest
 from schemas.response.account import CreateAccountResponse, GetAccountResponse
+from schemas.response.account import CreateStatementResponse
 
 
 class AccountService(BaseService):
@@ -38,3 +41,29 @@ class AccountService(BaseService):
         )
 
         return response
+
+    async def create_statement(self, statement_entry: CreateStatementRequest) -> CreateStatementResponse:
+        new_statement = AccountStatementModel(**statement_entry.model_dump())
+
+        new_statement.owner_id = self.user['user_id']
+        new_statement.period = self.get_period(new_statement.transaction_date)
+
+        if not new_statement.transaction_currency_id:
+            new_statement.transaction_currency_id = new_statement.currency_id
+            new_statement.transaction_amount = new_statement.amount
+
+        new_statement = await AccountManager(session=self.session).create_statement(statement=new_statement)
+
+        response = CreateStatementResponse(
+            account_statement_entry=StatementSchema.model_validate(new_statement),
+        )
+
+        return response
+
+    @staticmethod
+    def get_period(date: datetime.date | datetime.datetime) -> int:
+        # if is_date_str:
+        #     date = DateTime.str_to_datetime(date, input_format=input_format)
+        year = date.year
+        month = date.month
+        return year * 100 + month

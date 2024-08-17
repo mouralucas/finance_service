@@ -5,7 +5,7 @@ from rolf_common.managers import BaseDataManager
 from rolf_common.models import SQLModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models.account import AccountModel
+from models.account import AccountModel, AccountStatementModel
 
 
 class AccountManager(BaseDataManager):
@@ -27,3 +27,8 @@ class AccountManager(BaseDataManager):
         accounts: list[SQLModel] = await self.get_all(stmt, unique_result=True)
 
         return accounts
+
+    async def create_statement(self, statement: AccountStatementModel) -> SQLModel:
+        new_statement = await self.add_one(statement)
+
+        return new_statement

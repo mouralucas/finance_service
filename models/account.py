@@ -56,15 +56,15 @@ class AccountStatementModel(SQLModel):
     transaction_amount: Mapped[float] = mapped_column('transaction_amount')
 
     # Fields for exchange rates and applicable tax and fees
-    exchange_rate: Mapped[float] = mapped_column('exchange_rate')  # the rate between default currency and transaction currency
-    tax_perc: Mapped[float] = mapped_column('perc_tax')  # the total tax percentage
-    tax: Mapped[float] = mapped_column('tax')  # the exchange_rate * tax_perc
-    spread_perc: Mapped[float] = mapped_column('spread_perc')  # the percentage of spread applied
-    spread: Mapped[float] = mapped_column('spread')  # the exchange_rate * spread_perc
-    effective_rate: Mapped[float] = mapped_column('effective_rate')  # the final exchange rate, with tax and fees
+    exchange_rate: Mapped[float] = mapped_column('exchange_rate', nullable=True)  # the rate between default currency and transaction currency
+    tax_perc: Mapped[float] = mapped_column('perc_tax', nullable=True)  # the total tax percentage
+    tax: Mapped[float] = mapped_column('tax', nullable=True)  # the exchange_rate * tax_perc
+    spread_perc: Mapped[float] = mapped_column('spread_perc', nullable=True)  # the percentage of spread applied
+    spread: Mapped[float] = mapped_column('spread', nullable=True)  # the exchange_rate * spread_perc
+    effective_rate: Mapped[float] = mapped_column('effective_rate', nullable=True)  # the final exchange rate, with tax and fees
 
     origin: Mapped[str] = mapped_column('origin', String(10))
-    is_validated: Mapped[bool] = mapped_column('is_validated', default=False)
+    is_validated: Mapped[bool] = mapped_column('is_validated', default=True)
 
 
 class AccountBalanceModel(SQLModel):

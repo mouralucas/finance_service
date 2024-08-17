@@ -19,3 +19,25 @@ class CreateAccountRequest(BaseModel):
 
 class GetAccountRequest(BaseModel):
     id: uuid.UUID | None = Field(Query(None, alias="accountId", description="The id of the account"))
+
+
+class CreateStatementRequest(BaseModel):
+    account_id: uuid.UUID = Field(..., alias="accountId", description="The id of the account")
+    currency_id: str = Field(..., alias="currencyId", description="The currency of the account")
+    amount: float = Field(..., alias='amount', description="The amount of the transaction in the account currency")
+    transaction_date: datetime.date = Field(..., alias="transactionDate", description="The date of the transaction")
+    category_id: uuid.UUID = Field(..., alias="categoryId", description="The id of the category")
+    description: str = Field(None, alias="description", description="The description of the transaction")
+    operation_type: str = Field(None, alias="operationType", description="The type of the transaction")
+
+    transaction_currency_id: str = Field(None, alias="transactionCurrencyId", description="The currency of the transaction")
+    transaction_amount: float = Field(None, alias="transactionAmount", description="The amount in the transaction currency")
+    exchange_rate: float = Field(None, alias="exchangeRate", description="The exchange rate for international transactions")
+    tax_perc: float = Field(None, alias="taxPerc", description="The percentage of tax")
+    tax: float = Field(None, alias="tax", description="The tax of transaction")
+    spread_perc: float = Field(None, alias="spreadPerc", description="The percentage of spread")
+    spread: float = Field(None, alias="spread", description="The spread of transaction")
+    effective_rate: float = Field(None, alias="effectiveRate", description="The effective rate of the transaction")
+
+    origin: str = Field("SYSTEM", alias="origin", description="The origin of the entry")
+    is_validated: bool = Field(None, alias="isValidated", description="Whether the transaction is validated by the user")
