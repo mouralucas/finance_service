@@ -3,10 +3,12 @@ from starlette import status
 
 
 @pytest.mark.asyncio
-async def test_create_credit_card(client, create_open_account):
+async def test_create_credit_card(client, create_open_account, create_currency):
     accounts = create_open_account
+    currencies = create_currency
 
     account_id = accounts[0].id
+    currency_id = currencies[0].id
     issue_date = '2020-02-20'
     due_day = 20
     close_day = 13
@@ -14,6 +16,7 @@ async def test_create_credit_card(client, create_open_account):
     payload = {
         'nickname': 'My new credit card',
         'accountId': str(account_id),
+        'currencyId': str(currency_id),
         'issueDate': issue_date,
         'dueDay': due_day,
         'closeDay': close_day
@@ -31,6 +34,8 @@ async def test_create_credit_card(client, create_open_account):
     assert 'issueDate' in data['creditCard']
     assert 'cancellationDate' in data['creditCard']
 
+    assert 'currencyId' in data['creditCard']
+    assert data['creditCard']['currencyId'] == str(currency_id)
     assert 'dueDay' in data['creditCard']
     assert data['creditCard']['dueDay'] == due_day
     assert 'closeDay' in data['creditCard']

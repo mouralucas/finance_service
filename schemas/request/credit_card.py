@@ -7,7 +7,8 @@ from pydantic import BaseModel, Field, model_validator
 
 class CreateCreditCardRequest(BaseModel):
     nickname: str = Field(..., alias="nickname", description='A nickname for the card')
-    account_id: uuid.UUID = Field(..., alias="accountId", description='The account id, if any')
+    account_id: uuid.UUID = Field(None, alias="accountId", description='The account id, if any')
+    currency_id: str = Field(..., alias="currencyId", description='The currency id')
     issue_date: datetime.date = Field(None, alias="issueDate", description='The issue date of the card')
     cancellation_date: datetime.date = Field(None, alias="cancellationDate", description='The cancel date of the card')
     due_day: int = Field(..., alias="dueDay", description='The due day of the card')
