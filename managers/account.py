@@ -1,9 +1,13 @@
+import uuid
+
+from fastapi import HTTPException
 from sqlalchemy import select
 from typing import Any
 
 from rolf_common.managers import BaseDataManager
 from rolf_common.models import SQLModel
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette import status
 
 from models.account import AccountModel, AccountStatementModel
 
@@ -27,6 +31,16 @@ class AccountManager(BaseDataManager):
         accounts: list[SQLModel] = await self.get_all(stmt, unique_result=True)
 
         return accounts
+
+    async def get_account_by_id(self, account_id: uuid.UUID, raise_exception: bool = False) -> SQLModel:
+        stmt = select(AccountModel).where(AccountModel.id == account_id)
+
+        investment: SQLModel = await self.get_only_one(stmt)
+
+        if not investment and raise_exception:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, detail='Investment not found')
+
+        return investment
 
     async def create_statement(self, statement: AccountStatementModel) -> SQLModel:
         new_statement = await self.add_one(statement)

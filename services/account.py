@@ -1,8 +1,10 @@
 import datetime
 
+from fastapi import HTTPException
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import BaseService
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette import status
 
 from managers.account import AccountManager
 from models.account import AccountModel, AccountStatementModel
@@ -43,13 +45,18 @@ class AccountService(BaseService):
         return response
 
     async def create_statement(self, statement_entry: CreateStatementRequest) -> CreateStatementResponse:
+        account = await AccountManager(self.session).get_account_by_id(statement_entry.account_id)
+        if not account.active:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Account is not active')
+
         new_statement = AccountStatementModel(**statement_entry.model_dump())
 
         new_statement.owner_id = self.user['user_id']
+        new_statement.currency = account.currency
         new_statement.period = self.get_period(new_statement.transaction_date)
 
         if not new_statement.transaction_currency_id:
-            new_statement.transaction_currency_id = new_statement.currency_id
+            new_statement.transaction_currency = new_statement.currency
             new_statement.transaction_amount = new_statement.amount
 
         new_statement = await AccountManager(session=self.session).create_statement(statement=new_statement)

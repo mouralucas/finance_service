@@ -86,7 +86,6 @@ async def test_create_statement(client, create_open_account, create_category, cr
 
     payload = {
         'accountId': str(user_account.id),
-        'currencyId': str(currency_id),
         'amount': amount,
         'transactionDate': transaction_date,
         'categoryId': str(category_id),
@@ -123,3 +122,30 @@ async def test_create_statement(client, create_open_account, create_category, cr
     assert data['accountStatementEntry']['transactionCurrencyId'] == str(currency_id)
     assert 'transactionAmount' in data['accountStatementEntry']
     assert data['accountStatementEntry']['transactionAmount'] == amount
+
+
+@pytest.mark.asyncio
+async def test_create_statement_closed_account(client, create_closed_account, create_category, create_currency):
+    accounts = create_closed_account
+    categories = create_category
+    currencies = create_currency
+
+    # Data only for local transaction, that means in the same currency as the account
+    user_account = accounts[0]
+    amount = 37.89
+    transaction_date = '2024-08-25'
+    category_id = categories[1].id
+    description = 'My transaction that I made in a closed account'
+    operation_type = 'OUTGOING'
+
+    payload = {
+        'accountId': str(user_account.id),
+        'amount': amount,
+        'transactionDate': transaction_date,
+        'categoryId': str(category_id),
+        'description': description,
+        'operationType': operation_type,
+    }
+    response = await client.post('/account/statement', json=payload)
+
+    assert response.status_code == status.HTTP_403_FORBIDDEN

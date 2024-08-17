@@ -14,16 +14,17 @@ class CreateAccountRequest(BaseModel):
     open_date: datetime.date = Field(None, alias="openDate", description="The open date of the account")
     close_date: datetime.date = Field(None, alias="closeDate", description="The close date of the account")
     type_id: uuid.UUID = Field(..., alias='accountTypeId', description="The type of the account")
-    currency_id: str = Field(None, alias="currencyId", description="The currency of the account")
+    currency_id: str = Field(..., alias="currencyId", description="The currency of the account")
 
 
 class GetAccountRequest(BaseModel):
     id: uuid.UUID | None = Field(Query(None, alias="accountId", description="The id of the account"))
+    currency_id: str | None = Field(Query(None, alias="currencyId", description="The currency of the account"))
 
 
 class CreateStatementRequest(BaseModel):
     account_id: uuid.UUID = Field(..., alias="accountId", description="The id of the account")
-    currency_id: str = Field(..., alias="currencyId", description="The currency of the account")
+    # currency_id: str = Field(..., alias="currencyId", description="The currency of the account")
     amount: float = Field(..., alias='amount', description="The amount of the transaction in the account currency")
     transaction_date: datetime.date = Field(..., alias="transactionDate", description="The date of the transaction")
     category_id: uuid.UUID = Field(..., alias="categoryId", description="The id of the category")

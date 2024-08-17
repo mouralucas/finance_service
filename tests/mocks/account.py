@@ -54,3 +54,24 @@ async def create_open_account(create_test_session, create_account_type, create_b
     account_list.append(account_3)
 
     return account_list
+
+
+@pytest_asyncio.fixture
+async def create_closed_account(create_test_session, create_account_type, create_bank, create_currency) -> list:
+    account_types = create_account_type
+    banks = create_bank
+    currencies = create_currency
+
+    closed_account_list = []
+
+    account = AccountModel(owner_id=uuid.UUID("adf52a1e-7a19-11ed-a1eb-0242ac120002"), bank_id=banks[0].id,
+                           nickname='Account 1', active=False,
+                           description='Checking account description', branch='1212-1',
+                           number='123654', open_date=datetime.date(2010, 8, 9),
+                           close_date=datetime.date(2023, 7, 2),
+                           type_id=account_types[0].id, currency_id=currencies[0].id)
+    account_1 = await BaseDataManager(session=create_test_session).add_one(account)
+
+    closed_account_list.append(account_1)
+
+    return closed_account_list
