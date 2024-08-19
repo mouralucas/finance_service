@@ -1,7 +1,8 @@
-import uuid
 import datetime
+import uuid
 from typing import Any
 
+from fastapi import Query
 from pydantic import BaseModel, Field, model_validator
 
 
@@ -15,10 +16,22 @@ class CreateCreditCardRequest(BaseModel):
     close_day: int = Field(..., alias="closeDay", description='The close day of the card')
 
 
+class GetCreditCardRequest(BaseModel):
+    id: uuid.UUID | None = Field(Query(None, alias="creditCardId", description="The id of the credit card"))
+
+
+class BillEntryInstallment(BaseModel):
+    amount: float = Field(..., alias="amount")
+    due_date: datetime.date = Field(None, alias="dueDate")
+    installment: int = Field(..., alias="installment")
+    tot_installment: int = Field(..., alias="totalInstallment")
+
+
 class CreateBillEntryRequest(BaseModel):
     credit_card_id: uuid.UUID = Field(..., alias="creditCardId", description='The credit card id')
     transaction_date: datetime.date = Field(None, alias="transactionDate", description='The transaction date of the card')
-    amount: float = Field(..., alias="amount", description='The amount of the transaction')
+    amount: float = Field(..., alias="amount", description='The total amount of the transaction')  # create another schema to add here (amount, installment ad tot_installment)
+    installments: list[BillEntryInstallment] = Field(..., alias="installments")
     category_id: uuid.UUID = Field(..., alias="categoryId", description='The id of the category of transaction')
     currency_id: str = Field(..., alias="currencyId", description='The if of the bill currency')
 
@@ -33,9 +46,9 @@ class CreateBillEntryRequest(BaseModel):
     total_tax: float = Field(None, alias='totalTax', description='The tax amount of the transaction')
     tax_detail: dict = Field(None, alias='taxDetail', description='The tax detail of the transaction')
 
-    installment: int = Field(1, description='The current installment')
-    tot_installment: int = Field(1, alias='totInstallment', description='The total installment of the card')
-    parent_id: uuid.UUID = Field(None, alias="parentId", description='The id of the parent transaction when installments. Usually the first installment')
+    # installment: int = Field(1, description='The current installment')
+    # tot_installment: int = Field(1, alias='totInstallment', description='The total installment of the card')
+    # parent_id: uuid.UUID = Field(None, alias="parentId", description='The id of the parent transaction when installments. Usually the first installment')
 
     description: str = Field(None, alias='description', description='The description of the transaction')
 

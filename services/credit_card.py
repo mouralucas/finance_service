@@ -7,8 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from managers.credit_card import CreditCardManager
 from models.credit_card import CreditCardModel
 from schemas.credit_card import CreditCardSchema
-from schemas.request.credit_card import CreateCreditCardRequest
-from schemas.response.credit_card import CreateCreditCardResponse
+from schemas.request.credit_card import CreateCreditCardRequest, GetCreditCardRequest
+from schemas.response.credit_card import CreateCreditCardResponse, GetCreditCardResponse
 
 
 class CreditCardService(BaseService):
@@ -24,6 +24,16 @@ class CreditCardService(BaseService):
 
         response = CreateCreditCardResponse(
             credit_card=CreditCardSchema.model_validate(new_credit_card)
+        )
+
+        return response
+
+    async def get_credit_cards(self, params: GetCreditCardRequest) -> GetCreditCardResponse:
+        credit_cards = await CreditCardManager(session=self.session).get_credit_cards(params.model_dump())
+
+        response = GetCreditCardResponse(
+            quantity=len(credit_cards) if credit_cards else 0,
+            credit_cards=credit_cards
         )
 
         return response

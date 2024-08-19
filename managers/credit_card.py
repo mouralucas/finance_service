@@ -18,7 +18,7 @@ class CreditCardManager(BaseDataManager):
         return new_card
 
     async def get_credit_cards(self, params: dict[str, Any]) -> list[SQLModel]:
-        stmt = select(CreditCardModel)
+        stmt = select(CreditCardModel).order_by(CreditCardModel.nickname)
 
         for key, value in params.items():
             if value:
