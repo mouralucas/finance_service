@@ -12,7 +12,7 @@ from schemas.account import AccountSchema, StatementSchema
 from schemas.request.account import CreateAccountRequest, GetAccountRequest, CreateStatementRequest
 from schemas.response.account import CreateAccountResponse, GetAccountResponse
 from schemas.response.account import CreateStatementResponse
-from services.utils import get_period
+from services.utils.datetime import get_period
 
 
 class AccountService(BaseService):

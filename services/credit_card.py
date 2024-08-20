@@ -13,7 +13,7 @@ from schemas.request.credit_card import CreateCreditCardRequest, GetCreditCardRe
 from schemas.response.credit_card import CreateCreditCardResponse, GetCreditCardResponse, CreateBillEntryResponse
 from dateutil.relativedelta import relativedelta
 
-from services.utils import get_period
+from services.utils.datetime import get_period
 
 
 class CreditCardService(BaseService):
