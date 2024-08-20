@@ -83,8 +83,8 @@ class CreditCardService(BaseService):
         return response
 
     @staticmethod
-    def set_due_date(transaction_date: datetime.date, close_day: int, due_day: int, installment: int, return_str: bool = False) -> datetime.date | str:
-        # Get the month and year of transaction
+    def set_due_date(transaction_date: datetime.date, close_day: int, due_day: int,
+                     installment: int = 1, return_str: bool = False) -> datetime.date | str:
         month = transaction_date.month
         year = transaction_date.year
 
@@ -96,7 +96,6 @@ class CreditCardService(BaseService):
                 year += 1
 
         if close_day > due_day:
-            # Se o fechamento é após o vencimento, o vencimento será no mês subsequente
             month += 1
             if month > 12:
                 month = 1
