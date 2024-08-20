@@ -1,14 +1,19 @@
 import datetime
 
+from fastapi import HTTPException
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import BaseService
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette import status
 
 from managers.credit_card import CreditCardManager
-from models.credit_card import CreditCardModel
+from models.credit_card import CreditCardModel, CreditCardBillModel
 from schemas.credit_card import CreditCardSchema
-from schemas.request.credit_card import CreateCreditCardRequest, GetCreditCardRequest
-from schemas.response.credit_card import CreateCreditCardResponse, GetCreditCardResponse
+from schemas.request.credit_card import CreateCreditCardRequest, GetCreditCardRequest, CreateBillEntryRequest
+from schemas.response.credit_card import CreateCreditCardResponse, GetCreditCardResponse, CreateBillEntryResponse
+from dateutil.relativedelta import relativedelta
+
+from services.utils import get_period
 
 
 class CreditCardService(BaseService):
@@ -38,8 +43,47 @@ class CreditCardService(BaseService):
 
         return response
 
+    async def create_bill_entry(self, bill_entry: CreateBillEntryRequest) -> CreateBillEntryResponse:
+        credit_card = await CreditCardManager(session=self.session).get_credit_card_by_id(bill_entry.credit_card_id)
+        if not credit_card:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Credit card not valid')
+
+        due_day: int = credit_card.due_day
+        close_day: int = credit_card.close_day
+        transaction_date = bill_entry.transaction_date
+        owner_id = self.user['user_id']
+        currency_id = credit_card.currency_id
+
+        entry_list = []
+        for i in bill_entry.installments:
+            new_bill_entry = CreditCardBillModel(**bill_entry.model_dump(exclude={'installment', 'is_international_transaction', 'tax_detail'}))
+
+            new_bill_entry.owner_id = owner_id
+            new_bill_entry.amount = i.amount
+            new_bill_entry.currency_id = currency_id
+            new_bill_entry.current_installment = i.current_installment
+            new_bill_entry.installments = i.installments
+            new_bill_entry.due_date = self.set_due_date(transaction_date, close_day, due_day, i.current_installment)
+            new_bill_entry.period = get_period(new_bill_entry.due_date)
+            new_bill_entry.is_installment = True if len(bill_entry.installments) > 1 else False
+
+            # If it's not an international transaction, currency and amount are the same as the indicated before
+            if not bill_entry.is_international_transaction:
+                new_bill_entry.transaction_currency_id = currency_id
+                new_bill_entry.transaction_amount = i.amount
+
+            entry_list.append(new_bill_entry)
+
+        created_entries = await CreditCardManager(session=self.session).create_bill_entry(entry_list)
+
+        response = CreateBillEntryResponse(
+            bill_entry=created_entries
+        )
+
+        return response
+
     @staticmethod
-    def set_due_date(transaction_date: datetime.date, close_day: int, due_day: int, return_str: bool = True) -> datetime.date | str:
+    def set_due_date(transaction_date: datetime.date, close_day: int, due_day: int, installment: int, return_str: bool = False) -> datetime.date | str:
         # Get the month and year of transaction
         month = transaction_date.month
         year = transaction_date.year
@@ -59,6 +103,8 @@ class CreditCardService(BaseService):
                 year += 1
 
         due_date = datetime.datetime(year, month, due_day)
+        if installment > 1:
+            due_date += relativedelta(months=installment-1)
 
         if return_str:
             return due_date.strftime("%Y-%m-%d")

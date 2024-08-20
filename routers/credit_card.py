@@ -6,7 +6,7 @@ from starlette import status
 
 from backend.database import db_session
 from schemas.request.credit_card import CreateCreditCardRequest, CreateBillEntryRequest, GetCreditCardRequest
-from schemas.response.credit_card import CreateCreditCardResponse
+from schemas.response.credit_card import CreateCreditCardResponse, CreateBillEntryResponse
 from services.credit_card import CreditCardService
 
 router = APIRouter(prefix="/creditcard", tags=['Credit cards'])
@@ -37,5 +37,5 @@ async def get_credit_cards(
              status_code=status.HTTP_201_CREATED)
 async def create_bill_entry(bill_entry: CreateBillEntryRequest,
                             session: AsyncSession = Depends(db_session),
-                            user: RequiredUser = Security(get_user)):
-    return None
+                            user: RequiredUser = Security(get_user)) -> CreateBillEntryResponse:
+    return await CreditCardService(session=session, user=user).create_bill_entry(bill_entry)

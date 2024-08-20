@@ -12,6 +12,7 @@ from schemas.account import AccountSchema, StatementSchema
 from schemas.request.account import CreateAccountRequest, GetAccountRequest, CreateStatementRequest
 from schemas.response.account import CreateAccountResponse, GetAccountResponse
 from schemas.response.account import CreateStatementResponse
+from services.utils import get_period
 
 
 class AccountService(BaseService):
@@ -53,7 +54,7 @@ class AccountService(BaseService):
 
         new_statement.owner_id = self.user['user_id']
         new_statement.currency = account.currency
-        new_statement.period = self.get_period(new_statement.transaction_date)
+        new_statement.period = get_period(new_statement.transaction_date)
 
         if not new_statement.transaction_currency_id:
             new_statement.transaction_currency = new_statement.currency
@@ -66,11 +67,3 @@ class AccountService(BaseService):
         )
 
         return response
-
-    @staticmethod
-    def get_period(date: datetime.date | datetime.datetime) -> int:
-        # if is_date_str:
-        #     date = DateTime.str_to_datetime(date, input_format=input_format)
-        year = date.year
-        month = date.month
-        return year * 100 + month
