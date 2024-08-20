@@ -55,7 +55,7 @@ class CreditCardBillModel(SQLModel):
     parent_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('credit_card_bill.id'), nullable=True)
     parent: Mapped['CreditCardBillModel'] = relationship(foreign_keys=[parent_id], lazy='subquery')
 
-    description: Mapped[str] = mapped_column('description', String(500))
+    description: Mapped[str] = mapped_column('description', String(500), nullable=True)
 
     origin: Mapped[str] = mapped_column('origin', String(10))
     is_validated: Mapped[bool] = mapped_column('is_validated', default=True)

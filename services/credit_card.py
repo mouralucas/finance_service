@@ -45,7 +45,7 @@ class CreditCardService(BaseService):
 
     async def create_bill_entry(self, bill_entry: CreateBillEntryRequest) -> CreateBillEntryResponse:
         credit_card = await CreditCardManager(session=self.session).get_credit_card_by_id(bill_entry.credit_card_id)
-        if not credit_card:
+        if not credit_card or not credit_card.active:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Credit card not valid')
 
         due_day: int = credit_card.due_day

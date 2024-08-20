@@ -42,4 +42,4 @@ class BillEntrySchema(BaseModel):
     installments: int = Field(..., serialization_alias='installments', description='The number of installments of the bill entry')
     total_amount: float = Field(..., serialization_alias='totalAmount', description='The total amount of the bill entry')
 
-    description: str = Field(..., description='The description of the bill entry')
+    description: str | None = Field(None, description='The description of the bill entry')

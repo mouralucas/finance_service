@@ -279,3 +279,34 @@ async def test_create_bill_with_installment(client, create_valid_credit_card, cr
     assert entry_3['installments'] == total_installments
     assert 'totalAmount' in entry_3
     assert entry_3['totalAmount'] == total_amount
+
+
+@pytest.mark.asyncio
+async def test_create_bill_cancelled_card(client, create_cancelled_card, create_category, create_currency):
+    transaction_date = '2024-07-03'
+    total_amount = 112.45
+    installments = [
+        {
+            'amount': total_amount,
+            'currentInstallment': 1,
+            'installments': 1
+        }
+    ]
+    credit_card_id = str(create_cancelled_card[0].id)
+    category_id = str(create_category[0].id)
+    currency_id = str(create_currency[0].id)
+
+    payload = {
+        'creditCardId': credit_card_id,
+        'transactionDate': transaction_date,
+        'totalAmount': total_amount,
+        'installments': installments,
+        'categoryId': category_id,
+        'currencyId': currency_id,
+        'isInternationalTransaction': False,
+        'operationType': 'OUTGOING'
+    }
+
+    response = await client.post('/creditcard/bill', json=payload)
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND
