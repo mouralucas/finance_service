@@ -1,5 +1,8 @@
 import pytest
 from starlette import status
+import datetime
+from services.credit_card import CreditCardService
+from services.utils.datetime import get_period
 
 
 @pytest.mark.asyncio
@@ -43,12 +46,33 @@ async def test_create_credit_card(client, create_open_account, create_currency):
 
 
 @pytest.mark.asyncio
-async def test_get_credit_card(client, create_valid_credit_card):
+async def test_get_valid_credit_card(client, create_valid_credit_card):
     credit_cards = create_valid_credit_card
-
     response = await client.get('/creditcard')
 
     assert response.status_code == status.HTTP_200_OK
+
+    data = response.json()
+
+    assert 'creditCards' in data
+    credit_card_1 = data['creditCards'][0]
+
+    assert 'creditCardId' in credit_card_1
+    assert credit_card_1['creditCardId'] == str(credit_cards[0].id)
+    assert 'nickname' in credit_card_1
+    assert credit_card_1['nickname'] == credit_cards[0].nickname
+    assert 'accountId' in credit_card_1
+    assert credit_card_1['accountId'] == str(credit_cards[0].account_id)
+    assert 'currencyId' in credit_card_1
+    assert credit_card_1['currencyId'] == str(credit_cards[0].currency_id)
+    assert 'issueDate' in credit_card_1
+    assert credit_card_1['issueDate'] == credit_cards[0].issue_date.strftime('%Y-%m-%d')
+    assert 'cancellationDate' in credit_card_1
+    assert credit_card_1['cancellationDate'] is None
+    assert 'dueDay' in credit_card_1
+    assert credit_card_1['dueDay'] == credit_cards[0].due_day
+    assert 'closeDay' in credit_card_1
+    assert credit_card_1['closeDay'] == credit_cards[0].close_day
 
 
 @pytest.mark.asyncio
@@ -60,13 +84,15 @@ async def test_create_bill_no_installment(client, create_valid_credit_card, crea
     # Since it's a transaction with no installments, the total amount should be
     # exact the same as the amount
     credit_card_id = str(credit_cards[0].id)
-    due_date = '2024-09-20'
+    due_day = credit_cards[0].due_day
+    close_day = credit_cards[0].close_day
     transaction_date = '2024-08-25'
+    due_date = CreditCardService.set_due_date(datetime.datetime.strptime(transaction_date, "%Y-%m-%d").date(), close_day, due_day, installment=1)
+    period = get_period(due_date)
     total_amount = 112.45
     installments = [
         {
             'amount': total_amount,
-            'dueDate': due_date,
             'currentInstallment': 1,
             'installments': 1
         }
@@ -106,9 +132,9 @@ async def test_create_bill_no_installment(client, create_valid_credit_card, crea
     assert 'creditCardId' in entry_1
     assert entry_1['creditCardId'] == credit_card_id
     assert 'period' in entry_1
-    # assert correct period
+    assert entry_1['period'] == period
     assert 'dueDate' in entry_1
-    # assert correct due_date
+    assert entry_1['dueDate'] == due_date.strftime('%Y-%m-%d')
     assert 'transactionDate' in entry_1
     assert entry_1['transactionDate'] == transaction_date
     assert 'amount' in entry_1
@@ -143,25 +169,33 @@ async def test_create_bill_with_installment(client, create_valid_credit_card, cr
     # "amount" its basically total amount / installments (it could vary a few cents due to different forms to calculate installments)
     total_installments = 3
     credit_card_id = str(credit_cards[0].id)
-    due_date = '2024-09-20'
+    due_day = credit_cards[0].due_day
+    close_day = credit_cards[0].close_day
+
     transaction_date = '2024-08-05'
+
+    # Get expected due date and periods
+    due_date_1 = CreditCardService.set_due_date(datetime.datetime.strptime(transaction_date, "%Y-%m-%d").date(), close_day, due_day, installment=1)
+    period_1 = get_period(due_date_1)
+    due_date_2 = CreditCardService.set_due_date(datetime.datetime.strptime(transaction_date, "%Y-%m-%d").date(), close_day, due_day, installment=2)
+    period_2 = get_period(due_date_2)
+    due_date_3 = CreditCardService.set_due_date(datetime.datetime.strptime(transaction_date, "%Y-%m-%d").date(), close_day, due_day, installment=3)
+    period_3 = get_period(due_date_3)
+
     total_amount = 1229.99
     installments = [
         {
             'amount': total_amount / 3,
-            'dueDate': due_date,
             'currentInstallment': 1,
             'installments': total_installments
         },
         {
             'amount': total_amount / 3,
-            'dueDate': due_date,
             'currentInstallment': 2,
             'installments': total_installments
         },
         {
             'amount': total_amount / 3,
-            'dueDate': due_date,
             'currentInstallment': 3,
             'installments': total_installments
         }
@@ -201,7 +235,10 @@ async def test_create_bill_with_installment(client, create_valid_credit_card, cr
     assert 'amount' in entry_1
     assert entry_1['amount'] == total_amount/total_installments
 
-    # TODO add test for the due date and period!!
+    assert 'period' in entry_1
+    assert entry_1['period'] == period_1
+    assert 'dueDate' in entry_1
+    assert entry_1['dueDate'] == due_date_1.strftime('%Y-%m-%d')
     assert 'isInstallment' in entry_1
     assert entry_1['isInstallment']
     assert 'currentInstallment' in entry_1
@@ -214,6 +251,10 @@ async def test_create_bill_with_installment(client, create_valid_credit_card, cr
     assert 'amount' in entry_2
     assert entry_2['amount'] == total_amount / total_installments
 
+    assert 'period' in entry_1
+    assert entry_2['period'] == period_2
+    assert 'dueDate' in entry_1
+    assert entry_2['dueDate'] == due_date_2.strftime('%Y-%m-%d')
     assert 'isInstallment' in entry_2
     assert entry_2['isInstallment']
     assert 'currentInstallment' in entry_2
@@ -226,6 +267,10 @@ async def test_create_bill_with_installment(client, create_valid_credit_card, cr
     assert 'amount' in entry_3
     assert entry_3['amount'] == total_amount / total_installments
 
+    assert 'period' in entry_1
+    assert entry_3['period'] == period_3
+    assert 'dueDate' in entry_1
+    assert entry_3['dueDate'] == due_date_3.strftime('%Y-%m-%d')
     assert 'isInstallment' in entry_3
     assert entry_3['isInstallment']
     assert 'currentInstallment' in entry_3

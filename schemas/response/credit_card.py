@@ -10,7 +10,7 @@ class CreateCreditCardResponse(SuccessResponseBase):
 
 class GetCreditCardResponse(SuccessResponseBase):
     quantity: int = Field(..., serialization_alias='quantity', description='The number of credit cards fetched')
-    credit_cards: list[CreditCardSchema] = Field(..., serialization_alias='creditCard', description='The list of the credit cards of the user')
+    credit_cards: list[CreditCardSchema] = Field(..., serialization_alias='creditCards', description='The list of the credit cards of the user')
 
 
 class CreateBillEntryResponse(SuccessResponseBase):

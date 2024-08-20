@@ -9,6 +9,7 @@ from schemas.core import CurrencySchema
 class CreditCardSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
+    id: uuid.UUID = Field(..., serialization_alias='creditCardId', description='The id of the credit card')
     owner_id: uuid.UUID = Field(..., serialization_alias='ownerId', description='The id of the card owner')
     nickname: str = Field(..., serialization_alias='nickname', description='The nickname of the card', json_schema_extra={'example': 'My credit card for bank X'})
     account_id: uuid.UUID | None = Field(None, serialization_alias='accountId', description='The id of the account, if any')

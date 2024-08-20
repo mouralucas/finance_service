@@ -22,7 +22,6 @@ class GetCreditCardRequest(BaseModel):
 
 class BillEntryInstallment(BaseModel):
     amount: float = Field(..., alias="amount")
-    due_date: datetime.date = Field(None, alias="dueDate")
     current_installment: int = Field(..., alias="currentInstallment")
     installments: int = Field(..., alias="installments")
 
