@@ -8,8 +8,9 @@ from pydantic import BaseModel, Field, ConfigDict
 class AccountSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: uuid.UUID = Field(..., serialization_alias="accountId", description="Unique account ID")
-    bank_id: uuid.UUID = Field(..., serialization_alias='bankId', description="Bank account ID")
+    id: uuid.UUID = Field(..., serialization_alias="accountId", description="Unique account id")
+    active: bool = Field(..., description="Whether the account is active (open) or closed")
+    bank_id: uuid.UUID = Field(..., serialization_alias='bankId', description="Bank account id")
     nickname: str = Field(..., description="Nickname of the account")
     description: str | None = Field(None, description="Description of the account")
     branch: str | None = Field(None, description="Branch of bank")

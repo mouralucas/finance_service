@@ -17,6 +17,11 @@ class CreateAccountRequest(BaseModel):
     currency_id: str = Field(..., alias="currencyId", description="The currency of the account")
 
 
+class CloseAccountRequest(BaseModel):
+    id: uuid.UUID = Field(..., alias="accountId", description="The id of the account")
+    close_date: datetime.date = Field(None, alias="closeDate", description="The close date of the account")
+
+
 class GetAccountRequest(BaseModel):
     id: uuid.UUID | None = Field(Query(None, alias="accountId", description="The id of the account"))
     currency_id: str | None = Field(Query(None, alias="currencyId", description="The currency of the account"))

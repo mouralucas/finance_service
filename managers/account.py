@@ -1,7 +1,7 @@
 import uuid
 
 from fastapi import HTTPException
-from sqlalchemy import select
+from sqlalchemy import select, update
 from typing import Any
 
 from rolf_common.managers import BaseDataManager
@@ -31,6 +31,17 @@ class AccountManager(BaseDataManager):
         accounts: list[SQLModel] = await self.get_all(stmt, unique_result=True)
 
         return accounts
+
+    async def update_account(self, account: SQLModel, fields: dict[str, Any]) -> SQLModel:
+        stmt = (
+            update(AccountModel)
+            .where(AccountModel.id == account.id)
+            .values(**fields)
+        )
+
+        updated_account = await self.update_one(sql_statement=stmt, sql_model=account)
+
+        return updated_account
 
     async def get_account_by_id(self, account_id: uuid.UUID, raise_exception: bool = False) -> SQLModel:
         stmt = select(AccountModel).where(AccountModel.id == account_id)
