@@ -49,6 +49,21 @@ async def test_create_account(client, create_bank, create_account_type, create_c
     assert 'currencyId' in data['account']
     assert data['account']['currencyId'] == str(currency_id)
 
+@pytest.mark.asyncio
+async def test_cancel_account(client, create_bank, create_account_type, create_currency):
+    """
+        This test should validate the cancellation date if the account and if the attr 'active' is false
+        While an account may have a credit card associated with it, the card also need to be cancelled and tested, the fields
+        to validate are the same as the account
+
+        TODO: maybe add a relation to credit card and in service add in the response the card object into account object, if any
+    :param client:
+    :param create_bank:
+    :param create_account_type:
+    :param create_currency:
+    :return:
+    """
+    pass
 
 @pytest.mark.asyncio
 async def test_get_account(client, create_open_account):

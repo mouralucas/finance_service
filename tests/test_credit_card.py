@@ -76,6 +76,31 @@ async def test_get_valid_credit_card(client, create_valid_credit_card):
 
 
 @pytest.mark.asyncio
+async def test_cancel_credit_card(client, create_valid_credit_card):
+    credit_cards = create_valid_credit_card
+
+    credit_card_id = str(credit_cards[0].id)
+    cancellation_date = '2024-08-20'
+
+    payload = {
+        'creditCardId': credit_card_id,
+        'cancellationDate': cancellation_date
+    }
+    response = await client.patch('/creditcard/cancel', json=payload)
+
+    assert response.status_code == status.HTTP_200_OK
+
+    data = response.json()
+
+    assert 'creditCard' in data
+    assert 'cancellationDate' in data['creditCard']
+    assert data['creditCard']['cancellationDate'] == cancellation_date
+    assert 'active' in data['creditCard']
+    assert data['creditCard']['active'] is False
+
+
+####### Credit Card Bill Tests #######
+@pytest.mark.asyncio
 async def test_create_bill_no_installment(client, create_valid_credit_card, create_category, create_currency):
     credit_cards = create_valid_credit_card
     currencies = create_currency

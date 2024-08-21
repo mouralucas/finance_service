@@ -16,6 +16,11 @@ class CreateCreditCardRequest(BaseModel):
     close_day: int = Field(..., alias="closeDay", description='The close day of the card')
 
 
+class CancelCreditCardRequest(BaseModel):
+    id: uuid.UUID = Field(None, alias="creditCardId", description='The unique identifier of the card')
+    cancellation_date: datetime.date = Field(None, alias="cancellationDate", description='The cancel date of the card')
+
+
 class GetCreditCardRequest(BaseModel):
     id: uuid.UUID | None = Field(Query(None, alias="creditCardId", description="The id of the credit card"))
 

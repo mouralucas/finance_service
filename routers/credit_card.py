@@ -1,3 +1,5 @@
+from cgitb import reset
+
 from fastapi import APIRouter, Depends, Security
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import get_user
@@ -5,7 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from backend.database import db_session
-from schemas.request.credit_card import CreateCreditCardRequest, CreateBillEntryRequest, GetCreditCardRequest
+from models.credit_card import CreditCardModel
+from schemas.request.credit_card import CreateCreditCardRequest, CreateBillEntryRequest, GetCreditCardRequest, CancelCreditCardRequest
 from schemas.response.credit_card import CreateCreditCardResponse, CreateBillEntryResponse
 from services.credit_card import CreditCardService
 
@@ -21,6 +24,13 @@ async def create_credit_card(
         user: RequiredUser = Security(get_user)
 ) -> CreateCreditCardResponse:
     return await CreditCardService(session=session, user=user).create_credit_card(credit_card)
+
+
+@router.patch('/cancel', summary='Cancel a credit card', description='Cancel a credit card')
+async def cancel_credit_card(credit_card: CancelCreditCardRequest,
+                             session: AsyncSession = Depends(db_session),
+                             user: RequiredUser = Security(get_user)):
+    return await CreditCardService(session=session, user=user).cancel(credit_card)
 
 
 @router.get('', summary='Get credit cards', description='Get all credit cards for a user filter by params')

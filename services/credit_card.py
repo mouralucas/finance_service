@@ -9,8 +9,8 @@ from starlette import status
 from managers.credit_card import CreditCardManager
 from models.credit_card import CreditCardModel, CreditCardBillModel
 from schemas.credit_card import CreditCardSchema
-from schemas.request.credit_card import CreateCreditCardRequest, GetCreditCardRequest, CreateBillEntryRequest
-from schemas.response.credit_card import CreateCreditCardResponse, GetCreditCardResponse, CreateBillEntryResponse
+from schemas.request.credit_card import CreateCreditCardRequest, GetCreditCardRequest, CreateBillEntryRequest, CancelCreditCardRequest
+from schemas.response.credit_card import CreateCreditCardResponse, GetCreditCardResponse, CreateBillEntryResponse, CancelCreditCardResponse
 from dateutil.relativedelta import relativedelta
 
 from services.utils.datetime import get_period
@@ -21,8 +21,8 @@ class CreditCardService(BaseService):
         super().__init__(session)
         self.user = user.model_dump()
 
-    async def create_credit_card(self, card: CreateCreditCardRequest) -> CreateCreditCardResponse:
-        new_credit_card = CreditCardModel(**card.model_dump())
+    async def create_credit_card(self, credit_card: CreateCreditCardRequest) -> CreateCreditCardResponse:
+        new_credit_card = CreditCardModel(**credit_card.model_dump())
         new_credit_card.owner_id = self.user['user_id']
 
         new_credit_card = await CreditCardManager(session=self.session).create_credit_card(new_credit_card)
@@ -32,6 +32,26 @@ class CreditCardService(BaseService):
         )
 
         return response
+
+    async def cancel(self, credit_card: CancelCreditCardRequest) -> CancelCreditCardResponse:
+        current_credit_card = await CreditCardManager(session=self.session).get_credit_card_by_id(card_id=credit_card.id)
+        if not current_credit_card or not current_credit_card.active:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Credit card not found or not valid')
+
+        clean_fields = {}
+        for key, value in credit_card.model_dump().items():
+            if value:
+                clean_fields[key] = value
+        clean_fields['active'] = False
+
+        updated_credit_card = await CreditCardManager(session=self.session).update_credit_card(current_credit_card, clean_fields)
+
+        response = CancelCreditCardResponse(
+            credit_card=CreditCardSchema.model_validate(updated_credit_card)
+        )
+
+        return response
+
 
     async def get_credit_cards(self, params: GetCreditCardRequest) -> GetCreditCardResponse:
         credit_cards = await CreditCardManager(session=self.session).get_credit_cards(params.model_dump())
