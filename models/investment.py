@@ -44,3 +44,5 @@ class InvestmentModel(SQLModel):
     is_liquidated: Mapped[bool] = mapped_column('is_liquidated', default=False)
     liquidation_date: Mapped[datetime.date] = mapped_column('liquidation_date', nullable=True)
     liquidation_amount: Mapped[float] = mapped_column('liquidation_amount', default=0.0)
+
+    country_id: Mapped[str] = mapped_column('country_id')  # Will tell what kind of tax will be charged

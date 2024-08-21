@@ -103,7 +103,9 @@ async def create_investment(create_test_session, create_open_account, create_inv
                                  currency_id=currencies[0].id,
                                  index_type_id=index_types[0].id,
                                  index_id=indexes[0].id,
-                                 liquidity_id=liquidity[0].id)
+                                 liquidity_id=liquidity[0].id,
+                                 country_id='BR')
+
     investment_1 = await BaseDataManager(session=create_test_session).add_one(investment)
 
     investment_list.append(investment_1)

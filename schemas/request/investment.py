@@ -23,6 +23,7 @@ class CreateInvestmentRequest(BaseModel):
     liquidity_id: uuid.UUID = Field(..., alias='liquidityId', description='The id of investment liquidity')
     liquidation_date: datetime.date = Field(None, alias='liquidationDate', description='The date that the investment was liquidated')
     liquidation_amount: float = Field(None, alias='liquidationAmount', description='The amount liquidated, after tax')
+    country_id: str = Field(..., alias='countryId', description='The id of the country')
 
 
 class GetInvestmentRequest(BaseModel):

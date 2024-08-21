@@ -25,6 +25,7 @@ async def test_create_investment(client, create_open_account, create_investment_
     index_id = indexes[0].id
     liquidity_id = liquidity[0].id
     currency_id = currencies[0].id
+    country_id = 'BR'
 
     payload = {
         'custodianId': str(custodian_id),
@@ -39,7 +40,8 @@ async def test_create_investment(client, create_open_account, create_investment_
         'currencyId': str(currency_id),
         'indexTypeId': str(index_type_id),
         'indexId': str(index_id),
-        'liquidityId': str(liquidity_id)
+        'liquidityId': str(liquidity_id),
+        'countryId': country_id,
     }
     response = await client.post('/investment', json=payload)
 

@@ -26,3 +26,5 @@ class InvestmentSchema(BaseModel):
     is_liquidated: bool = Field(None, serialization_alias='isLiquidated', description='Whether the investment is liquidated')
     liquidation_date: datetime.date | None = Field(None, serialization_alias='liquidationDate', description='The date that the investment was liquidated')
     liquidation_amount: float | None = Field(None, serialization_alias='liquidationAmount', description='The amount liquidated, after tax')
+
+    country_id: str = Field(..., serialization_alias='countryId', description='The id of the country')

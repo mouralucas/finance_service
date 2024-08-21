@@ -25,6 +25,14 @@ class CategoryModel(SQLModel):
     # more necessary fields
 
 
+class CountryModel(SQLModel):
+    __tablename__ = 'country'
+
+    id: Mapped[str] = mapped_column('id', String(5), primary_key=True)
+    name: Mapped[str] = mapped_column('name', String(250))
+    continent: Mapped[str] = mapped_column('continent', String(5))
+
+
 class BankModel(SQLModel):
     __tablename__ = 'bank'
 
