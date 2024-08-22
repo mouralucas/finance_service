@@ -4,6 +4,8 @@ import uuid
 from fastapi.openapi.models import Schema
 from pydantic import BaseModel, Field, ConfigDict
 
+from schemas.credit_card import CreditCardSchema
+
 
 class AccountSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -19,6 +21,7 @@ class AccountSchema(BaseModel):
     close_date: datetime.date | None = Field(None, serialization_alias="closeDate", description="Account close date")
     type_id: uuid.UUID = Field(..., serialization_alias="typeId", description="Account type")
     currency_id: str = Field(..., serialization_alias='currencyId', description="Account currency")
+    credit_cards: list[CreditCardSchema] | None = Field(None, serialization_alias='creditCards', description="List of credit cards of the account")
 
 
 class StatementSchema(BaseModel):

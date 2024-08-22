@@ -49,19 +49,18 @@ async def test_create_account(client, create_bank, create_account_type, create_c
     assert 'currencyId' in data['account']
     assert data['account']['currencyId'] == str(currency_id)
 
+
 @pytest.mark.asyncio
-async def test_close_account(client, create_open_account):
+async def test_close_account_with_credit_card(client, create_valid_credit_card):
     """
         This test should validate the cancellation date if the account and if the attr 'active' is false
         While an account may have a credit card associated with it, the card also need to be cancelled and tested, the fields
         to validate are the same as the account
-
-        TODO: maybe add a relation to credit card and in service add in the response the card object into account object, if any
     :param client:
-    :param create_open_account
+    :param create_valid_credit_card
     :return:
     """
-    account = create_open_account[0]
+    account = create_valid_credit_card[0].account
     account_id = str(account.id)
     close_date = '2024-12-21'
 
@@ -74,6 +73,8 @@ async def test_close_account(client, create_open_account):
     assert response.status_code == status.HTTP_200_OK
 
     data = response.json()
+
+    # Test the account itself
     assert 'account' in data
     assert 'accountId' in data['account']
     assert data['account']['accountId'] == account_id
@@ -81,6 +82,18 @@ async def test_close_account(client, create_open_account):
     assert data['account']['closeDate'] == close_date
     assert 'active' in data['account']
     assert not data['account']['active']
+
+    # Test the credit card
+    assert 'creditCards' in data['account']
+    credit_cards = data['account']['creditCards']
+    for i in credit_cards:
+        assert 'creditCardId' in i
+        assert 'accountId' in i
+        assert i['accountId'] == account_id
+        assert 'cancellationDate' in i
+        assert i['cancellationDate'] == close_date
+        assert 'active' in i
+        assert not i['active']
 
 
 @pytest.mark.asyncio

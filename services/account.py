@@ -3,10 +3,12 @@ import datetime
 from fastapi import HTTPException
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import BaseService
+from sqlalchemy import event
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from managers.account import AccountManager
+from managers.credit_card import CreditCardManager
 from models.account import AccountModel, AccountStatementModel
 from schemas.account import AccountSchema, StatementSchema
 from schemas.request.account import CreateAccountRequest, GetAccountRequest, CreateStatementRequest, CloseAccountRequest
@@ -21,7 +23,7 @@ class AccountService(BaseService):
         self.user = user.model_dump()
         self.account_manager = AccountManager(session=self.session)
 
-    async def create_account(self, account: CreateAccountRequest) -> CreateAccountResponse:
+    async def create(self, account: CreateAccountRequest) -> CreateAccountResponse:
         new_account = AccountModel(**account.model_dump())
         new_account.owner_id = self.user['user_id']
 
@@ -43,11 +45,23 @@ class AccountService(BaseService):
 
         closed_account = await self.account_manager.update_account(current_account, fields)
 
+        for i in current_account.credit_cards:
+            credit_card_fields = {
+                'id': i.id,
+                'cancellation_date': account.close_date,
+                'active': False
+            }
+            await CreditCardManager(session=self.session).update_credit_card(i, credit_card_fields)
+
+        # Refresh account object with the cancelled credit cards
+        await self.session.refresh(closed_account)
+
         response = CloseAccountResponse(
             account=AccountSchema.model_validate(closed_account),
         )
 
         return response
+
 
     async def get_accounts(self, params: GetAccountRequest) -> GetAccountResponse:
         params = params.model_dump()
@@ -61,6 +75,7 @@ class AccountService(BaseService):
         )
 
         return response
+
 
     async def create_statement(self, statement_entry: CreateStatementRequest) -> CreateStatementResponse:
         account = await self.account_manager.get_account_by_id(statement_entry.account_id)

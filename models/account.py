@@ -12,7 +12,7 @@ class AccountTypeModel(SQLModel):
     __tablename__ = "account_type"
 
     type: Mapped[str] = mapped_column('type', String(50))
-    description: Mapped[str] = mapped_column('description', String(500))
+    description: Mapped[str] = mapped_column('description', String(500), nullable=True)
 
 
 class AccountModel(SQLModel):
@@ -31,6 +31,9 @@ class AccountModel(SQLModel):
     type: Mapped['AccountTypeModel'] = relationship(foreign_keys=[type_id], lazy='subquery')
     currency_id: Mapped[str] = mapped_column(ForeignKey('currency.id'))
     currency: Mapped['CurrencyModel'] = relationship(foreign_keys=[currency_id], lazy='subquery')  # The currency showed on the bill
+
+    # Relations
+    credit_cards: Mapped[list['CreditCardModel']] = relationship(back_populates='account', lazy='subquery')
 
 
 class AccountStatementModel(SQLModel):

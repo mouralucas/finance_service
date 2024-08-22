@@ -12,7 +12,7 @@ class CreditCardModel(SQLModel):
     owner_id: Mapped[uuid.UUID] = mapped_column('owner_id')
     nickname: Mapped[str] = mapped_column('nickname', String(50))
     account_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('account.id'), nullable=True)
-    account: Mapped["AccountModel"] = relationship(foreign_keys=[account_id], lazy='subquery')
+    account: Mapped["AccountModel"] = relationship(back_populates='credit_cards', lazy='subquery')
     issue_date: Mapped[datetime.date] = mapped_column('issue_date', nullable=True)
     cancellation_date: Mapped[datetime.date] = mapped_column('cancellation_date', nullable=True)
     due_day: Mapped[int] = mapped_column('due_day', SmallInteger, nullable=True)
