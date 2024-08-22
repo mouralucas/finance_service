@@ -112,8 +112,6 @@ async def test_create_bill_no_installment(client, create_valid_credit_card, crea
     due_day = credit_cards[0].due_day
     close_day = credit_cards[0].close_day
     transaction_date = '2024-08-25'
-    due_date = CreditCardService.set_due_date(datetime.datetime.strptime(transaction_date, "%Y-%m-%d").date(), close_day, due_day, installment=1)
-    period = get_period(due_date)
     total_amount = 112.45
     installments = [
         {
@@ -150,38 +148,41 @@ async def test_create_bill_no_installment(client, create_valid_credit_card, crea
     assert type(data['billEntry']) is list
     assert len(data['billEntry']) == 1  # must be one when n installments
 
-    entry_1 = data['billEntry'][0]
+    entries = data['billEntry']
+    for entry in entries:
+        due_date = CreditCardService.set_due_date(datetime.datetime.strptime(transaction_date, "%Y-%m-%d").date(), close_day, due_day, installment=entry['currentInstallment'])
+        period = get_period(due_date)
 
-    assert 'billEntryId' in entry_1
+        assert 'billEntryId' in entry
 
-    assert 'creditCardId' in entry_1
-    assert entry_1['creditCardId'] == credit_card_id
-    assert 'period' in entry_1
-    assert entry_1['period'] == period
-    assert 'dueDate' in entry_1
-    assert entry_1['dueDate'] == due_date.strftime('%Y-%m-%d')
-    assert 'transactionDate' in entry_1
-    assert entry_1['transactionDate'] == transaction_date
-    assert 'amount' in entry_1
-    assert entry_1['amount'] == total_amount
-    assert 'categoryId' in entry_1
-    assert entry_1['categoryId'] == category_id
-    assert 'currencyId' in entry_1
-    assert entry_1['currencyId'] == currency_id
-    assert 'transactionCurrencyId' in entry_1
-    assert entry_1['transactionCurrencyId'] == currency_id
-    assert 'transactionAmount' in entry_1
-    assert entry_1['transactionAmount'] == total_amount
+        assert 'creditCardId' in entry
+        assert entry['creditCardId'] == credit_card_id
+        assert 'period' in entry
+        assert entry['period'] == period
+        assert 'dueDate' in entry
+        assert entry['dueDate'] == due_date.strftime('%Y-%m-%d')
+        assert 'transactionDate' in entry
+        assert entry['transactionDate'] == transaction_date
+        assert 'amount' in entry
+        assert entry['amount'] == total_amount
+        assert 'categoryId' in entry
+        assert entry['categoryId'] == category_id
+        assert 'currencyId' in entry
+        assert entry['currencyId'] == currency_id
+        assert 'transactionCurrencyId' in entry
+        assert entry['transactionCurrencyId'] == currency_id
+        assert 'transactionAmount' in entry
+        assert entry['transactionAmount'] == total_amount
 
-    # Installment fields
-    assert 'isInstallment' in entry_1
-    assert not entry_1['isInstallment']
-    assert 'currentInstallment' in entry_1
-    assert entry_1['currentInstallment'] == 1
-    assert 'installments' in entry_1
-    assert entry_1['installments'] == 1
-    assert 'totalAmount' in entry_1
-    assert entry_1['totalAmount'] == total_amount
+        # Installment fields
+        assert 'isInstallment' in entry
+        assert not entry['isInstallment']
+        assert 'currentInstallment' in entry
+        assert entry['currentInstallment'] == 1
+        assert 'installments' in entry
+        assert entry['installments'] == 1
+        assert 'totalAmount' in entry
+        assert entry['totalAmount'] == total_amount
 
 
 @pytest.mark.asyncio
@@ -196,16 +197,7 @@ async def test_create_bill_with_installment(client, create_valid_credit_card, cr
     credit_card_id = str(credit_cards[0].id)
     due_day = credit_cards[0].due_day
     close_day = credit_cards[0].close_day
-
     transaction_date = '2024-08-05'
-
-    # Get expected due date and periods
-    due_date_1 = CreditCardService.set_due_date(datetime.datetime.strptime(transaction_date, "%Y-%m-%d").date(), close_day, due_day, installment=1)
-    period_1 = get_period(due_date_1)
-    due_date_2 = CreditCardService.set_due_date(datetime.datetime.strptime(transaction_date, "%Y-%m-%d").date(), close_day, due_day, installment=2)
-    period_2 = get_period(due_date_2)
-    due_date_3 = CreditCardService.set_due_date(datetime.datetime.strptime(transaction_date, "%Y-%m-%d").date(), close_day, due_day, installment=3)
-    period_3 = get_period(due_date_3)
 
     total_amount = 1229.99
     installments = [
@@ -252,58 +244,27 @@ async def test_create_bill_with_installment(client, create_valid_credit_card, cr
     assert type(data['billEntry']) is list
     assert len(data['billEntry']) == total_installments
 
-    entry_1 = data['billEntry'][0]
-    entry_2 = data['billEntry'][1]
-    entry_3 = data['billEntry'][2]
+    entries = data['billEntry']
 
-    # Test each entry
-    assert 'amount' in entry_1
-    assert entry_1['amount'] == total_amount/total_installments
+    for idx, entry in enumerate(entries):
+        due_date = CreditCardService.set_due_date(datetime.datetime.strptime(transaction_date, "%Y-%m-%d").date(), close_day, due_day, installment=entry['currentInstallment'])
+        period = get_period(due_date)
 
-    assert 'period' in entry_1
-    assert entry_1['period'] == period_1
-    assert 'dueDate' in entry_1
-    assert entry_1['dueDate'] == due_date_1.strftime('%Y-%m-%d')
-    assert 'isInstallment' in entry_1
-    assert entry_1['isInstallment']
-    assert 'currentInstallment' in entry_1
-    assert entry_1['currentInstallment'] == 1
-    assert 'installments' in entry_1
-    assert entry_1['installments'] == total_installments
-    assert 'totalAmount' in entry_1
-    assert entry_1['totalAmount'] == total_amount
+        assert 'amount' in entry
+        assert entry['amount'] == total_amount/total_installments
 
-    assert 'amount' in entry_2
-    assert entry_2['amount'] == total_amount / total_installments
-
-    assert 'period' in entry_1
-    assert entry_2['period'] == period_2
-    assert 'dueDate' in entry_1
-    assert entry_2['dueDate'] == due_date_2.strftime('%Y-%m-%d')
-    assert 'isInstallment' in entry_2
-    assert entry_2['isInstallment']
-    assert 'currentInstallment' in entry_2
-    assert entry_2['currentInstallment'] == 2
-    assert 'installments' in entry_2
-    assert entry_2['installments'] == total_installments
-    assert 'totalAmount' in entry_2
-    assert entry_2['totalAmount'] == total_amount
-
-    assert 'amount' in entry_3
-    assert entry_3['amount'] == total_amount / total_installments
-
-    assert 'period' in entry_1
-    assert entry_3['period'] == period_3
-    assert 'dueDate' in entry_1
-    assert entry_3['dueDate'] == due_date_3.strftime('%Y-%m-%d')
-    assert 'isInstallment' in entry_3
-    assert entry_3['isInstallment']
-    assert 'currentInstallment' in entry_3
-    assert entry_3['currentInstallment'] == 3
-    assert 'installments' in entry_3
-    assert entry_3['installments'] == total_installments
-    assert 'totalAmount' in entry_3
-    assert entry_3['totalAmount'] == total_amount
+        assert 'period' in entry
+        assert entry['period'] == period
+        assert 'dueDate' in entry
+        assert entry['dueDate'] == due_date.strftime('%Y-%m-%d')
+        assert 'isInstallment' in entry
+        assert entry['isInstallment']
+        assert 'currentInstallment' in entry
+        assert entry['currentInstallment'] == idx+1
+        assert 'installments' in entry
+        assert entry['installments'] == total_installments
+        assert 'totalAmount' in entry
+        assert entry['totalAmount'] == total_amount
 
 
 @pytest.mark.asyncio
