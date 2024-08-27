@@ -89,6 +89,63 @@ async def test_create_investment(client, create_open_account, create_investment_
     assert 'currencyId' in data['investment']
     assert data['investment']['currencyId'] == str(currency_id)
 
+    assert 'isLiquidated' in data['investment']
+    assert data['investment']['isLiquidated'] is False
+
+@pytest.mark.asyncio
+async def test_create_liquidated_investment(client, create_open_account, create_investment_type, create_index_type,
+                                 create_index, create_liquidity, create_currency):
+    accounts = create_open_account
+
+    custodian_id = accounts[0].bank_id
+    name = 'Investment already liquidated'
+    type_id = create_investment_type[0].id
+    transaction_date = '2022-07-04'
+    maturity_date = '2024-08-01'
+    quantity = 1
+    price = 112.47
+    amount = quantity * price
+    index_type_id = create_index_type[0].id
+    index_id = create_index[0].id
+    liquidity_id = create_liquidity[0].id
+    currency_id = create_currency[0].id
+    country_id = 'BR'
+    liquidation_date = '2024-08-01'
+    liquidation_amount = price + (price * 0.2) #(about 20%)
+
+    payload = {
+        'custodianId': str(custodian_id),
+        'accountId': str(accounts[0].id),
+        'name': name,
+        'typeId': str(type_id),
+        'transactionDate': transaction_date,
+        'maturityDate': maturity_date,
+        'quantity': quantity,
+        'price': price,
+        'amount': amount,
+        'currencyId': str(currency_id),
+        'indexTypeId': str(index_type_id),
+        'indexId': str(index_id),
+        'liquidityId': str(liquidity_id),
+        'countryId': country_id,
+        'liquidationDate': liquidation_date,
+        'liquidationAmount': liquidation_amount
+    }
+    response = await client.post('/investment', json=payload)
+
+    assert response.status_code == status.HTTP_201_CREATED
+    data = response.json()
+
+    assert 'investment' in data
+
+    assert 'liquidationDate' in data['investment']
+    assert data['investment']['liquidationDate'] == liquidation_date
+    assert 'liquidationAmount' in data['investment']
+    assert data['investment']['liquidationAmount'] == liquidation_amount
+    assert 'isLiquidated' in data['investment']
+    assert data['investment']['isLiquidated'] is True
+
+
 
 @pytest.mark.asyncio
 async def test_liquidate_investment(client, create_investment):

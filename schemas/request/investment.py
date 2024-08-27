@@ -1,11 +1,7 @@
 import datetime
 import uuid
-from dataclasses import Field
 
-from pydantic import BaseModel, Field
-from sqlalchemy import alias
-
-from schemas.core import TaxSchema
+from pydantic import BaseModel, Field, model_validator
 
 
 class CreateInvestmentRequest(BaseModel):
@@ -27,6 +23,14 @@ class CreateInvestmentRequest(BaseModel):
     liquidation_date: datetime.date = Field(None, alias='liquidationDate', description='The date that the investment was liquidated')
     liquidation_amount: float = Field(None, alias='liquidationAmount', description='The amount liquidated, after tax')
     country_id: str = Field(..., alias='countryId', description='The id of the country')
+
+    @model_validator(mode='before')
+    def check_liquidation(cls, data: dict) -> dict:
+        if (data.get('liquidationAmount') and not data.get('liquidationDate') or
+            not data.get('liquidationAmount') and data.get('liquidationDate')):
+            raise ValueError('both liquidation date and amount must be specified')
+
+        return data
 
 
 class GetInvestmentRequest(BaseModel):

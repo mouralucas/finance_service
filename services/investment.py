@@ -1,3 +1,5 @@
+import datetime
+
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import BaseService
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -17,6 +19,10 @@ class InvestmentService(BaseService):
     async def create_investment(self, investment: CreateInvestmentRequest) -> CreateInvestmentResponse:
         new_investment = InvestmentModel(**investment.model_dump())
         new_investment.owner_id = self.user['user_id']
+
+        if investment.liquidation_date and investment.liquidation_date <= datetime.date.today() and investment.liquidation_amount:
+            new_investment.is_liquidated = True
+
         # TODO: if liquidation date <= today and liquidation amount set is_liquidated to true
         new_investment = await InvestmentManager(session=self.session).create(new_investment)
 
