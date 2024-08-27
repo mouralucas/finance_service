@@ -251,7 +251,7 @@ async def test_create_bill_with_installment(client, create_valid_credit_card, cr
         period = get_period(due_date)
 
         assert 'amount' in entry
-        assert entry['amount'] == total_amount/total_installments
+        assert entry['amount'] == total_amount / total_installments
 
         assert 'period' in entry
         assert entry['period'] == period
@@ -260,7 +260,7 @@ async def test_create_bill_with_installment(client, create_valid_credit_card, cr
         assert 'isInstallment' in entry
         assert entry['isInstallment']
         assert 'currentInstallment' in entry
-        assert entry['currentInstallment'] == idx+1
+        assert entry['currentInstallment'] == idx + 1
         assert 'installments' in entry
         assert entry['installments'] == total_installments
         assert 'totalAmount' in entry

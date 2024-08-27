@@ -1,7 +1,7 @@
 import uuid
 import datetime
 from rolf_common.models import SQLModel
-from sqlalchemy import String, ForeignKey
+from sqlalchemy import String, ForeignKey, JSON
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 
@@ -9,7 +9,7 @@ class InvestmentTypeModel(SQLModel):
     __tablename__ = 'investment_type'
 
     name: Mapped[str] = mapped_column('name', String(200))
-    description: Mapped[str] = mapped_column('description', String(200))
+    description: Mapped[str] = mapped_column('description', String(200), nullable=True)
     # parent_id
 
 
@@ -46,3 +46,33 @@ class InvestmentModel(SQLModel):
     liquidation_amount: Mapped[float] = mapped_column('liquidation_amount', default=0.0)
 
     country_id: Mapped[str] = mapped_column('country_id')  # Will tell what kind of tax will be charged
+
+    objective_id: Mapped[str] = mapped_column(ForeignKey('investment_objective.id'))
+    objective: Mapped['InvestmentObjectiveModel'] = relationship('InvestmentObjectiveModel', foreign_keys=[objective_id], lazy='subquery')
+
+
+class InvestmentStatementModel(SQLModel):
+    __tablename__ = 'investment_statement'
+
+    investment_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('investment.id'))
+    investment: Mapped['InvestmentModel'] = relationship(foreign_keys=[investment_id], lazy='subquery')
+    period: Mapped[int] = mapped_column('period')
+    start_amount: Mapped[float] = mapped_column('start_amount', default=0)
+    gross_amount: Mapped[float] = mapped_column('gross_amount')
+    total_tax: Mapped[float] = mapped_column('total_tax', default=0)
+    total_fee: Mapped[float] = mapped_column('total_fee', default=0)
+    net_amount: Mapped[float] = mapped_column('net_amount')
+    tax_detail: Mapped[dict] = mapped_column('tax_detail', JSON, nullable=True)
+    fee_detail: Mapped[dict] = mapped_column('fee_detail', JSON, nullable=True)
+
+
+class InvestmentObjectiveModel(SQLModel):
+    __tablename__ = 'investment_objective'
+
+    owner_id: Mapped[uuid.UUID] = mapped_column('owner_id')
+    title: Mapped[str] = mapped_column('title', String(100))
+    description: Mapped[str] = mapped_column('description', String(500))
+    estimated_deadline: Mapped[datetime.date] = mapped_column('estimated_deadline', nullable=True)
+
+    # Investment reverse relation
+    investments: Mapped[list['InvestmentModel']] = relationship(back_populates='objective', lazy='subquery')

@@ -18,7 +18,7 @@ class InvestmentService(BaseService):
         new_investment = InvestmentModel(**investment.model_dump())
         new_investment.owner_id = self.user['user_id']
         # TODO: if liquidation date <= today and liquidation amount set is_liquidated to true
-        new_investment = await InvestmentManager(session=self.session).create_investment(new_investment)
+        new_investment = await InvestmentManager(session=self.session).create(new_investment)
 
         response = CreateInvestmentResponse(
             investment=InvestmentSchema.model_validate(new_investment),
@@ -27,7 +27,7 @@ class InvestmentService(BaseService):
         return response
 
     async def get_investments(self, params: GetInvestmentRequest) -> GetInvestmentResponse:
-        investments = await InvestmentManager(self.session).get_investments(params.model_dump())
+        investments = await InvestmentManager(self.session).get(params.model_dump())
 
         response = GetInvestmentResponse(
             quantity=len(investments),
@@ -37,12 +37,12 @@ class InvestmentService(BaseService):
         return response
 
     async def liquidate_investment(self, investment: LiquidateInvestmentRequest) -> LiquidateInvestmentResponse:
-        current_investment = await InvestmentManager(self.session).get_investment_by_id(investment.id)
+        current_investment = await InvestmentManager(self.session).get_by_id(investment.id)
 
         fields = investment.model_dump()
         fields['is_liquidated'] = True
 
-        liquidated_investment = await InvestmentManager(session=self.session).update_investment(current_investment, fields)
+        liquidated_investment = await InvestmentManager(session=self.session).update(current_investment, fields)
 
         response = LiquidateInvestmentResponse(
             investment=InvestmentSchema.model_validate(liquidated_investment),

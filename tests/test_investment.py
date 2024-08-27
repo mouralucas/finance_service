@@ -116,3 +116,46 @@ async def test_liquidate_investment(client, create_investment):
     assert data['investment']['liquidationDate'] == liquidation_date
     assert 'liquidationAmount' in data['investment']
     assert data['investment']['liquidationAmount'] == liquidation_amount
+
+
+async def test_investment_statement(client, create_investment, create_tax):
+    investments = create_investment
+
+    investment_id = str(investments[0].id)
+    period = 202408
+    gross_amount = 35.10
+    total_tax = 0.2
+    total_fee = 0
+    net_amount = gross_amount - total_tax - total_fee
+
+    payload = {
+        'investmentId': investment_id,
+        'period': period,
+        'grossAmount': gross_amount,
+        'totalTax': total_tax,
+        'totalFee': total_fee,
+        'netAmount': net_amount,
+        'taxDetail': {
+            'name': 'IR',
+            'amount': total_tax
+        }
+    }
+
+    response = client.post('/investment/statement', json=payload)
+
+    assert response.status_code == status.HTTP_201_CREATED
+
+    data = response.json()
+    assert 'investmentStatement' in data
+    assert 'investmentId' in data['investmentStatement']
+    assert data['investmentStatement']['investmentId'] == str(investment_id)
+    assert 'period' in data['investmentStatement']
+    assert data['investmentStatement']['period'] == period
+    assert 'grossAmount' in data['investmentStatement']
+    assert data['investmentStatement']['grossAmount'] == gross_amount
+    assert 'totalTax' in data['investmentStatement']
+    assert data['investmentStatement']['totalTax'] == total_tax
+    assert 'totalFee' in data['investmentStatement']
+    assert data['investmentStatement']['totalFee'] == total_fee
+    assert 'netAmount' in data['investmentStatement']
+    assert data['investmentStatement']['netAmount'] == net_amount

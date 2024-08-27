@@ -13,6 +13,8 @@ class CreditCardSchema(BaseModel):
     active: bool = Field(..., description='Whether the credit card is active (cancelled) or not')
     owner_id: uuid.UUID = Field(..., serialization_alias='ownerId', description='The id of the card owner')
     nickname: str = Field(..., serialization_alias='nickname', description='The nickname of the card', json_schema_extra={'example': 'My credit card for bank X'})
+    # Problem with AccountSchema with crossed imports
+    # account: AccountSchema | None = Field(None, serialization_alias='account', description='The account object')
     account_id: uuid.UUID | None = Field(None, serialization_alias='accountId', description='The id of the account, if any')
     currency: CurrencySchema = Field(..., serialization_alias='currency', description='The currency of the card')
     currency_id: str = Field(..., serialization_alias='currencyId', description='The id of the currency of the card', json_schema_extra={'example': 'BRL'})

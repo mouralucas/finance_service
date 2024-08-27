@@ -3,6 +3,9 @@ import uuid
 from dataclasses import Field
 
 from pydantic import BaseModel, Field
+from sqlalchemy import alias
+
+from schemas.core import TaxSchema
 
 
 class CreateInvestmentRequest(BaseModel):
@@ -41,7 +44,14 @@ class LiquidateInvestmentRequest(BaseModel):
 
 
 class CreateStatementRequest(BaseModel):
-    pass
+    investment_id: uuid.UUID = Field(..., alias='investmentId', description='The unique identifier of the investment')
+    period: int = Field(..., alias='period', description='The period of the statement', examples=['202408'])
+    gross_amount: float = Field(..., alias='grossAmount', description='The gross amount of the period')
+    total_tax: float = Field(0, alias='totalTax', description='The total of the tax if investment were liquidated in the period')
+    total_fee: float = Field(0, alias='totalFee', description='The total of fee if investment were liquidated in the period')
+    net_amount: float = Field(..., alias='netAmount', description='The net amount of the period')
+    tax_detail: TaxSchema | None = Field(None, alias='taxDetail', description='The tax details of the investment tax')
+    fee_detail: dict | None = Field(None, alias='feeDetail', description='The fee details of the investment fee')
 
 
 class GetStatementRequest(BaseModel):

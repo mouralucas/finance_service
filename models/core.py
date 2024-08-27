@@ -2,7 +2,7 @@ import uuid
 
 from rolf_common.models import SQLModel
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import String, SmallInteger
+from sqlalchemy import String, SmallInteger, ForeignKey
 
 
 class CurrencyModel(SQLModel):
@@ -59,3 +59,13 @@ class LiquidityModel(SQLModel):
 
     name: Mapped[str] = mapped_column('name', String(250))
     description: Mapped[str] = mapped_column('description', String(500), nullable=True)
+
+
+class TaxModel(SQLModel):
+    __tablename__ = 'tax'
+
+    name: Mapped[str] = mapped_column('name', String(250))
+    description: Mapped[str] = mapped_column('description', String(500), nullable=True)
+    acronyms: Mapped[str] = mapped_column('acronyms', String(30))
+    country_id: Mapped[str] = mapped_column(ForeignKey('country.id'))
+

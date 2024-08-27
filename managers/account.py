@@ -44,14 +44,12 @@ class AccountManager(BaseDataManager):
         return updated_account
 
     async def get_account_by_id(self, account_id: uuid.UUID, raise_exception: bool = False) -> SQLModel:
-        stmt = select(AccountModel).where(AccountModel.id == account_id)
+        account = await self.get_by_id(sql_model=AccountModel, object_id=account_id)
 
-        investment: SQLModel = await self.get_only_one(stmt)
+        if raise_exception:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, detail='Account not found')
 
-        if not investment and raise_exception:
-            raise HTTPException(status.HTTP_404_NOT_FOUND, detail='Investment not found')
-
-        return investment
+        return account
 
     async def create_statement(self, statement: AccountStatementModel) -> SQLModel:
         new_statement = await self.add_one(statement)
