@@ -3,10 +3,10 @@ from rolf_common.services import BaseService
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from managers.investment import InvestmentManager
-from models.investment import InvestmentModel
-from schemas.investment import InvestmentSchema
-from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, LiquidateInvestmentRequest
-from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, LiquidateInvestmentResponse
+from models.investment import InvestmentModel, InvestmentStatementModel
+from schemas.investment import InvestmentSchema, InvestmentStatementSchema
+from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, LiquidateInvestmentRequest, CreateStatementRequest
+from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, LiquidateInvestmentResponse, CreateStatementResponse
 
 
 class InvestmentService(BaseService):
@@ -37,7 +37,7 @@ class InvestmentService(BaseService):
         return response
 
     async def liquidate_investment(self, investment: LiquidateInvestmentRequest) -> LiquidateInvestmentResponse:
-        current_investment = await InvestmentManager(self.session).get_by_id(investment.id)
+        current_investment = await InvestmentManager(self.session).get_investment_by_id(investment.id)
 
         fields = investment.model_dump()
         fields['is_liquidated'] = True
@@ -46,6 +46,18 @@ class InvestmentService(BaseService):
 
         response = LiquidateInvestmentResponse(
             investment=InvestmentSchema.model_validate(liquidated_investment),
+        )
+
+        return response
+
+    async def create_statement(self, statement: CreateStatementRequest) -> CreateStatementResponse:
+        new_statement = InvestmentStatementModel(**statement.model_dump())
+        new_statement.owner_id = self.user['user_id']
+
+        new_statement = await InvestmentManager(session=self.session).create_statement(new_statement)
+
+        response = CreateStatementResponse(
+            investment_statement=InvestmentStatementSchema.model_validate(new_statement),
         )
 
         return response

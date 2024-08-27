@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, Security
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import get_user
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.util import await_only
 from starlette import status
 
 from backend.database import db_session
@@ -51,7 +52,7 @@ async def create_statement(
         session: AsyncSession = Depends(db_session),
         user: RequiredUser = Security(get_user)
 ) -> CreateStatementResponse:
-    pass
+    return await InvestmentService(session=session, user=user).create_statement(statement=statement)
 
 
 @router.get('/statement', summary='Get statement for an investment', description='Get statement base on filters')

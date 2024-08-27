@@ -43,7 +43,7 @@ class AccountManager(BaseDataManager):
 
         return updated_account
 
-    async def get_account_by_id(self, account_id: uuid.UUID, raise_exception: bool = False) -> SQLModel:
+    async def get_account_by_id(self, account_id: uuid.UUID, raise_exception: bool = False) -> SQLModel | None:
         account = await self.get_by_id(sql_model=AccountModel, object_id=account_id)
 
         if raise_exception:

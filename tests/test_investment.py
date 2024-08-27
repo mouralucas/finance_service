@@ -118,12 +118,16 @@ async def test_liquidate_investment(client, create_investment):
     assert data['investment']['liquidationAmount'] == liquidation_amount
 
 
+@pytest.mark.asyncio
 async def test_investment_statement(client, create_investment, create_tax):
     investments = create_investment
+    taxes = create_tax
 
     investment_id = str(investments[0].id)
     period = 202408
     gross_amount = 35.10
+    tax_id = str(create_tax[0].id)
+    tax_name = create_tax[0].name
     total_tax = 0.2
     total_fee = 0
     net_amount = gross_amount - total_tax - total_fee
@@ -136,12 +140,13 @@ async def test_investment_statement(client, create_investment, create_tax):
         'totalFee': total_fee,
         'netAmount': net_amount,
         'taxDetail': {
-            'name': 'IR',
+            'taxId': tax_id,
+            'name': tax_name,
             'amount': total_tax
         }
     }
 
-    response = client.post('/investment/statement', json=payload)
+    response = await client.post('/investment/statement', json=payload)
 
     assert response.status_code == status.HTTP_201_CREATED
 
@@ -159,3 +164,4 @@ async def test_investment_statement(client, create_investment, create_tax):
     assert data['investmentStatement']['totalFee'] == total_fee
     assert 'netAmount' in data['investmentStatement']
     assert data['investmentStatement']['netAmount'] == net_amount
+    # TODO: add test to tax and fee details

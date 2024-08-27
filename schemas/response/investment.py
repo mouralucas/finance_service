@@ -1,7 +1,9 @@
+import uuid
+
 from pydantic import Field
 from rolf_common.schemas import SuccessResponseBase
 
-from schemas.investment import InvestmentSchema
+from schemas.investment import InvestmentSchema, InvestmentStatementSchema
 
 
 class CreateInvestmentResponse(SuccessResponseBase):
@@ -19,7 +21,7 @@ class LiquidateInvestmentResponse(CreateInvestmentResponse):
 
 
 class CreateStatementResponse(SuccessResponseBase):
-    pass
+    investment_statement: InvestmentStatementSchema = Field(..., serialization_alias='investmentStatement', description='The investment statement')
 
 
 class GetStatementResponse(SuccessResponseBase):

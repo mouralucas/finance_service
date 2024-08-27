@@ -9,7 +9,7 @@ from rolf_common.models import SQLModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from models.investment import InvestmentModel, InvestmentTypeModel
+from models.investment import InvestmentModel, InvestmentTypeModel, InvestmentStatementModel
 from schemas.request.investment import LiquidateInvestmentRequest
 from schemas.response.investment import LiquidateInvestmentResponse
 
@@ -34,12 +34,10 @@ class InvestmentManager(BaseDataManager):
 
         return updated_item
 
-    async def get_by_id(self, investment_id: uuid.UUID, raise_exception: bool = False) -> SQLModel:
-        stmt = select(InvestmentModel).where(InvestmentModel.id == investment_id)
+    async def get_investment_by_id(self, investment_id: uuid.UUID, raise_exception: bool = False) -> SQLModel | None:
+        investment = await self.get_by_id(InvestmentModel, investment_id)
 
-        investment: SQLModel = await self.get_only_one(stmt)
-
-        if not investment and raise_exception:
+        if raise_exception:
             raise HTTPException(status.HTTP_404_NOT_FOUND, detail='Investment not found')
 
         return investment
@@ -55,6 +53,12 @@ class InvestmentManager(BaseDataManager):
 
         return investments
 
+    async def create_statement(self, statement: InvestmentStatementModel) -> SQLModel:
+        await self.add_one(statement)
+
+        return statement
+
+    # Investment Types
     async def create_investment_type(self, investment_type: InvestmentTypeModel) -> SQLModel:
         await self.add_one(investment_type)
 

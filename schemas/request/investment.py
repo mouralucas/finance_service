@@ -50,7 +50,7 @@ class CreateStatementRequest(BaseModel):
     total_tax: float = Field(0, alias='totalTax', description='The total of the tax if investment were liquidated in the period')
     total_fee: float = Field(0, alias='totalFee', description='The total of fee if investment were liquidated in the period')
     net_amount: float = Field(..., alias='netAmount', description='The net amount of the period')
-    tax_detail: TaxSchema | None = Field(None, alias='taxDetail', description='The tax details of the investment tax')
+    tax_detail: dict | None = Field(None, alias='taxDetail', description='The tax details of the investment tax')
     fee_detail: dict | None = Field(None, alias='feeDetail', description='The fee details of the investment fee')
 
 

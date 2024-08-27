@@ -47,7 +47,7 @@ class InvestmentModel(SQLModel):
 
     country_id: Mapped[str] = mapped_column('country_id')  # Will tell what kind of tax will be charged
 
-    objective_id: Mapped[str] = mapped_column(ForeignKey('investment_objective.id'))
+    objective_id: Mapped[str] = mapped_column(ForeignKey('investment_objective.id'), nullable=True)
     objective: Mapped['InvestmentObjectiveModel'] = relationship('InvestmentObjectiveModel', foreign_keys=[objective_id], lazy='subquery')
 
 

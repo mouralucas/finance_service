@@ -15,7 +15,7 @@ class CurrencySchema(BaseModel):
 class TaxSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: uuid.UUID = Field(..., json_schema_extra={'example': uuid.uuid4()})
+    id: uuid.UUID = Field(..., alias='taxId', json_schema_extra={'example': uuid.uuid4()})
     name: str = Field(..., description='The name of the tax')
     description: str | None = Field(None, description='The description of the tax')
     country_id: str = Field(..., description='The country of the tax')

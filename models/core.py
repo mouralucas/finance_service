@@ -30,7 +30,7 @@ class CountryModel(SQLModel):
 
     id: Mapped[str] = mapped_column('id', String(5), primary_key=True)
     name: Mapped[str] = mapped_column('name', String(250))
-    continent: Mapped[str] = mapped_column('continent', String(5))
+    continent: Mapped[str] = mapped_column('continent', String(5), nullable=True)
 
 
 class BankModel(SQLModel):

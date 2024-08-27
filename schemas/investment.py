@@ -28,3 +28,16 @@ class InvestmentSchema(BaseModel):
     liquidation_amount: float | None = Field(None, serialization_alias='liquidationAmount', description='The amount liquidated, after tax')
 
     country_id: str = Field(..., serialization_alias='countryId', description='The id of the country')
+
+
+class InvestmentStatementSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID = Field(..., serialization_alias='investmentStatementId', description='The id of the statement')
+    investment_id: uuid.UUID = Field(..., serialization_alias='investmentId', description='The id of the investment')
+    period: int = Field(..., serialization_alias='period', description='The period of the statement')
+    gross_amount: float = Field(..., serialization_alias='grossAmount', description='The gross amount of the investment in the period')
+    total_tax: float = Field(..., serialization_alias='totalTax', description='The total tax amount of the investment in the period')
+    total_fee: float = Field(..., serialization_alias='totalFee', description='The total fee of the investment in the period')
+    net_amount: float = Field(..., serialization_alias='netAmount', description='The net amount of the investment in the period')
+
