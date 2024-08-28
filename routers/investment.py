@@ -6,8 +6,8 @@ from sqlalchemy.util import await_only
 from starlette import status
 
 from backend.database import db_session
-from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, CreateStatementRequest, GetStatementRequest, LiquidateInvestmentRequest
-from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, CreateStatementResponse, GetStatementResponse, LiquidateInvestmentResponse
+from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, CreateStatementRequest, GetStatementRequest, LiquidateInvestmentRequest, GetInvestmentObjectiveRequest, CreateInvestmentObjectiveRequest
+from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, CreateStatementResponse, GetStatementResponse, LiquidateInvestmentResponse, CreateInvestmentObjectiveResponse, GetInvestmentObjectiveResponse
 from services.investment import InvestmentService
 
 router = APIRouter(prefix="/investment", tags=['Investments'])
@@ -61,4 +61,22 @@ async def get_statement(
         session: AsyncSession = Depends(db_session),
         user: RequiredUser = Security(get_user)
 ) -> GetStatementResponse:
+    pass
+
+
+@router.post('/objective', summary='', description='')
+async def create_objective(
+        objective: CreateInvestmentObjectiveRequest,
+        session: AsyncSession = Depends(db_session),
+        user: RequiredUser = Security(get_user)
+) -> CreateInvestmentObjectiveResponse:
+    pass
+
+
+@router.get('/objective', summary='', description='')
+async def get_objective(
+        params: GetInvestmentObjectiveRequest,
+        session: AsyncSession = Depends(db_session),
+        user: RequiredUser = Security(get_user)
+) -> GetInvestmentObjectiveResponse:
     pass

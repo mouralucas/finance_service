@@ -26,3 +26,10 @@ class CreateStatementResponse(SuccessResponseBase):
 
 class GetStatementResponse(SuccessResponseBase):
     pass
+
+
+class CreateInvestmentObjectiveResponse(SuccessResponseBase):
+    pass
+
+class GetInvestmentObjectiveResponse(SuccessResponseBase):
+    pass

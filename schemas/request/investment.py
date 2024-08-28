@@ -1,6 +1,7 @@
 import datetime
 import uuid
 
+from fastapi import Query
 from pydantic import BaseModel, Field, model_validator
 
 
@@ -27,7 +28,7 @@ class CreateInvestmentRequest(BaseModel):
     @model_validator(mode='before')
     def check_liquidation(cls, data: dict) -> dict:
         if (data.get('liquidationAmount') and not data.get('liquidationDate') or
-            not data.get('liquidationAmount') and data.get('liquidationDate')):
+                not data.get('liquidationAmount') and data.get('liquidationDate')):
             raise ValueError('both liquidation date and amount must be specified')
 
         return data
@@ -59,4 +60,14 @@ class CreateStatementRequest(BaseModel):
 
 
 class GetStatementRequest(BaseModel):
-    pass
+    period: int = Field(Query(..., alias='period'), description='The period of the statement')
+
+
+class CreateInvestmentObjectiveRequest(BaseModel):
+    title: str = Field(..., alias='title', description='The title of the objective')
+    description: str = Field(..., alias='description', description='The description of the objective')
+    estimated_deadline: datetime.date = Field(..., alias='estimatedDeadline', description='The estimated deadline of the objective')
+
+
+class GetInvestmentObjectiveRequest(BaseModel):
+    objective_id: uuid.UUID = Field(Query(..., serialization_alias='objectiveId', description='The unique identifier of the investment objective'))
