@@ -19,6 +19,12 @@ def get_mocked_countries() -> list[CountryModel]:
 
 def get_mocked_tax():
     tax_list: list[TaxModel] = []
-    ir = TaxModel(name='Imposto de Renda', acronyms='IR', description='Imposto sobre a renda')
-    iof = TaxModel(name='Imposto sobre Operações Financeiras', acronyms='IOF', description='Imposto sobre as operações financeiras')
+    country_list = get_mocked_countries()
 
+    ir = TaxModel(name='Imposto de Renda', acronyms='IR', description='Imposto sobre a renda', country=country_list[0])
+    iof = TaxModel(name='Imposto sobre Operações Financeiras', acronyms='IOF', description='Imposto sobre as operações financeiras', country=country_list[0])
+
+    tax_list.append(ir)
+    tax_list.append(iof)
+
+    return tax_list

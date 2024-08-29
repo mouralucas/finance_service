@@ -1,5 +1,9 @@
+import datetime
+
 import pytest
 from starlette import status
+
+from services.utils.datetime import get_period
 
 
 @pytest.mark.asyncio
@@ -92,9 +96,10 @@ async def test_create_investment(client, create_open_account, create_investment_
     assert 'isLiquidated' in data['investment']
     assert data['investment']['isLiquidated'] is False
 
+
 @pytest.mark.asyncio
 async def test_create_liquidated_investment(client, create_open_account, create_investment_type, create_index_type,
-                                 create_index, create_liquidity, create_currency):
+                                            create_index, create_liquidity, create_currency):
     accounts = create_open_account
 
     custodian_id = accounts[0].bank_id
@@ -111,7 +116,7 @@ async def test_create_liquidated_investment(client, create_open_account, create_
     currency_id = create_currency[0].id
     country_id = 'BR'
     liquidation_date = '2024-08-01'
-    liquidation_amount = price + (price * 0.2) #(about 20%)
+    liquidation_amount = price + (price * 0.2)  # (about 20%)
 
     payload = {
         'custodianId': str(custodian_id),
@@ -146,7 +151,6 @@ async def test_create_liquidated_investment(client, create_open_account, create_
     assert data['investment']['isLiquidated'] is True
 
 
-
 @pytest.mark.asyncio
 async def test_liquidate_investment(client, create_investment):
     investments = create_investment
@@ -176,7 +180,7 @@ async def test_liquidate_investment(client, create_investment):
 
 
 @pytest.mark.asyncio
-async def test_investment_statement(client, create_investment, create_tax):
+async def test_create_investment_statement(client, create_investment, create_tax):
     investments = create_investment
     taxes = create_tax
 
@@ -222,3 +226,17 @@ async def test_investment_statement(client, create_investment, create_tax):
     assert 'netAmount' in data['investmentStatement']
     assert data['investmentStatement']['netAmount'] == net_amount
     # TODO: add test to tax and fee details
+
+
+@pytest.mark.asyncio
+async def test_get_statement(client, create_investment_statement):
+    print('')
+    payload = {
+        'period': get_period(datetime.date.today())
+    }
+    response = await client.get('/investment/statement', params=payload)
+
+    assert response.status_code == status.HTTP_200_OK
+    data = response.json()
+
+    print('')

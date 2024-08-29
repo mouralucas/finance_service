@@ -7,8 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from managers.investment import InvestmentManager
 from models.investment import InvestmentModel, InvestmentStatementModel
 from schemas.investment import InvestmentSchema, InvestmentStatementSchema
-from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, LiquidateInvestmentRequest, CreateStatementRequest
-from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, LiquidateInvestmentResponse, CreateStatementResponse
+from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, LiquidateInvestmentRequest, CreateStatementRequest, GetStatementRequest
+from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, LiquidateInvestmentResponse, CreateStatementResponse, GetStatementResponse
 
 
 class InvestmentService(BaseService):
@@ -64,6 +64,15 @@ class InvestmentService(BaseService):
 
         response = CreateStatementResponse(
             investment_statement=InvestmentStatementSchema.model_validate(new_statement),
+        )
+
+        return response
+
+    async def get_statement(self, params: GetStatementRequest) -> GetStatementResponse:
+        statement = await InvestmentManager(self.session).get_statement(params=params.model_dump())
+
+        response = GetStatementResponse(
+            statement=statement
         )
 
         return response

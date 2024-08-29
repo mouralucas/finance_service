@@ -62,7 +62,6 @@ class AccountService(BaseService):
 
         return response
 
-
     async def get_accounts(self, params: GetAccountRequest) -> GetAccountResponse:
         params = params.model_dump()
         params['owner_id'] = self.user['user_id']
@@ -75,7 +74,6 @@ class AccountService(BaseService):
         )
 
         return response
-
 
     async def create_statement(self, statement_entry: CreateStatementRequest) -> CreateStatementResponse:
         account = await self.account_manager.get_account_by_id(statement_entry.account_id)

@@ -40,4 +40,3 @@ class InvestmentStatementSchema(BaseModel):
     total_tax: float = Field(..., serialization_alias='totalTax', description='The total tax amount of the investment in the period')
     total_fee: float = Field(..., serialization_alias='totalFee', description='The total fee of the investment in the period')
     net_amount: float = Field(..., serialization_alias='netAmount', description='The net amount of the investment in the period')
-

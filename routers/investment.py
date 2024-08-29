@@ -57,11 +57,11 @@ async def create_statement(
 
 @router.get('/statement', summary='Get statement for an investment', description='Get statement base on filters')
 async def get_statement(
-        params: GetStatementRequest,
+        params: GetStatementRequest = Depends(),
         session: AsyncSession = Depends(db_session),
         user: RequiredUser = Security(get_user)
 ) -> GetStatementResponse:
-    pass
+    return await InvestmentService(session=session, user=user).get_statement(params=params)
 
 
 @router.post('/objective', summary='', description='')

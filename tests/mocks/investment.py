@@ -1,11 +1,14 @@
 import datetime
 import uuid
+from datetime import timedelta
 
 import pytest_asyncio
+from dateutil.relativedelta import relativedelta
 from rolf_common.managers import BaseDataManager
 
 from models.core import IndexTypeModel, IndexModel, LiquidityModel
-from models.investment import InvestmentTypeModel, InvestmentModel
+from models.investment import InvestmentTypeModel, InvestmentModel, InvestmentStatementModel
+from services.utils.datetime import get_period
 
 
 @pytest_asyncio.fixture
@@ -95,8 +98,8 @@ async def create_investment(create_test_session, create_open_account, create_inv
                                  name="Test Investment",
                                  description="Test Investment",
                                  type_id=investment_types[0].id,
-                                 transaction_date=datetime.date(2024, 8, 12),
-                                 maturity_date=datetime.date(2025, 8, 12),
+                                 transaction_date=datetime.date.today() - relativedelta(years=1, months=2, days=5),
+                                 maturity_date=datetime.date.today() + relativedelta(years=1, months=0, days=17),
                                  quantity=1.02,
                                  price=150.65,
                                  amount=1.02 * 150.65,
@@ -108,6 +111,47 @@ async def create_investment(create_test_session, create_open_account, create_inv
 
     investment_1 = await BaseDataManager(session=create_test_session).add_one(investment)
 
+    investment = InvestmentModel(owner_id=uuid.UUID("adf52a1e-7a19-11ed-a1eb-0242ac120002"),
+                                 custodian_id=accounts[1].bank_id,
+                                 account_id=accounts[1].id,
+                                 name="Test Investment 2",
+                                 description="Test Investment 2",
+                                 type_id=investment_types[1].id,
+                                 transaction_date=datetime.date.today() - relativedelta(years=4, months=7, days=28),
+                                 maturity_date=datetime.date.today() + relativedelta(years=0, months=11, days=9),
+                                 quantity=998.3,
+                                 price=1.50,
+                                 amount=998.3 * 1.50,
+                                 currency_id=currencies[0].id,
+                                 index_type_id=index_types[0].id,
+                                 index_id=indexes[0].id,
+                                 liquidity_id=liquidity[0].id,
+                                 country_id='BR')
+    investment_2 = await BaseDataManager(session=create_test_session).add_one(investment)
+
     investment_list.append(investment_1)
+    investment_list.append(investment_2)
 
     return investment_list
+
+
+@pytest_asyncio.fixture
+async def create_investment_statement(create_test_session, create_investment):
+    investments = create_investment
+
+    statement_list = []
+    period = get_period(datetime.date.today())
+
+    statement = InvestmentStatementModel(investment=investments[0],
+                                         period=period,
+                                         start_amount=0,
+                                         gross_amount=investments[0].amount + investments[0].amount * 0.001,
+                                         total_tax=0.25,
+                                         total_fee=0,
+                                         net_amount=(investments[0].amount + investments[0].amount * 0.001) - 0.25
+                                         )
+    statement_1 = await BaseDataManager(create_test_session).add_one(statement)
+
+    statement_list.append(statement_1)
+
+    return statement_list

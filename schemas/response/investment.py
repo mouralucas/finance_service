@@ -25,7 +25,7 @@ class CreateStatementResponse(SuccessResponseBase):
 
 
 class GetStatementResponse(SuccessResponseBase):
-    pass
+    statement: list[InvestmentStatementSchema] = Field(..., description='The investment statement')
 
 
 class CreateInvestmentObjectiveResponse(SuccessResponseBase):

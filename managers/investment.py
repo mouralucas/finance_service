@@ -2,7 +2,7 @@ import uuid
 
 from fastapi import HTTPException
 from sqlalchemy import select, update
-from typing import Any
+from typing import Any, List
 
 from rolf_common.managers import BaseDataManager
 from rolf_common.models import SQLModel
@@ -53,10 +53,24 @@ class InvestmentManager(BaseDataManager):
 
         return investments
 
+
+    # Investment statement
     async def create_statement(self, statement: InvestmentStatementModel) -> SQLModel:
         await self.add_one(statement)
 
         return statement
+
+    async def get_statement(self, params: dict[str, Any]) -> list[SQLModel]:
+        stmt = select(InvestmentStatementModel)
+
+        for key, value in params.items():
+            if value:
+                stmt = stmt.where(getattr(InvestmentStatementModel, key) == value)
+
+        statements: list[SQLModel] = await self.get_all(stmt, unique_result=True)
+
+        return statements
+
 
     # Investment Types
     async def create_investment_type(self, investment_type: InvestmentTypeModel) -> SQLModel:
