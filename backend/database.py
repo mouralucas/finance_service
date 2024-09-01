@@ -61,7 +61,7 @@ class DatabaseSessionManager:
 
 
 sessionmanager = DatabaseSessionManager(settings.finance_database_url, {"echo": settings.echo_sql})
-test_sessionmanager = DatabaseSessionManager(settings.test_database_url, {"echo": settings.echo_test_sql}, expire_on_commit=False, test_db=True)
+test_sessionmanager = DatabaseSessionManager(settings.test_database_url, {"echo": settings.echo_test_sql}, expire_on_commit=True, test_db=True)
 
 
 async def db_session():

@@ -1,5 +1,6 @@
 import datetime
 
+from dateutil.relativedelta import relativedelta
 from fastapi import HTTPException
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import BaseService
@@ -11,8 +12,6 @@ from models.credit_card import CreditCardModel, CreditCardBillModel
 from schemas.credit_card import CreditCardSchema
 from schemas.request.credit_card import CreateCreditCardRequest, GetCreditCardRequest, CreateBillEntryRequest, CancelCreditCardRequest
 from schemas.response.credit_card import CreateCreditCardResponse, GetCreditCardResponse, CreateBillEntryResponse, CancelCreditCardResponse
-from dateutil.relativedelta import relativedelta
-
 from services.utils.datetime import get_period
 
 

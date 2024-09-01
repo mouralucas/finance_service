@@ -50,5 +50,6 @@ class CreditCardManager(BaseDataManager):
     ## Bills entries
     async def create_bill_entry(self, bill_entries: list[CreditCardBillModel]) -> list[SQLModel]:
         new_bill_entries = await self.add_all(bill_entries)
+        [await self.session.refresh(i) for i in new_bill_entries]
 
         return new_bill_entries
