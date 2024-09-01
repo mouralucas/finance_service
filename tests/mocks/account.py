@@ -1,77 +1,30 @@
-import datetime
-import uuid
-
 import pytest_asyncio
 from rolf_common.managers import BaseDataManager
 
+from data_mock.account import get_open_account_mocked, get_mocked_account_type, get_closed_account_mocked
 from models.account import AccountTypeModel, AccountModel
+from schemas.account import AccountSchema, AccountTypeSchema
 
 
 @pytest_asyncio.fixture
-async def create_account_type(create_test_session) -> list:
-    type_list = []
+async def create_account_type(create_test_session) -> list[AccountTypeSchema]:
+    data_ = await BaseDataManager(create_test_session).add_or_ignore_all(AccountTypeModel, get_mocked_account_type())
+    account_types = [AccountTypeSchema.model_validate(data) for data in data_]
 
-    account_type = AccountTypeModel(type='Checking account', description='Checking account description')
-    type_1 = await BaseDataManager(session=create_test_session).add_one(account_type)
-
-    account_type = AccountTypeModel(type='Investment account', description='Investment account description')
-    type_2 = await BaseDataManager(session=create_test_session).add_one(account_type)
-
-    type_list.append(type_1)
-    type_list.append(type_2)
-
-    return type_list
+    return account_types
 
 
 @pytest_asyncio.fixture
-async def create_open_account(create_test_session, create_account_type, create_bank, create_currency) -> list:
-    account_types = create_account_type
-    banks = create_bank
-    currencies = create_currency
-
-    account_list = []
-
-    account = AccountModel(owner_id=uuid.UUID("adf52a1e-7a19-11ed-a1eb-0242ac120002"), bank_id=banks[0].id, nickname='Account 1',
-                           description='Checking account description', branch='1212-1',
-                           number='123654', open_date=datetime.date(2024, 8, 9),
-                           type_id=account_types[0].id, currency_id=currencies[0].id)
-    account_1 = await BaseDataManager(session=create_test_session).add_one(account)
-
-    account = AccountModel(owner_id=uuid.UUID("adf52a1e-7a19-11ed-a1eb-0242ac120002"), bank_id=banks[1].id, nickname='Account 1',
-                           description='Checking account description of second account', branch='7896-2',
-                           number='987456', open_date=datetime.date(2023, 2, 19),
-                           type_id=account_types[1].id, currency_id=currencies[1].id)
-    account_2 = await BaseDataManager(session=create_test_session).add_one(account)
-
-    account = AccountModel(owner_id=uuid.uuid4(), bank_id=banks[0].id, nickname='Account from another user',
-                           description='This account should not appear in tests for the user', branch='1212-1',
-                           number='7549653', open_date=datetime.date(2014, 9, 27),
-                           type_id=account_types[0].id, currency_id=currencies[0].id)
-    account_3 = await BaseDataManager(session=create_test_session).add_one(account)
-
-    account_list.append(account_1)
-    account_list.append(account_2)
-    account_list.append(account_3)
+async def create_open_account(create_test_session, create_bank, create_account_type, create_currency) -> list[AccountSchema]:
+    data_ = await BaseDataManager(create_test_session).add_or_ignore_all(AccountModel, get_open_account_mocked())
+    account_list = [AccountSchema.model_validate(data) for data in data_]
 
     return account_list
 
 
 @pytest_asyncio.fixture
 async def create_closed_account(create_test_session, create_account_type, create_bank, create_currency) -> list:
-    account_types = create_account_type
-    banks = create_bank
-    currencies = create_currency
+    data_ = await BaseDataManager(create_test_session).add_or_ignore_all(AccountModel, get_closed_account_mocked())
+    account_list = [AccountSchema.model_validate(data) for data in data_]
 
-    closed_account_list = []
-
-    account = AccountModel(owner_id=uuid.UUID("adf52a1e-7a19-11ed-a1eb-0242ac120002"), bank_id=banks[0].id,
-                           nickname='Account 1', active=False,
-                           description='Checking account description', branch='1212-1',
-                           number='123654', open_date=datetime.date(2010, 8, 9),
-                           close_date=datetime.date(2023, 7, 2),
-                           type_id=account_types[0].id, currency_id=currencies[0].id)
-    account_1 = await BaseDataManager(session=create_test_session).add_one(account)
-
-    closed_account_list.append(account_1)
-
-    return closed_account_list
+    return account_list

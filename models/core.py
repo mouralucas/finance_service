@@ -44,7 +44,7 @@ class IndexTypeModel(SQLModel):
     __tablename__ = 'index_type'
 
     name: Mapped[str] = mapped_column('name', String(250))
-    description: Mapped[str] = mapped_column('description', String(500))
+    description: Mapped[str] = mapped_column('description', String(500), nullable=True)
 
 
 class IndexModel(SQLModel):

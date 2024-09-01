@@ -60,8 +60,7 @@ async def test_close_account_with_credit_card(client, create_valid_credit_card):
     :param create_valid_credit_card
     :return:
     """
-    account = create_valid_credit_card[0].account
-    account_id = str(account.id)
+    account_id = str(create_valid_credit_card[0].account_id)
     close_date = '2024-12-21'
 
     payload = {

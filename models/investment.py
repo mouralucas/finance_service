@@ -10,7 +10,8 @@ class InvestmentTypeModel(SQLModel):
 
     name: Mapped[str] = mapped_column('name', String(200))
     description: Mapped[str] = mapped_column('description', String(200), nullable=True)
-    # parent_id
+    parent_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('investment_type.id'), nullable=True)
+    parent: Mapped['InvestmentTypeModel'] = relationship(foreign_keys=[parent_id], lazy='subquery')
 
 
 class InvestmentModel(SQLModel):
@@ -57,7 +58,7 @@ class InvestmentStatementModel(SQLModel):
     investment_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('investment.id'))
     investment: Mapped['InvestmentModel'] = relationship(foreign_keys=[investment_id], lazy='subquery')
     period: Mapped[int] = mapped_column('period')
-    start_amount: Mapped[float] = mapped_column('start_amount', default=0)
+    previous_amount: Mapped[float] = mapped_column('start_amount', default=0)
     gross_amount: Mapped[float] = mapped_column('gross_amount')
     total_tax: Mapped[float] = mapped_column('total_tax', default=0)
     total_fee: Mapped[float] = mapped_column('total_fee', default=0)

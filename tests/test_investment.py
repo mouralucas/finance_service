@@ -8,14 +8,14 @@ from services.utils.datetime import get_period
 
 @pytest.mark.asyncio
 async def test_create_investment(client, create_open_account, create_investment_type, create_index_type,
-                                 create_index, create_liquidity, create_currency):
+                                 create_index, create_liquidity):
     accounts = create_open_account
     account = accounts[0]
     investment_types = create_investment_type
     index_types = create_index_type
     indexes = create_index
     liquidity = create_liquidity
-    currencies = create_currency
+    currency_id = accounts[0].currency_id
 
     custodian_id = account.bank_id
     name = 'Investment in an asset'
@@ -28,7 +28,7 @@ async def test_create_investment(client, create_open_account, create_investment_
     index_type_id = index_types[0].id
     index_id = indexes[0].id
     liquidity_id = liquidity[0].id
-    currency_id = currencies[0].id
+    currency_id = currency_id
     country_id = 'BR'
 
     payload = {
@@ -238,5 +238,3 @@ async def test_get_statement(client, create_investment_statement):
 
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
-
-    print('')

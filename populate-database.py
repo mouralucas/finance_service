@@ -7,14 +7,14 @@ from rolf_common.managers import BaseDataManager
 from backend.database import sessionmanager
 import sqlalchemy.exc
 
-from data_mock.core import get_mocked_countries
+from data_mock.core import get_country_mocked
 from models.core import TaxModel, CountryModel
 
 
 async def insert_data():
     async with sessionmanager.session() as session:
         try:
-            await BaseDataManager(session=session).add_all(get_mocked_countries())
+            await BaseDataManager(session=session).add_all(get_country_mocked())
         except sqlalchemy.exc.PendingRollbackError:
             print('Country data already inserted.')
 

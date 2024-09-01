@@ -7,6 +7,14 @@ from pydantic import BaseModel, Field, ConfigDict
 from schemas.credit_card import CreditCardSchema
 
 
+class AccountTypeSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID = Field(..., serialization_alias='accountTypeId', description='The unique identification of the account type')
+    type: str = Field(..., description='The type of account')
+    description: str = Field(..., description='The description of the account type')
+
+
 class AccountSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

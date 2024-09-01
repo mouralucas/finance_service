@@ -59,6 +59,14 @@ class InvestmentService(BaseService):
     async def create_statement(self, statement: CreateStatementRequest) -> CreateStatementResponse:
         new_statement = InvestmentStatementModel(**statement.model_dump())
         new_statement.owner_id = self.user['user_id']
+        # TODO: rules to add
+        # The period must not be less then the investment transaction period
+        # If the period is the same of investment transaction:
+        #   The previous_amount is zero
+        # If period greater then investment transaction period:
+        #   Check if the previous period is available in statement
+        #       If not warn the user
+        #   If exist, get the gross amount and set the previous amount from adding period
 
         new_statement = await InvestmentManager(session=self.session).create_statement(new_statement)
 

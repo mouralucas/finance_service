@@ -4,6 +4,15 @@ import uuid
 from pydantic import BaseModel, Field, ConfigDict
 
 
+class InvestmentTypeSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID = Field(..., serialization_alias='investmentTypeId', description='The unique identification for the investment type')
+    name: str = Field(..., description='The name of the investment type')
+    description: str | None = Field(None, description='Description of the investment type')
+    parent_id: uuid.UUID | None = Field(None, serialization_alias='parentId', description='The id of the parent investment type')
+
+
 class InvestmentSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

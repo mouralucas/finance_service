@@ -1,78 +1,71 @@
 import pytest_asyncio
 from rolf_common.managers import BaseDataManager
 
-from data_mock.core import get_mocked_countries
-from models.core import BankModel, CurrencyModel, CategoryModel, CountryModel, TaxModel
+from data_mock.core import get_country_mocked, get_tax_mocked, get_currency_mocked, get_bank_mocked, get_category_mocked, get_liquidity_mocked
+from data_mock.core import get_index_mocked, get_index_type_mocked
+from models.core import BankModel, CurrencyModel, CategoryModel, CountryModel, TaxModel, IndexTypeModel, IndexModel, LiquidityModel
+from schemas.core import CurrencySchema, BankSchema, CountrySchema, TaxSchema, CategorySchema, IndexTypeSchema, IndexSchema, LiquiditySchema
 
 
 @pytest_asyncio.fixture
-async def create_bank(create_test_session) -> list:
-    bank_list = []
+async def create_bank(create_test_session) -> list[BankSchema]:
+    data_ = await BaseDataManager(create_test_session).add_or_ignore_all(BankModel, get_bank_mocked())
+    banks: list[BankSchema] = [BankSchema.model_validate(data) for data in data_]
 
-    bank = BankModel(name='Bank 1', code=123)
-    bank_1 = await BaseDataManager(session=create_test_session).add_one(bank)
-
-    bank = BankModel(name='Bank 2', code=345)
-    bank_2 = await BaseDataManager(session=create_test_session).add_one(bank)
-
-    bank_list.append(bank_1)
-    bank_list.append(bank_2)
-
-    return bank_list
+    return banks
 
 
 @pytest_asyncio.fixture
-async def create_currency(create_test_session) -> list:
-    currency_list = []
+async def create_currency(create_test_session) -> list[CurrencySchema]:
+    data_ = await BaseDataManager(create_test_session).add_or_ignore_all(CurrencyModel, get_currency_mocked())
+    currencies: list[CurrencySchema] = [CurrencySchema.model_validate(currency) for currency in data_]
 
-    currency = CurrencyModel(id='BRL', name='Real', symbol='R$')
-    currency_1 = await BaseDataManager(session=create_test_session).add_one(currency)
-
-    currency = CurrencyModel(id='USD', name='Dollar', symbol='$')
-    currency_2 = await BaseDataManager(session=create_test_session).add_one(currency)
-
-    currency = CurrencyModel(id='EUR', name='Euro', symbol='$')
-    currency_3 = await BaseDataManager(session=create_test_session).add_one(currency)
-
-    currency_list.append(currency_1)
-    currency_list.append(currency_2)
-    currency_list.append(currency_3)
-
-    return currency_list
+    return currencies
 
 
 @pytest_asyncio.fixture
-async def create_category(create_test_session) -> list:
-    category_list = []
+async def create_index_type(create_test_session) -> list[IndexTypeSchema]:
+    data_ = await BaseDataManager(create_test_session).add_or_ignore_all(IndexTypeModel, get_index_type_mocked())
+    index_type = [IndexTypeSchema.model_validate(data) for data in data_]
 
-    category = CategoryModel(name='Test category', description='This is a test category')
-    category_1 = await BaseDataManager(session=create_test_session).add_one(category)
-
-    category = CategoryModel(name='Second test category', description='This is another test category')
-    category_2 = await BaseDataManager(session=create_test_session).add_one(category)
-
-    category_list.append(category_1)
-    category_list.append(category_2)
-
-    return category_list
+    return index_type
 
 
 @pytest_asyncio.fixture
-async def create_country(create_test_session) -> list:
-    return await BaseDataManager(session=create_test_session).add_all(get_mocked_countries())
+async def create_index(create_test_session) -> list[IndexSchema]:
+    data_ = await BaseDataManager(create_test_session).add_or_ignore_all(IndexModel, get_index_mocked())
+    index = [IndexSchema.model_validate(data) for data in data_]
+
+    return index
+
 
 @pytest_asyncio.fixture
-async def create_tax(create_test_session, create_investment, create_country):
-    tax_list = []
+async def create_category(create_test_session) -> list[CategorySchema]:
+    data_ = await BaseDataManager(create_test_session).add_or_ignore_all(CategoryModel, get_category_mocked())
+    categories = [CategorySchema.model_validate(data) for data in data_]
 
-    tax = TaxModel(name='Imposto de Renda', acronyms='IR', description='Imposto aplicado sobre a renda', country_id=create_country[0].id)
-    tax_1 = await BaseDataManager(session=create_test_session).add_one(tax)
+    return categories
 
-    tax = TaxModel(name='Imposto sobre Operações Financeiras', acronyms='IOF',
-                   description='Imposto aplicado a toda operação financeira', country_id=create_country[0].id)
-    tax_2 = await BaseDataManager(session=create_test_session).add_one(tax)
 
-    tax_list.append(tax_1)
-    tax_list.append(tax_2)
+@pytest_asyncio.fixture
+async def create_country(create_test_session) -> list[CountrySchema]:
+    data_ = await BaseDataManager(create_test_session).add_or_ignore_all(CountryModel, get_country_mocked())
+    countries: list[CountrySchema] = [CountrySchema.model_validate(data) for data in data_]
+
+    return countries
+
+
+@pytest_asyncio.fixture
+async def create_tax(create_test_session, create_country) -> list[TaxSchema]:
+    data_ = await BaseDataManager(create_test_session).add_or_ignore_all(TaxModel, get_tax_mocked())
+    tax_list = [TaxSchema.model_validate(data) for data in data_]
 
     return tax_list
+
+
+@pytest_asyncio.fixture
+async def create_liquidity(create_test_session):
+    data_ = await BaseDataManager(create_test_session).add_or_ignore_all(LiquidityModel, get_liquidity_mocked())
+    liquidity = [LiquiditySchema.model_validate(data) for data in data_]
+
+    return liquidity
