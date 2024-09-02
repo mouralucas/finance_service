@@ -63,7 +63,7 @@ class GetStatementRequest(BaseModel):
     period: int = Field(Query(..., alias='period'), description='The period of the statement')
 
 
-class CreateInvestmentObjectiveRequest(BaseModel):
+class CreateObjectiveRequest(BaseModel):
     title: str = Field(..., alias='title', description='The title of the objective')
     description: str = Field(..., alias='description', description='The description of the objective')
     estimated_deadline: datetime.date = Field(..., alias='estimatedDeadline', description='The estimated deadline of the objective')

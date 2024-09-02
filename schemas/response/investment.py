@@ -3,7 +3,7 @@ import uuid
 from pydantic import Field
 from rolf_common.schemas import SuccessResponseBase
 
-from schemas.investment import InvestmentSchema, InvestmentStatementSchema
+from schemas.investment import InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema
 
 
 class CreateInvestmentResponse(SuccessResponseBase):
@@ -28,8 +28,9 @@ class GetStatementResponse(SuccessResponseBase):
     statement: list[InvestmentStatementSchema] = Field(..., description='The investment statement')
 
 
-class CreateInvestmentObjectiveResponse(SuccessResponseBase):
-    pass
+class CreateObjectiveResponse(SuccessResponseBase):
+    objective: InvestmentObjectiveSchema = Field(..., description='The investment objective')
+
 
 class GetInvestmentObjectiveResponse(SuccessResponseBase):
     pass

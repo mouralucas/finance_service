@@ -5,10 +5,10 @@ from rolf_common.services import BaseService
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from managers.investment import InvestmentManager
-from models.investment import InvestmentModel, InvestmentStatementModel
-from schemas.investment import InvestmentSchema, InvestmentStatementSchema
-from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, LiquidateInvestmentRequest, CreateStatementRequest, GetStatementRequest
-from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, LiquidateInvestmentResponse, CreateStatementResponse, GetStatementResponse
+from models.investment import InvestmentModel, InvestmentStatementModel, InvestmentObjectiveModel
+from schemas.investment import InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema
+from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, LiquidateInvestmentRequest, CreateStatementRequest, GetStatementRequest, CreateObjectiveRequest
+from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, LiquidateInvestmentResponse, CreateStatementResponse, GetStatementResponse, CreateObjectiveResponse
 
 
 class InvestmentService(BaseService):
@@ -56,6 +56,7 @@ class InvestmentService(BaseService):
 
         return response
 
+    # Statements
     async def create_statement(self, statement: CreateStatementRequest) -> CreateStatementResponse:
         new_statement = InvestmentStatementModel(**statement.model_dump())
         new_statement.owner_id = self.user['user_id']
@@ -81,6 +82,19 @@ class InvestmentService(BaseService):
 
         response = GetStatementResponse(
             statement=statement
+        )
+
+        return response
+
+    # Objectives
+    async def create_objective(self, objective: CreateObjectiveRequest) -> CreateObjectiveResponse:
+        new_objective_ = InvestmentObjectiveModel(**objective.model_dump())
+        new_objective_.owner_id = self.user['user_id']
+
+        new_objective = await InvestmentManager(session=self.session).create_objective(new_objective_)
+
+        response = CreateObjectiveResponse(
+            objective=InvestmentObjectiveSchema.model_validate(new_objective)
         )
 
         return response

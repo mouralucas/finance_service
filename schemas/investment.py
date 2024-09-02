@@ -49,3 +49,13 @@ class InvestmentStatementSchema(BaseModel):
     total_tax: float = Field(..., serialization_alias='totalTax', description='The total tax amount of the investment in the period')
     total_fee: float = Field(..., serialization_alias='totalFee', description='The total fee of the investment in the period')
     net_amount: float = Field(..., serialization_alias='netAmount', description='The net amount of the investment in the period')
+
+
+class InvestmentObjectiveSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID = Field(..., serialization_alias='objectiveId', description='The id of the objective')
+    owner_id: uuid.UUID = Field(..., serialization_alias='ownerId', description='The id of the owner of the objective')
+    title: str = Field(..., description='The title of the objective')
+    description: str | None = Field(None, description='The description of the objective')
+    estimated_deadline: datetime.date = Field(..., serialization_alias='estimatedDeadline', description='The date that are expected to reach the objective')

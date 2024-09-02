@@ -6,8 +6,8 @@ from sqlalchemy.util import await_only
 from starlette import status
 
 from backend.database import db_session
-from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, CreateStatementRequest, GetStatementRequest, LiquidateInvestmentRequest, GetInvestmentObjectiveRequest, CreateInvestmentObjectiveRequest
-from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, CreateStatementResponse, GetStatementResponse, LiquidateInvestmentResponse, CreateInvestmentObjectiveResponse, GetInvestmentObjectiveResponse
+from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, CreateStatementRequest, GetStatementRequest, LiquidateInvestmentRequest, GetInvestmentObjectiveRequest, CreateObjectiveRequest
+from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, CreateStatementResponse, GetStatementResponse, LiquidateInvestmentResponse, CreateObjectiveResponse, GetInvestmentObjectiveResponse
 from services.investment import InvestmentService
 
 router = APIRouter(prefix="/investment", tags=['Investments'])
@@ -64,13 +64,14 @@ async def get_statement(
     return await InvestmentService(session=session, user=user).get_statement(params=params)
 
 
-@router.post('/objective', summary='', description='')
+@router.post('/objective',status_code=status.HTTP_201_CREATED,
+             summary='Create a investment objective', description='')
 async def create_objective(
-        objective: CreateInvestmentObjectiveRequest,
+        objective: CreateObjectiveRequest,
         session: AsyncSession = Depends(db_session),
         user: RequiredUser = Security(get_user)
-) -> CreateInvestmentObjectiveResponse:
-    pass
+) -> CreateObjectiveResponse:
+    return await InvestmentService(session, user).create_objective(objective)
 
 
 @router.get('/objective', summary='', description='')

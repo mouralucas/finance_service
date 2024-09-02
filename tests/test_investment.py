@@ -1,6 +1,7 @@
 import datetime
 
 import pytest
+from dateutil.relativedelta import relativedelta
 from starlette import status
 
 from services.utils.datetime import get_period
@@ -238,3 +239,26 @@ async def test_get_statement(client, create_investment_statement):
 
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
+
+
+@pytest.mark.asyncio
+async def test_create_objective(client):
+    payload = {
+        'title': 'Meu objetivo',
+        'description': 'Comprar um apartamento na praia',
+        'estimatedDeadline': (datetime.datetime.utcnow() + relativedelta(years=1, months=6)).strftime('%Y-%m-%d'),
+    }
+    response = await client.post('/investment/objective', json=payload)
+
+    assert response.status_code == status.HTTP_201_CREATED
+    data = response.json()
+
+    assert 'objective' in data
+    assert 'objectiveId' in data['objective']
+
+    assert 'title' in data['objective']
+    assert data['objective']['title'] == payload['title']
+    assert 'description' in data['objective']
+    assert data['objective']['description'] == payload['description']
+    assert 'estimatedDeadline' in data['objective']
+    assert data['objective']['estimatedDeadline'] == payload['estimatedDeadline']

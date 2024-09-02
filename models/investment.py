@@ -72,7 +72,7 @@ class InvestmentObjectiveModel(SQLModel):
 
     owner_id: Mapped[uuid.UUID] = mapped_column('owner_id')
     title: Mapped[str] = mapped_column('title', String(100))
-    description: Mapped[str] = mapped_column('description', String(500))
+    description: Mapped[str] = mapped_column('description', String(500), nullable=True)
     estimated_deadline: Mapped[datetime.date] = mapped_column('estimated_deadline', nullable=True)
 
     # Investment reverse relation

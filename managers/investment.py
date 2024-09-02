@@ -9,7 +9,7 @@ from rolf_common.models import SQLModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from models.investment import InvestmentModel, InvestmentTypeModel, InvestmentStatementModel
+from models.investment import InvestmentModel, InvestmentTypeModel, InvestmentStatementModel, InvestmentObjectiveModel
 from schemas.request.investment import LiquidateInvestmentRequest
 from schemas.response.investment import LiquidateInvestmentResponse
 
@@ -53,7 +53,6 @@ class InvestmentManager(BaseDataManager):
 
         return investments
 
-
     # Investment statement
     async def create_statement(self, statement: InvestmentStatementModel) -> SQLModel:
         await self.add_one(statement)
@@ -71,7 +70,6 @@ class InvestmentManager(BaseDataManager):
 
         return statements
 
-
     # Investment Types
     async def create_investment_type(self, investment_type: InvestmentTypeModel) -> SQLModel:
         await self.add_one(investment_type)
@@ -80,7 +78,7 @@ class InvestmentManager(BaseDataManager):
 
     async def get_investment_type(self, params: dict[str, Any]):
         # TODO: create a generic method (all gets are the same, onle change is the model)
-        stmt = select(InvestmentTypeModel) # TODO: create an order by rule
+        stmt = select(InvestmentTypeModel)  # TODO: create an order by rule
 
         for key, value in params.items():
             if value:
@@ -89,3 +87,12 @@ class InvestmentManager(BaseDataManager):
         investment_types: list[SQLModel] = await self.get_all(stmt, unique_result=True)
 
         return investment_types
+
+    # Investment objectives
+    async def create_objective(self, objective: InvestmentObjectiveModel) -> SQLModel:
+        new_objective = await self.add_one(objective)
+
+        return new_objective
+
+    async def get_investment_objectives(self, params: dict[str, Any]) -> list[SQLModel]:
+        pass
