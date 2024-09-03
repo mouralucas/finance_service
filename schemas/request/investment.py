@@ -65,9 +65,10 @@ class GetStatementRequest(BaseModel):
 
 class CreateObjectiveRequest(BaseModel):
     title: str = Field(..., alias='title', description='The title of the objective')
-    description: str = Field(..., alias='description', description='The description of the objective')
+    description: str = Field(None, alias='description', description='The description of the objective')
+    amount: float = Field(None, alias='amount', description='The amount of the objective')
     estimated_deadline: datetime.date = Field(..., alias='estimatedDeadline', description='The estimated deadline of the objective')
 
 
-class GetInvestmentObjectiveRequest(BaseModel):
-    objective_id: uuid.UUID = Field(Query(..., serialization_alias='objectiveId', description='The unique identifier of the investment objective'))
+class GetObjectiveRequest(BaseModel):
+    id: uuid.UUID | None = Field(Query(None, serialization_alias='objectiveId', description='The unique identifier of the investment objective'))

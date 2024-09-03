@@ -246,6 +246,7 @@ async def test_create_objective(client):
     payload = {
         'title': 'Meu objetivo',
         'description': 'Comprar um apartamento na praia',
+        'amount': 50000,
         'estimatedDeadline': (datetime.datetime.utcnow() + relativedelta(years=1, months=6)).strftime('%Y-%m-%d'),
     }
     response = await client.post('/investment/objective', json=payload)
@@ -260,5 +261,18 @@ async def test_create_objective(client):
     assert data['objective']['title'] == payload['title']
     assert 'description' in data['objective']
     assert data['objective']['description'] == payload['description']
+    assert 'amount' in data['objective']
+    assert data['objective']['amount'] == payload['amount']
     assert 'estimatedDeadline' in data['objective']
     assert data['objective']['estimatedDeadline'] == payload['estimatedDeadline']
+
+
+@pytest.mark.asyncio
+async def test_get_open_objectives(client, create_open_investment_objectives):
+    response = await client.get('/investment/objective')
+
+    assert response.status_code == status.HTTP_200_OK
+
+    data = response.json()
+
+    assert 'objectives' in data

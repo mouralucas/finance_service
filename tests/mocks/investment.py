@@ -1,9 +1,9 @@
 import pytest_asyncio
 from rolf_common.managers import BaseDataManager
 
-from data_mock.investment import get_investment_type_mocked, get_investment_mocked, get_investment_statement_mock
-from models.investment import InvestmentTypeModel, InvestmentModel, InvestmentStatementModel
-from schemas.investment import InvestmentTypeSchema, InvestmentSchema, InvestmentStatementSchema
+from data_mock.investment import get_investment_type_mocked, get_investment_mocked, get_investment_statement_mock, get_open_investment_objective_mocked
+from models.investment import InvestmentTypeModel, InvestmentModel, InvestmentStatementModel, InvestmentObjectiveModel
+from schemas.investment import InvestmentTypeSchema, InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema
 
 
 @pytest_asyncio.fixture
@@ -30,3 +30,10 @@ async def create_investment_statement(create_test_session, create_investment) ->
     statements = [InvestmentStatementSchema.model_validate(data) for data in data_]
 
     return statements
+
+@pytest_asyncio.fixture
+async def create_open_investment_objectives(create_test_session) -> list[InvestmentObjectiveSchema]:
+    data_ = await BaseDataManager(create_test_session).add_or_ignore_all(InvestmentObjectiveModel, get_open_investment_objective_mocked())
+    open_objectives = [InvestmentObjectiveSchema.model_validate(data) for data in data_]
+
+    return open_objectives

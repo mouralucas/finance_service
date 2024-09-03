@@ -95,4 +95,12 @@ class InvestmentManager(BaseDataManager):
         return new_objective
 
     async def get_investment_objectives(self, params: dict[str, Any]) -> list[SQLModel]:
-        pass
+        stmt = select(InvestmentObjectiveModel)
+
+        for key, value in params.items():
+            if value:
+                stmt = stmt.where(getattr(InvestmentObjectiveModel, key) == value)
+
+        investment_objectives: list[SQLModel] = await self.get_all(stmt, unique_result=True)
+
+        return investment_objectives

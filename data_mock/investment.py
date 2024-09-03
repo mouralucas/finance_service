@@ -108,3 +108,28 @@ def get_investment_statement_mock() -> list[dict[str, Any]]:
     ]
 
     return statements
+
+
+def get_open_investment_objective_mocked() -> list[dict[str, Any]]:
+    open_objectives: list[dict[str, Any]] = [
+        {
+            **default_model_dict,
+            'id': uuid.UUID('97502c10-1dec-48b8-b0d7-0d5a3eef7020'),
+            'owner_id': uuid.UUID('be5b2413-a009-455f-bd8d-69ded09b5cb8'),
+            'title': 'Meu objetivo futuro',
+            'description': 'Comprar casa na praia',
+            'amount': 75500,
+            'estimated_deadline': datetime.date.today() + relativedelta(years=4),
+        },
+        {
+            **default_model_dict,
+            'id': uuid.UUID('26c28396-4d6f-454f-bc00-3bb2933a6238'),
+            'owner_id': uuid.UUID('be5b2413-a009-455f-bd8d-69ded09b5cb8'),
+            'title': 'Compra um carro novo',
+            'description': 'Comprar um carro melhor que meu carro atual',
+            'amount': 25000,
+            'estimated_deadline': datetime.date.today() + relativedelta(years=1, months=6),
+        }
+    ]
+
+    return open_objectives

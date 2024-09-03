@@ -58,4 +58,5 @@ class InvestmentObjectiveSchema(BaseModel):
     owner_id: uuid.UUID = Field(..., serialization_alias='ownerId', description='The id of the owner of the objective')
     title: str = Field(..., description='The title of the objective')
     description: str | None = Field(None, description='The description of the objective')
+    amount: float = Field(..., description='The amount of the objective')
     estimated_deadline: datetime.date = Field(..., serialization_alias='estimatedDeadline', description='The date that are expected to reach the objective')

@@ -6,8 +6,8 @@ from sqlalchemy.util import await_only
 from starlette import status
 
 from backend.database import db_session
-from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, CreateStatementRequest, GetStatementRequest, LiquidateInvestmentRequest, GetInvestmentObjectiveRequest, CreateObjectiveRequest
-from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, CreateStatementResponse, GetStatementResponse, LiquidateInvestmentResponse, CreateObjectiveResponse, GetInvestmentObjectiveResponse
+from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, CreateStatementRequest, GetStatementRequest, LiquidateInvestmentRequest, GetObjectiveRequest, CreateObjectiveRequest
+from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, CreateStatementResponse, GetStatementResponse, LiquidateInvestmentResponse, CreateObjectiveResponse, GetObjectiveResponse
 from services.investment import InvestmentService
 
 router = APIRouter(prefix="/investment", tags=['Investments'])
@@ -76,8 +76,9 @@ async def create_objective(
 
 @router.get('/objective', summary='', description='')
 async def get_objective(
-        params: GetInvestmentObjectiveRequest,
+        params: GetObjectiveRequest = Depends(),
         session: AsyncSession = Depends(db_session),
         user: RequiredUser = Security(get_user)
-) -> GetInvestmentObjectiveResponse:
-    pass
+) -> GetObjectiveResponse:
+    a =  await InvestmentService(session, user).get_objectives(params=params)
+    return a
