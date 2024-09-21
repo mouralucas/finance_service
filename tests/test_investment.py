@@ -13,8 +13,8 @@ async def test_create_investment(client, create_open_account, create_investment_
     accounts = create_open_account
     account = accounts[0]
     investment_types = create_investment_type
-    index_types = create_index_type
-    indexes = create_index
+    indexer_types = create_index_type
+    indexers = create_index
     liquidity = create_liquidity
     currency_id = accounts[0].currency_id
 
@@ -26,8 +26,8 @@ async def test_create_investment(client, create_open_account, create_investment_
     quantity = 1.025
     price = 1021.32
     amount = quantity * price
-    index_type_id = index_types[0].id
-    index_id = indexes[0].id
+    indexer_type_id = indexer_types[0].id
+    indexer_id = indexers[0].id
     liquidity_id = liquidity[0].id
     currency_id = currency_id
     country_id = 'BR'
@@ -43,8 +43,8 @@ async def test_create_investment(client, create_open_account, create_investment_
         'price': price,
         'amount': amount,
         'currencyId': str(currency_id),
-        'indexTypeId': str(index_type_id),
-        'indexId': str(index_id),
+        'indexerTypeId': str(indexer_type_id),
+        'indexerId': str(indexer_id),
         'liquidityId': str(liquidity_id),
         'countryId': country_id,
     }
@@ -82,11 +82,11 @@ async def test_create_investment(client, create_open_account, create_investment_
     assert 'amount' in data['investment']
     assert data['investment']['amount'] == amount
 
-    assert 'indexTypeId' in data['investment']
-    assert data['investment']['indexTypeId'] == str(index_type_id)
+    assert 'indexerTypeId' in data['investment']
+    assert data['investment']['indexerTypeId'] == str(indexer_type_id)
 
-    assert 'indexId' in data['investment']
-    assert data['investment']['indexId'] == str(index_id)
+    assert 'indexerId' in data['investment']
+    assert data['investment']['indexerId'] == str(indexer_id)
 
     assert 'liquidityId' in data['investment']
     assert data['investment']['liquidityId'] == str(liquidity_id)
@@ -111,8 +111,8 @@ async def test_create_liquidated_investment(client, create_open_account, create_
     quantity = 1
     price = 112.47
     amount = quantity * price
-    index_type_id = create_index_type[0].id
-    index_id = create_index[0].id
+    indexer_type_id = create_index_type[0].id
+    indexer_id = create_index[0].id
     liquidity_id = create_liquidity[0].id
     currency_id = create_currency[0].id
     country_id = 'BR'
@@ -130,8 +130,8 @@ async def test_create_liquidated_investment(client, create_open_account, create_
         'price': price,
         'amount': amount,
         'currencyId': str(currency_id),
-        'indexTypeId': str(index_type_id),
-        'indexId': str(index_id),
+        'indexerTypeId': str(indexer_type_id),
+        'indexerId': str(indexer_id),
         'liquidityId': str(liquidity_id),
         'countryId': country_id,
         'liquidationDate': liquidation_date,
@@ -276,3 +276,18 @@ async def test_get_open_objectives(client, create_open_investment_objectives):
     data = response.json()
 
     assert 'objectives' in data
+
+
+@pytest.mark.asyncio
+async def test_get_investment_type(client):
+    response = client.get('/investment/type')
+
+    assert response.status_code == status.HTTP_200_OK
+    data = response.json()
+
+    assert type(data) is dict
+    assert 'investmentType' in data
+    assert type(data['investmentType']) is list
+
+    for investmentType in data['investmentType']:
+        assert 'name' in investmentType

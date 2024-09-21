@@ -64,10 +64,9 @@ class InvestmentModel(SQLModel):
     currency_id: Mapped[str] = mapped_column(ForeignKey('currency.id'))
     currency: Mapped['CurrencyModel'] = relationship(foreign_keys=[currency_id], lazy='subquery')
 
-    index_type_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('indexer_type.id'))  # pre-fixado, pos, hibrido, etc MAYBE A TABLE?
-    index_type: Mapped['IndexerTypeModel'] = relationship(foreign_keys=[index_type_id], lazy='subquery')
-    index_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('indexer.id'))  # criar tabela
-    index: Mapped['IndexerModel'] = relationship(foreign_keys=[index_id], lazy='subquery')
+    indexer_type_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('indexer_type.id'))
+    indexer_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('indexer.id'))  # criar tabela
+    indexer: Mapped['IndexerModel'] = relationship(foreign_keys=[indexer_id], lazy='subquery')
     liquidity_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('liquidity.id'))
     liquidity: Mapped['LiquidityModel'] = relationship(foreign_keys=[liquidity_id], lazy='subquery')
     is_liquidated: Mapped[bool] = mapped_column('is_liquidated', default=False)

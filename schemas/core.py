@@ -35,18 +35,18 @@ class TaxSchema(BaseModel):
     country_id: str = Field(..., serialization_alias='countryId', description='The country of the tax')
 
 
-class IndexTypeSchema(BaseModel):
+class IndexerTypeSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: uuid.UUID = Field(..., serialization_alias='indexTypeId', description='The unique id of the index type')
+    id: uuid.UUID = Field(..., serialization_alias='indexerTypeId', description='The unique id of the index type')
     name: str = Field(..., description='The name of the index type')
     description: str | None = Field(None, description='The description of the index type')
 
 
-class IndexSchema(BaseModel):
+class IndexerSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: uuid.UUID = Field(serialization_alias='indexId', description=' The unique identification of the index', json_schema_extra={'example': uuid.uuid4()})
+    id: uuid.UUID = Field(serialization_alias='indexerId', description=' The unique identification of the index', json_schema_extra={'example': uuid.uuid4()})
     name: str = Field(..., description='The name of the index')
     description: str | None = Field(None, description='The description of the index')
 

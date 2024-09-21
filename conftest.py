@@ -24,7 +24,7 @@ def event_loop(request):
 
 
 @pytest_asyncio.fixture(scope='function')
-async def create_test_session():
+async def test_session():
     async with test_sessionmanager.connect() as connection:
         await connection.run_sync(Base.metadata.drop_all)
         await connection.run_sync(Base.metadata.create_all)
@@ -34,12 +34,12 @@ async def create_test_session():
 
 
 @pytest_asyncio.fixture(scope='function', autouse=True)
-def override_db_session(create_test_session):
+def override_db_session(test_session):
     """
     Overrides the database session, in this case using test_sessionmanager.
     In session end it rolls back all database operations.
     """
-    app.dependency_overrides[db_session] = lambda: create_test_session
+    app.dependency_overrides[db_session] = lambda: test_session
 
 
 def get_mock_user():

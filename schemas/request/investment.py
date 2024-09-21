@@ -17,9 +17,9 @@ class CreateInvestmentRequest(BaseModel):
     price: float = Field(None, description='The unit price for the investment')
     amount: float = Field(None, description='The total bought. Quantity * price')
     currency_id: str = Field(..., alias='currencyId', description='The id of the currency')
-    index_type_id: uuid.UUID = Field(..., alias='indexTypeId', description='The type of the index for the investment')
+    indexer_type_id: uuid.UUID = Field(..., alias='indexerTypeId', description='The type of the index for the investment')
 
-    index_id: uuid.UUID = Field(..., alias='indexId', description='The id of the investment index')
+    indexer_id: uuid.UUID = Field(..., alias='indexerId', description='The id of the investment index')
     liquidity_id: uuid.UUID = Field(..., alias='liquidityId', description='The id of investment liquidity')
     liquidation_date: datetime.date = Field(None, alias='liquidationDate', description='The date that the investment was liquidated')
     liquidation_amount: float = Field(None, alias='liquidationAmount', description='The amount liquidated, after tax')

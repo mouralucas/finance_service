@@ -11,6 +11,7 @@ class InvestmentTypeSchema(BaseModel):
     name: str = Field(..., description='The name of the investment type')
     description: str | None = Field(None, description='Description of the investment type')
     parent_id: uuid.UUID | None = Field(None, serialization_alias='parentId', description='The id of the parent investment type')
+    investment_category_id: uuid.UUID = Field(None, description='The id the category of this type of investment')
 
 
 class InvestmentSchema(BaseModel):
@@ -28,9 +29,9 @@ class InvestmentSchema(BaseModel):
     price: float = Field(None, description='The unit price for the investment')
     amount: float = Field(None, description='The total bought. Quantity * price')
     currency_id: str = Field(..., serialization_alias='currencyId', description='The id of the currency')
-    index_type_id: uuid.UUID = Field(..., serialization_alias='indexTypeId', description='The id of index type for the investment')
+    indexer_type_id: uuid.UUID = Field(..., serialization_alias='indexerTypeId', description='The id of index type for the investment')
 
-    index_id: uuid.UUID = Field(..., serialization_alias='indexId', description='The id of the investment index')
+    indexer_id: uuid.UUID = Field(..., serialization_alias='indexerId', description='The id of the investment index')
     liquidity_id: uuid.UUID = Field(..., serialization_alias='liquidityId', description='The id of investment liquidity')
     is_liquidated: bool = Field(None, serialization_alias='isLiquidated', description='Whether the investment is liquidated')
     liquidation_date: datetime.date | None = Field(None, serialization_alias='liquidationDate', description='The date that the investment was liquidated')

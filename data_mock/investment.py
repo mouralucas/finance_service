@@ -41,7 +41,7 @@ def get_investment_mocked() -> list[dict[str, Any]]:
     investment_types = get_investment_type_mocked()
     currencies = get_currency_mocked()
     index_types = get_index_type_mocked()
-    index = get_index_mocked()
+    indexer = get_index_mocked()
     liquidity = get_liquidity_mocked()
     countries = get_country_mocked()
 
@@ -61,8 +61,8 @@ def get_investment_mocked() -> list[dict[str, Any]]:
             'price': 150.65,
             'amount': 1.02 * 150.65,
             'currency_id': currencies[0]['id'],
-            'index_type_id': index_types[0]['id'],
-            'index_id': index[0]['id'],
+            'indexer_type_id': index_types[0]['id'],
+            'indexer_id': indexer[0]['id'],
             'liquidity_id': liquidity[0]['id'],
             'country_id': countries[0]['id'],
         },
@@ -81,8 +81,8 @@ def get_investment_mocked() -> list[dict[str, Any]]:
             'price': 1.50,
             'amount': 998.3 * 1.50,
             'currency_id': currencies[0]['id'],
-            'index_type_id': index_types[0]['id'],
-            'index_id': index[0]['id'],
+            'indexer_type_id': index_types[0]['id'],
+            'indexer_id': indexer[0]['id'],
             'liquidity_id': liquidity[0]['id'],
             'country_id': countries[0]['id'],
         }
