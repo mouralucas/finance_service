@@ -4,17 +4,45 @@ from rolf_common.models import SQLModel
 from sqlalchemy import String, ForeignKey, JSON
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
+class InvestmentCategory(SQLModel):
+    """
+    Created by: Lucas Penha de Moura - 21/09/2024
+        This table stores the categories of investments. At first only two:
+        Fixed Incoming
+        Variable Incoming
+
+        This information is used to filter the 'investment_type' model.
+    """
+    __tablename__ = 'investment_category'
+
+    name: Mapped[str] = mapped_column('name', String(50))
+    description: Mapped[str] = mapped_column('description', String(250), nullable=True)
+
 
 class InvestmentTypeModel(SQLModel):
+    """
+    Created by: Lucas Penha de Moura - 11/08/2024
+        This model is used to store all kinds of investment types.
+        In Brazil, for example, it can be CDB, LCI, LCA, Tesouro Direto, etc
+
+        TODO: maybe create a field to country, to indicate types by country
+    """
     __tablename__ = 'investment_type'
 
     name: Mapped[str] = mapped_column('name', String(200))
     description: Mapped[str] = mapped_column('description', String(200), nullable=True)
     parent_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('investment_type.id'), nullable=True)
     parent: Mapped['InvestmentTypeModel'] = relationship(foreign_keys=[parent_id], lazy='subquery')
+    investment_category_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('investment_category.id'), nullable=True)
+    investment_category: Mapped['InvestmentCategory'] = relationship(foreign_keys=[investment_category_id], lazy='subquery')
 
 
 class InvestmentModel(SQLModel):
+    """
+    Created by: Lucas Penha de Moura - 11/08/2024
+        This model stores the investment itself, using the values in the contract.
+        It does not show the position of the investment, although you can show the amount at the end (liquidation_amount)
+    """
     __tablename__ = 'investment'
 
     owner_id: Mapped[uuid.UUID] = mapped_column('owner_id')
@@ -36,10 +64,10 @@ class InvestmentModel(SQLModel):
     currency_id: Mapped[str] = mapped_column(ForeignKey('currency.id'))
     currency: Mapped['CurrencyModel'] = relationship(foreign_keys=[currency_id], lazy='subquery')
 
-    index_type_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('index_type.id'))  # pre-fixado, pos, hibrido, etc MAYBE A TABLE?
-    index_type: Mapped['IndexTypeModel'] = relationship(foreign_keys=[index_type_id], lazy='subquery')
-    index_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('index.id'))  # criar tabela
-    index: Mapped['IndexModel'] = relationship(foreign_keys=[index_id], lazy='subquery')
+    index_type_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('indexer_type.id'))  # pre-fixado, pos, hibrido, etc MAYBE A TABLE?
+    index_type: Mapped['IndexerTypeModel'] = relationship(foreign_keys=[index_type_id], lazy='subquery')
+    index_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('indexer.id'))  # criar tabela
+    index: Mapped['IndexerModel'] = relationship(foreign_keys=[index_id], lazy='subquery')
     liquidity_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('liquidity.id'))
     liquidity: Mapped['LiquidityModel'] = relationship(foreign_keys=[liquidity_id], lazy='subquery')
     is_liquidated: Mapped[bool] = mapped_column('is_liquidated', default=False)
@@ -53,6 +81,11 @@ class InvestmentModel(SQLModel):
 
 
 class InvestmentStatementModel(SQLModel):
+    """
+    Created by: Lucas Penha de Moura - 11/08/2024
+        This model stores the values of each investment at the end of each month
+        The fee and tax stored here is only for reference, in case the investment were liquidated that day
+    """
     __tablename__ = 'investment_statement'
 
     investment_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('investment.id'))

@@ -3,7 +3,7 @@ from rolf_common.managers import BaseDataManager
 
 from data_mock.core import get_country_mocked, get_tax_mocked, get_currency_mocked, get_bank_mocked, get_category_mocked, get_liquidity_mocked
 from data_mock.core import get_index_mocked, get_index_type_mocked
-from models.core import BankModel, CurrencyModel, CategoryModel, CountryModel, TaxModel, IndexTypeModel, IndexModel, LiquidityModel
+from models.core import BankModel, CurrencyModel, CategoryModel, CountryModel, TaxModel, IndexerTypeModel, IndexerModel, LiquidityModel
 from schemas.core import CurrencySchema, BankSchema, CountrySchema, TaxSchema, CategorySchema, IndexTypeSchema, IndexSchema, LiquiditySchema
 
 
@@ -25,7 +25,7 @@ async def create_currency(create_test_session) -> list[CurrencySchema]:
 
 @pytest_asyncio.fixture
 async def create_index_type(create_test_session) -> list[IndexTypeSchema]:
-    data_ = await BaseDataManager(create_test_session).add_or_ignore_all(IndexTypeModel, get_index_type_mocked())
+    data_ = await BaseDataManager(create_test_session).add_or_ignore_all(IndexerTypeModel, get_index_type_mocked())
     index_type = [IndexTypeSchema.model_validate(data) for data in data_]
 
     return index_type
@@ -33,7 +33,7 @@ async def create_index_type(create_test_session) -> list[IndexTypeSchema]:
 
 @pytest_asyncio.fixture
 async def create_index(create_test_session) -> list[IndexSchema]:
-    data_ = await BaseDataManager(create_test_session).add_or_ignore_all(IndexModel, get_index_mocked())
+    data_ = await BaseDataManager(create_test_session).add_or_ignore_all(IndexerModel, get_index_mocked())
     index = [IndexSchema.model_validate(data) for data in data_]
 
     return index

@@ -6,6 +6,10 @@ from sqlalchemy import String, SmallInteger, ForeignKey
 
 
 class CurrencyModel(SQLModel):
+    """
+    Created by: Lucas Penha de Moura - 08/08/2024
+        This model is used to store the currencies available in the system.
+    """
     __tablename__ = 'currency'
 
     id: Mapped[str] = mapped_column('id', String(3), primary_key=True)
@@ -19,8 +23,8 @@ class CategoryModel(SQLModel):
     name: Mapped[str] = mapped_column('name', String(250))
     description: Mapped[str] = mapped_column('description', String(500), nullable=True)
     comment: Mapped[str] = mapped_column('comment', String(500), nullable=True)
-    # parent_id: Mapped[uuid.UUID] =
-    # parent: Mapped[Category]...
+    parent_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('category.id'), nullable=True)
+    parent: Mapped['CategoryModel'] = relationship(foreign_keys=[parent_id], lazy='subquery')
     order: Mapped[int] = mapped_column('order', SmallInteger, nullable=True)
     # more necessary fields
 
@@ -40,21 +44,41 @@ class BankModel(SQLModel):
     code: Mapped[int] = mapped_column('code', SmallInteger)
 
 
-class IndexTypeModel(SQLModel):
-    __tablename__ = 'index_type'
+class IndexerTypeModel(SQLModel):
+    """
+    Created by: Lucas Penha de Moura - 12/08/2024
+        This table stores the types of indexes.
+        It's a small table that, at first, only sores 2 register (fixed, floating and hybrid)
+    """
+    __tablename__ = 'indexer_type'
 
     name: Mapped[str] = mapped_column('name', String(250))
     description: Mapped[str] = mapped_column('description', String(500), nullable=True)
 
 
-class IndexModel(SQLModel):
-    __tablename__ = 'index'
+class IndexerModel(SQLModel):
+    """
+    Created by: Lucas Penha de Moura - 11/08/2024
+        This model stores all possible indexers.
+        For example, in Brazil, there is SELIC, CDI, IPCA, etc
+        There is a default option in table when a index is not used {name='Índice não definido'}
+
+        TODO: maybe add country
+        TODO: create the default data creation for this table after migrate
+    """
+    __tablename__ = 'indexer'
 
     name: Mapped[str] = mapped_column('name', String(250))
     description: Mapped[str] = mapped_column('description', String(500), nullable=True)
 
 
 class LiquidityModel(SQLModel):
+    """
+    Created by: Lucas Penha de Moura - 11/08/2024
+        This model stores liquidity information like if it is "daily", "monthly", etc.
+
+        # TODO: rethink this table, it can be infinite liquidity like D+
+    """
     __tablename__ = 'liquidity'
 
     name: Mapped[str] = mapped_column('name', String(250))
@@ -62,6 +86,11 @@ class LiquidityModel(SQLModel):
 
 
 class TaxModel(SQLModel):
+    """
+    Created by: Lucas Penha de Moura - 26/08/2024
+        This table stores tax descriptions.
+        Each country have an infinite of taxes that are applied to every transaction made.
+    """
     __tablename__ = 'tax'
 
     name: Mapped[str] = mapped_column('name', String(250))

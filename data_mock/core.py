@@ -131,11 +131,35 @@ def get_index_type_mocked() -> list[dict[str, Any]]:
         {
             **default_model_dict,
             'id': uuid.UUID('7676d154-4384-4d84-9a17-6d951df80b66'),
-            'name': 'Renda Fixa',
+            'name': 'Indexador variável',
+            'description': 'O rendimento é variável de acordo com o mercado'
         },
         {
             **default_model_dict,
             'id': uuid.UUID('ddacb442-a487-403b-9419-cab038e53373'),
+            'name': 'Indexador fixo',
+            'description': 'O rendimento é fixo independente de variações do mercado'
+        },
+        {
+            **default_model_dict,
+            'id': uuid.UUID('14ece4c4-d168-45de-ad0c-a410e425c7ad'),
+            'name': 'Indexador híbrido'
+            'description' 'O rendimento é baseado em um indexador variável e um fixo. Ex: IPCA + 6%'
+        }
+    ]
+
+    return index_types
+
+def get_investment_category_mocked() -> list[dict[str, Any]]:
+    index_types: list[dict[str, Any]] = [
+        {
+            **default_model_dict,
+            'id': uuid.UUID('f001458a-251f-4f82-9846-a14834e82c68'),
+            'name': 'Renda Fixa',
+        },
+        {
+            **default_model_dict,
+            'id': uuid.UUID('954d50fc-3e0b-458f-92b5-fe00f163b3d2'),
             'name': 'Renda variável'
         }
     ]
@@ -166,6 +190,7 @@ def get_index_mocked() -> list[dict[str, Any]]:
     ]
 
     return index_list
+
 
 def get_liquidity_mocked() -> list[dict[str, Any]]:
     liquidity: list[dict[str, Any]] = [
