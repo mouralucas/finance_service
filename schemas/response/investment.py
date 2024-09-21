@@ -14,8 +14,9 @@ class GetInvestmentResponse(SuccessResponseBase):
     quantity: int = Field(..., description='The total number of investment returned')
     investments: list[InvestmentSchema] = Field(..., description='The list of investments')
 
+
 class GetInvestmentTypeResponse(SuccessResponseBase):
-    investment_type: list[InvestmentTypeSchema] = Field(..., description='The list of investment types')
+    investment_type: list[InvestmentTypeSchema] = Field(..., serialization_alias='investmentType', description='The list of investment types')
 
 
 class LiquidateInvestmentResponse(CreateInvestmentResponse):

@@ -20,16 +20,9 @@ def get_investment_type_mocked() -> list[dict[str, Any]]:
     investment_types: list[dict[str, Any]] = [
         {
             **default_model_dict,
-            'id': uuid.UUID('bbf6a741-a7cf-4bbf-99c0-7bbadba69710'),
-            'name': 'Renda Fixa',
-            'description': 'Investimento de renda fixa'
-        },
-        {
-            **default_model_dict,
             'id': uuid.UUID('b9df5e2c-874b-4e7b-a68d-adfdb84dcbe6'),
             'name': 'CDB',
             'description': 'Certificado de Depósito Bancário',
-            'parent_id': uuid.UUID('bbf6a741-a7cf-4bbf-99c0-7bbadba69710')
         }
     ]
 
@@ -74,7 +67,7 @@ def get_investment_mocked() -> list[dict[str, Any]]:
             'account_id': accounts[1]['id'],
             'name': "Test Investment 2",
             'description': "Test Investment 2",
-            'type_id': investment_types[1]['id'],
+            'type_id': investment_types[0]['id'],
             'transaction_date': datetime.date.today() - relativedelta(years=4, months=7, days=28),
             'maturity_date': datetime.date.today() + relativedelta(years=0, months=11, days=9),
             'quantity': 998.3,

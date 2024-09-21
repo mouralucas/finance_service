@@ -1,7 +1,7 @@
 import uuid
 
 from fastapi import HTTPException
-from sqlalchemy import select, update
+from sqlalchemy import select, update, Executable
 from typing import Any, List
 
 from rolf_common.managers import BaseDataManager
@@ -76,17 +76,24 @@ class InvestmentManager(BaseDataManager):
 
         return investment_type
 
-    async def get_investment_type(self, params: dict[str, Any]):
-        # TODO: create a generic method (all gets are the same, onle change is the model)
-        stmt = select(InvestmentTypeModel)  # TODO: create an order by rule
+    async def get_investment_type(self) -> list[SQLModel]:
+        sql_statement: Executable = select(InvestmentTypeModel).order_by(InvestmentTypeModel.name)
 
-        for key, value in params.items():
-            if value:
-                stmt = stmt.where(getattr(InvestmentTypeModel, key) == value)
-
-        investment_types: list[SQLModel] = await self.get_all(stmt, unique_result=True)
+        investment_types: list[SQLModel] = await self.get_all(sql_statement)
 
         return investment_types
+
+    # async def get_investment_type(self, params: dict[str, Any]):
+    #     # TODO: create a generic method (all gets are the same, only change is the model)
+    #     stmt = select(InvestmentTypeModel)  # TODO: create an order by rule
+    #
+    #     for key, value in params.items():
+    #         if value:
+    #             stmt = stmt.where(getattr(InvestmentTypeModel, key) == value)
+    #
+    #     investment_types: list[SQLModel] = await self.get_all(stmt, unique_result=True)
+    #
+    #     return investment_types
 
     # Investment objectives
     async def create_objective(self, objective: InvestmentObjectiveModel) -> SQLModel:

@@ -11,7 +11,7 @@ class InvestmentTypeSchema(BaseModel):
     name: str = Field(..., description='The name of the investment type')
     description: str | None = Field(None, description='Description of the investment type')
     parent_id: uuid.UUID | None = Field(None, serialization_alias='parentId', description='The id of the parent investment type')
-    investment_category_id: uuid.UUID = Field(None, description='The id the category of this type of investment')
+    investment_category_id: uuid.UUID | None = Field(None, description='The id the category of this type of investment')
 
 
 class InvestmentSchema(BaseModel):

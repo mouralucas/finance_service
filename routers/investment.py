@@ -7,7 +7,7 @@ from starlette import status
 
 from backend.database import db_session
 from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, CreateStatementRequest, GetStatementRequest, LiquidateInvestmentRequest, GetObjectiveRequest, CreateObjectiveRequest
-from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, CreateStatementResponse, GetStatementResponse, LiquidateInvestmentResponse, CreateObjectiveResponse, GetObjectiveResponse
+from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, CreateStatementResponse, GetStatementResponse, LiquidateInvestmentResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse
 from services.investment import InvestmentService
 
 router = APIRouter(prefix="/investment", tags=['Investments'])
@@ -44,6 +44,13 @@ async def liquidate(
 
     return response
 
+
+@router.get('/type', summary='Get investment types')
+async def get_investment_types(
+        session: AsyncSession = Depends(db_session),
+        user: RequiredUser = Security(get_user)
+) -> GetInvestmentTypeResponse:
+    return await InvestmentService(session=session, user=user).get_investment_types()
 
 @router.post('/statement', status_code=status.HTTP_201_CREATED,
              summary='Create a statement for an investment', description='Create a statement for an investment')

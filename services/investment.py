@@ -1,14 +1,15 @@
 import datetime
 
+from rolf_common.models import SQLModel
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import BaseService
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from managers.investment import InvestmentManager
 from models.investment import InvestmentModel, InvestmentStatementModel, InvestmentObjectiveModel
-from schemas.investment import InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema
+from schemas.investment import InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema, InvestmentTypeSchema
 from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, LiquidateInvestmentRequest, CreateStatementRequest, GetStatementRequest, CreateObjectiveRequest, GetObjectiveRequest
-from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, LiquidateInvestmentResponse, CreateStatementResponse, GetStatementResponse, CreateObjectiveResponse, GetObjectiveResponse
+from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, LiquidateInvestmentResponse, CreateStatementResponse, GetStatementResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse
 
 
 class InvestmentService(BaseService):
@@ -17,6 +18,7 @@ class InvestmentService(BaseService):
         self.user = user.model_dump()
         self.investment_manager = InvestmentManager(session=self.session)
 
+    # Investments
     async def create_investment(self, investment: CreateInvestmentRequest) -> CreateInvestmentResponse:
         new_investment = InvestmentModel(**investment.model_dump())
         new_investment.owner_id = self.user['user_id']
@@ -53,6 +55,19 @@ class InvestmentService(BaseService):
 
         response = LiquidateInvestmentResponse(
             investment=InvestmentSchema.model_validate(liquidated_investment),
+        )
+
+        return response
+
+    # Investment Types
+    async def create_investment_type(self):
+        pass
+
+    async def get_investment_types(self) -> GetInvestmentTypeResponse:
+        investment_types: list[SQLModel] = await self.investment_manager.get_investment_type()
+
+        response = GetInvestmentTypeResponse(
+            investment_type=investment_types,
         )
 
         return response

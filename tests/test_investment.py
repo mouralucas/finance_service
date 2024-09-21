@@ -279,8 +279,8 @@ async def test_get_open_objectives(client, create_open_investment_objectives):
 
 
 @pytest.mark.asyncio
-async def test_get_investment_type(client):
-    response = client.get('/investment/type')
+async def test_get_investment_type(client, create_investment_type):
+    response = await client.get('/investment/type')
 
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
