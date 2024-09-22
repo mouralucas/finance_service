@@ -9,7 +9,7 @@ from managers.investment import InvestmentManager
 from models.investment import InvestmentModel, InvestmentStatementModel, InvestmentObjectiveModel
 from schemas.investment import InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema, InvestmentTypeSchema
 from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, LiquidateInvestmentRequest, CreateStatementRequest, GetStatementRequest, CreateObjectiveRequest, GetObjectiveRequest
-from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, LiquidateInvestmentResponse, CreateStatementResponse, GetStatementResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse
+from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, LiquidateInvestmentResponse, CreateStatementResponse, GetStatementResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse, GetInvestmentWithoutObjectives
 
 
 class InvestmentService(BaseService):
@@ -122,4 +122,13 @@ class InvestmentService(BaseService):
             objectives=objectives
         )
 
+        return response
+
+    async def get_investment_without_objective(self) -> GetInvestmentWithoutObjectives:
+        investments = await self.investment_manager.get_investment_by_objective({})
+
+        response = GetInvestmentWithoutObjectives(
+            quantity=len(investments),
+            investments=investments,
+        )
         return response

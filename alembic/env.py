@@ -13,6 +13,7 @@ from backend.settings import settings
 from models.core import *
 from models.account import *
 from models.credit_card import *
+from models.investment import *
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

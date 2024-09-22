@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from fastapi import APIRouter, Depends, Security
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import get_user
@@ -7,7 +9,7 @@ from starlette import status
 
 from backend.database import db_session
 from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, CreateStatementRequest, GetStatementRequest, LiquidateInvestmentRequest, GetObjectiveRequest, CreateObjectiveRequest
-from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, CreateStatementResponse, GetStatementResponse, LiquidateInvestmentResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse
+from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, CreateStatementResponse, GetStatementResponse, LiquidateInvestmentResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse, GetInvestmentWithoutObjectives
 from services.investment import InvestmentService
 
 router = APIRouter(prefix="/investment", tags=['Investments'])
@@ -89,3 +91,12 @@ async def get_objective(
 ) -> GetObjectiveResponse:
     a =  await InvestmentService(session, user).get_objectives(params=params)
     return a
+
+@router.get('/objective/not-set')
+async def get_investments_without_objectives(
+        session: AsyncSession = Depends(db_session),
+        # user: RequiredUser = Security(get_user)
+) -> GetInvestmentWithoutObjectives:
+    user = RequiredUser(user_id=uuid4())
+    return await InvestmentService(session=session, user=user).get_investment_without_objective()
+

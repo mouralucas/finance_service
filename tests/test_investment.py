@@ -181,6 +181,21 @@ async def test_liquidate_investment(client, create_investment):
 
 
 @pytest.mark.asyncio
+async def test_get_investment_type(client, create_investment_type):
+    response = await client.get('/investment/type')
+
+    assert response.status_code == status.HTTP_200_OK
+    data = response.json()
+
+    assert type(data) is dict
+    assert 'investmentType' in data
+    assert type(data['investmentType']) is list
+
+    for investmentType in data['investmentType']:
+        assert 'name' in investmentType
+
+
+@pytest.mark.asyncio
 async def test_create_investment_statement(client, create_investment, create_tax):
     investments = create_investment
     taxes = create_tax
@@ -279,15 +294,15 @@ async def test_get_open_objectives(client, create_open_investment_objectives):
 
 
 @pytest.mark.asyncio
-async def test_get_investment_type(client, create_investment_type):
-    response = await client.get('/investment/type')
+async def test_check_investments_for_objectives(client, create_investment):
+    """
+    Created by: Lucas Penha de Moura - 21/09/2024
+        This test checks the function that looks for an investment without an objective
+    """
+    response = await client.get('/investment/objective/not-set')
 
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
 
-    assert type(data) is dict
-    assert 'investmentType' in data
-    assert type(data['investmentType']) is list
-
-    for investmentType in data['investmentType']:
-        assert 'name' in investmentType
+    assert 'investments' in data
+    assert type(data['investments']) is list

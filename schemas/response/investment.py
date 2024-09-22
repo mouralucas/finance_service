@@ -38,3 +38,7 @@ class CreateObjectiveResponse(SuccessResponseBase):
 
 class GetObjectiveResponse(SuccessResponseBase):
     objectives: list[InvestmentObjectiveSchema] = Field(..., description='The list of investment objectives')
+
+
+class GetInvestmentWithoutObjectives(GetInvestmentResponse):
+    pass

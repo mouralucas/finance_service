@@ -1,5 +1,6 @@
 import datetime
 import uuid
+from gzip import FEXTRA
 
 from pydantic import BaseModel, Field, ConfigDict
 
@@ -39,6 +40,7 @@ class InvestmentSchema(BaseModel):
 
     country_id: str = Field(..., serialization_alias='countryId', description='The id of the country')
 
+    objective_id: uuid.UUID | None = Field(None, serialization_alias='objectiveId', description='The id of the objective')
 
 class InvestmentStatementSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)

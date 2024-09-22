@@ -83,18 +83,6 @@ class InvestmentManager(BaseDataManager):
 
         return investment_types
 
-    # async def get_investment_type(self, params: dict[str, Any]):
-    #     # TODO: create a generic method (all gets are the same, only change is the model)
-    #     stmt = select(InvestmentTypeModel)  # TODO: create an order by rule
-    #
-    #     for key, value in params.items():
-    #         if value:
-    #             stmt = stmt.where(getattr(InvestmentTypeModel, key) == value)
-    #
-    #     investment_types: list[SQLModel] = await self.get_all(stmt, unique_result=True)
-    #
-    #     return investment_types
-
     # Investment objectives
     async def create_objective(self, objective: InvestmentObjectiveModel) -> SQLModel:
         new_objective = await self.add_one(objective)
@@ -111,3 +99,10 @@ class InvestmentManager(BaseDataManager):
         investment_objectives: list[SQLModel] = await self.get_all(stmt, unique_result=True)
 
         return investment_objectives
+
+    async def get_investment_by_objective(self, params: dict[str, Any]) -> list[SQLModel]:
+        sql_statement = select(InvestmentModel).where(InvestmentModel.objective_id == None).order_by(InvestmentModel.transaction_date)
+
+        return await self.get_all(sql_statement)
+
+
