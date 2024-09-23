@@ -10,6 +10,7 @@ from models.investment import InvestmentModel, InvestmentStatementModel, Investm
 from schemas.investment import InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema, InvestmentTypeSchema
 from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, LiquidateInvestmentRequest, CreateStatementRequest, GetStatementRequest, CreateObjectiveRequest, GetObjectiveRequest
 from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, LiquidateInvestmentResponse, CreateStatementResponse, GetStatementResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse, GetInvestmentWithoutObjectives
+from services.utils.datetime import get_period, get_previous_period
 
 
 class InvestmentService(BaseService):
@@ -76,10 +77,27 @@ class InvestmentService(BaseService):
     async def create_statement(self, statement: CreateStatementRequest) -> CreateStatementResponse:
         new_statement = InvestmentStatementModel(**statement.model_dump())
         new_statement.owner_id = self.user['user_id']
+
+        investment = await self.investment_manager.get_investment_by_id(statement.investment_id)
+        previous_statements = await self.investment_manager.get_statement({'investment_id': investment.id})
+        last_statement = previous_statements[0] if previous_statements else None
+
+        # If it is the first statement period must be the sabe as the investment
+        if not previous_statements and get_period(investment.transaction_date) != statement.period:
+            raise
+
+        # check if the statement period is less then investment
+        if statement.period < get_period(investment.transaction_date):
+            raise
+
+        # Check if the statement from last period exists
+        if last_statement and last_statement.period != get_previous_period(statement.period):
+            pass
+
         # TODO: rules to add
         # The period must not be less then the investment transaction period
         # If the period is the same of investment transaction:
-        #   The previous_amount is zero
+        #   The previous_amount is the amount invested
         # If period greater then investment transaction period:
         #   Check if the previous period is available in statement
         #       If not warn the user

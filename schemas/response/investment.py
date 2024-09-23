@@ -29,7 +29,7 @@ class CreateStatementResponse(SuccessResponseBase):
 
 
 class GetStatementResponse(SuccessResponseBase):
-    statement: list[InvestmentStatementSchema] = Field(..., description='The investment statement')
+    statement: list[InvestmentStatementSchema] | None = Field(None, description='The investment statement')
 
 
 class CreateObjectiveResponse(SuccessResponseBase):

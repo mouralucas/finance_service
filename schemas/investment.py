@@ -47,6 +47,7 @@ class InvestmentStatementSchema(BaseModel):
 
     id: uuid.UUID = Field(..., serialization_alias='investmentStatementId', description='The id of the statement')
     investment_id: uuid.UUID = Field(..., serialization_alias='investmentId', description='The id of the investment')
+    investment: InvestmentSchema = Field(..., serialization_alias='investment', description='The object of the investment')
     period: int = Field(..., serialization_alias='period', description='The period of the statement')
     gross_amount: float = Field(..., serialization_alias='grossAmount', description='The gross amount of the investment in the period')
     total_tax: float = Field(..., serialization_alias='totalTax', description='The total tax amount of the investment in the period')

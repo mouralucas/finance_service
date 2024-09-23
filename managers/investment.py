@@ -60,7 +60,7 @@ class InvestmentManager(BaseDataManager):
         return statement
 
     async def get_statement(self, params: dict[str, Any]) -> list[SQLModel]:
-        stmt = select(InvestmentStatementModel)
+        stmt = select(InvestmentStatementModel).order_by(InvestmentStatementModel.period)
 
         for key, value in params.items():
             if value:

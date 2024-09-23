@@ -91,7 +91,7 @@ def get_investment_statement_mock() -> list[dict[str, Any]]:
         {
             **default_model_dict,
             'investment_id': investments[0]['id'],
-            'period': get_period(datetime.date.today()),
+            'period': get_period(investments[0]['transaction_date']),
             'previous_amount': 0,
             'gross_amount': investments[0]['amount'] + investments[0]['amount'] * 0.001,
             'total_tax': 0.25,
