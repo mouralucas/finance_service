@@ -4,6 +4,7 @@ from rolf_common.models import SQLModel
 from sqlalchemy import String, ForeignKey, JSON
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
+
 class InvestmentCategory(SQLModel):
     """
     Created by: Lucas Penha de Moura - 21/09/2024
@@ -97,6 +98,10 @@ class InvestmentStatementModel(SQLModel):
     net_amount: Mapped[float] = mapped_column('net_amount')
     tax_detail: Mapped[dict] = mapped_column('tax_detail', JSON, nullable=True)
     fee_detail: Mapped[dict] = mapped_column('fee_detail', JSON, nullable=True)
+    # TODO: decide if persist this data or calculate when needed
+    value_change: Mapped[float] = mapped_column('value_change', default=0)
+    percentage_change: Mapped[float] = mapped_column('percentage_change', default=0)
+    index_change: Mapped[float] = mapped_column('index_change', default=0)  # how much the index changed in the period
 
 
 class InvestmentObjectiveModel(SQLModel):
