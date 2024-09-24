@@ -3,7 +3,7 @@ from rolf_common.managers import BaseDataManager
 
 from data_mock.core import get_country_mocked, get_tax_mocked, get_currency_mocked, get_bank_mocked, get_category_mocked, get_liquidity_mocked
 from data_mock.core import get_index_mocked, get_index_type_mocked
-from models.core import BankModel, CurrencyModel, CategoryModel, CountryModel, TaxModel, IndexerTypeModel, IndexerModel, LiquidityModel
+from models.core import BankModel, CurrencyModel, CategoryModel, CountryModel, TaxFeeModel, IndexerTypeModel, IndexerModel, LiquidityModel
 from schemas.core import CurrencySchema, BankSchema, CountrySchema, TaxSchema, CategorySchema, IndexerTypeSchema, IndexerSchema, LiquiditySchema
 
 
@@ -57,7 +57,7 @@ async def create_country(test_session) -> list[CountrySchema]:
 
 @pytest_asyncio.fixture
 async def create_tax(test_session, create_country) -> list[TaxSchema]:
-    data_ = await BaseDataManager(test_session).add_or_ignore_all(TaxModel, get_tax_mocked())
+    data_ = await BaseDataManager(test_session).add_or_ignore_all(TaxFeeModel, get_tax_mocked())
     tax_list = [TaxSchema.model_validate(data) for data in data_]
 
     return tax_list

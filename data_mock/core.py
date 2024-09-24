@@ -94,6 +94,7 @@ def get_tax_mocked() -> list[dict[str, Any]]:
             'name': 'Imposto de renda',
             'acronyms': 'IR',
             'country_id': country_list[0]['id'],
+            'type': 'tax',
         },
         {
             **default_model_dict,
@@ -101,6 +102,7 @@ def get_tax_mocked() -> list[dict[str, Any]]:
             'name': 'Imposto sobre Operações Financeiras',
             'acronyms': 'IOF',
             'country_id': country_list[1]['id'],
+            'type': 'tax',
         }
     ]
 
