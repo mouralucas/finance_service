@@ -41,7 +41,7 @@ class BankModel(SQLModel):
     __tablename__ = 'bank'
 
     name: Mapped[str] = mapped_column('name', String(250))
-    code: Mapped[int] = mapped_column('code', SmallInteger)
+    code: Mapped[int] = mapped_column('code', SmallInteger, nullable=True)
 
 
 class IndexerTypeModel(SQLModel):
@@ -85,17 +85,17 @@ class LiquidityModel(SQLModel):
     description: Mapped[str] = mapped_column('description', String(500), nullable=True)
 
 
-class TaxModel(SQLModel):
+class TaxFeeModel(SQLModel):
     """
     Created by: Lucas Penha de Moura - 26/08/2024
         This table stores tax descriptions.
         Each country have an infinite of taxes that are applied to every transaction made.
     """
-    __tablename__ = 'tax'
+    __tablename__ = 'tax_fee'
 
     name: Mapped[str] = mapped_column('name', String(250))
     description: Mapped[str] = mapped_column('description', String(500), nullable=True)
-    acronyms: Mapped[str] = mapped_column('acronyms', String(30))
+    acronyms: Mapped[str] = mapped_column('acronyms', String(30), nullable=True)
     country_id: Mapped[str] = mapped_column(ForeignKey('country.id'))
     country: Mapped['CountryModel'] = relationship(foreign_keys=[country_id], lazy='subquery')
-
+    type: Mapped[str] = mapped_column('type', String(3)) # Can be 'tax' or 'fee'

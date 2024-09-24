@@ -48,7 +48,8 @@ class AccountStatementModel(SQLModel):
     currency: Mapped['CurrencyModel'] = relationship(foreign_keys=[currency_id], lazy='subquery')  # Should be always the same as the account currency
     amount: Mapped[float] = mapped_column('amount')
     transaction_date: Mapped[datetime.date] = mapped_column('transaction_date')
-    category_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('category.id'))
+    category_id_old: Mapped[str] = mapped_column('category_id_old', nullable=True)
+    category_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('category.id'), nullable=True) # Set to null, return to not null after migration
     category: Mapped['CategoryModel'] = relationship(foreign_keys=[category_id], lazy='subquery')
     description: Mapped[str] = mapped_column('description', String(500))
     operation_type: Mapped[str] = mapped_column('operation_type', String(15))  # whether is incoming or outgoing

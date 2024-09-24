@@ -101,7 +101,7 @@ class InvestmentStatementModel(SQLModel):
     # TODO: decide if persist this data or calculate when needed
     value_change: Mapped[float] = mapped_column('value_change', default=0)
     percentage_change: Mapped[float] = mapped_column('percentage_change', default=0)
-    index_change: Mapped[float] = mapped_column('index_change', default=0)  # how much the index changed in the period
+    index_percent_change: Mapped[float] = mapped_column('index_change', default=0)  # how much the index changed in the period
 
 
 class InvestmentObjectiveModel(SQLModel):
