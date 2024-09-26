@@ -30,7 +30,7 @@ async def create_credit_card(
 async def cancel_credit_card(credit_card: CancelCreditCardRequest,
                              session: AsyncSession = Depends(db_session),
                              user: RequiredUser = Security(get_user)):
-    return await CreditCardService(session=session, user=user).cancel(credit_card)
+    return await CreditCardService(session=session, user=user).cancel_credit_card(credit_card)
 
 
 @router.get('', summary='Get credit cards', description='Get all credit cards for a user filter by params')

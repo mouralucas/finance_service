@@ -31,7 +31,8 @@ class CreditCardBillModel(SQLModel):
     due_date: Mapped[datetime.date] = mapped_column('due_date')
     transaction_date: Mapped[datetime.date] = mapped_column('transaction_date')
     amount: Mapped[float] = mapped_column('amount')  # The amount show on the credit card bill
-    category_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('category.id'), nullable=True)
+    category_id_old: Mapped[str] = mapped_column('category_id_old', nullable=True)
+    category_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('category.id'), nullable=True) # TODO: set to not null after migration
     category: Mapped['CategoryModel'] = relationship(foreign_keys=[category_id], lazy='subquery')
     currency_id: Mapped[str] = mapped_column(ForeignKey('currency.id'))
     currency: Mapped['CurrencyModel'] = relationship(foreign_keys=[currency_id], lazy='subquery')  # The currency showed on the bill

@@ -1,8 +1,8 @@
 import uuid
 
 from fastapi import HTTPException
-from sqlalchemy import select, update, Executable
-from typing import Any, List
+from sqlalchemy import select, update, Executable, RowMapping
+from typing import Any, List, cast
 
 from rolf_common.managers import BaseDataManager
 from rolf_common.models import SQLModel
@@ -34,11 +34,13 @@ class InvestmentManager(BaseDataManager):
 
         return updated_item
 
-    async def get_investment_by_id(self, investment_id: uuid.UUID, raise_exception: bool = False) -> SQLModel | None:
+    async def get_investment_by_id(self, investment_id: uuid.UUID, raise_exception: bool = False) -> InvestmentModel | None:
         investment = await self.get_by_id(InvestmentModel, investment_id)
 
         if raise_exception:
             raise HTTPException(status.HTTP_404_NOT_FOUND, detail='Investment not found')
+
+        investment = cast(InvestmentModel, investment)
 
         return investment
 
@@ -59,14 +61,14 @@ class InvestmentManager(BaseDataManager):
 
         return statement
 
-    async def get_statement(self, params: dict[str, Any]) -> list[SQLModel]:
+    async def get_statement(self, params: dict[str, Any]) -> list[RowMapping] | None:
         stmt = select(InvestmentStatementModel).order_by(InvestmentStatementModel.period)
 
         for key, value in params.items():
             if value:
                 stmt = stmt.where(getattr(InvestmentStatementModel, key) == value)
 
-        statements: list[SQLModel] = await self.get_all(stmt, unique_result=True)
+        statements: list[RowMapping] = await self.get_all(stmt, unique_result=True)
 
         return statements
 
@@ -76,10 +78,10 @@ class InvestmentManager(BaseDataManager):
 
         return investment_type
 
-    async def get_investment_type(self) -> list[SQLModel]:
+    async def get_investment_type(self) -> list[RowMapping]:
         sql_statement: Executable = select(InvestmentTypeModel).order_by(InvestmentTypeModel.name)
 
-        investment_types: list[SQLModel] = await self.get_all(sql_statement)
+        investment_types: list[RowMapping] = await self.get_all(sql_statement)
 
         return investment_types
 
@@ -89,18 +91,18 @@ class InvestmentManager(BaseDataManager):
 
         return new_objective
 
-    async def get_investment_objectives(self, params: dict[str, Any]) -> list[SQLModel]:
+    async def get_investment_objectives(self, params: dict[str, Any]) -> list[RowMapping] | None:
         stmt = select(InvestmentObjectiveModel)
 
         for key, value in params.items():
             if value:
                 stmt = stmt.where(getattr(InvestmentObjectiveModel, key) == value)
 
-        investment_objectives: list[SQLModel] = await self.get_all(stmt, unique_result=True)
+        investment_objectives: list[RowMapping] = await self.get_all(stmt, unique_result=True)
 
         return investment_objectives
 
-    async def get_investment_by_objective(self, params: dict[str, Any]) -> list[SQLModel]:
+    async def get_investment_by_objective(self, params: dict[str, Any]) -> list[RowMapping]:
         sql_statement = select(InvestmentModel).where(InvestmentModel.objective_id == None).order_by(InvestmentModel.transaction_date)
 
         return await self.get_all(sql_statement)

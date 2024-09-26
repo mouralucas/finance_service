@@ -9,6 +9,8 @@ class BankSchema(BaseModel):
 
     id: uuid.UUID = Field(..., serialization_alias='bankId', description='The unique id og the bank')
     name: str = Field(..., description='The name of the bank')
+    code: int | None = Field(None, description='The code of the bank')
+
 
 
 class CountrySchema(BaseModel):

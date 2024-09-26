@@ -32,7 +32,7 @@ class CreditCardService(BaseService):
 
         return response
 
-    async def cancel(self, credit_card: CancelCreditCardRequest) -> CancelCreditCardResponse:
+    async def cancel_credit_card(self, credit_card: CancelCreditCardRequest) -> CancelCreditCardResponse:
         current_credit_card = await CreditCardManager(session=self.session).get_credit_card_by_id(card_id=credit_card.id)
         if not current_credit_card or not current_credit_card.active:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Credit card not found or not valid')
@@ -51,17 +51,17 @@ class CreditCardService(BaseService):
 
         return response
 
-
     async def get_credit_cards(self, params: GetCreditCardRequest) -> GetCreditCardResponse:
         credit_cards = await CreditCardManager(session=self.session).get_credit_cards(params.model_dump())
 
         response = GetCreditCardResponse(
             quantity=len(credit_cards) if credit_cards else 0,
-            credit_cards=credit_cards
+            credit_cards=[CreditCardSchema.model_validate(data["CreditCardModel"]) for data in credit_cards]
         )
 
         return response
 
+    # Bill entries
     async def create_bill_entry(self, bill_entry: CreateBillEntryRequest) -> CreateBillEntryResponse:
         credit_card = await CreditCardManager(session=self.session).get_credit_card_by_id(bill_entry.credit_card_id)
         if not credit_card or not credit_card.active:
@@ -122,7 +122,7 @@ class CreditCardService(BaseService):
 
         due_date = datetime.datetime(year, month, due_day)
         if installment > 1:
-            due_date += relativedelta(months=installment-1)
+            due_date += relativedelta(months=installment - 1)
 
         if return_str:
             return due_date.strftime("%Y-%m-%d")

@@ -47,3 +47,8 @@ class CreateStatementRequest(BaseModel):
 
     origin: str = Field("SYSTEM", alias="origin", description="The origin of the entry")
     is_validated: bool = Field(None, alias="isValidated", description="Whether the transaction is validated by the user")
+
+
+class CreateBalanceRequest(BaseModel):
+    account_id: uuid.UUID = Field(None, alias='accountId', description='The id of the account')
+    start_period: int = Field(None, alias='startPeriod', description='The start period of the account')

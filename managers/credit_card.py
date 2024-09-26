@@ -1,9 +1,9 @@
 import uuid
-from typing import Any
+from typing import Any, cast
 
 from rolf_common.managers import BaseDataManager
 from rolf_common.models import SQLModel
-from sqlalchemy import select, update
+from sqlalchemy import select, update, RowMapping
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.credit_card import CreditCardModel, CreditCardBillModel
@@ -29,21 +29,23 @@ class CreditCardManager(BaseDataManager):
 
         return updated_credit_card
 
-    async def get_credit_card_by_id(self, card_id: uuid.UUID) -> SQLModel:
+    async def get_credit_card_by_id(self, card_id: uuid.UUID) -> CreditCardModel:
         stmt = select(CreditCardModel).where(CreditCardModel.id == card_id)
 
         credit_card = await self.get_only_one(stmt)
 
+        credit_card = cast(CreditCardModel, credit_card)
+
         return credit_card
 
-    async def get_credit_cards(self, params: dict[str, Any]) -> list[SQLModel]:
+    async def get_credit_cards(self, params: dict[str, Any]) -> list[RowMapping]:
         stmt = select(CreditCardModel).order_by(CreditCardModel.nickname)
 
         for key, value in params.items():
             if value:
                 stmt = stmt.where(getattr(CreditCardModel, key) == value)
 
-        credit_cards: list[SQLModel] = await self.get_all(stmt, unique_result=True)
+        credit_cards: list[RowMapping] = await self.get_all(stmt, unique_result=True)
 
         return credit_cards
 

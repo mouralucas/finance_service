@@ -2,7 +2,7 @@ import datetime
 import uuid
 
 from rolf_common.models import SQLModel
-from sqlalchemy import ForeignKey, String, Integer, Float
+from sqlalchemy import ForeignKey, String, Integer, Float, DECIMAL
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from models.core import BankModel
@@ -49,9 +49,9 @@ class AccountStatementModel(SQLModel):
     amount: Mapped[float] = mapped_column('amount')
     transaction_date: Mapped[datetime.date] = mapped_column('transaction_date')
     category_id_old: Mapped[str] = mapped_column('category_id_old', nullable=True)
-    category_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('category.id'), nullable=True) # Set to null, return to not null after migration
+    category_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('category.id'), nullable=True)  # TODO: Set to null, return to not null after migration
     category: Mapped['CategoryModel'] = relationship(foreign_keys=[category_id], lazy='subquery')
-    description: Mapped[str] = mapped_column('description', String(500))
+    description: Mapped[str] = mapped_column('description', String(500), nullable=True)
     operation_type: Mapped[str] = mapped_column('operation_type', String(15))  # whether is incoming or outgoing
 
     # Fields for international transactions, like exchange money or by in a currency different from the account
@@ -73,3 +73,12 @@ class AccountStatementModel(SQLModel):
 
 class AccountBalanceModel(SQLModel):
     __tablename__ = 'account_balance'
+
+    account_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('account.id'))
+    period: Mapped[int] = mapped_column('period', Integer)
+    previous_balance: Mapped[float] = mapped_column('previous_balance', DECIMAL(precision=10, scale=2))
+    incoming: Mapped[float] = mapped_column('incoming', DECIMAL(precision=10, scale=2))
+    outgoing: Mapped[float] = mapped_column('outgoing', DECIMAL(precision=10, scale=2))
+    transactions: Mapped[float] = mapped_column('transactions', DECIMAL(precision=10, scale=2))  # incoming - outgoing
+    earnings: Mapped[float] = mapped_column('earnings', DECIMAL(precision=10, scale=2), default=0)
+    balance: Mapped[float] = mapped_column('balance', DECIMAL(precision=10, scale=2))

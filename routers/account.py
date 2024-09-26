@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from backend.database import db_session
-from schemas.request.account import CreateAccountRequest, GetAccountRequest, CreateStatementRequest, CloseAccountRequest
+from schemas.request.account import CreateAccountRequest, GetAccountRequest, CreateStatementRequest, CloseAccountRequest, CreateBalanceRequest
 from schemas.response.account import CreateAccountResponse, GetAccountResponse, CloseAccountResponse
 from services.account import AccountService
 
@@ -21,7 +21,7 @@ async def create(
         session: AsyncSession = Depends(db_session),
         user: RequiredUser = Security(get_user)
 ) -> CreateAccountResponse:
-    return await AccountService(session=session, user=user).create(account=account)
+    return await AccountService(session=session, user=user).create_account(account=account)
 
 
 @router.patch('/close', summary='Close an account', description='Close an account and its relations (credit cards)')
@@ -33,7 +33,7 @@ async def close(
     user = RequiredUser(
         user_id='adf52a1e-7a19-11ed-a1eb-0242ac120002',
     )
-    return await AccountService(session=session, user=user).close(account=account)
+    return await AccountService(session=session, user=user).close_account(account=account)
 
 
 @router.get('', summary='List all accounts', description='Get user accounts base on filters chosen')
@@ -51,3 +51,13 @@ async def create_statement(statement_entry: CreateStatementRequest,
                            session: AsyncSession = Depends(db_session),
                            user: RequiredUser = Security(get_user)):
     return await AccountService(session=session, user=user).create_statement(statement_entry=statement_entry)
+
+
+@router.post('/balance', summary='Generate the balance for the account')
+async def create_balance(
+        params: CreateBalanceRequest,
+        session: AsyncSession = Depends(db_session),
+        # user: RequiredUser = Security(get_user)
+):
+    user = RequiredUser(user_id = 'adf52a1e-7a19-11ed-a1eb-0242ac120002')
+    return await AccountService(session=session, user=user).create_balance(params=params)

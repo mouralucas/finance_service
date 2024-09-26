@@ -3,6 +3,7 @@ import datetime
 from rolf_common.models import SQLModel
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import BaseService
+from sqlalchemy import RowMapping
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from managers.investment import InvestmentManager
@@ -65,10 +66,10 @@ class InvestmentService(BaseService):
         pass
 
     async def get_investment_types(self) -> GetInvestmentTypeResponse:
-        investment_types: list[SQLModel] = await self.investment_manager.get_investment_type()
+        investment_types: list[RowMapping] = await self.investment_manager.get_investment_type()
 
         response = GetInvestmentTypeResponse(
-            investment_type=investment_types,
+            investment_type=[InvestmentTypeSchema.model_validate(data['InvestmentTypeModel']) for data in investment_types],
         )
 
         return response
@@ -115,7 +116,7 @@ class InvestmentService(BaseService):
         statement = await InvestmentManager(self.session).get_statement(params=params.model_dump())
 
         response = GetStatementResponse(
-            statement=statement
+            statement=[InvestmentStatementSchema.model_validate(data["InvestmentStatementModel"]) for data in statement]
         )
 
         return response
@@ -137,16 +138,16 @@ class InvestmentService(BaseService):
         objectives = await InvestmentManager(self.session).get_investment_objectives(params=params.model_dump())
 
         response = GetObjectiveResponse(
-            objectives=objectives
+            objectives=[InvestmentObjectiveSchema.model_validate(data['InvestmentObjectiveModel']) for data in objectives]
         )
 
         return response
 
     async def get_investment_without_objective(self) -> GetInvestmentWithoutObjectives:
-        investments = await self.investment_manager.get_investment_by_objective({})
+        investments: list[RowMapping] = await self.investment_manager.get_investment_by_objective({})
 
         response = GetInvestmentWithoutObjectives(
             quantity=len(investments),
-            investments=investments,
+            investments=[InvestmentSchema.model_validate(data["InvestmentModel"]) for data in investments],
         )
         return response

@@ -1,6 +1,13 @@
 import datetime
 
 
+def get_current_period():
+    today = datetime.datetime.now(datetime.timezone.utc)
+    month = today.month
+    year = today.year
+
+    return year * 100 + month
+
 def get_period(date: datetime.date | datetime.datetime) -> int:
     year = date.year
     month = date.month
