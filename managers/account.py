@@ -1,14 +1,16 @@
 import uuid
-from typing import Any, Sequence, cast
+from typing import Any, Sequence, cast, List
 
 from fastapi import HTTPException
 from rolf_common.managers import BaseDataManager
 from rolf_common.models import SQLModel
-from sqlalchemy import select, update, Executable, Row, func, case, RowMapping
+from sqlalchemy import select, update, Executable, Row, func, case, RowMapping, literal_column, literal, text
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import aliased
 from starlette import status
 
 from models.account import AccountModel, AccountStatementModel
+from services.utils.datetime import get_period_sequence
 
 
 class AccountManager(BaseDataManager):
@@ -58,41 +60,66 @@ class AccountManager(BaseDataManager):
 
         return new_statement
 
-    async def get_statement(self, sql_statement: Executable) -> list[SQLModel]:
-        statements_entries: list[SQLModel] = await self.get_all(sql_statement)
+    async def get_statement(self, sql_statement: Executable) -> list[RowMapping]:
+        statements_entries: list[RowMapping] = await self.get_all(sql_statement)
 
         return statements_entries
 
-    async def get_balance(self, account_id: uuid.UUID) -> Sequence[Row[tuple[Any, ...] | Any]]:
-        sql_statement: Executable = (
-            select(
-                AccountStatementModel.period,
-                func.sum(AccountStatementModel.amount).label("total_amount"),
-                func.sum(
-                    case(
-                        (AccountStatementModel.amount > 0, AccountStatementModel.amount),
-                        else_=0
-                    )
-                ).label("incoming"),
-                func.sum(
-                    case(
-                        (AccountStatementModel.amount < 0, AccountStatementModel.amount),
-                        else_=0
-                    )
-                ).label("outgoing"),
-                func.sum(
-                    case(
-                        (AccountStatementModel.category_id == 'dcef92cb-9664-4dc4-9adb-afe556016fe2', AccountStatementModel.amount),
-                        else_=0
-                    )
-                ).label('earnings')
+    async def get_consolidated_transactions_by_period(self, account_id: uuid.UUID, period_range: list[int]) -> list[RowMapping] | None:
+        """
+        Created by: Lucas Penha de Moura - 27/09/2024
+            This function feches the transactions by an account in a given period range.
+            The return of this function is a list of rows that contains all incoming and outgoing transactions, plus the earnings of the account, if set.
 
-            )
-            .where(AccountStatementModel.account_id == account_id, AccountStatementModel.active == True)
-            .group_by(AccountStatementModel.period)
-            .order_by(AccountStatementModel.period)
+        :param account_id: The id of the account
+        :param period_range: The range of periods
+        :return: A list of RowMapping containing the incoming and outgoing transactions
+        """
+        # TODO: create a relation that the user can choose its own 'earning' category, then add a parameter to that case
+        period_series = (
+            select(func.unnest(literal_column(f'ARRAY{period_range}')).label('period'))
+            .cte('integer_series')
         )
 
-        entries = await self.get_all(sql_statement)
+        sql_statement = (
+            select(
+                period_series.c.period,
+                func.coalesce(
+                    func.sum(
+                        case(
+                            (AccountStatementModel.amount > 0, AccountStatementModel.amount),
+                            else_=0
+                        )
+                    ), 0
+                ).label("incoming"),
+                func.coalesce(
+                    func.sum(
+                        case(
+                            (AccountStatementModel.amount < 0, AccountStatementModel.amount),
+                            else_=0
+                        )
+                    ), 0
+                ).label("outgoing"),
+                func.coalesce(
+                    func.sum(
+                        case(
+                            (AccountStatementModel.category_id == 'dcef92cb-9664-4dc4-9adb-afe556016fe2', AccountStatementModel.amount),
+                            else_=0
+                        )
+                    ), 0
+                ).label('earnings')
+            )
+            # Move the filtering conditions to the LEFT JOIN ON clause
+            .outerjoin(
+                AccountStatementModel,
+                (period_series.c.period == AccountStatementModel.period) &
+                (AccountStatementModel.account_id == account_id) &
+                (AccountStatementModel.active == True)
+            )
+            .group_by(period_series.c.period)
+            .order_by(period_series.c.period)
+        )
 
-        return entries
+        transactions = await self.get_all(sql_statement)
+
+        return transactions

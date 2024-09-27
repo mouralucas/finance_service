@@ -8,6 +8,7 @@ def get_current_period():
 
     return year * 100 + month
 
+
 def get_period(date: datetime.date | datetime.datetime) -> int:
     year = date.year
     month = date.month
@@ -27,3 +28,28 @@ def get_previous_period(period: int) -> int:
 
     previous_period = (previous_period_year * 100) + previous_period_month
     return previous_period
+
+
+def get_period_sequence(start_period: int, end_period: int = None) -> list[int]:
+    if not end_period:
+        today = datetime.datetime.now(datetime.timezone.utc)
+        end_period = today.year * 100 + today.month
+
+    start_month = start_period % 100
+    start_year = start_period // 100
+    end_month = end_period % 100
+    end_year = end_period // 100
+
+    list_size = (end_year - start_year) * 12 + end_month - start_month
+    period_list: list[int] = []
+    for i in range(0, list_size + 1):
+        period = start_year * 100 + start_month
+
+        start_month += 1
+        if start_month > 12:
+            start_month = 1
+            start_year += 1
+
+        period_list.append(period)
+
+    return period_list

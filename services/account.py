@@ -1,22 +1,21 @@
-import datetime
+from typing import cast
 
 from fastapi import HTTPException
-from rolf_common.models import SQLModel
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import BaseService
-from sqlalchemy import event, Executable, select, func, case, delete, RowMapping
+from sqlalchemy import select, func, delete, RowMapping
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from managers.account import AccountManager
 from managers.credit_card import CreditCardManager
 from models.account import AccountModel, AccountStatementModel, AccountBalanceModel
-from models.core import BankModel
+from models.credit_card import CreditCardModel
 from schemas.account import AccountSchema, StatementSchema
 from schemas.request.account import CreateAccountRequest, GetAccountRequest, CreateStatementRequest, CloseAccountRequest, CreateBalanceRequest
-from schemas.response.account import CreateAccountResponse, GetAccountResponse, CloseAccountResponse
+from schemas.response.account import CreateAccountResponse, GetAccountResponse, CloseAccountResponse, CreateBalanceResponse
 from schemas.response.account import CreateStatementResponse
-from services.utils.datetime import get_period, get_current_period
+from services.utils.datetime import get_period, get_current_period, get_period_sequence
 
 
 class AccountService(BaseService):
@@ -48,13 +47,13 @@ class AccountService(BaseService):
 
         closed_account = await self.account_manager.update_account(current_account, fields)
 
-        for i in current_account.credit_cards:
+        for credit_card in current_account.credit_cards:
             credit_card_fields = {
-                'id': i.id,
+                'id': credit_card.id,
                 'cancellation_date': account.close_date,
                 'active': False
             }
-            await CreditCardManager(session=self.session).update_credit_card(i, credit_card_fields)
+            await CreditCardManager(session=self.session).update_credit_card(cast(CreditCardModel, credit_card), credit_card_fields)
 
         # Refresh account object with the cancelled credit cards
         await self.session.refresh(closed_account)
@@ -104,25 +103,31 @@ class AccountService(BaseService):
 
     # Balance
     async def create_balance(self, params: CreateBalanceRequest):
-        account = await self.account_manager.get_account_by_id(params.account_id)
+        account: AccountModel = await self.account_manager.get_account_by_id(params.account_id)
         if not account:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Account not exists')
 
-        # TODO: add this queries as a function in manager
-        min_period = await self.account_manager.get_only_one(select(func.min(AccountStatementModel.period)).where(AccountStatementModel.account_id == params.account_id))
-        max_period = get_period(account.close_date) if account.close_date else get_current_period()
+        # Get balance from the last period with registered transactions until the account is closed or current period
+        min_period: int = await self.account_manager.get_only_one(select(func.min(AccountStatementModel.period)).where(AccountStatementModel.account_id == params.account_id))
+        max_period: int = get_period(account.close_date) if account.close_date else get_current_period()
 
-        transactions_by_period = await self.account_manager.get_balance(params.account_id)
+        # Get all periods between min and max periods so even without transactions all periods in this range have its own balance
+        period_range: list[int] = get_period_sequence(min_period, max_period)
+
+        # Fetch all transactions grouped by period
+        transactions_by_period = await self.account_manager.get_consolidated_transactions_by_period(account_id=params.account_id, period_range=period_range)
+
+        # The firs balance available always start with 'previous_balance' at zero, even if in actual account have more transactions
+        # The user should add the previous amount as a transaction, so the calculation is correct at the end
         previous_balance = 0.0
 
-        # Para cada período calculado
+        # Remove previous balance data for the account
         await self.session.execute(delete(AccountBalanceModel).where(AccountBalanceModel.account_id == params.account_id))
-        await self.session.commit()
+        await self.session.flush()
+
+        balance_entries = []
         for period_data in transactions_by_period:
-            """
-            TODO: se não for o primeiro periodo, e o anterior não for get_previous_period() então tem que adicionar uma linha extra com os valores 0 e 
-            previous_balance = balance do proximo periodo
-            """
+
             period = period_data.period
             earnings = period_data.earnings
             incoming = period_data.incoming - earnings
@@ -130,7 +135,6 @@ class AccountService(BaseService):
             transactions = incoming - abs(outgoing)
             balance = previous_balance + transactions + earnings
 
-            # Salvar o resultado no AccountBalanceModel
             account_balance = AccountBalanceModel(
                 account_id=params.account_id,
                 period=period,
@@ -142,7 +146,15 @@ class AccountService(BaseService):
                 balance=balance
             )
 
-            self.session.add(account_balance)
-
-            # Atualizar o saldo anterior para o próximo período
+            balance_entries.append(account_balance)
+            # Update the previous balance with the current balance
             previous_balance = balance
+
+        self.session.add_all(balance_entries)
+
+        response = CreateBalanceResponse(
+            accountNickname=account.nickname,
+            periods_saved=len(balance_entries),
+        )
+
+        return response

@@ -19,3 +19,8 @@ class GetAccountResponse(SuccessResponseBase):
 
 class CreateStatementResponse(SuccessResponseBase):
     account_statement_entry: StatementSchema = Field(..., serialization_alias='accountStatementEntry', description='The entry statement created by the user')
+
+
+class CreateBalanceResponse(SuccessResponseBase):
+    accountNickname: str = Field(..., description='The account nickname')
+    periods_saved: int = Field(..., serialization_alias='periodsSaved', description='The number of periods saved')
