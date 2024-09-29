@@ -11,9 +11,9 @@ from managers.account import AccountManager
 from managers.credit_card import CreditCardManager
 from models.account import AccountModel, AccountStatementModel, AccountBalanceModel
 from models.credit_card import CreditCardModel
-from schemas.account import AccountSchema, StatementSchema
-from schemas.request.account import CreateAccountRequest, GetAccountRequest, CreateStatementRequest, CloseAccountRequest, CreateBalanceRequest
-from schemas.response.account import CreateAccountResponse, GetAccountResponse, CloseAccountResponse, CreateBalanceResponse
+from schemas.account import AccountSchema, StatementSchema, BalanceSchema
+from schemas.request.account import CreateAccountRequest, GetAccountRequest, CreateStatementRequest, CloseAccountRequest, CreateBalanceRequest, GetBalanceRequest
+from schemas.response.account import CreateAccountResponse, GetAccountResponse, CloseAccountResponse, CreateBalanceResponse, GetBalanceResponse
 from schemas.response.account import CreateStatementResponse
 from services.utils.datetime import get_period, get_current_period, get_period_sequence
 
@@ -155,6 +155,16 @@ class AccountService(BaseService):
         response = CreateBalanceResponse(
             accountNickname=account.nickname,
             periods_saved=len(balance_entries),
+        )
+
+        return response
+
+    async def get_balance(self, params: GetBalanceRequest) -> GetBalanceResponse:
+        balance = await self.account_manager.get_balance(params.account_id, params.start_period, params.end_period)
+
+        response = GetBalanceResponse(
+            quantity=len(balance) if balance else 0,
+            balance=[BalanceSchema.model_validate(data["AccountBalanceModel"]) for data in balance]
         )
 
         return response

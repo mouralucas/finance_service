@@ -55,3 +55,16 @@ class StatementSchema(BaseModel):
     spread_perc: float | None = Field(None, serialization_alias='spreadPerc', description="Spread percentage")
     spread: float | None = Field(None, serialization_alias='spread', description="Spread amount")
     effective_rate: float | None = Field(None, serialization_alias='effectiveRate', description="Effective rate")
+
+
+class BalanceSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID = Field(..., serialization_alias='balanceEntryId', description='The id of the balance entry')
+    account_id: uuid.UUID = Field(..., serialization_alias='accountId', description='Account identification')
+    previous_balance: float = Field(None, description="The balance from the past period")
+    incoming: float = Field(None, description="The amount o money that enter the account in the period")
+    outgoing: float = Field(None, description="The amount o money that leave the account in the period")
+    transactions: float = Field(None, description="The difference between incoming and outgoing")
+    earning: float = Field(None, description="How much the account profits in the period, if set")
+    balance: float = Field(None, description="How many money is in the account by the end of the period")

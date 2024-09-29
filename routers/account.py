@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from backend.database import db_session
-from schemas.request.account import CreateAccountRequest, GetAccountRequest, CreateStatementRequest, CloseAccountRequest, CreateBalanceRequest
+from schemas.request.account import CreateAccountRequest, GetAccountRequest, CreateStatementRequest, CloseAccountRequest, CreateBalanceRequest, GetBalanceRequest
 from schemas.response.account import CreateAccountResponse, GetAccountResponse, CloseAccountResponse
 from services.account import AccountService
 
@@ -61,3 +61,14 @@ async def create_balance(
 ):
     user = RequiredUser(user_id = 'adf52a1e-7a19-11ed-a1eb-0242ac120002')
     return await AccountService(session=session, user=user).create_balance(params=params)
+
+
+@router.get('/balance', summary='Get the balance', description='Get the balance for a account in the specified period range. If no period is specified, '
+                                                               'the range is from the first period with transaction to close account or current period')
+async def get_balance(
+        params: GetBalanceRequest = Depends(),
+        session: AsyncSession = Depends(db_session),
+        # user: RequiredUser = Security(get_user)
+):
+    user = RequiredUser(user_id='adf52a1e-7a19-11ed-a1eb-0242ac120002')
+    return await AccountService(session, user).get_balance(params=params)

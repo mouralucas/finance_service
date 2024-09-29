@@ -1,7 +1,7 @@
 from pydantic import Field
 from rolf_common.schemas import SuccessResponseBase
 
-from schemas.account import AccountSchema, StatementSchema
+from schemas.account import AccountSchema, StatementSchema, BalanceSchema
 
 
 class CreateAccountResponse(SuccessResponseBase):
@@ -24,3 +24,6 @@ class CreateStatementResponse(SuccessResponseBase):
 class CreateBalanceResponse(SuccessResponseBase):
     accountNickname: str = Field(..., description='The account nickname')
     periods_saved: int = Field(..., serialization_alias='periodsSaved', description='The number of periods saved')
+
+class GetBalanceResponse(SuccessResponseBase):
+    balance: list[BalanceSchema] = Field(..., serialization_alias='balance', description='The balance for the account in selected period range')

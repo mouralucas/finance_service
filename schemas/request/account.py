@@ -51,4 +51,10 @@ class CreateStatementRequest(BaseModel):
 
 class CreateBalanceRequest(BaseModel):
     account_id: uuid.UUID = Field(None, alias='accountId', description='The id of the account')
-    start_period: int = Field(None, alias='startPeriod', description='The start period of the account')
+    start_period: int = Field(None, alias='startPeriod', description='The start period of the balance')
+
+
+class GetBalanceRequest(BaseModel):
+    account_id: uuid.UUID = Field(None, alias='accountId', description='The id of the account')
+    start_period: int | None = Field(None, alias='startPeriod', description='The start period of the balance')
+    end_period: int | None = Field(None, alias='endPeriod', description='The end period of the balance')

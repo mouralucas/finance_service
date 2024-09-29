@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 from starlette import status
 
-from models.account import AccountModel, AccountStatementModel
+from models.account import AccountModel, AccountStatementModel, AccountBalanceModel
 from services.utils.datetime import get_period_sequence
 
 
@@ -64,6 +64,21 @@ class AccountManager(BaseDataManager):
         statements_entries: list[RowMapping] = await self.get_all(sql_statement)
 
         return statements_entries
+
+
+    async def get_balance(self, account_id: uuid.UUID, start_period: int, end_period: int) -> list[RowMapping]:
+        sql_statement = select(AccountBalanceModel).order_by(AccountBalanceModel.period)
+
+        if start_period:
+            sql_statement = sql_statement.where(AccountBalanceModel.period >= start_period)
+
+        if end_period:
+            sql_statement = sql_statement.where(AccountBalanceModel.period <= end_period)
+
+        balance = await self.get_all(sql_statement)
+
+        return balance
+
 
     async def get_consolidated_transactions_by_period(self, account_id: uuid.UUID, period_range: list[int]) -> list[RowMapping] | None:
         """
