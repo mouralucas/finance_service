@@ -10,8 +10,8 @@ from starlette import status
 from managers.credit_card import CreditCardManager
 from models.credit_card import CreditCardModel, CreditCardBillModel
 from schemas.credit_card import CreditCardSchema
-from schemas.request.credit_card import CreateCreditCardRequest, GetCreditCardRequest, CreateBillEntryRequest, CancelCreditCardRequest
-from schemas.response.credit_card import CreateCreditCardResponse, GetCreditCardResponse, CreateBillEntryResponse, CancelCreditCardResponse
+from schemas.request.credit_card import CreateCreditCardRequest, GetCreditCardRequest, CreateCreditCardTransactionRequest, CancelCreditCardRequest
+from schemas.response.credit_card import CreateCreditCardResponse, GetCreditCardResponse, CreateCreditCardTransactionResponse, CancelCreditCardResponse
 from services.utils.datetime import get_period
 
 
@@ -62,7 +62,7 @@ class CreditCardService(BaseService):
         return response
 
     # Bill entries
-    async def create_bill_entry(self, bill_entry: CreateBillEntryRequest) -> CreateBillEntryResponse:
+    async def create_bill_entry(self, bill_entry: CreateCreditCardTransactionRequest) -> CreateCreditCardTransactionResponse:
         credit_card = await CreditCardManager(session=self.session).get_credit_card_by_id(bill_entry.credit_card_id)
         if not credit_card or not credit_card.active:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Credit card not valid')
@@ -95,8 +95,8 @@ class CreditCardService(BaseService):
 
         created_entries = await CreditCardManager(session=self.session).create_bill_entry(entry_list)
 
-        response = CreateBillEntryResponse(
-            bill_entry=created_entries
+        response = CreateCreditCardTransactionResponse(
+            transaction=created_entries
         )
 
         return response

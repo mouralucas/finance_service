@@ -24,10 +24,10 @@ class CreditCardSchema(BaseModel):
     close_day: int | None = Field(None, serialization_alias='closeDay', description='The day that the card id close')
 
 
-class BillEntrySchema(BaseModel):
+class CreditCardTransactionSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: uuid.UUID = Field(..., serialization_alias='billEntryId', description='The id of the bill entry')
+    id: int = Field(..., serialization_alias='transactionId', description='The id of the bill entry')
     credit_card_id: uuid.UUID = Field(..., serialization_alias='creditCardId', description='The id of the credit card')
     period: int = Field(..., serialization_alias='period', description='The period of the bill entry')
     due_date: datetime.date = Field(..., serialization_alias='dueDate', description='The due date of the bill entry')

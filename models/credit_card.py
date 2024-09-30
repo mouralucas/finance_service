@@ -24,6 +24,7 @@ class CreditCardModel(SQLModel):
 class CreditCardBillModel(SQLModel):
     __tablename__ = 'credit_card_bill'
 
+    id: Mapped[int] = mapped_column('id', primary_key=True, nullable=False)
     owner_id: Mapped[uuid.UUID] = mapped_column('owner_id')
     credit_card_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('credit_card.id'))
     credit_card: Mapped[CreditCardModel] = relationship(foreign_keys=[credit_card_id], lazy='subquery')

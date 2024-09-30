@@ -27,7 +27,7 @@ class GetAccountRequest(BaseModel):
     currency_id: str | None = Field(Query(None, alias="currencyId", description="The currency of the account"))
 
 
-class CreateStatementRequest(BaseModel):
+class CreateAccountTransactionRequest(BaseModel):
     account_id: uuid.UUID = Field(..., alias="accountId", description="The id of the account")
     # currency_id: str = Field(..., alias="currencyId", description="The currency of the account")
     amount: float = Field(..., alias='amount', description="The amount of the transaction in the account currency")

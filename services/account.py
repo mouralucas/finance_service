@@ -11,10 +11,10 @@ from managers.account import AccountManager
 from managers.credit_card import CreditCardManager
 from models.account import AccountModel, AccountStatementModel, AccountBalanceModel
 from models.credit_card import CreditCardModel
-from schemas.account import AccountSchema, StatementSchema, BalanceSchema
-from schemas.request.account import CreateAccountRequest, GetAccountRequest, CreateStatementRequest, CloseAccountRequest, CreateBalanceRequest, GetBalanceRequest
+from schemas.account import AccountSchema, TransactionSchema, BalanceSchema
+from schemas.request.account import CreateAccountRequest, GetAccountRequest, CreateAccountTransactionRequest, CloseAccountRequest, CreateBalanceRequest, GetBalanceRequest
 from schemas.response.account import CreateAccountResponse, GetAccountResponse, CloseAccountResponse, CreateBalanceResponse, GetBalanceResponse
-from schemas.response.account import CreateStatementResponse
+from schemas.response.account import CreateAccountTransactionResponse
 from services.utils.datetime import get_period, get_current_period, get_period_sequence
 
 
@@ -78,7 +78,7 @@ class AccountService(BaseService):
         return response
 
     # Statement
-    async def create_statement(self, statement_entry: CreateStatementRequest) -> CreateStatementResponse:
+    async def create_statement(self, statement_entry: CreateAccountTransactionRequest) -> CreateAccountTransactionResponse:
         account = await self.account_manager.get_account_by_id(statement_entry.account_id)
         if not account.active:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Account is not active')
@@ -95,8 +95,8 @@ class AccountService(BaseService):
 
         new_statement = await self.account_manager.create_statement(statement=new_statement)
 
-        response = CreateStatementResponse(
-            account_statement_entry=StatementSchema.model_validate(new_statement),
+        response = CreateAccountTransactionResponse(
+            transaction=TransactionSchema.model_validate(new_statement),
         )
 
         return response

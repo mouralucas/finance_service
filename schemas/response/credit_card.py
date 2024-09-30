@@ -1,7 +1,7 @@
 from pydantic import Field
 from rolf_common.schemas import SuccessResponseBase
 
-from schemas.credit_card import CreditCardSchema, BillEntrySchema
+from schemas.credit_card import CreditCardSchema, CreditCardTransactionSchema
 
 
 class CreateCreditCardResponse(SuccessResponseBase):
@@ -17,5 +17,5 @@ class GetCreditCardResponse(SuccessResponseBase):
     credit_cards: list[CreditCardSchema] = Field(..., serialization_alias='creditCards', description='The list of the credit cards of the user')
 
 
-class CreateBillEntryResponse(SuccessResponseBase):
-    bill_entry: list[BillEntrySchema] = Field(..., serialization_alias='billEntry', description='The entry (or entries) created. If installments transactions will return more than one entry')
+class CreateCreditCardTransactionResponse(SuccessResponseBase):
+    transaction: list[CreditCardTransactionSchema] = Field(..., serialization_alias='transaction', description='The transaction(s) created. If installments transaction, will return more than one transaction')

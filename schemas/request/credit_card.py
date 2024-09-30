@@ -31,7 +31,7 @@ class BillEntryInstallment(BaseModel):
     installments: int = Field(..., alias="installments")
 
 
-class CreateBillEntryRequest(BaseModel):
+class CreateCreditCardTransactionRequest(BaseModel):
     credit_card_id: uuid.UUID = Field(..., alias="creditCardId", description='The credit card id')
     transaction_date: datetime.date = Field(None, alias="transactionDate", description='The transaction date of the card')
     total_amount: float = Field(..., alias="totalAmount", description='The total amount of the transaction')

@@ -115,7 +115,7 @@ async def test_get_account(client, create_open_account):
 
 
 @pytest.mark.asyncio
-async def test_create_statement(client, create_open_account, create_category, create_currency):
+async def test_create_transaction(client, create_open_account, create_category, create_currency):
     accounts = create_open_account
     categories = create_category
     currencies = create_currency
@@ -143,30 +143,30 @@ async def test_create_statement(client, create_open_account, create_category, cr
 
     data = response.json()
 
-    assert 'accountStatementEntry' in data
-    assert 'statementEntryId' in data['accountStatementEntry']
-    assert 'ownerId' in data['accountStatementEntry']
+    assert 'transaction' in data
+    assert 'transactionId' in data['transaction']
+    assert 'ownerId' in data['transaction']
 
-    assert 'accountId' in data['accountStatementEntry']
-    assert data['accountStatementEntry']['accountId'] == str(user_account.id)
-    assert 'period' in data['accountStatementEntry']
-    assert data['accountStatementEntry']['period'] == 202408  # add function to calc period
-    assert 'currencyId' in data['accountStatementEntry']
-    assert data['accountStatementEntry']['currencyId'] == str(currency_id)
-    assert 'amount' in data['accountStatementEntry']
-    assert data['accountStatementEntry']['amount'] == amount
-    assert 'transactionDate' in data['accountStatementEntry']
-    assert data['accountStatementEntry']['transactionDate'] == transaction_date
-    assert 'categoryId' in data['accountStatementEntry']
-    assert data['accountStatementEntry']['categoryId'] == str(category_id)
-    assert 'description' in data['accountStatementEntry']
-    assert data['accountStatementEntry']['description'] == description
+    assert 'accountId' in data['transaction']
+    assert data['transaction']['accountId'] == str(user_account.id)
+    assert 'period' in data['transaction']
+    assert data['transaction']['period'] == 202408  # add function to calc period
+    assert 'currencyId' in data['transaction']
+    assert data['transaction']['currencyId'] == str(currency_id)
+    assert 'amount' in data['transaction']
+    assert data['transaction']['amount'] == amount
+    assert 'transactionDate' in data['transaction']
+    assert data['transaction']['transactionDate'] == transaction_date
+    assert 'categoryId' in data['transaction']
+    assert data['transaction']['categoryId'] == str(category_id)
+    assert 'description' in data['transaction']
+    assert data['transaction']['description'] == description
 
     # The transaction currency and amount must be the same in local transactions
-    assert 'transactionCurrencyId' in data['accountStatementEntry']
-    assert data['accountStatementEntry']['transactionCurrencyId'] == str(currency_id)
-    assert 'transactionAmount' in data['accountStatementEntry']
-    assert data['accountStatementEntry']['transactionAmount'] == amount
+    assert 'transactionCurrencyId' in data['transaction']
+    assert data['transaction']['transactionCurrencyId'] == str(currency_id)
+    assert 'transactionAmount' in data['transaction']
+    assert data['transaction']['transactionAmount'] == amount
 
 
 @pytest.mark.asyncio

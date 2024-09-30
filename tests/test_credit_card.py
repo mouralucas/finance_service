@@ -99,9 +99,9 @@ async def test_cancel_credit_card(client, create_valid_credit_card):
     assert data['creditCard']['active'] is False
 
 
-####### Credit Card Bill Tests #######
+####### Credit Card Transactions Tests #######
 @pytest.mark.asyncio
-async def test_create_bill_no_installment(client, create_valid_credit_card, create_category, create_currency):
+async def test_create_transaction_no_installment(client, create_valid_credit_card, create_category, create_currency):
     credit_cards = create_valid_credit_card
     currencies = create_currency
     categories = create_category
@@ -144,16 +144,16 @@ async def test_create_bill_no_installment(client, create_valid_credit_card, crea
     assert response.status_code == status.HTTP_201_CREATED
 
     data = response.json()
-    assert 'billEntry' in data
-    assert type(data['billEntry']) is list
-    assert len(data['billEntry']) == 1  # must be one when n installments
+    assert 'transaction' in data
+    assert type(data['transaction']) is list
+    assert len(data['transaction']) == 1  # must be one when n installments
 
-    entries = data['billEntry']
+    entries = data['transaction']
     for entry in entries:
         due_date = CreditCardService.set_due_date(datetime.datetime.strptime(transaction_date, "%Y-%m-%d").date(), close_day, due_day, installment=entry['currentInstallment'])
         period = get_period(due_date)
 
-        assert 'billEntryId' in entry
+        assert 'transactionId' in entry
 
         assert 'creditCardId' in entry
         assert entry['creditCardId'] == credit_card_id
@@ -186,7 +186,7 @@ async def test_create_bill_no_installment(client, create_valid_credit_card, crea
 
 
 @pytest.mark.asyncio
-async def test_create_bill_with_installment(client, create_valid_credit_card, create_category, create_currency):
+async def test_create_transaction_with_installment(client, create_valid_credit_card, create_category, create_currency):
     credit_cards = create_valid_credit_card
     currencies = create_currency
     categories = create_category
@@ -240,11 +240,11 @@ async def test_create_bill_with_installment(client, create_valid_credit_card, cr
     assert response.status_code == status.HTTP_201_CREATED
 
     data = response.json()
-    assert 'billEntry' in data
-    assert type(data['billEntry']) is list
-    assert len(data['billEntry']) == total_installments
+    assert 'transaction' in data
+    assert type(data['transaction']) is list
+    assert len(data['transaction']) == total_installments
 
-    entries = data['billEntry']
+    entries = data['transaction']
 
     for idx, entry in enumerate(entries):
         due_date = CreditCardService.set_due_date(datetime.datetime.strptime(transaction_date, "%Y-%m-%d").date(), close_day, due_day, installment=entry['currentInstallment'])
@@ -268,7 +268,7 @@ async def test_create_bill_with_installment(client, create_valid_credit_card, cr
 
 
 @pytest.mark.asyncio
-async def test_create_bill_cancelled_card(client, create_cancelled_card, create_category, create_currency):
+async def test_create_transaction_cancelled_card(client, create_cancelled_card, create_category, create_currency):
     transaction_date = '2024-07-03'
     total_amount = 112.45
     installments = [
@@ -296,3 +296,12 @@ async def test_create_bill_cancelled_card(client, create_cancelled_card, create_
     response = await client.post('/creditcard/bill', json=payload)
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+@pytest.mark.asyncio
+async def test_get_all_transactions(client):
+    pass
+
+@pytest.mark.asyncio
+async def test_get_transactions_by_period(client):
+    pass

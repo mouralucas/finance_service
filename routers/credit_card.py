@@ -8,8 +8,8 @@ from starlette import status
 
 from backend.database import db_session
 from models.credit_card import CreditCardModel
-from schemas.request.credit_card import CreateCreditCardRequest, CreateBillEntryRequest, GetCreditCardRequest, CancelCreditCardRequest
-from schemas.response.credit_card import CreateCreditCardResponse, CreateBillEntryResponse
+from schemas.request.credit_card import CreateCreditCardRequest, CreateCreditCardTransactionRequest, GetCreditCardRequest, CancelCreditCardRequest
+from schemas.response.credit_card import CreateCreditCardResponse, CreateCreditCardTransactionResponse
 from services.credit_card import CreditCardService
 
 router = APIRouter(prefix="/creditcard", tags=['Credit cards'])
@@ -45,7 +45,7 @@ async def get_credit_cards(
 @router.post('/bill',
              summary='Create a bill entry', description='Create a bill entry in selected credit card',
              status_code=status.HTTP_201_CREATED)
-async def create_bill_entry(bill_entry: CreateBillEntryRequest,
+async def create_bill_entry(bill_entry: CreateCreditCardTransactionRequest,
                             session: AsyncSession = Depends(db_session),
-                            user: RequiredUser = Security(get_user)) -> CreateBillEntryResponse:
+                            user: RequiredUser = Security(get_user)) -> CreateCreditCardTransactionResponse:
     return await CreditCardService(session=session, user=user).create_bill_entry(bill_entry)
