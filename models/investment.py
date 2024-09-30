@@ -49,7 +49,7 @@ class InvestmentModel(SQLModel):
     owner_id: Mapped[uuid.UUID] = mapped_column('owner_id')
     custodian_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('bank.id'))
     custodiam: Mapped['BankModel'] = relationship(foreign_keys=[custodian_id], lazy='subquery')
-    account_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('account.id'))
+    account_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('account.id'), nullable=True) # TODO: change back to not null after migration
     account: Mapped['AccountModel'] = relationship(foreign_keys=[account_id], lazy='subquery')
     name: Mapped[str] = mapped_column('name', String(200))
     description: Mapped[str] = mapped_column('description', String(200), nullable=True)
@@ -61,18 +61,19 @@ class InvestmentModel(SQLModel):
     quantity: Mapped[float] = mapped_column('quantity', nullable=True)
     price: Mapped[float] = mapped_column('price', nullable=True)
     amount: Mapped[float] = mapped_column('amount')  # quantity*price
+    contracted_rate: Mapped[str] = mapped_column('contracted_rate', String(50), nullable=True)
 
     currency_id: Mapped[str] = mapped_column(ForeignKey('currency.id'))
     currency: Mapped['CurrencyModel'] = relationship(foreign_keys=[currency_id], lazy='subquery')
 
     indexer_type_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('indexer_type.id'))
-    indexer_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('indexer.id'))  # criar tabela
+    indexer_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('indexer.id'))
     indexer: Mapped['IndexerModel'] = relationship(foreign_keys=[indexer_id], lazy='subquery')
     liquidity_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('liquidity.id'))
     liquidity: Mapped['LiquidityModel'] = relationship(foreign_keys=[liquidity_id], lazy='subquery')
     is_liquidated: Mapped[bool] = mapped_column('is_liquidated', default=False)
     liquidation_date: Mapped[datetime.date] = mapped_column('liquidation_date', nullable=True)
-    liquidation_amount: Mapped[float] = mapped_column('liquidation_amount', default=0.0)
+    liquidation_amount: Mapped[float] = mapped_column('liquidation_amount', nullable=True)
 
     country_id: Mapped[str] = mapped_column('country_id')  # Will tell what kind of tax will be charged
 
@@ -99,9 +100,9 @@ class InvestmentStatementModel(SQLModel):
     tax_detail: Mapped[dict] = mapped_column('tax_detail', JSON, nullable=True)
     fee_detail: Mapped[dict] = mapped_column('fee_detail', JSON, nullable=True)
     # TODO: decide if persist this data or calculate when needed
-    value_change: Mapped[float] = mapped_column('value_change', default=0)
-    percentage_change: Mapped[float] = mapped_column('percentage_change', default=0)
-    index_percent_change: Mapped[float] = mapped_column('index_change', default=0)  # how much the index changed in the period
+    value_change: Mapped[float] = mapped_column('value_change', nullable=True)
+    percentage_change: Mapped[float] = mapped_column('percentage_change', nullable=True)
+    index_percent_change: Mapped[float] = mapped_column('index_change', nullable=True)  # how much the index changed in the period
 
 
 class InvestmentObjectiveModel(SQLModel):

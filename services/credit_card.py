@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from managers.credit_card import CreditCardManager
-from models.credit_card import CreditCardModel, CreditCardBillModel
+from models.credit_card import CreditCardModel, CreditCardTransactionModel
 from schemas.credit_card import CreditCardSchema
 from schemas.request.credit_card import CreateCreditCardRequest, GetCreditCardRequest, CreateCreditCardTransactionRequest, CancelCreditCardRequest
 from schemas.response.credit_card import CreateCreditCardResponse, GetCreditCardResponse, CreateCreditCardTransactionResponse, CancelCreditCardResponse
@@ -75,7 +75,7 @@ class CreditCardService(BaseService):
 
         entry_list = []
         for i in bill_entry.installments:
-            new_bill_entry = CreditCardBillModel(**bill_entry.model_dump(exclude={'installment', 'is_international_transaction', 'tax_detail'}))
+            new_bill_entry = CreditCardTransactionModel(**bill_entry.model_dump(exclude={'installment', 'is_international_transaction', 'tax_detail'}))
 
             new_bill_entry.owner_id = owner_id
             new_bill_entry.amount = i.amount

@@ -9,7 +9,7 @@ from starlette import status
 
 from managers.account import AccountManager
 from managers.credit_card import CreditCardManager
-from models.account import AccountModel, AccountStatementModel, AccountBalanceModel
+from models.account import AccountModel, AccountTransactionModel, AccountBalanceModel
 from models.credit_card import CreditCardModel
 from schemas.account import AccountSchema, TransactionSchema, BalanceSchema
 from schemas.request.account import CreateAccountRequest, GetAccountRequest, CreateAccountTransactionRequest, CloseAccountRequest, CreateBalanceRequest, GetBalanceRequest
@@ -83,7 +83,7 @@ class AccountService(BaseService):
         if not account.active:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Account is not active')
 
-        new_statement = AccountStatementModel(**statement_entry.model_dump())
+        new_statement = AccountTransactionModel(**statement_entry.model_dump())
 
         new_statement.owner_id = self.user['user_id']
         new_statement.currency = account.currency
@@ -108,7 +108,7 @@ class AccountService(BaseService):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Account not exists')
 
         # Get balance from the last period with registered transactions until the account is closed or current period
-        min_period: int = await self.account_manager.get_only_one(select(func.min(AccountStatementModel.period)).where(AccountStatementModel.account_id == params.account_id))
+        min_period: int = await self.account_manager.get_only_one(select(func.min(AccountTransactionModel.period)).where(AccountTransactionModel.account_id == params.account_id))
         max_period: int = get_period(account.close_date) if account.close_date else get_current_period()
 
         # Get all periods between min and max periods so even without transactions all periods in this range have its own balance

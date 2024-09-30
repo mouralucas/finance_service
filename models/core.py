@@ -48,7 +48,7 @@ class IndexerTypeModel(SQLModel):
     """
     Created by: Lucas Penha de Moura - 12/08/2024
         This table stores the types of indexes.
-        It's a small table that, at first, only sores 2 register (fixed, floating and hybrid)
+        It's a small table that, at first, only sores 3 register (fixed, floating and hybrid)
     """
     __tablename__ = 'indexer_type'
 

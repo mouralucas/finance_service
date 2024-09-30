@@ -6,7 +6,7 @@ from rolf_common.models import SQLModel
 from sqlalchemy import select, update, RowMapping
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models.credit_card import CreditCardModel, CreditCardBillModel
+from models.credit_card import CreditCardModel, CreditCardTransactionModel
 
 
 class CreditCardManager(BaseDataManager):
@@ -50,7 +50,7 @@ class CreditCardManager(BaseDataManager):
         return credit_cards
 
     ## Bills entries
-    async def create_bill_entry(self, bill_entries: list[CreditCardBillModel]) -> list[SQLModel]:
+    async def create_bill_entry(self, bill_entries: list[CreditCardTransactionModel]) -> list[SQLModel]:
         new_bill_entries = await self.add_all(bill_entries)
         [await self.session.refresh(i) for i in new_bill_entries]
 

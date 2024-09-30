@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 from starlette import status
 
-from models.account import AccountModel, AccountStatementModel, AccountBalanceModel
+from models.account import AccountModel, AccountTransactionModel, AccountBalanceModel
 from services.utils.datetime import get_period_sequence
 
 
@@ -55,7 +55,7 @@ class AccountManager(BaseDataManager):
         return account
 
     # Statement
-    async def create_statement(self, statement: AccountStatementModel) -> SQLModel:
+    async def create_statement(self, statement: AccountTransactionModel) -> SQLModel:
         new_statement = await self.add_one(statement)
 
         return new_statement
@@ -102,7 +102,7 @@ class AccountManager(BaseDataManager):
                 func.coalesce(
                     func.sum(
                         case(
-                            (AccountStatementModel.amount > 0, AccountStatementModel.amount),
+                            (AccountTransactionModel.amount > 0, AccountTransactionModel.amount),
                             else_=0
                         )
                     ), 0
@@ -110,7 +110,7 @@ class AccountManager(BaseDataManager):
                 func.coalesce(
                     func.sum(
                         case(
-                            (AccountStatementModel.amount < 0, AccountStatementModel.amount),
+                            (AccountTransactionModel.amount < 0, AccountTransactionModel.amount),
                             else_=0
                         )
                     ), 0
@@ -118,7 +118,7 @@ class AccountManager(BaseDataManager):
                 func.coalesce(
                     func.sum(
                         case(
-                            (AccountStatementModel.category_id == 'dcef92cb-9664-4dc4-9adb-afe556016fe2', AccountStatementModel.amount),
+                            (AccountTransactionModel.category_id == 'dcef92cb-9664-4dc4-9adb-afe556016fe2', AccountTransactionModel.amount),
                             else_=0
                         )
                     ), 0
@@ -126,10 +126,10 @@ class AccountManager(BaseDataManager):
             )
             # Move the filtering conditions to the LEFT JOIN ON clause
             .outerjoin(
-                AccountStatementModel,
-                (period_series.c.period == AccountStatementModel.period) &
-                (AccountStatementModel.account_id == account_id) &
-                (AccountStatementModel.active == True)
+                AccountTransactionModel,
+                (period_series.c.period == AccountTransactionModel.period) &
+                (AccountTransactionModel.account_id == account_id) &
+                (AccountTransactionModel.active == True)
             )
             .group_by(period_series.c.period)
             .order_by(period_series.c.period)

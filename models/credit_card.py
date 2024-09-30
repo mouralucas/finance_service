@@ -21,8 +21,8 @@ class CreditCardModel(SQLModel):
     currency: Mapped['CurrencyModel'] = relationship(foreign_keys=[currency_id], lazy='subquery')
 
 
-class CreditCardBillModel(SQLModel):
-    __tablename__ = 'credit_card_bill'
+class CreditCardTransactionModel(SQLModel):
+    __tablename__ = 'credit_card_transaction'
 
     id: Mapped[int] = mapped_column('id', primary_key=True, nullable=False)
     owner_id: Mapped[uuid.UUID] = mapped_column('owner_id')
@@ -54,8 +54,8 @@ class CreditCardBillModel(SQLModel):
     current_installment: Mapped[int] = mapped_column('current_installment', SmallInteger, default=1)
     installments: Mapped[int] = mapped_column('installments', SmallInteger, default=1)
     total_amount: Mapped[float] = mapped_column('total_amount')  # The total amount of transaction
-    parent_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('credit_card_bill.id'), nullable=True)
-    parent: Mapped['CreditCardBillModel'] = relationship(foreign_keys=[parent_id], lazy='subquery')
+    parent_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('credit_card_transaction.id'), nullable=True)
+    parent: Mapped['CreditCardTransactionModel'] = relationship(foreign_keys=[parent_id], lazy='subquery')
 
     description: Mapped[str] = mapped_column('description', String(500), nullable=True)
 

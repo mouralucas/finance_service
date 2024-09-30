@@ -36,8 +36,8 @@ class AccountModel(SQLModel):
     credit_cards: Mapped[list['CreditCardModel']] = relationship(back_populates='account', lazy='subquery')
 
 
-class AccountStatementModel(SQLModel):
-    __tablename__ = 'account_statement'
+class AccountTransactionModel(SQLModel):
+    __tablename__ = 'account_transaction'
 
     id: Mapped[int] = mapped_column('id', primary_key=True)
     owner_id: Mapped[uuid.UUID] = mapped_column('owner_id')
