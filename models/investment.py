@@ -99,6 +99,8 @@ class InvestmentStatementModel(SQLModel):
     net_amount: Mapped[float] = mapped_column('net_amount')
     tax_detail: Mapped[dict] = mapped_column('tax_detail', JSON, nullable=True)
     fee_detail: Mapped[dict] = mapped_column('fee_detail', JSON, nullable=True)
+    reference_date: Mapped[datetime.date] = mapped_column('reference_date', nullable=True) # TODO: Add not null after migration
+    at_maturity: Mapped[bool] = mapped_column('at_maturity', default=False)
     # TODO: decide if persist this data or calculate when needed
     value_change: Mapped[float] = mapped_column('value_change', nullable=True)
     percentage_change: Mapped[float] = mapped_column('percentage_change', nullable=True)
