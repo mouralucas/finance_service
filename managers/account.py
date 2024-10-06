@@ -135,6 +135,8 @@ class AccountManager(BaseDataManager):
             .order_by(period_series.c.period)
         )
 
+        print(sql_statement)
+
         transactions = await self.get_all(sql_statement)
 
         return transactions

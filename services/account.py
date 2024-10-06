@@ -11,7 +11,7 @@ from managers.account import AccountManager
 from managers.credit_card import CreditCardManager
 from models.account import AccountModel, AccountTransactionModel, AccountBalanceModel
 from models.credit_card import CreditCardModel
-from schemas.account import AccountSchema, TransactionSchema, BalanceSchema
+from schemas.account import AccountSchema, AccountTransactionSchema, BalanceSchema
 from schemas.request.account import CreateAccountRequest, GetAccountRequest, CreateAccountTransactionRequest, CloseAccountRequest, CreateBalanceRequest, GetBalanceRequest
 from schemas.response.account import CreateAccountResponse, GetAccountResponse, CloseAccountResponse, CreateBalanceResponse, GetBalanceResponse
 from schemas.response.account import CreateAccountTransactionResponse
@@ -96,7 +96,7 @@ class AccountService(BaseService):
         new_statement = await self.account_manager.create_statement(statement=new_statement)
 
         response = CreateAccountTransactionResponse(
-            transaction=TransactionSchema.model_validate(new_statement),
+            transaction=AccountTransactionSchema.model_validate(new_statement),
         )
 
         return response

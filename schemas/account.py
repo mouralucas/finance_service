@@ -32,7 +32,7 @@ class AccountSchema(BaseModel):
     credit_cards: list[CreditCardSchema] | None = Field(None, serialization_alias='creditCards', description="List of credit cards of the account")
 
 
-class TransactionSchema(BaseModel):
+class AccountTransactionSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int = Field(..., serialization_alias="transactionId", description="Unique transaction ID")

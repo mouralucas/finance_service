@@ -1,4 +1,5 @@
 import datetime
+import random
 
 
 def get_current_period():
@@ -53,3 +54,20 @@ def get_period_sequence(start_period: int, end_period: int = None) -> list[int]:
         period_list.append(period)
 
     return period_list
+
+
+def get_randon_date(start_date: datetime.date, end_date: datetime.date) -> datetime.date:
+    """
+    Created by: Lucas Penha de Moura
+        Creates randon date between two specified dates.
+
+        This is very useful when creating test data mocks.
+    :param start_date:
+    :param end_date:
+    :return:
+    """
+    date_range = end_date - start_date
+    random_days = random.randint(0, date_range.days)
+    random_date = start_date + datetime.timedelta(days=random_days)
+
+    return random_date

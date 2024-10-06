@@ -1,7 +1,7 @@
 from pydantic import Field
 from rolf_common.schemas import SuccessResponseBase
 
-from schemas.account import AccountSchema, TransactionSchema, BalanceSchema
+from schemas.account import AccountSchema, AccountTransactionSchema, BalanceSchema
 
 
 class CreateAccountResponse(SuccessResponseBase):
@@ -18,7 +18,7 @@ class GetAccountResponse(SuccessResponseBase):
 
 
 class CreateAccountTransactionResponse(SuccessResponseBase):
-    transaction: TransactionSchema = Field(..., serialization_alias='transaction', description='The entry statement created by the user')
+    transaction: AccountTransactionSchema = Field(..., serialization_alias='transaction', description='The entry statement created by the user')
 
 
 class CreateBalanceResponse(SuccessResponseBase):

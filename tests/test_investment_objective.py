@@ -55,3 +55,7 @@ async def test_check_investments_for_objectives(client, create_investment):
 
     assert 'investments' in data
     assert type(data['investments']) is list
+
+@pytest.mark.asyncio
+async def test_get_objective_summary(client):
+    pass

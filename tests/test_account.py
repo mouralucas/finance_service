@@ -137,7 +137,7 @@ async def test_create_transaction(client, create_open_account, create_category, 
         'description': description,
         'operationType': operation_type,
     }
-    response = await client.post('/account/statement', json=payload)
+    response = await client.post('/account/transaction', json=payload)
 
     assert response.status_code == status.HTTP_201_CREATED
 
@@ -170,7 +170,7 @@ async def test_create_transaction(client, create_open_account, create_category, 
 
 
 @pytest.mark.asyncio
-async def test_create_statement_closed_account(client, create_closed_account, create_category, create_currency):
+async def test_create_transaction_closed_account(client, create_closed_account, create_category, create_currency):
     accounts = create_closed_account
     categories = create_category
     currencies = create_currency
@@ -191,6 +191,27 @@ async def test_create_statement_closed_account(client, create_closed_account, cr
         'description': description,
         'operationType': operation_type,
     }
-    response = await client.post('/account/statement', json=payload)
+    response = await client.post('/account/transaction', json=payload)
 
     assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+@pytest.mark.asyncio
+async def test_get_transactions(client, create_account_transaction):
+    transactions = create_account_transaction
+
+    response = await client.get('/account/transaction')
+
+    assert response.status_code == status.HTTP_501_NOT_IMPLEMENTED
+
+
+@pytest.mark.asyncio
+async def test_create_balance(client, create_account_transaction):
+    transactions = create_account_transaction
+
+    # payload = {
+    #     'accountId': str(transactions[0].account_id),
+    # }
+    # response = await client.post('/account/balance', json=payload)
+
+    # assert response.status_code == status.HTTP_201_CREATED
