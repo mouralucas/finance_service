@@ -1,16 +1,20 @@
 import datetime
+import uuid
+
+from fastapi import HTTPException
 
 from rolf_common.models import SQLModel
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import BaseService
 from sqlalchemy import RowMapping
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette import status
 
 from managers.investment import InvestmentManager
 from models.investment import InvestmentModel, InvestmentStatementModel, InvestmentObjectiveModel
 from schemas.investment import InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema, InvestmentTypeSchema
-from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, LiquidateInvestmentRequest, CreateStatementRequest, GetStatementRequest, CreateObjectiveRequest, GetObjectiveRequest
-from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, LiquidateInvestmentResponse, CreateStatementResponse, GetStatementResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse, GetInvestmentWithoutObjectives
+from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, LiquidateInvestmentRequest, CreateStatementRequest, GetStatementRequest, CreateObjectiveRequest, GetObjectiveRequest, GetObjectiveSummaryRequest
+from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, LiquidateInvestmentResponse, CreateStatementResponse, GetStatementResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse, GetInvestmentWithoutObjectives, GetObjectiveSummaryResponse
 from services.utils.datetime import get_period, get_previous_period
 
 
@@ -29,6 +33,7 @@ class InvestmentService(BaseService):
             new_investment.is_liquidated = True
 
         # TODO: if liquidation date <= today and liquidation amount set is_liquidated to true
+        # TODO: Maybe when creating a new investment, create the first line of the statement, with zero tax/fee and the invested value, when set the first statement just update
         new_investment = await self.investment_manager.create(new_investment)
 
         response = CreateInvestmentResponse(
@@ -38,7 +43,7 @@ class InvestmentService(BaseService):
         return response
 
     async def get_investments(self, params: GetInvestmentRequest) -> GetInvestmentResponse:
-        investments = await InvestmentManager(self.session).get(params.model_dump())
+        investments = await InvestmentManager(self.session).get_investments(params.model_dump())
 
         response = GetInvestmentResponse(
             quantity=len(investments),
@@ -144,10 +149,40 @@ class InvestmentService(BaseService):
         return response
 
     async def get_investment_without_objective(self) -> GetInvestmentWithoutObjectives:
-        investments: list[RowMapping] = await self.investment_manager.get_investment_by_objective({})
+        investments: list[RowMapping] = await self.investment_manager.get_investments({'objective_id': None})
 
         response = GetInvestmentWithoutObjectives(
             quantity=len(investments),
             investments=[InvestmentSchema.model_validate(data["InvestmentModel"]) for data in investments],
         )
         return response
+
+    async def get_objective_summary(self, params: GetObjectiveSummaryRequest) -> GetObjectiveSummaryResponse:
+        # The summary contais:
+        #   1 - All data available from the objective (title, description,amount and estimated deadline)
+        #   2 - If amount is present, check with the latest statement for the investment the gross amount. if not statement get the amount invested.
+        #   3 - If estimated deadline and amount is present, calculate the amount needed to invest monthly until the amount is the goal is reach.
+        #       3.1 - If possíble, use the calculation for investments, how many I have to invest to reach my goal, considering the gains
+        objective = await self.investment_manager.get_objective_by_id(objective_id=params.id)
+        if not objective:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Objective not found")
+
+        investments = await self.investment_manager.get_investments({'active': True, 'objective_id': params.id})
+        if not investments:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No investment for objective '{objective_title}'".format(objective_title=objective.title))
+        investment_ids = [investment['InvestmentModel'].id for investment in investments]
+
+        statements = await self.investment_manager.get_latest_investment_statements(investment_ids=investment_ids)
+        amount_invested = sum(statement.gross_amount for statement in statements)
+        amount_stipulated = objective.amount
+        perc_completed = amount_invested/amount_stipulated*100
+
+        response = GetObjectiveSummaryResponse(
+            objective_title=objective.title,
+            amount_stipulated=amount_stipulated,
+            amount_invested=amount_invested,
+            perc_completed=perc_completed,
+        )
+
+        return response
+

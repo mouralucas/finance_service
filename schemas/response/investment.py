@@ -42,3 +42,9 @@ class GetObjectiveResponse(SuccessResponseBase):
 
 class GetInvestmentWithoutObjectives(GetInvestmentResponse):
     pass
+
+class GetObjectiveSummaryResponse(SuccessResponseBase):
+    objective_title: str = Field(..., serialization_alias='objectiveTitle', description='The title of the objective')
+    amount_stipulated: float = Field(..., serialization_alias='amountStipulated', description='The amount stipulated when objective was created')
+    amount_invested: float = Field(..., serialization_alias='amountInvested', description='The amount invested so far in this objective')
+    perc_completed: float = Field(..., serialization_alias='percCompleted', description='The percentage completed of the objective')

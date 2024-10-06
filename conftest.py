@@ -26,6 +26,9 @@ def event_loop(request):
 @pytest_asyncio.fixture(scope='function')
 async def test_session():
     async with test_sessionmanager.connect() as connection:
+        """
+            For testing, all tables are dropped and then created again
+        """
         await connection.run_sync(Base.metadata.drop_all)
         await connection.run_sync(Base.metadata.create_all)
 

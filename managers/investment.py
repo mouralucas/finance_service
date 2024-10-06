@@ -1,17 +1,15 @@
 import uuid
+from typing import Any, cast
 
 from fastapi import HTTPException
-from sqlalchemy import select, update, Executable, RowMapping
-from typing import Any, List, cast
-
 from rolf_common.managers import BaseDataManager
 from rolf_common.models import SQLModel
+from sqlalchemy import select, update, Executable, RowMapping, func
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import aliased
 from starlette import status
 
 from models.investment import InvestmentModel, InvestmentTypeModel, InvestmentStatementModel, InvestmentObjectiveModel
-from schemas.request.investment import LiquidateInvestmentRequest
-from schemas.response.investment import LiquidateInvestmentResponse
 
 
 class InvestmentManager(BaseDataManager):
@@ -44,14 +42,14 @@ class InvestmentManager(BaseDataManager):
 
         return investment
 
-    async def get(self, params: dict[str, Any]) -> list[SQLModel]:
-        stmt = select(InvestmentModel).order_by(InvestmentModel.transaction_date)
+    async def get_investments(self, params: dict[str, Any]) -> list[RowMapping]:
+        sql_statement = select(InvestmentModel).order_by(InvestmentModel.transaction_date)
 
         for key, value in params.items():
             if value:
-                stmt = stmt.where(getattr(InvestmentModel, key) == value)
+                sql_statement = sql_statement.where(getattr(InvestmentModel, key) == value)
 
-        investments: list[SQLModel] = await self.get_all(stmt, unique_result=True)
+        investments: list[RowMapping] = await self.get_all(sql_statement, unique_result=True)
 
         return investments
 
@@ -71,6 +69,34 @@ class InvestmentManager(BaseDataManager):
         statements: list[RowMapping] = await self.get_all(stmt, unique_result=True)
 
         return statements
+
+    async def get_latest_investment_statements(self, investment_ids: list[uuid.UUID]):
+        subquery = (
+            select(
+                InvestmentStatementModel.investment_id,
+                func.max(InvestmentStatementModel.period).label('max_period')
+            )
+            .where(InvestmentStatementModel.investment_id.in_(investment_ids))
+            .group_by(InvestmentStatementModel.investment_id)
+            .subquery()
+        )
+
+        sql_statement = (
+            select(
+                InvestmentStatementModel.investment_id,
+                InvestmentStatementModel.period,
+                InvestmentStatementModel.gross_amount,
+            )
+            .join(
+                subquery,
+                (InvestmentStatementModel.investment_id == subquery.c.investment_id) &
+                (InvestmentStatementModel.period == subquery.c.max_period)
+            )
+        )
+
+        result = await self.get_all(sql_statement)
+
+        return result
 
     # Investment Types
     async def create_investment_type(self, investment_type: InvestmentTypeModel) -> SQLModel:
@@ -102,9 +128,7 @@ class InvestmentManager(BaseDataManager):
 
         return investment_objectives
 
-    async def get_investment_by_objective(self, params: dict[str, Any]) -> list[RowMapping]:
-        sql_statement = select(InvestmentModel).where(InvestmentModel.objective_id == None).order_by(InvestmentModel.transaction_date)
+    async def get_objective_by_id(self, objective_id: uuid.UUID) -> InvestmentObjectiveModel | None:
+        objective = await self.get_by_id(InvestmentObjectiveModel, objective_id)
 
-        return await self.get_all(sql_statement)
-
-
+        return cast(InvestmentObjectiveModel, objective)

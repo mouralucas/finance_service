@@ -8,8 +8,8 @@ from sqlalchemy.util import await_only
 from starlette import status
 
 from backend.database import db_session
-from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, CreateStatementRequest, GetStatementRequest, LiquidateInvestmentRequest, GetObjectiveRequest, CreateObjectiveRequest
-from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, CreateStatementResponse, GetStatementResponse, LiquidateInvestmentResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse, GetInvestmentWithoutObjectives
+from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, CreateStatementRequest, GetStatementRequest, LiquidateInvestmentRequest, GetObjectiveRequest, CreateObjectiveRequest, GetObjectiveSummaryRequest
+from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, CreateStatementResponse, GetStatementResponse, LiquidateInvestmentResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse, GetInvestmentWithoutObjectives, GetObjectiveSummaryResponse
 from services.investment import InvestmentService
 
 router = APIRouter(prefix="/investment", tags=['Investments'])
@@ -54,6 +54,7 @@ async def get_investment_types(
 ) -> GetInvestmentTypeResponse:
     return await InvestmentService(session=session, user=user).get_investment_types()
 
+
 @router.post('/statement', status_code=status.HTTP_201_CREATED,
              summary='Create a statement for an investment', description='Create a statement for an investment')
 async def create_statement(
@@ -73,7 +74,7 @@ async def get_statement(
     return await InvestmentService(session=session, user=user).get_statement(params=params)
 
 
-@router.post('/objective',status_code=status.HTTP_201_CREATED,
+@router.post('/objective', status_code=status.HTTP_201_CREATED,
              summary='Create a investment objective', description='')
 async def create_objective(
         objective: CreateObjectiveRequest,
@@ -83,20 +84,29 @@ async def create_objective(
     return await InvestmentService(session, user).create_objective(objective)
 
 
-@router.get('/objective', summary='', description='')
+@router.get('/objective', summary='Get all user objectives', description='Get all active user objectives')
 async def get_objective(
         params: GetObjectiveRequest = Depends(),
         session: AsyncSession = Depends(db_session),
         user: RequiredUser = Security(get_user)
 ) -> GetObjectiveResponse:
-    a =  await InvestmentService(session, user).get_objectives(params=params)
-    return a
+    return await InvestmentService(session, user).get_objectives(params=params)
+
+
+@router.get('/objective/summary', summary='Objective summary', description='Get all information for a single objective')
+async def get_objective_summary(
+        params: GetObjectiveSummaryRequest = Depends(),
+        session: AsyncSession = Depends(db_session),
+        user: RequiredUser = Security(get_user)
+) -> GetObjectiveSummaryResponse:
+    response = await InvestmentService(session=session, user=user).get_objective_summary(params=params)
+
+    return response
+
 
 @router.get('/objective/not-set')
 async def get_investments_without_objectives(
         session: AsyncSession = Depends(db_session),
-        # user: RequiredUser = Security(get_user)
+        user: RequiredUser = Security(get_user)
 ) -> GetInvestmentWithoutObjectives:
-    user = RequiredUser(user_id=uuid4())
     return await InvestmentService(session=session, user=user).get_investment_without_objective()
-
