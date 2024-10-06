@@ -160,11 +160,13 @@ class AccountService(BaseService):
         return response
 
     async def get_balance(self, params: GetBalanceRequest) -> GetBalanceResponse:
+        account = await self.account_manager.get_account_by_id(account_id=params.account_id, raise_exception=True)
         balance = await self.account_manager.get_balance(params.account_id, params.start_period, params.end_period)
 
         response = GetBalanceResponse(
+            account_name=account.nickname,
             quantity=len(balance) if balance else 0,
-            balance=[BalanceSchema.model_validate(data["AccountBalanceModel"]) for data in balance]
+            balance=[BalanceSchema.model_validate(data["AccountBalanceModel"]) for data in balance] if balance else []
         )
 
         return response

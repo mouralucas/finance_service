@@ -47,7 +47,7 @@ class AccountManager(BaseDataManager):
     async def get_account_by_id(self, account_id: uuid.UUID, raise_exception: bool = False) -> AccountModel | None:
         account = await self.get_by_id(sql_model=AccountModel, object_id=account_id)
 
-        if raise_exception:
+        if not account and raise_exception:
             raise HTTPException(status.HTTP_404_NOT_FOUND, detail='Account not found')
 
         account = cast(AccountModel, account)
