@@ -4,7 +4,7 @@ from typing import Any, Sequence, cast, List
 from fastapi import HTTPException
 from rolf_common.managers import BaseDataManager
 from rolf_common.models import SQLModel
-from sqlalchemy import select, update, Executable, Row, func, case, RowMapping, literal_column, literal, text
+from sqlalchemy import select, update, Executable, Row, func, case, RowMapping, literal_column, literal, text, union_all
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 from starlette import status
@@ -91,10 +91,15 @@ class AccountManager(BaseDataManager):
         :return: A list of RowMapping containing the incoming and outgoing transactions
         """
         # TODO: create a relation that the user can choose its own 'earning' category, then add a parameter to that case
-        period_series = (
-            select(func.unnest(literal_column(f'ARRAY{period_range}')).label('period'))
-            .cte('integer_series')
+        # period_series = (
+        #     select(func.unnest(literal_column(f'ARRAY{period_range}')).label('period'))
+        #     .cte('integer_series')
+        # )
+        integer_series_cte = (
+            select(literal_column(str(value)).label('period'))
+            for value in period_range
         )
+        period_series = union_all(*integer_series_cte).cte('integer_series')
 
         sql_statement = (
             select(
@@ -118,7 +123,7 @@ class AccountManager(BaseDataManager):
                 func.coalesce(
                     func.sum(
                         case(
-                            (AccountTransactionModel.category_id == 'dcef92cb-9664-4dc4-9adb-afe556016fe2', AccountTransactionModel.amount),
+                            (AccountTransactionModel.category_id == uuid.UUID('dcef92cb-9664-4dc4-9adb-afe556016fe2'), AccountTransactionModel.amount),
                             else_=0
                         )
                     ), 0

@@ -4,7 +4,7 @@ from typing import Any
 
 from dateutil.relativedelta import relativedelta
 
-from data_mock.account import get_open_account_mocked
+from data_mock.account import get_open_account_mock
 from data_mock.core import get_currency_mocked, get_index_type_mocked, get_index_mocked, get_liquidity_mocked, get_country_mocked
 from models.core import LiquidityModel
 from models.investment import InvestmentModel
@@ -30,7 +30,7 @@ def get_investment_type_mocked() -> list[dict[str, Any]]:
 
 
 def get_investment_mocked() -> list[dict[str, Any]]:
-    accounts = get_open_account_mocked()
+    accounts = get_open_account_mock()
     investment_types = get_investment_type_mocked()
     currencies = get_currency_mocked()
     index_types = get_index_type_mocked()

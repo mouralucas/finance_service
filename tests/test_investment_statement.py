@@ -22,30 +22,33 @@ async def test_get_investment_type(client, create_investment_type):
 
 
 @pytest.mark.asyncio
-async def test_create_investment_statement(client, create_investment, create_tax):
+async def test_create_first_investment_statement(client, create_investment, create_tax):
+    """
+        The first statement should have the same period as the investment
+    :param client:
+    :param create_investment:
+    :param create_tax:
+    :return:
+    """
     investments = create_investment
 
     investment_id = str(investments[0].id)
     period = get_period(investments[0].transaction_date)
     gross_amount = 35.10
-    tax_id = str(create_tax[0].id)
-    tax_name = create_tax[0].name
-    total_tax = 0.2
-    total_fee = 0
-    net_amount = gross_amount - total_tax - total_fee
+    tax_detail = [{
+        'taxFeeId': str(create_tax[0].id),
+        'amount': 0.21
+    }]
+
+    net_amount = gross_amount - sum(tax['amount'] for tax in tax_detail)
 
     payload = {
         'investmentId': investment_id,
         'period': period,
+        'referenceDate': investments[0].transaction_date.strftime('%Y-%m-%d'),
         'grossAmount': gross_amount,
-        'totalTax': total_tax,
-        'totalFee': total_fee,
         'netAmount': net_amount,
-        'taxDetail': {
-            'taxId': tax_id,
-            'name': tax_name,
-            'amount': total_tax
-        }
+        'taxDetail': tax_detail,
     }
 
     response = await client.post('/investment/statement', json=payload)
@@ -61,9 +64,9 @@ async def test_create_investment_statement(client, create_investment, create_tax
     assert 'grossAmount' in data['investmentStatement']
     assert data['investmentStatement']['grossAmount'] == gross_amount
     assert 'totalTax' in data['investmentStatement']
-    assert data['investmentStatement']['totalTax'] == total_tax
+    assert data['investmentStatement']['totalTax'] == sum(tax['amount'] for tax in tax_detail)
     assert 'totalFee' in data['investmentStatement']
-    assert data['investmentStatement']['totalFee'] == total_fee
+    assert data['investmentStatement']['totalFee'] == 0
     assert 'netAmount' in data['investmentStatement']
     assert data['investmentStatement']['netAmount'] == net_amount
     # TODO: add test to tax and fee details

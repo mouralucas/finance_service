@@ -67,7 +67,7 @@ class InvestmentManager(BaseDataManager):
                 stmt = stmt.where(getattr(InvestmentStatementModel, key) == value)
 
         result: list[RowMapping] = await self.get_all(stmt, unique_result=True)
-        statements = [cast(InvestmentStatementModel, statement) for statement in result]
+        statements = [cast(InvestmentStatementModel, statement) for statement in result] if result else None
 
         return statements
 

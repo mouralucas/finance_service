@@ -209,9 +209,9 @@ async def test_get_transactions(client, create_account_transaction):
 async def test_create_balance(client, create_account_transaction):
     transactions = create_account_transaction
 
-    # payload = {
-    #     'accountId': str(transactions[0].account_id),
-    # }
-    # response = await client.post('/account/balance', json=payload)
+    payload = {
+        'accountId': str(transactions[0].account_id),
+    }
+    response = await client.post('/account/balance', json=payload)
 
-    # assert response.status_code == status.HTTP_201_CREATED
+    assert response.status_code == status.HTTP_201_CREATED

@@ -16,7 +16,7 @@ default_model_dict = {
 }
 
 
-def get_mocked_account_type() -> list[dict[str, Any]]:
+def get_account_type_mock() -> list[dict[str, Any]]:
     account_types: list[dict[str, Any]] = [
         {
             **default_model_dict,
@@ -35,8 +35,8 @@ def get_mocked_account_type() -> list[dict[str, Any]]:
     return account_types
 
 
-def get_open_account_mocked() -> list[dict[str, Any]]:
-    account_types = get_mocked_account_type()
+def get_open_account_mock() -> list[dict[str, Any]]:
+    account_types = get_account_type_mock()
     banks = get_bank_mocked()
     currencies = get_currency_mocked()
 
@@ -72,8 +72,8 @@ def get_open_account_mocked() -> list[dict[str, Any]]:
     return accounts
 
 
-def get_closed_account_mocked() -> list[dict[str, Any]]:
-    account_types = get_mocked_account_type()
+def get_closed_account_mock() -> list[dict[str, Any]]:
+    account_types = get_account_type_mock()
     banks = get_bank_mocked()
     currencies = get_currency_mocked()
 
@@ -98,7 +98,7 @@ def get_closed_account_mocked() -> list[dict[str, Any]]:
 
 
 def get_account_transaction_mock() -> list[dict[str, Any]]:
-    accounts = get_open_account_mocked()
+    accounts = get_open_account_mock()
     currencies = get_currency_mocked()
     categories = get_category_mocked()
 

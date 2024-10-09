@@ -1,14 +1,14 @@
 import pytest_asyncio
 from rolf_common.managers import BaseDataManager
 
-from data_mock.account import get_open_account_mocked, get_mocked_account_type, get_closed_account_mocked, get_account_transaction_mock
+from data_mock.account import get_open_account_mock, get_account_type_mock, get_closed_account_mock, get_account_transaction_mock
 from models.account import AccountTypeModel, AccountModel, AccountTransactionModel
 from schemas.account import AccountSchema, AccountTypeSchema, AccountTransactionSchema
 
 
 @pytest_asyncio.fixture
 async def create_account_type(test_session) -> list[AccountTypeSchema]:
-    data_ = await BaseDataManager(test_session).add_or_ignore_all(AccountTypeModel, get_mocked_account_type())
+    data_ = await BaseDataManager(test_session).add_or_ignore_all(AccountTypeModel, get_account_type_mock())
     account_types = [AccountTypeSchema.model_validate(data["AccountTypeModel"]) for data in data_]
 
     return account_types
@@ -16,7 +16,7 @@ async def create_account_type(test_session) -> list[AccountTypeSchema]:
 
 @pytest_asyncio.fixture
 async def create_open_account(test_session, create_bank, create_account_type, create_currency) -> list[AccountSchema]:
-    data_ = await BaseDataManager(test_session).add_or_ignore_all(AccountModel, get_open_account_mocked())
+    data_ = await BaseDataManager(test_session).add_or_ignore_all(AccountModel, get_open_account_mock())
     account_list = [AccountSchema.model_validate(data["AccountModel"]) for data in data_]
 
     return account_list
@@ -24,7 +24,7 @@ async def create_open_account(test_session, create_bank, create_account_type, cr
 
 @pytest_asyncio.fixture
 async def create_closed_account(test_session, create_account_type, create_bank, create_currency) -> list[AccountSchema]:
-    data_ = await BaseDataManager(test_session).add_or_ignore_all(AccountModel, get_closed_account_mocked())
+    data_ = await BaseDataManager(test_session).add_or_ignore_all(AccountModel, get_closed_account_mock())
     account_list = [AccountSchema.model_validate(data["AccountModel"]) for data in data_]
 
     return account_list

@@ -4,7 +4,7 @@ from typing import Any
 
 from dateutil.relativedelta import relativedelta
 
-from data_mock.account import get_open_account_mocked
+from data_mock.account import get_open_account_mock
 from data_mock.core import get_currency_mocked
 
 
@@ -14,7 +14,7 @@ default_model_dict = {
 }
 
 def get_credit_card_mocked() -> list[dict[str, Any]]:
-    accounts = get_open_account_mocked()
+    accounts = get_open_account_mock()
     currencies = get_currency_mocked()
 
     credit_cards: list[dict[str, Any]] = [
@@ -33,7 +33,7 @@ def get_credit_card_mocked() -> list[dict[str, Any]]:
 
 
 def get_cancelled_credit_card_mocked() -> list[dict[str, Any]]:
-    accounts = get_open_account_mocked()
+    accounts = get_open_account_mock()
     currencies = get_currency_mocked()
 
     credit_cards: list[dict[str, Any]] = [
