@@ -81,25 +81,6 @@ class InvestmentService(BaseService):
 
     # Statements
     async def create_statement(self, statement: CreateStatementRequest) -> CreateStatementResponse:
-        new_statement = InvestmentStatementModel(**statement.model_dump())
-        new_statement.owner_id = self.user['user_id']
-
-        investment = await self.investment_manager.get_investment_by_id(statement.investment_id)
-        previous_statements = await self.investment_manager.get_statement({'investment_id': investment.id})
-        last_statement = previous_statements[0] if previous_statements else None
-
-        # If it is the first statement period must be the sabe as the investment
-        if not previous_statements and get_period(investment.transaction_date) != statement.period:
-            raise
-
-        # check if the statement period is less then investment
-        if statement.period < get_period(investment.transaction_date):
-            raise
-
-        # Check if the statement from last period exists
-        if last_statement and last_statement.period != get_previous_period(statement.period):
-            pass
-
         # TODO: rules to add
         # The period must not be less then the investment transaction period
         # If the period is the same of investment transaction:
@@ -108,6 +89,33 @@ class InvestmentService(BaseService):
         #   Check if the previous period is available in statement
         #       If not warn the user
         #   If exist, get the gross amount and set the previous amount from adding period
+
+        investment = await self.investment_manager.get_investment_by_id(statement.investment_id, raise_exception=True)
+
+        new_statement = InvestmentStatementModel(**statement.model_dump())
+        new_statement.owner_id = self.user['user_id']
+
+        previous_statements = await self.investment_manager.get_statement({'investment_id': investment.id})
+        last_statement = previous_statements[-1]['InvestmentStatementModel'] if previous_statements else None
+
+        # If it is the first statement period must be the same as the investment
+        if not previous_statements and get_period(investment.transaction_date) != statement.period:
+            raise HTTPException(status_code=status.HTTP_412_PRECONDITION_FAILED, detail='First statement period must be the sabe as transaction period')
+
+        # check if the statement period is less then investment
+        if statement.period < get_period(investment.transaction_date):
+            raise HTTPException(status_code=status.HTTP_412_PRECONDITION_FAILED, detail='Statement period cannot be before transaction period')
+
+        # Check if the statement from last period exists
+        if last_statement and last_statement.period != get_previous_period(statement.period):
+            raise HTTPException(status_code=status.HTTP_412_PRECONDITION_FAILED, detail='Statement must be the following period of the last statement')
+
+        new_statement.previous_amount = last_statement.gross_amount if last_statement else investment.amount
+        new_statement.total_tax = sum(tax.amount for tax in statement.tax_detail) if statement.tax_detail else 0
+        new_statement.total_fee = sum(fee.amount for fee in statement.fee_detail) if statement.fee_detail else 0
+
+        new_statement.value_change = new_statement.gross_amount - new_statement.previous_amount
+        new_statement.percentage_change = new_statement.value_change / new_statement.previous_amount * 100
 
         new_statement = await self.investment_manager.create_statement(new_statement)
 

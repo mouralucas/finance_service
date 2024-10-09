@@ -3,6 +3,7 @@ import uuid
 
 from fastapi import Query
 from pydantic import BaseModel, Field, model_validator
+from setuptools.command.alias import alias
 
 
 class CreateInvestmentRequest(BaseModel):
@@ -48,15 +49,20 @@ class LiquidateInvestmentRequest(BaseModel):
     liquidation_amount: float = Field(None, alias='liquidationAmount', description='The amount liquidated, after tax')
 
 
+class TaxFeeRequest(BaseModel):
+    id: str = Field(..., alias='taxFeeId', description='The identification of the tax/fee')
+    amount: float = Field(..., description='The amount of the tax/fee')
+    currency_id: str = Field('BRL', alias='currencyId', description='The currency of the tax/fee')
+
+
 class CreateStatementRequest(BaseModel):
     investment_id: uuid.UUID = Field(..., alias='investmentId', description='The unique identifier of the investment')
     period: int = Field(..., alias='period', description='The period of the statement', examples=['202408'])
+    reference_date: datetime.date = Field(..., alias='referenceDate', description='The date when the statement was calculated, usually the last business of the month')
     gross_amount: float = Field(..., alias='grossAmount', description='The gross amount of the period')
-    total_tax: float = Field(0, alias='totalTax', description='The total of the tax if investment were liquidated in the period')
-    total_fee: float = Field(0, alias='totalFee', description='The total of fee if investment were liquidated in the period')
     net_amount: float = Field(..., alias='netAmount', description='The net amount of the period')
-    tax_detail: dict | None = Field(None, alias='taxDetail', description='The tax details of the investment tax')
-    fee_detail: dict | None = Field(None, alias='feeDetail', description='The fee details of the investment fee')
+    tax_detail: list[TaxFeeRequest] | None = Field(None, alias='taxDetail', description='The tax details of the investment tax')
+    fee_detail: list[TaxFeeRequest] | None = Field(None, alias='feeDetail', description='The fee details of the investment fee')
 
 
 class GetStatementRequest(BaseModel):

@@ -35,7 +35,7 @@ class InvestmentManager(BaseDataManager):
     async def get_investment_by_id(self, investment_id: uuid.UUID, raise_exception: bool = False) -> InvestmentModel | None:
         investment = await self.get_by_id(InvestmentModel, investment_id)
 
-        if raise_exception:
+        if not investment and raise_exception:
             raise HTTPException(status.HTTP_404_NOT_FOUND, detail='Investment not found')
 
         investment = cast(InvestmentModel, investment)
@@ -59,14 +59,15 @@ class InvestmentManager(BaseDataManager):
 
         return statement
 
-    async def get_statement(self, params: dict[str, Any]) -> list[RowMapping] | None:
+    async def get_statement(self, params: dict[str, Any]) -> list[InvestmentStatementModel] | None:
         stmt = select(InvestmentStatementModel).order_by(InvestmentStatementModel.period)
 
         for key, value in params.items():
             if value:
                 stmt = stmt.where(getattr(InvestmentStatementModel, key) == value)
 
-        statements: list[RowMapping] = await self.get_all(stmt, unique_result=True)
+        result: list[RowMapping] = await self.get_all(stmt, unique_result=True)
+        statements = [cast(InvestmentStatementModel, statement) for statement in result]
 
         return statements
 

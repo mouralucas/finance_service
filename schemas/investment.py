@@ -25,7 +25,7 @@ class InvestmentSchema(BaseModel):
     description: str | None = Field(None, description='Optional description of the investment')
     type_id: uuid.UUID = Field(..., serialization_alias='typeId', description='The id of the investment type')
     transaction_date: datetime.date = Field(..., serialization_alias='transactionDate', description='The date of the investment')
-    maturity_date: datetime.date = Field(None, serialization_alias='maturityDate', description='The date that the investment will be liquidated')
+    maturity_date: datetime.date | None = Field(None, serialization_alias='maturityDate', description='The date that the investment will be liquidated')
     quantity: float = Field(None, description='The quantity of the investment bought')
     price: float = Field(None, description='The unit price for the investment')
     amount: float = Field(None, description='The total bought. Quantity * price')
