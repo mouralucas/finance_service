@@ -42,6 +42,13 @@ class InvestmentSchema(BaseModel):
 
     objective_id: uuid.UUID | None = Field(None, serialization_alias='objectiveId', description='The id of the objective')
 
+
+class TaxFeeResponse(BaseModel):
+    id: uuid.UUID = Field(..., serialization_alias='taxFeeId', description='The identification of the tax/fee')
+    amount: float = Field(..., description='The amount of the tax/fee')
+    currency_id: str = Field('BRL', serialization_alias='currencyId', description='The currency of the tax/fee')
+
+
 class InvestmentStatementSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -51,7 +58,9 @@ class InvestmentStatementSchema(BaseModel):
     period: int = Field(..., serialization_alias='period', description='The period of the statement')
     gross_amount: float = Field(..., serialization_alias='grossAmount', description='The gross amount of the investment in the period')
     total_tax: float = Field(..., serialization_alias='totalTax', description='The total tax amount of the investment in the period')
+    tax_detail: list[TaxFeeResponse] | None = Field(..., serialization_alias='taxDetail', description='The detail of taxes')
     total_fee: float = Field(..., serialization_alias='totalFee', description='The total fee of the investment in the period')
+    fee_detail: list[TaxFeeResponse] | None = Field(..., serialization_alias='feeDetail', description='The detail of fees')
     net_amount: float = Field(..., serialization_alias='netAmount', description='The net amount of the investment in the period')
 
 

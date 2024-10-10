@@ -69,6 +69,11 @@ async def test_create_first_investment_statement(client, create_investment, crea
     assert data['investmentStatement']['totalFee'] == 0
     assert 'netAmount' in data['investmentStatement']
     assert data['investmentStatement']['netAmount'] == net_amount
+
+    assert 'taxDetail' in data['investmentStatement']
+    assert type(data['investmentStatement']['taxDetail']) is list
+    assert 'feeDetail' in data['investmentStatement']
+    assert data['investmentStatement']['feeDetail'] is None
     # TODO: add test to tax and fee details
 
 

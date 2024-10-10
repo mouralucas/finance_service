@@ -50,7 +50,7 @@ class LiquidateInvestmentRequest(BaseModel):
 
 
 class TaxFeeRequest(BaseModel):
-    id: str = Field(..., alias='taxFeeId', description='The identification of the tax/fee')
+    id: uuid.UUID = Field(..., alias='taxFeeId', description='The identification of the tax/fee') # TODO: should be UUID not str
     amount: float = Field(..., description='The amount of the tax/fee')
     currency_id: str = Field('BRL', alias='currencyId', description='The currency of the tax/fee')
 
