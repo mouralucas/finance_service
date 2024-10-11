@@ -1,5 +1,5 @@
 import uuid
-
+import datetime
 from rolf_common.models import SQLModel
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String, SmallInteger, ForeignKey
@@ -72,6 +72,19 @@ class IndexerModel(SQLModel):
     description: Mapped[str] = mapped_column('description', String(500), nullable=True)
 
 
+class IndexerSeriesModel(SQLModel):
+    __tablename__ = 'indexer_series'
+
+    indexer_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('indexer.id'))
+    indexer_name: Mapped[str] = mapped_column('indexer_name', String(100))  # Usually the same as Indexer model, just denormalized
+    date: Mapped[datetime.date] = mapped_column('date', nullable=True)
+    period: Mapped[str] = mapped_column('period', nullable=True)
+    value: Mapped[float] = mapped_column('value', nullable=True)
+    periodicity_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('periodicity.id'))
+    periodicity_name: Mapped[str] = mapped_column('periodicity_name', String(100))
+    unit: Mapped[str] = mapped_column('unit', String(10))
+
+
 class LiquidityModel(SQLModel):
     """
     Created by: Lucas Penha de Moura - 11/08/2024
@@ -83,6 +96,14 @@ class LiquidityModel(SQLModel):
 
     name: Mapped[str] = mapped_column('name', String(250))
     description: Mapped[str] = mapped_column('description', String(500), nullable=True)
+
+
+class PeriodicityModel(SQLModel):
+    __tablename__ = 'periodicity'
+
+    name: Mapped[str] = mapped_column('name', String(100))
+    description: Mapped[str] = mapped_column('description', String(250), nullable=True)
+    order: Mapped[int] = mapped_column('order', SmallInteger, nullable=True)
 
 
 class TaxFeeModel(SQLModel):
@@ -98,4 +119,4 @@ class TaxFeeModel(SQLModel):
     acronyms: Mapped[str] = mapped_column('acronyms', String(30), nullable=True)
     country_id: Mapped[str] = mapped_column(ForeignKey('country.id'))
     country: Mapped['CountryModel'] = relationship(foreign_keys=[country_id], lazy='subquery')
-    type: Mapped[str] = mapped_column('type', String(3)) # Can be 'tax' or 'fee'
+    type: Mapped[str] = mapped_column('type', String(3))  # Can be 'tax' or 'fee'

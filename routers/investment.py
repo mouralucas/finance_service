@@ -63,7 +63,6 @@ async def create_statement(
         # user: RequiredUser = Security(get_user)
 ) -> CreateStatementResponse:
     user = RequiredUser(user_id='adf52a1e-7a19-11ed-a1eb-0242ac120002')
-    # return None
     return await InvestmentService(session=session, user=user).create_statement(statement=statement)
 
 

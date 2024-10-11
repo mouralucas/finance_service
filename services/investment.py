@@ -84,16 +84,6 @@ class InvestmentService(BaseService):
         # Get the investment
         investment = await self.investment_manager.get_investment_by_id(statement.investment_id, raise_exception=True)
 
-        # Set the model with the new statement
-        new_statement = InvestmentStatementModel(**statement.model_dump())
-
-        # Serialize the tax/fee information
-        new_statement.tax_detail = [tax.model_dump(mode='json') for tax in statement.tax_detail] if statement.tax_detail else None
-        new_statement.fee_detail = [fee.model_dump(mode='json') for fee in statement.fee_detail] if statement.fee_detail else None
-
-        # Link the statement with the user
-        new_statement.owner_id = self.user['user_id']
-
         # Get previous statement
         previous_statements = await self.investment_manager.get_statement({'investment_id': investment.id})
         last_statement = previous_statements[-1]['InvestmentStatementModel'] if previous_statements else None
@@ -109,6 +99,16 @@ class InvestmentService(BaseService):
         # Check if the statement from last period exists
         if last_statement and last_statement.period != get_previous_period(statement.period):
             raise HTTPException(status_code=status.HTTP_412_PRECONDITION_FAILED, detail='Statement must be the following period of the last statement')
+
+        # Set the model with the new statement
+        new_statement = InvestmentStatementModel(**statement.model_dump())
+
+        # Serialize the tax/fee information
+        new_statement.tax_detail = [tax.model_dump(mode='json') for tax in statement.tax_detail] if statement.tax_detail else None
+        new_statement.fee_detail = [fee.model_dump(mode='json') for fee in statement.fee_detail] if statement.fee_detail else None
+
+        # Link the statement with the user
+        new_statement.owner_id = self.user['user_id']
 
         # Set previous amount
         new_statement.previous_amount = last_statement.gross_amount if last_statement else investment.amount
