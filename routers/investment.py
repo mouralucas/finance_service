@@ -9,7 +9,7 @@ from starlette import status
 
 from backend.database import db_session
 from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, CreateStatementRequest, GetStatementRequest, LiquidateInvestmentRequest, GetObjectiveRequest, CreateObjectiveRequest, GetObjectiveSummaryRequest
-from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, CreateStatementResponse, GetStatementResponse, LiquidateInvestmentResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse, GetInvestmentWithoutObjectives, GetObjectiveSummaryResponse
+from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, CreateStatementResponse, GetStatementResponse, LiquidateInvestmentResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse, GetInvestmentWithoutObjectives, GetObjectiveSummaryResponse, GetInvestmentAllocationResponse
 from services.investment import InvestmentService
 
 router = APIRouter(prefix="/investment", tags=['Investments'])
@@ -110,3 +110,11 @@ async def get_investments_without_objectives(
         user: RequiredUser = Security(get_user)
 ) -> GetInvestmentWithoutObjectives:
     return await InvestmentService(session=session, user=user).get_investment_without_objective()
+
+@router.get('/allocation', summary='Get investment allocation', description='Get the investment distribution between investment types')
+async def get_allocation(
+        session: AsyncSession = Depends(db_session),
+        # user: RequiredUser = Security(get_user)
+) -> GetInvestmentAllocationResponse:
+    user = RequiredUser(user_id='adf52a1e-7a19-11ed-a1eb-0242ac120002')
+    return await InvestmentService(session=session, user=user).get_investment_allocation()

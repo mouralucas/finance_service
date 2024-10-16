@@ -12,9 +12,9 @@ from starlette import status
 
 from managers.investment import InvestmentManager
 from models.investment import InvestmentModel, InvestmentStatementModel, InvestmentObjectiveModel
-from schemas.investment import InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema, InvestmentTypeSchema
+from schemas.investment import InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema, InvestmentTypeSchema, InvestmentAllocationSchema
 from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, LiquidateInvestmentRequest, CreateStatementRequest, GetStatementRequest, CreateObjectiveRequest, GetObjectiveRequest, GetObjectiveSummaryRequest
-from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, LiquidateInvestmentResponse, CreateStatementResponse, GetStatementResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse, GetInvestmentWithoutObjectives, GetObjectiveSummaryResponse
+from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, LiquidateInvestmentResponse, CreateStatementResponse, GetStatementResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse, GetInvestmentWithoutObjectives, GetObjectiveSummaryResponse, GetInvestmentAllocationResponse
 from services.utils.datetime import get_period, get_previous_period
 
 
@@ -162,7 +162,14 @@ class InvestmentService(BaseService):
         return response
 
     async def get_investment_without_objective(self) -> GetInvestmentWithoutObjectives:
-        investments: list[RowMapping] = await self.investment_manager.get_investments({'objective_id': None})
+        # TODO: how to change the manager to accept None in specific cases like this one?
+        investments: list[RowMapping] = await self.investment_manager.get_investments(
+            {
+                'objective_id': None,
+                'owner_id': self.user['user_id'],
+                'active': True
+            }
+        )
 
         response = GetInvestmentWithoutObjectives(
             quantity=len(investments),
@@ -188,7 +195,7 @@ class InvestmentService(BaseService):
         statements = await self.investment_manager.get_latest_investment_statements(investment_ids=investment_ids)
         amount_invested = sum(statement.gross_amount for statement in statements)
         amount_stipulated = objective.amount
-        perc_completed = amount_invested/amount_stipulated*100
+        perc_completed = amount_invested / amount_stipulated * 100
 
         response = GetObjectiveSummaryResponse(
             objective_title=objective.title,
@@ -199,3 +206,13 @@ class InvestmentService(BaseService):
 
         return response
 
+    # Allocation
+    async def get_investment_allocation(self) -> GetInvestmentAllocationResponse:
+        allocation_by_type = await self.investment_manager.get_allocation_by_investment_type(owner_id='')
+
+        response = GetInvestmentAllocationResponse(
+            allocation_by_type=[InvestmentAllocationSchema.model_validate(allocation) for allocation in allocation_by_type],
+            allocation_by_category=[InvestmentAllocationSchema.model_validate(allocation) for allocation in allocation_by_type],
+        )
+
+        return response

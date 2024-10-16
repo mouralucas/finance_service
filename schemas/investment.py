@@ -73,3 +73,9 @@ class InvestmentObjectiveSchema(BaseModel):
     description: str | None = Field(None, description='The description of the objective')
     amount: float = Field(..., description='The amount of the objective')
     estimated_deadline: datetime.date | None = Field(None, serialization_alias='estimatedDeadline', description='The date that are expected to reach the objective')
+
+
+# Allocation
+class InvestmentAllocationSchema(BaseModel):
+    name: str = Field(..., description='The name of the allocation')
+    total: float = Field(..., description='The total amount allocated')

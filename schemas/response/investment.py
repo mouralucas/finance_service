@@ -3,7 +3,7 @@ import uuid
 from pydantic import Field
 from rolf_common.schemas import SuccessResponseBase
 
-from schemas.investment import InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema, InvestmentTypeSchema
+from schemas.investment import InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema, InvestmentTypeSchema, InvestmentAllocationSchema
 
 
 class CreateInvestmentResponse(SuccessResponseBase):
@@ -49,3 +49,8 @@ class GetObjectiveSummaryResponse(SuccessResponseBase):
     amount_stipulated: float = Field(..., serialization_alias='amountStipulated', description='The amount stipulated when objective was created')
     amount_invested: float = Field(..., serialization_alias='amountInvested', description='The amount invested so far in this objective')
     perc_completed: float = Field(..., serialization_alias='percCompleted', description='The percentage completed of the objective')
+
+
+class GetInvestmentAllocationResponse(SuccessResponseBase):
+    allocation_by_type: list[InvestmentAllocationSchema] = Field(..., description='The list of investment allocated by type')
+    allocation_by_category: list[InvestmentAllocationSchema] = Field(..., description='The list of investment allocated by category')

@@ -1,5 +1,5 @@
 import uuid
-from typing import Any, cast
+from typing import Any, cast, List
 
 from fastapi import HTTPException
 from rolf_common.managers import BaseDataManager
@@ -75,7 +75,7 @@ class InvestmentManager(BaseDataManager):
         subquery = (
             select(
                 InvestmentStatementModel.investment_id,
-                func.max(InvestmentStatementModel.period).label('max_period')
+                func.max(InvestmentStatementModel.period).label('latest_period')
             )
             .where(InvestmentStatementModel.investment_id.in_(investment_ids))
             .group_by(InvestmentStatementModel.investment_id)
@@ -91,7 +91,7 @@ class InvestmentManager(BaseDataManager):
             .join(
                 subquery,
                 (InvestmentStatementModel.investment_id == subquery.c.investment_id) &
-                (InvestmentStatementModel.period == subquery.c.max_period)
+                (InvestmentStatementModel.period == subquery.c.latest_period)
             )
         )
 
@@ -133,3 +133,34 @@ class InvestmentManager(BaseDataManager):
         objective = await self.get_by_id(InvestmentObjectiveModel, objective_id)
 
         return cast(InvestmentObjectiveModel, objective)
+
+    # Allocation
+    async def get_allocation_by_investment_type(self, owner_id) -> list[RowMapping] | None:
+        # Get the latest statement per investment
+        subquery_latest_period = (
+            select(
+                InvestmentStatementModel.investment_id,
+                func.max(InvestmentStatementModel.period).label('latest_period')
+            )
+            .group_by(InvestmentStatementModel.investment_id)
+            .subquery()
+        )
+
+
+        query = (
+            select(
+                InvestmentTypeModel.name.label('name'),
+                func.sum(InvestmentStatementModel.gross_amount).label('total')
+            )
+            .join(InvestmentModel, InvestmentModel.type_id == InvestmentTypeModel.id)
+            .join(InvestmentStatementModel, InvestmentStatementModel.investment_id == InvestmentModel.id)
+            .join(subquery_latest_period,
+                  (InvestmentStatementModel.investment_id == subquery_latest_period.c.investment_id) &
+                  (InvestmentStatementModel.period == subquery_latest_period.c.latest_period)
+                  )
+            .group_by(InvestmentTypeModel.name)
+        )
+
+        result = await self.get_all(query)
+
+        return result
