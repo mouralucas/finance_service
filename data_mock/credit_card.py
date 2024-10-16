@@ -9,7 +9,7 @@ from data_mock.core import get_currency_mocked
 
 
 default_model_dict = {
-    'created_at': datetime.datetime.utcnow(),
+    'created_at': datetime.datetime.now(datetime.timezone.utc),
     'active': True
 }
 

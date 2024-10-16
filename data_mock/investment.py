@@ -11,7 +11,7 @@ from models.investment import InvestmentModel
 from services.utils.datetime import get_period
 
 default_model_dict = {
-    'created_at': datetime.datetime.utcnow(),
+    'created_at': datetime.datetime.now(datetime.timezone.utc),
     'active': True
 }
 

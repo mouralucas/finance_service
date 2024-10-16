@@ -1,5 +1,3 @@
-from datetime import datetime
-
 import pytest
 from starlette import status
 
@@ -97,8 +95,6 @@ async def test_close_account_with_credit_card(client, create_valid_credit_card):
 
 @pytest.mark.asyncio
 async def test_get_account(client, create_open_account):
-    accounts = create_open_account
-
     response = await client.get('/account')
 
     assert response.status_code == status.HTTP_200_OK
@@ -173,7 +169,6 @@ async def test_create_transaction(client, create_open_account, create_category, 
 async def test_create_transaction_closed_account(client, create_closed_account, create_category, create_currency):
     accounts = create_closed_account
     categories = create_category
-    currencies = create_currency
 
     # Data only for local transaction, that means in the same currency as the account
     user_account = accounts[0]
@@ -198,8 +193,6 @@ async def test_create_transaction_closed_account(client, create_closed_account, 
 
 @pytest.mark.asyncio
 async def test_get_transactions(client, create_account_transaction):
-    transactions = create_account_transaction
-
     response = await client.get('/account/transaction')
 
     assert response.status_code == status.HTTP_501_NOT_IMPLEMENTED

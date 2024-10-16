@@ -1,7 +1,6 @@
 import datetime
 import uuid
 
-from fastapi.openapi.models import Schema
 from pydantic import BaseModel, Field, ConfigDict
 
 from schemas.credit_card import CreditCardSchema

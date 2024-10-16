@@ -6,12 +6,10 @@ from typing import Any
 from dateutil.relativedelta import relativedelta
 
 from data_mock.core import get_bank_mocked, get_currency_mocked, get_category_mocked
-from models.account import AccountModel, AccountTypeModel
-from models.core import BankModel, CurrencyModel
 from services.utils.datetime import get_period, get_randon_date
 
 default_model_dict = {
-    'created_at': datetime.datetime.utcnow(),
+    'created_at': datetime.datetime.now(datetime.timezone.utc),
     'active': True
 }
 
@@ -50,7 +48,7 @@ def get_open_account_mock() -> list[dict[str, Any]]:
             'description': 'My account 1 description',
             'branch': '123-4',
             'number': '123456',
-            'open_date': datetime.datetime.utcnow() - relativedelta(years=5, months=7, days=21),
+            'open_date': datetime.datetime.now(datetime.timezone.utc) - relativedelta(years=5, months=7, days=21),
             'type_id': account_types[0]['id'],
             'currency_id': currencies[0]['id'],
         },
@@ -63,7 +61,7 @@ def get_open_account_mock() -> list[dict[str, Any]]:
             'description': 'My second account description',
             'branch': '567-8',
             'number': '789123',
-            'open_date': datetime.datetime.utcnow() - relativedelta(years=2, months=8, days=0),
+            'open_date': datetime.datetime.now(datetime.timezone.utc) - relativedelta(years=2, months=8, days=0),
             'type_id': account_types[0]['id'],
             'currency_id': currencies[0]['id'],
         }

@@ -1,5 +1,3 @@
-from http.client import responses
-
 from fastapi import APIRouter, Depends, Security
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import get_user

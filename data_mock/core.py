@@ -3,7 +3,7 @@ import uuid
 from typing import Any
 
 default_model_dict = {
-    'created_at': datetime.datetime.utcnow(),
+    'created_at': datetime.datetime.now(datetime.timezone.utc),
     'active': True
 }
 

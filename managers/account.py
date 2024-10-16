@@ -1,16 +1,14 @@
 import uuid
-from typing import Any, Sequence, cast, List
+from typing import Any, cast
 
 from fastapi import HTTPException
 from rolf_common.managers import BaseDataManager
 from rolf_common.models import SQLModel
-from sqlalchemy import select, update, Executable, Row, func, case, RowMapping, literal_column, literal, text, union_all
+from sqlalchemy import select, update, Executable, func, case, RowMapping, literal_column, union_all
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import aliased
 from starlette import status
 
 from models.account import AccountModel, AccountTransactionModel, AccountBalanceModel
-from services.utils.datetime import get_period_sequence
 
 
 class AccountManager(BaseDataManager):

@@ -3,7 +3,6 @@ import uuid
 
 from fastapi import Query
 from pydantic import BaseModel, Field, model_validator
-from setuptools.command.alias import alias
 
 
 class CreateInvestmentRequest(BaseModel):

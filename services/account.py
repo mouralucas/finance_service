@@ -108,6 +108,7 @@ class AccountService(BaseService):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Account not exists')
 
         # Get balance from the last period with registered transactions until the account is closed or current period
+        # TODO: stmt should not be in service!
         min_period: int = await self.account_manager.get_only_one(select(func.min(AccountTransactionModel.period)).where(AccountTransactionModel.account_id == params.account_id))
         max_period: int = get_period(account.close_date) if account.close_date else get_current_period()
 

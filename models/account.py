@@ -2,7 +2,7 @@ import datetime
 import uuid
 
 from rolf_common.models import SQLModel
-from sqlalchemy import ForeignKey, String, Integer, Float, DECIMAL
+from sqlalchemy import ForeignKey, String, Integer, DECIMAL
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from models.core import BankModel

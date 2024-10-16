@@ -11,7 +11,7 @@ async def test_create_objective(client):
         'title': 'Meu objetivo',
         'description': 'Comprar um apartamento na praia',
         'amount': 50000,
-        'estimatedDeadline': (datetime.datetime.utcnow() + relativedelta(years=1, months=6)).strftime('%Y-%m-%d'),
+        'estimatedDeadline': (datetime.datetime.now(datetime.timezone.utc) + relativedelta(years=1, months=6)).strftime('%Y-%m-%d'),
     }
     response = await client.post('/investment/objective', json=payload)
 
