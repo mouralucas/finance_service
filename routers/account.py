@@ -37,11 +37,8 @@ async def get(
 async def close(
         account: CloseAccountRequest,
         session: AsyncSession = Depends(db_session),
-        # user: RequiredUser = Security(get_user)
+        user: RequiredUser = Security(get_user)
 ) -> CloseAccountResponse:
-    user = RequiredUser(
-        user_id='adf52a1e-7a19-11ed-a1eb-0242ac120002',
-    )
     return await AccountService(session=session, user=user).close_account(account=account)
 
 
@@ -65,9 +62,8 @@ async def get_transactions(
 async def create_balance(
         params: CreateBalanceRequest,
         session: AsyncSession = Depends(db_session),
-        # user: RequiredUser = Security(get_user)
+        user: RequiredUser = Security(get_user)
 ):
-    user = RequiredUser(user_id='adf52a1e-7a19-11ed-a1eb-0242ac120002')
     return await AccountService(session=session, user=user).create_balance(params=params)
 
 
@@ -76,7 +72,6 @@ async def create_balance(
 async def get_balance(
         params: GetBalanceRequest = Depends(),
         session: AsyncSession = Depends(db_session),
-        # user: RequiredUser = Security(get_user)
+        user: RequiredUser = Security(get_user)
 ):
-    user = RequiredUser(user_id='adf52a1e-7a19-11ed-a1eb-0242ac120002')
     return await AccountService(session, user).get_balance(params=params)

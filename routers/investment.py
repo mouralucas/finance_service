@@ -60,9 +60,8 @@ async def get_investment_types(
 async def create_statement(
         statement: CreateStatementRequest,
         session: AsyncSession = Depends(db_session),
-        # user: RequiredUser = Security(get_user)
+        user: RequiredUser = Security(get_user)
 ) -> CreateStatementResponse:
-    user = RequiredUser(user_id='adf52a1e-7a19-11ed-a1eb-0242ac120002')
     return await InvestmentService(session=session, user=user).create_statement(statement=statement)
 
 

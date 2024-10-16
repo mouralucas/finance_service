@@ -1,5 +1,3 @@
-from cgitb import reset
-
 from fastapi import APIRouter, Depends, Security
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import get_user
@@ -7,7 +5,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from backend.database import db_session
-from models.credit_card import CreditCardModel
 from schemas.request.credit_card import CreateCreditCardRequest, CreateCreditCardTransactionRequest, GetCreditCardRequest, CancelCreditCardRequest
 from schemas.response.credit_card import CreateCreditCardResponse, CreateCreditCardTransactionResponse
 from services.credit_card import CreditCardService
