@@ -139,7 +139,7 @@ async def test_create_transaction_no_installment(client, create_valid_credit_car
         'operationType': operation_type
     }
 
-    response = await client.post('/creditcard/bill', json=payload)
+    response = await client.post('/creditcard/transaction', json=payload)
 
     assert response.status_code == status.HTTP_201_CREATED
 
@@ -235,7 +235,7 @@ async def test_create_transaction_with_installment(client, create_valid_credit_c
         'description': description,
         'operationType': operation_type
     }
-    response = await client.post('/creditcard/bill', json=payload)
+    response = await client.post('/creditcard/transaction', json=payload)
 
     assert response.status_code == status.HTTP_201_CREATED
 

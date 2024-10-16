@@ -39,7 +39,7 @@ async def get_credit_cards(
     return await CreditCardService(session=session, user=user).get_credit_cards(params)
 
 
-@router.post('/bill',
+@router.post('/transaction',
              summary='Create a bill entry', description='Create a bill entry in selected credit card',
              status_code=status.HTTP_201_CREATED)
 async def create_bill_entry(bill_entry: CreateCreditCardTransactionRequest,
