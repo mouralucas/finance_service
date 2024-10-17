@@ -114,7 +114,6 @@ async def get_investments_without_objectives(
 @router.get('/allocation', summary='Get investment allocation', description='Get the investment distribution between investment types')
 async def get_allocation(
         session: AsyncSession = Depends(db_session),
-        # user: RequiredUser = Security(get_user)
+        user: RequiredUser = Security(get_user)
 ) -> GetInvestmentAllocationResponse:
-    user = RequiredUser(user_id='adf52a1e-7a19-11ed-a1eb-0242ac120002')
     return await InvestmentService(session=session, user=user).get_investment_allocation()

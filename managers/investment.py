@@ -4,7 +4,7 @@ from typing import Any, cast, List
 from fastapi import HTTPException
 from rolf_common.managers import BaseDataManager
 from rolf_common.models import SQLModel
-from sqlalchemy import select, update, Executable, RowMapping, func
+from sqlalchemy import select, update, Executable, RowMapping, func, case
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 from starlette import status
@@ -146,23 +146,36 @@ class InvestmentManager(BaseDataManager):
             .subquery()
         )
 
+        # Create an alias to the self relation in InvestmentType
+        parent_investment_type = aliased(InvestmentTypeModel)
+
         query = (
             select(
-                InvestmentTypeModel.name.label('name'),
+                case(
+                    (parent_investment_type.name != None, parent_investment_type.name),
+                    else_=InvestmentTypeModel.name
+                ).label('name'),
                 func.sum(InvestmentStatementModel.gross_amount).label('total')
             )
-            .join(InvestmentModel, InvestmentModel.type_id == InvestmentTypeModel.id)
-            .join(InvestmentStatementModel, InvestmentStatementModel.investment_id == InvestmentModel.id)
+            .select_from(InvestmentStatementModel)
+            .join(InvestmentModel, InvestmentModel.id == InvestmentStatementModel.investment_id)
+            .join(InvestmentTypeModel, InvestmentTypeModel.id == InvestmentModel.type_id)
+            .outerjoin(parent_investment_type, InvestmentTypeModel.parent_id == parent_investment_type.id)
             .join(
                 subquery_latest_period,
                 (InvestmentStatementModel.investment_id == subquery_latest_period.c.investment_id) &
                 (InvestmentStatementModel.period == subquery_latest_period.c.latest_period)
             )
-            .where(
-                InvestmentModel.is_liquidated == False,
-                InvestmentModel.owner_id == owner_id,
+            .where(InvestmentModel.is_liquidated == False,
+                   InvestmentModel.owner_id == owner_id)
+            .group_by(
+                case(
+
+                    (parent_investment_type.name != None, parent_investment_type.name),
+                    else_=InvestmentTypeModel.name
+                )
             )
-            .group_by(InvestmentTypeModel.name)
+
         )
 
         result = await self.get_all(query)
