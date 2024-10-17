@@ -5,7 +5,7 @@ from sqlalchemy import String, ForeignKey, JSON
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 
-class InvestmentCategory(SQLModel):
+class InvestmentCategoryModel(SQLModel):
     """
     Created by: Lucas Penha de Moura - 21/09/2024
         This table stores the categories of investments. At first only two:
@@ -35,7 +35,7 @@ class InvestmentTypeModel(SQLModel):
     parent_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('investment_type.id'), nullable=True)
     parent: Mapped['InvestmentTypeModel'] = relationship(foreign_keys=[parent_id], lazy='subquery')
     investment_category_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('investment_category.id'), nullable=True)
-    investment_category: Mapped['InvestmentCategory'] = relationship(foreign_keys=[investment_category_id], lazy='subquery')
+    investment_category: Mapped['InvestmentCategoryModel'] = relationship(foreign_keys=[investment_category_id], lazy='subquery')
 
 
 class InvestmentModel(SQLModel):

@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 from starlette import status
 
-from models.investment import InvestmentModel, InvestmentTypeModel, InvestmentStatementModel, InvestmentObjectiveModel
+from models.investment import InvestmentModel, InvestmentTypeModel, InvestmentStatementModel, InvestmentObjectiveModel, InvestmentCategoryModel
 
 
 class InvestmentManager(BaseDataManager):
@@ -146,7 +146,6 @@ class InvestmentManager(BaseDataManager):
             .subquery()
         )
 
-
         query = (
             select(
                 InvestmentTypeModel.name.label('name'),
@@ -154,11 +153,52 @@ class InvestmentManager(BaseDataManager):
             )
             .join(InvestmentModel, InvestmentModel.type_id == InvestmentTypeModel.id)
             .join(InvestmentStatementModel, InvestmentStatementModel.investment_id == InvestmentModel.id)
-            .join(subquery_latest_period,
-                  (InvestmentStatementModel.investment_id == subquery_latest_period.c.investment_id) &
-                  (InvestmentStatementModel.period == subquery_latest_period.c.latest_period)
-                  )
+            .join(
+                subquery_latest_period,
+                (InvestmentStatementModel.investment_id == subquery_latest_period.c.investment_id) &
+                (InvestmentStatementModel.period == subquery_latest_period.c.latest_period)
+            )
+            .where(
+                InvestmentModel.is_liquidated == False,
+                InvestmentModel.owner_id == owner_id,
+            )
             .group_by(InvestmentTypeModel.name)
+        )
+
+        result = await self.get_all(query)
+
+        return result
+
+    async def get_allocation_by_category(self, owner_id):
+        subquery_latest_period = (
+            select(
+                InvestmentStatementModel.investment_id,
+                func.max(InvestmentStatementModel.period).label('latest_period')
+            )
+            .group_by(InvestmentStatementModel.investment_id)
+            .subquery()
+        )
+
+        query = (
+            select(
+                InvestmentCategoryModel.name.label('name'),
+                func.sum(InvestmentStatementModel.gross_amount).label('total')
+            )
+            # Estabelece explicitamente a origem para o JOIN, removendo a ambiguidade
+            .select_from(InvestmentStatementModel)
+            .join(InvestmentModel, InvestmentModel.id == InvestmentStatementModel.investment_id)
+            .join(InvestmentTypeModel, InvestmentTypeModel.id == InvestmentModel.type_id)
+            .join(InvestmentCategoryModel, InvestmentCategoryModel.id == InvestmentTypeModel.investment_category_id)
+            .join(
+                subquery_latest_period,
+                (InvestmentStatementModel.investment_id == subquery_latest_period.c.investment_id) &
+                (InvestmentStatementModel.period == subquery_latest_period.c.latest_period)
+            )
+            .where(
+                InvestmentModel.is_liquidated == False,
+                InvestmentModel.owner_id == owner_id,
+            )
+            .group_by(InvestmentCategoryModel.name)
         )
 
         result = await self.get_all(query)
