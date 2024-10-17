@@ -52,5 +52,5 @@ class GetObjectiveSummaryResponse(SuccessResponseBase):
 
 
 class GetInvestmentAllocationResponse(SuccessResponseBase):
-    allocation_by_type: list[InvestmentAllocationSchema] | list = Field([], description='The list of investment allocated by type')
-    allocation_by_category: list[InvestmentAllocationSchema] | list = Field([], description='The list of investment allocated by category')
+    type_allocation: list[InvestmentAllocationSchema] | list = Field([], serialization_alias='typeAllocation', description='The list of investment allocated by type')
+    category_allocation: list[InvestmentAllocationSchema] | list = Field([], serialization_alias='categoryAllocation', description='The list of investment allocated by category')

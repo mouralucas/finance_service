@@ -213,8 +213,8 @@ class InvestmentService(BaseService):
         allocation_by_category = await self.investment_manager.get_allocation_by_category(owner_id=self.user['user_id'])
 
         response = GetInvestmentAllocationResponse(
-            allocation_by_type=[InvestmentAllocationSchema.model_validate(allocation) for allocation in allocation_by_type] if allocation_by_type else [],
-            allocation_by_category=[InvestmentAllocationSchema.model_validate(allocation) for allocation in allocation_by_category] if allocation_by_category else [],
+            type_allocation=[InvestmentAllocationSchema.model_validate(allocation) for allocation in allocation_by_type] if allocation_by_type else [],
+            category_allocation=[InvestmentAllocationSchema.model_validate(allocation) for allocation in allocation_by_category] if allocation_by_category else [],
         )
 
         return response
