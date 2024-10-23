@@ -78,7 +78,7 @@ class IndexerSeriesModel(SQLModel):
     indexer_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('indexer.id'))
     indexer_name: Mapped[str] = mapped_column('indexer_name', String(100))  # Usually the same as Indexer model, just denormalized
     date: Mapped[datetime.date] = mapped_column('date', nullable=True)
-    period: Mapped[str] = mapped_column('period', nullable=True)
+    period: Mapped[int] = mapped_column('period', nullable=True)
     value: Mapped[float] = mapped_column('value', nullable=True)
     periodicity_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('periodicity.id'))
     periodicity_name: Mapped[str] = mapped_column('periodicity_name', String(100))

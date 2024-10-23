@@ -9,7 +9,8 @@ from starlette import status
 
 from backend.database import db_session
 from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, CreateStatementRequest, GetStatementRequest, LiquidateInvestmentRequest, GetObjectiveRequest, CreateObjectiveRequest, GetObjectiveSummaryRequest
-from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, CreateStatementResponse, GetStatementResponse, LiquidateInvestmentResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse, GetInvestmentWithoutObjectives, GetObjectiveSummaryResponse, GetInvestmentAllocationResponse
+from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, CreateStatementResponse, GetStatementResponse, LiquidateInvestmentResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse, GetInvestmentWithoutObjectives, GetObjectiveSummaryResponse, GetInvestmentAllocationResponse, GetInvestmentPerformanceResponse
+from services.integration import BcbIntegrationService
 from services.investment import InvestmentService
 
 router = APIRouter(prefix="/investment", tags=['Investments'])
@@ -117,3 +118,19 @@ async def get_allocation(
         user: RequiredUser = Security(get_user)
 ) -> GetInvestmentAllocationResponse:
     return await InvestmentService(session=session, user=user).get_investment_allocation()
+
+
+@router.get('/performance', summary='Get investment performance', description='Get investment performance')
+async def get_performance(
+        session: AsyncSession = Depends(db_session),
+        # user: RequiredUser = Security(get_user)
+) -> GetInvestmentPerformanceResponse:
+    user = RequiredUser(user_id='adf52a1e-7a19-11ed-a1eb-0242ac120002')
+    return await InvestmentService(session=session, user=user).get_performance()
+
+
+@router.get('/teste/indexer')
+async def test_indexer(
+        session: AsyncSession = Depends(db_session)
+):
+    await BcbIntegrationService(session=session).get_indexer('4391', '2a2b100f-17d9-4c61-b3b4-f06662113953', 'dc5b3bf8-2b84-423a-9a90-e7e194e355fa')

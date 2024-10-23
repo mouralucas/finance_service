@@ -15,7 +15,7 @@ from schemas.account import AccountSchema, AccountTransactionSchema, BalanceSche
 from schemas.request.account import CreateAccountRequest, GetAccountRequest, CreateAccountTransactionRequest, CloseAccountRequest, CreateBalanceRequest, GetBalanceRequest
 from schemas.response.account import CreateAccountResponse, GetAccountResponse, CloseAccountResponse, CreateBalanceResponse, GetBalanceResponse
 from schemas.response.account import CreateAccountTransactionResponse
-from services.utils.datetime import get_period, get_current_period, get_period_sequence
+from services.utils.datetime import get_period, get_current_period, get_period_range
 
 
 class AccountService(BaseService):
@@ -113,7 +113,7 @@ class AccountService(BaseService):
         max_period: int = get_period(account.close_date) if account.close_date else get_current_period()
 
         # Get all periods between min and max periods so even without transactions all periods in this range have its own balance
-        period_range: list[int] = get_period_sequence(min_period, max_period)
+        period_range: list[int] = get_period_range(min_period, max_period)
 
         # Fetch all transactions grouped by period
         transactions_by_period = await self.account_manager.get_consolidated_transactions_by_period(account_id=params.account_id, period_range=period_range)
@@ -123,6 +123,7 @@ class AccountService(BaseService):
         previous_balance = 0.0
 
         # Remove previous balance data for the account
+        # TODO: database operations must be in managers!!
         await self.session.execute(delete(AccountBalanceModel).where(AccountBalanceModel.account_id == params.account_id))
         await self.session.flush()
 

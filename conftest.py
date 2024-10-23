@@ -16,7 +16,7 @@ from tests.mocks.credit_card import *
 from tests.mocks.investment import *
 
 
-@pytest.fixture(scope="session")
+@pytest_asyncio.fixture(scope="session")
 def event_loop(request):
     loop = asyncio.get_event_loop_policy().new_event_loop()
     yield loop

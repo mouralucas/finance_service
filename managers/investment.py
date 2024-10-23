@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 from starlette import status
 
+from models.core import IndexerModel, PeriodicityModel
 from models.investment import InvestmentModel, InvestmentTypeModel, InvestmentStatementModel, InvestmentObjectiveModel, InvestmentCategoryModel
 
 
@@ -134,8 +135,8 @@ class InvestmentManager(BaseDataManager):
 
         return cast(InvestmentObjectiveModel, objective)
 
-    # Allocation
-    async def get_allocation_by_investment_type(self, owner_id) -> list[RowMapping] | None:
+    # Dashboard
+    async def get_allocation_by_investment_type(self, owner_id: uuid.UUID) -> list[RowMapping] | None:
         # Get the latest statement per investment
         subquery_latest_period = (
             select(
@@ -149,7 +150,7 @@ class InvestmentManager(BaseDataManager):
         # Create an alias to the self relation in InvestmentType
         parent_investment_type = aliased(InvestmentTypeModel)
 
-        query = (
+        sql_statement = (
             select(
                 case(
                     (parent_investment_type.name != None, parent_investment_type.name),
@@ -178,11 +179,11 @@ class InvestmentManager(BaseDataManager):
 
         )
 
-        result = await self.get_all(query)
+        result = await self.get_all(sql_statement)
 
         return result
 
-    async def get_allocation_by_category(self, owner_id):
+    async def get_allocation_by_category(self, owner_id: uuid.UUID) -> list[RowMapping]:
         subquery_latest_period = (
             select(
                 InvestmentStatementModel.investment_id,
@@ -192,7 +193,7 @@ class InvestmentManager(BaseDataManager):
             .subquery()
         )
 
-        query = (
+        sql_statement = (
             select(
                 InvestmentCategoryModel.name.label('name'),
                 func.sum(InvestmentStatementModel.gross_amount).label('total')
@@ -214,6 +215,42 @@ class InvestmentManager(BaseDataManager):
             .group_by(InvestmentCategoryModel.name)
         )
 
-        result = await self.get_all(query)
+        result = await self.get_all(sql_statement)
+
+        return result
+
+    async def get_performance(self, owner_id: uuid.UUID, period_range: int = 0) -> list[RowMapping]:
+        """
+        Created by: Lucas Penha de Moura - 17/10/2024
+            Fetches the sum of gross, net and previous amount for the period range
+        :param owner_id: the identification of the owner of the investment
+        :param period_range: The number of past periods to fetch, if 0 return all available periods
+
+        :return: RowMapping with period and total gross, net and previous amount
+        """
+        # TODO: verify if is possible to add a variable indicating if the period have new transactions
+        sql_statement = (
+            select(
+                InvestmentStatementModel.period,
+                func.sum(InvestmentStatementModel.previous_amount).label('total_previous'),
+                func.sum(InvestmentStatementModel.gross_amount).label('total_gross'),
+                func.sum(InvestmentStatementModel.net_amount).label('total_net'),
+            )
+            .select_from(InvestmentStatementModel)
+            .join(InvestmentModel, InvestmentModel.id == InvestmentStatementModel.investment_id)
+            .where(
+                InvestmentModel.is_liquidated == False,
+                InvestmentModel.owner_id == owner_id
+            )
+            .group_by(InvestmentStatementModel.period)
+            .order_by(InvestmentStatementModel.period)
+        )
+
+        if period_range >= 0:
+            # TODO: get the first period using the period range
+            start_period = 201810
+            sql_statement = sql_statement.where(InvestmentStatementModel.period >= start_period)
+
+        result = await self.get_all(sql_statement)
 
         return result

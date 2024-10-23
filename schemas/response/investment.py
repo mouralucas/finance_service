@@ -50,7 +50,11 @@ class GetObjectiveSummaryResponse(SuccessResponseBase):
     amount_invested: float = Field(..., serialization_alias='amountInvested', description='The amount invested so far in this objective')
     perc_completed: float = Field(..., serialization_alias='percCompleted', description='The percentage completed of the objective')
 
-
+# Dashboard information
 class GetInvestmentAllocationResponse(SuccessResponseBase):
     type_allocation: list[InvestmentAllocationSchema] | list = Field([], serialization_alias='typeAllocation', description='The list of investment allocated by type')
     category_allocation: list[InvestmentAllocationSchema] | list = Field([], serialization_alias='categoryAllocation', description='The list of investment allocated by category')
+
+
+class GetInvestmentPerformanceResponse(SuccessResponseBase):
+    pass

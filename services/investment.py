@@ -14,7 +14,7 @@ from managers.investment import InvestmentManager
 from models.investment import InvestmentModel, InvestmentStatementModel, InvestmentObjectiveModel
 from schemas.investment import InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema, InvestmentTypeSchema, InvestmentAllocationSchema
 from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, LiquidateInvestmentRequest, CreateStatementRequest, GetStatementRequest, CreateObjectiveRequest, GetObjectiveRequest, GetObjectiveSummaryRequest
-from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, LiquidateInvestmentResponse, CreateStatementResponse, GetStatementResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse, GetInvestmentWithoutObjectives, GetObjectiveSummaryResponse, GetInvestmentAllocationResponse
+from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, LiquidateInvestmentResponse, CreateStatementResponse, GetStatementResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse, GetInvestmentWithoutObjectives, GetObjectiveSummaryResponse, GetInvestmentAllocationResponse, GetInvestmentPerformanceResponse
 from services.utils.datetime import get_period, get_previous_period
 
 
@@ -206,7 +206,7 @@ class InvestmentService(BaseService):
 
         return response
 
-    # Allocation
+    # Dashboard information
     async def get_investment_allocation(self) -> GetInvestmentAllocationResponse:
         allocation_by_type = await self.investment_manager.get_allocation_by_investment_type(owner_id=self.user['user_id'])
 
@@ -218,3 +218,11 @@ class InvestmentService(BaseService):
         )
 
         return response
+
+    async def get_performance(self) -> GetInvestmentPerformanceResponse:
+        # A ideia é criar um gráfico de linhas com dois eixos, no primeiro eixo, colocar a evolução percentual de cada investimento,
+        # do agrupado de investimento e de algum indexador (como o cdi) para cada período
+        performance_1 = await self.investment_manager.get_performance(owner_id=self.user['user_id'])
+
+        print(performance_1)
+
