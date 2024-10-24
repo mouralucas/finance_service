@@ -23,11 +23,13 @@ class BcbIntegrationService:
         indexer = await self.investment_manager.get_indexer_by_id(indexer_id=indexer_id, raise_exception=True)
         periodicity = await self.investment_manager.get_periodicity_by_id(periodicity_id=periodicity_id, raise_exception=True)
 
+        # TODO: add validation to None in last_period
         latest_period = await self.investment_manager.get_latest_finance_series_period(indexer_id=indexer_id, periodicity_id=periodicity_id)
-        first_date = get_period_dates(latest_period)
-        a = first_date[0] + relativedelta(months=1)
-
-        params = 'dataInicial=' + a.strftime('%d/%m/%Y')
+        # first_date = get_period_dates(latest_period)
+        # a = first_date[0] + relativedelta(months=1)
+        #
+        # params = 'dataInicial=' + a.strftime('%d/%m/%Y')
+        params = ''
 
         async with AsyncClient() as client:
             response = await client.get(self.url_bcb.format(resource_code=indexer_code, params=params))

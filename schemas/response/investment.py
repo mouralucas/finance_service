@@ -1,4 +1,5 @@
 import uuid
+from typing import AnyStr, Any
 
 from pydantic import Field
 from rolf_common.schemas import SuccessResponseBase
@@ -57,4 +58,5 @@ class GetInvestmentAllocationResponse(SuccessResponseBase):
 
 
 class GetInvestmentPerformanceResponse(SuccessResponseBase):
-    pass
+    data: Any
+    series: Any

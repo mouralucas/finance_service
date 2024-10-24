@@ -123,9 +123,9 @@ async def get_allocation(
 @router.get('/performance', summary='Get investment performance', description='Get investment performance')
 async def get_performance(
         session: AsyncSession = Depends(db_session),
-        # user: RequiredUser = Security(get_user)
+        user: RequiredUser = Security(get_user)
 ) -> GetInvestmentPerformanceResponse:
-    user = RequiredUser(user_id='adf52a1e-7a19-11ed-a1eb-0242ac120002')
+    # user = RequiredUser(user_id='adf52a1e-7a19-11ed-a1eb-0242ac120002')
     return await InvestmentService(session=session, user=user).get_performance()
 
 
@@ -133,4 +133,8 @@ async def get_performance(
 async def test_indexer(
         session: AsyncSession = Depends(db_session)
 ):
-    await BcbIntegrationService(session=session).get_indexer('4391', '2a2b100f-17d9-4c61-b3b4-f06662113953', 'dc5b3bf8-2b84-423a-9a90-e7e194e355fa')
+    # TODO: add info as param
+    await BcbIntegrationService(session=session).get_indexer(
+        '433', # CDI = 4391, IPCA = 433
+        'ef07cbb0-9b29-43c6-a060-bef73f1cc000',
+        'dc5b3bf8-2b84-423a-9a90-e7e194e355fa')

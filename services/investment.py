@@ -1,5 +1,6 @@
 import datetime
 import uuid
+from typing import cast
 
 from fastapi import HTTPException
 
@@ -224,5 +225,18 @@ class InvestmentService(BaseService):
         # do agrupado de investimento e de algum indexador (como o cdi) para cada período
         performance_1 = await self.investment_manager.get_performance(owner_id=self.user['user_id'])
 
-        print(performance_1)
+        response = GetInvestmentPerformanceResponse(
+            data=performance_1,
+            series=[
+                {
+                    'value': 'indexer_variation',
+                    'name': 'CDI'
+                },
+                {
+                    'value': 'variation',
+                    'name': 'Performance da carteira'
+                }
+            ]
+        )
 
+        return response

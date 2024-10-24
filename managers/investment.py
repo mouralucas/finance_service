@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 from starlette import status
 
-from models.core import IndexerModel, PeriodicityModel
+from models.core import IndexerModel, PeriodicityModel, IndexerSeriesModel
 from models.investment import InvestmentModel, InvestmentTypeModel, InvestmentStatementModel, InvestmentObjectiveModel, InvestmentCategoryModel
 
 
@@ -219,7 +219,7 @@ class InvestmentManager(BaseDataManager):
 
         return result
 
-    async def get_performance(self, owner_id: uuid.UUID, period_range: int = 0) -> list[RowMapping]:
+    async def get_performance(self, owner_id: uuid.UUID, period_range: int = 0) -> list[dict]:
         """
         Created by: Lucas Penha de Moura - 17/10/2024
             Fetches the sum of gross, net and previous amount for the period range
@@ -229,20 +229,32 @@ class InvestmentManager(BaseDataManager):
         :return: RowMapping with period and total gross, net and previous amount
         """
         # TODO: verify if is possible to add a variable indicating if the period have new transactions
+        # I need to subtract the amount invested in the month
         sql_statement = (
             select(
                 InvestmentStatementModel.period,
-                func.sum(InvestmentStatementModel.previous_amount).label('total_previous'),
-                func.sum(InvestmentStatementModel.gross_amount).label('total_gross'),
-                func.sum(InvestmentStatementModel.net_amount).label('total_net'),
+                # func.sum(InvestmentStatementModel.previous_amount).label('total_previous'),
+                # func.sum(InvestmentStatementModel.gross_amount).label('total_gross'),
+                # func.sum(InvestmentStatementModel.net_amount).label('total_net'),
+                IndexerSeriesModel.value.label('indexer_variation'),
+                case(
+                    (func.sum(InvestmentStatementModel.previous_amount) != 0,
+                     ((func.sum(InvestmentStatementModel.gross_amount) - func.sum(InvestmentStatementModel.previous_amount)) /
+                      func.sum(InvestmentStatementModel.previous_amount)) * 100),
+                    else_=0
+                ).label('variation')
             )
             .select_from(InvestmentStatementModel)
             .join(InvestmentModel, InvestmentModel.id == InvestmentStatementModel.investment_id)
+            .outerjoin(IndexerSeriesModel,
+                  (IndexerSeriesModel.period == InvestmentStatementModel.period) &
+                  (IndexerSeriesModel.indexer_id == '2a2b100f-17d9-4c61-b3b4-f06662113953')
+                  )
             .where(
                 InvestmentModel.is_liquidated == False,
                 InvestmentModel.owner_id == owner_id
             )
-            .group_by(InvestmentStatementModel.period)
+            .group_by(InvestmentStatementModel.period, IndexerSeriesModel.value)
             .order_by(InvestmentStatementModel.period)
         )
 
@@ -251,6 +263,7 @@ class InvestmentManager(BaseDataManager):
             start_period = 201810
             sql_statement = sql_statement.where(InvestmentStatementModel.period >= start_period)
 
+        print(sql_statement)
         result = await self.get_all(sql_statement)
 
-        return result
+        return [dict(i.items()) for i in result] if result else None
