@@ -129,12 +129,3 @@ async def get_performance(
     return await InvestmentService(session=session, user=user).get_performance()
 
 
-@router.get('/teste/indexer')
-async def test_indexer(
-        session: AsyncSession = Depends(db_session)
-):
-    # TODO: add info as param
-    await BcbIntegrationService(session=session).get_indexer(
-        '433', # CDI = 4391, IPCA = 433
-        'ef07cbb0-9b29-43c6-a060-bef73f1cc000',
-        'dc5b3bf8-2b84-423a-9a90-e7e194e355fa')
