@@ -8,7 +8,7 @@ from sqlalchemy.util import await_only
 from starlette import status
 
 from backend.database import db_session
-from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, CreateStatementRequest, GetStatementRequest, LiquidateInvestmentRequest, GetObjectiveRequest, CreateObjectiveRequest, GetObjectiveSummaryRequest
+from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, CreateStatementRequest, GetStatementRequest, LiquidateInvestmentRequest, GetObjectiveRequest, CreateObjectiveRequest, GetObjectiveSummaryRequest, GetPerformanceRequest
 from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, CreateStatementResponse, GetStatementResponse, LiquidateInvestmentResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse, GetInvestmentWithoutObjectives, GetObjectiveSummaryResponse, GetInvestmentAllocationResponse, GetInvestmentPerformanceResponse
 from services.integration import BcbIntegrationService
 from services.investment import InvestmentService
@@ -17,7 +17,7 @@ router = APIRouter(prefix="/investment", tags=['Investments'])
 
 
 @router.post('', status_code=status.HTTP_201_CREATED,
-             summary='Create an investment', description='Create an new investment for the user')
+             summary='Create an investment', description='Create an new investment for the user', name='Qual é o nome')
 async def create_investment(
         investment: CreateInvestmentRequest,
         session: AsyncSession = Depends(db_session),
@@ -122,10 +122,11 @@ async def get_allocation(
 
 @router.get('/performance', summary='Get investment performance', description='Get investment performance')
 async def get_performance(
+        params: GetPerformanceRequest = Depends(),
         session: AsyncSession = Depends(db_session),
         user: RequiredUser = Security(get_user)
 ) -> GetInvestmentPerformanceResponse:
     # user = RequiredUser(user_id='adf52a1e-7a19-11ed-a1eb-0242ac120002')
-    return await InvestmentService(session=session, user=user).get_performance()
+    return await InvestmentService(session=session, user=user).get_performance(params=params)
 
 

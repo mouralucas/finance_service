@@ -14,7 +14,7 @@ from starlette import status
 from managers.investment import InvestmentManager
 from models.investment import InvestmentModel, InvestmentStatementModel, InvestmentObjectiveModel
 from schemas.investment import InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema, InvestmentTypeSchema, InvestmentAllocationSchema
-from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, LiquidateInvestmentRequest, CreateStatementRequest, GetStatementRequest, CreateObjectiveRequest, GetObjectiveRequest, GetObjectiveSummaryRequest
+from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, LiquidateInvestmentRequest, CreateStatementRequest, GetStatementRequest, CreateObjectiveRequest, GetObjectiveRequest, GetObjectiveSummaryRequest, GetPerformanceRequest
 from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, LiquidateInvestmentResponse, CreateStatementResponse, GetStatementResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse, GetInvestmentWithoutObjectives, GetObjectiveSummaryResponse, GetInvestmentAllocationResponse, GetInvestmentPerformanceResponse
 from services.utils.datetime import get_period, get_previous_period
 
@@ -220,21 +220,23 @@ class InvestmentService(BaseService):
 
         return response
 
-    async def get_performance(self) -> GetInvestmentPerformanceResponse:
+    async def get_performance(self, params: GetPerformanceRequest) -> GetInvestmentPerformanceResponse:
         # A ideia é criar um gráfico de linhas com dois eixos, no primeiro eixo, colocar a evolução percentual de cada investimento,
         # do agrupado de investimento e de algum indexador (como o cdi) para cada período
-        # TODO: temporary version, will change to definitive code when finish logic
-        performance_1 = await self.investment_manager.get_performance(owner_id=self.user['user_id'])
+        performance_portfolio = await self.investment_manager.get_performance_portfolio(
+            owner_id=self.user['user_id'],
+            period_range=params.period_range,
+            indexer_id=params.indexer_id
+        )
 
         accumulated_indexer = 1.0
         accumulated_variation = 1.0
 
         new_list = []
-        for item in performance_1:
+        for item in performance_portfolio:
             indexer_variation_decimal = item['indexer_variation'] / 100
             variation_decimal = item['variation'] / 100
 
-            # Calcula os acumulados para cada período
             accumulated_indexer *= (1 + indexer_variation_decimal)
             accumulated_variation *= (1 + variation_decimal)
 
@@ -255,7 +257,7 @@ class InvestmentService(BaseService):
                 },
                 {
                     'value': 'variation',
-                    'name': 'Performance da carteira'
+                    'name': 'Carteira'
                 }
             ]
         )

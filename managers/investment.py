@@ -219,7 +219,7 @@ class InvestmentManager(BaseDataManager):
 
         return result
 
-    async def get_performance(self, owner_id: uuid.UUID, period_range: int = 0) -> list[dict]:
+    async def get_performance_portfolio(self, owner_id: uuid.UUID, indexer_id: uuid.UUID, period_range: int) -> list[dict]:
         """
         Created by: Lucas Penha de Moura - 17/10/2024
             Fetches the sum of gross, net and previous amount for the period range
@@ -248,7 +248,7 @@ class InvestmentManager(BaseDataManager):
             .join(InvestmentModel, InvestmentModel.id == InvestmentStatementModel.investment_id)
             .outerjoin(IndexerSeriesModel,
                   (IndexerSeriesModel.period == InvestmentStatementModel.period) &
-                  (IndexerSeriesModel.indexer_id == '2a2b100f-17d9-4c61-b3b4-f06662113953')
+                  (IndexerSeriesModel.indexer_id == indexer_id)
                   )
             .where(
                 InvestmentModel.is_liquidated == False,
@@ -258,7 +258,7 @@ class InvestmentManager(BaseDataManager):
             .order_by(InvestmentStatementModel.period)
         )
 
-        if period_range >= 0:
+        if period_range == 0:
             # TODO: get the first period using the period range
             start_period = 201810
             query = query.where(InvestmentStatementModel.period >= start_period)
