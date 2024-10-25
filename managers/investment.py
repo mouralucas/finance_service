@@ -23,13 +23,13 @@ class InvestmentManager(BaseDataManager):
         return investment
 
     async def update(self, investment: SQLModel, fields: dict[str, Any]) -> SQLModel:
-        stmt = (
+        query = (
             update(InvestmentModel)
             .where(InvestmentModel.id == investment.id)
             .values(**fields)
         )
 
-        updated_item = await self.update_one(sql_statement=stmt, sql_model=investment)
+        updated_item = await self.update_one(sql_statement=query, sql_model=investment)
 
         return updated_item
 
@@ -44,13 +44,13 @@ class InvestmentManager(BaseDataManager):
         return investment
 
     async def get_investments(self, params: dict[str, Any]) -> list[RowMapping]:
-        sql_statement = select(InvestmentModel).order_by(InvestmentModel.transaction_date)
+        query = select(InvestmentModel).order_by(InvestmentModel.transaction_date)
 
         for key, value in params.items():
             if value:
-                sql_statement = sql_statement.where(getattr(InvestmentModel, key) == value)
+                query = query.where(getattr(InvestmentModel, key) == value)
 
-        investments: list[RowMapping] = await self.get_all(sql_statement, unique_result=True)
+        investments: list[RowMapping] = await self.get_all(query, unique_result=True)
 
         return investments
 
@@ -61,13 +61,13 @@ class InvestmentManager(BaseDataManager):
         return statement
 
     async def get_statement(self, params: dict[str, Any]) -> list[InvestmentStatementModel] | None:
-        stmt = select(InvestmentStatementModel).order_by(InvestmentStatementModel.period)
+        query = select(InvestmentStatementModel).order_by(InvestmentStatementModel.period)
 
         for key, value in params.items():
             if value:
-                stmt = stmt.where(getattr(InvestmentStatementModel, key) == value)
+                query = query.where(getattr(InvestmentStatementModel, key) == value)
 
-        result: list[RowMapping] = await self.get_all(stmt, unique_result=True)
+        result: list[RowMapping] = await self.get_all(query, unique_result=True)
         statements = [cast(InvestmentStatementModel, statement) for statement in result] if result else None
 
         return statements
@@ -83,7 +83,7 @@ class InvestmentManager(BaseDataManager):
             .subquery()
         )
 
-        sql_statement = (
+        query = (
             select(
                 InvestmentStatementModel.investment_id,
                 InvestmentStatementModel.period,
@@ -96,7 +96,7 @@ class InvestmentManager(BaseDataManager):
             )
         )
 
-        result = await self.get_all(sql_statement)
+        result = await self.get_all(query)
 
         return result
 
@@ -107,9 +107,9 @@ class InvestmentManager(BaseDataManager):
         return investment_type
 
     async def get_investment_type(self) -> list[RowMapping]:
-        sql_statement: Executable = select(InvestmentTypeModel).order_by(InvestmentTypeModel.name)
+        query: Executable = select(InvestmentTypeModel).order_by(InvestmentTypeModel.name)
 
-        investment_types: list[RowMapping] = await self.get_all(sql_statement)
+        investment_types: list[RowMapping] = await self.get_all(query)
 
         return investment_types
 
@@ -120,13 +120,13 @@ class InvestmentManager(BaseDataManager):
         return new_objective
 
     async def get_investment_objectives(self, params: dict[str, Any]) -> list[RowMapping] | None:
-        stmt = select(InvestmentObjectiveModel)
+        query = select(InvestmentObjectiveModel)
 
         for key, value in params.items():
             if value:
-                stmt = stmt.where(getattr(InvestmentObjectiveModel, key) == value)
+                query = query.where(getattr(InvestmentObjectiveModel, key) == value)
 
-        investment_objectives: list[RowMapping] = await self.get_all(stmt, unique_result=True)
+        investment_objectives: list[RowMapping] = await self.get_all(query, unique_result=True)
 
         return investment_objectives
 
@@ -150,7 +150,7 @@ class InvestmentManager(BaseDataManager):
         # Create an alias to the self relation in InvestmentType
         parent_investment_type = aliased(InvestmentTypeModel)
 
-        sql_statement = (
+        query = (
             select(
                 case(
                     (parent_investment_type.name != None, parent_investment_type.name),
@@ -179,7 +179,7 @@ class InvestmentManager(BaseDataManager):
 
         )
 
-        result = await self.get_all(sql_statement)
+        result = await self.get_all(query)
 
         return result
 
@@ -193,7 +193,7 @@ class InvestmentManager(BaseDataManager):
             .subquery()
         )
 
-        sql_statement = (
+        query = (
             select(
                 InvestmentCategoryModel.name.label('name'),
                 func.sum(InvestmentStatementModel.gross_amount).label('total')
@@ -215,7 +215,7 @@ class InvestmentManager(BaseDataManager):
             .group_by(InvestmentCategoryModel.name)
         )
 
-        result = await self.get_all(sql_statement)
+        result = await self.get_all(query)
 
         return result
 
@@ -230,7 +230,7 @@ class InvestmentManager(BaseDataManager):
         """
         # TODO: verify if is possible to add a variable indicating if the period have new transactions
         # I need to subtract the amount invested in the month
-        sql_statement = (
+        query = (
             select(
                 InvestmentStatementModel.period,
                 # func.sum(InvestmentStatementModel.previous_amount).label('total_previous'),
@@ -261,9 +261,8 @@ class InvestmentManager(BaseDataManager):
         if period_range >= 0:
             # TODO: get the first period using the period range
             start_period = 201810
-            sql_statement = sql_statement.where(InvestmentStatementModel.period >= start_period)
+            query = query.where(InvestmentStatementModel.period >= start_period)
 
-        print(sql_statement)
-        result = await self.get_all(sql_statement)
+        result = await self.get_all(query)
 
         return [dict(i.items()) for i in result] if result else None

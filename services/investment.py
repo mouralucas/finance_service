@@ -223,10 +223,31 @@ class InvestmentService(BaseService):
     async def get_performance(self) -> GetInvestmentPerformanceResponse:
         # A ideia é criar um gráfico de linhas com dois eixos, no primeiro eixo, colocar a evolução percentual de cada investimento,
         # do agrupado de investimento e de algum indexador (como o cdi) para cada período
+        # TODO: temporary version, will change to definitive code when finish logic
         performance_1 = await self.investment_manager.get_performance(owner_id=self.user['user_id'])
 
+        accumulated_indexer = 1.0
+        accumulated_variation = 1.0
+
+        new_list = []
+        for item in performance_1:
+            indexer_variation_decimal = item['indexer_variation'] / 100
+            variation_decimal = item['variation'] / 100
+
+            # Calcula os acumulados para cada período
+            accumulated_indexer *= (1 + indexer_variation_decimal)
+            accumulated_variation *= (1 + variation_decimal)
+
+            new_list.append(
+                {
+                    'period': item['period'],
+                    'indexer_variation': (accumulated_indexer - 1) * 100,
+                    'variation': (accumulated_variation - 1) * 100
+                }
+            )
+
         response = GetInvestmentPerformanceResponse(
-            data=performance_1,
+            data=new_list,
             series=[
                 {
                     'value': 'indexer_variation',
