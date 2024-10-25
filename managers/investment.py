@@ -11,6 +11,7 @@ from starlette import status
 
 from models.core import IndexerModel, PeriodicityModel, IndexerSeriesModel
 from models.investment import InvestmentModel, InvestmentTypeModel, InvestmentStatementModel, InvestmentObjectiveModel, InvestmentCategoryModel
+from services.utils.datetime import get_previous_period
 
 
 class InvestmentManager(BaseDataManager):
@@ -223,6 +224,7 @@ class InvestmentManager(BaseDataManager):
         """
         Created by: Lucas Penha de Moura - 17/10/2024
             Fetches the sum of gross, net and previous amount for the period range
+        :param indexer_id:
         :param owner_id: the identification of the owner of the investment
         :param period_range: The number of past periods to fetch, if 0 return all available periods
 
@@ -258,9 +260,8 @@ class InvestmentManager(BaseDataManager):
             .order_by(InvestmentStatementModel.period)
         )
 
-        if period_range == 0:
-            # TODO: get the first period using the period range
-            start_period = 201810
+        if period_range > 0:
+            start_period = get_previous_period(offset=period_range)
             query = query.where(InvestmentStatementModel.period >= start_period)
 
         result = await self.get_all(query)

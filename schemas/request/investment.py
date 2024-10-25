@@ -85,4 +85,4 @@ class GetObjectiveSummaryRequest(BaseModel):
 
 class GetPerformanceRequest(BaseModel):
     indexer_id: uuid.UUID = Field('2a2b100f-17d9-4c61-b3b4-f06662113953', alias='indexerId', description='The unique identifier of the indexer - Default is CDI')
-    period_range: int = Field(0, alias='periodRange', description='The period range of the objective, how many months will be displayed')
+    period_range: int = Field(12, alias='periodRange', description='The period range of the objective, how many months will be displayed')

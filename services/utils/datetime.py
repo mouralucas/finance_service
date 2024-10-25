@@ -17,19 +17,41 @@ def get_period(date: datetime.date | datetime.datetime) -> int:
     return year * 100 + month
 
 
-def get_previous_period(period: int) -> int:
-    year = period // 100
+# def get_previous_period(period: int) -> int:
+#     year = period // 100
+#     month = period % 100
+#
+#     if month == 1:
+#         previous_period_year = year - 1
+#         previous_period_month = 12
+#     else:
+#         previous_period_year = year
+#         previous_period_month = month - 1
+#
+#     previous_period = (previous_period_year * 100) + previous_period_month
+#     return previous_period
+
+
+def get_previous_period(period: int = None, offset: int = 1) -> int:
+    """
+    Created by: Lucas Penha de Moura - 25/10/2024
+        Returns the previous period based in the offset
+    :param period: the base period
+    :param offset: how many periods back is the period wanted
+    :return:
+    """
+    if not period:
+        period = get_current_period()
+
     month = period % 100
+    year = period // 100
+    for i in range(offset):
+        month -= 1
+        if month < 1:
+            month = 12
+            year -= 1
 
-    if month == 1:
-        previous_period_year = year - 1
-        previous_period_month = 12
-    else:
-        previous_period_year = year
-        previous_period_month = month - 1
-
-    previous_period = (previous_period_year * 100) + previous_period_month
-    return previous_period
+    return year * 100 + month
 
 
 def get_period_range(start_period: int, end_period: int = None) -> list[int]:

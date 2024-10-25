@@ -11,6 +11,7 @@ from sqlalchemy import RowMapping
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
+from managers.core import CoreManager
 from managers.investment import InvestmentManager
 from models.investment import InvestmentModel, InvestmentStatementModel, InvestmentObjectiveModel
 from schemas.investment import InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema, InvestmentTypeSchema, InvestmentAllocationSchema
@@ -229,6 +230,8 @@ class InvestmentService(BaseService):
             indexer_id=params.indexer_id
         )
 
+        indexer = await CoreManager(session=self.session).get_indexer_by_id(indexer_id=params.indexer_id, raise_exception=True)
+
         accumulated_indexer = 1.0
         accumulated_variation = 1.0
 
@@ -253,7 +256,7 @@ class InvestmentService(BaseService):
             series=[
                 {
                     'value': 'indexer_variation',
-                    'name': 'CDI'
+                    'name': indexer.name
                 },
                 {
                     'value': 'variation',

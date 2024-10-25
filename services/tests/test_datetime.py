@@ -1,6 +1,6 @@
 import datetime
 
-from services.utils.datetime import get_period_range, get_period
+from services.utils.datetime import get_period_range, get_period, get_previous_period
 
 
 def test_get_period():
@@ -37,3 +37,11 @@ def test_get_period_sequence():
     assert 202113 not in range_period
     assert 202213 not in range_period
     assert 202313 not in range_period
+
+def test_get_periods_back():
+    period = get_previous_period(period=202410, offset=5)
+    assert period == 202405
+
+    # Assert offset that change one year
+    period = get_previous_period(period=202410, offset=12)
+    assert period == 202310
