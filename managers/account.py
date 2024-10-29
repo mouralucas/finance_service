@@ -1,3 +1,4 @@
+import datetime
 import uuid
 from typing import Any, cast
 
@@ -9,18 +10,19 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from models.account import AccountModel, AccountTransactionModel, AccountBalanceModel
+from services.utils.datetime import get_current_period
 
 
 class AccountManager(BaseDataManager):
     def __init__(self, session: AsyncSession):
         super().__init__(session)
 
-    async def create_account(self, account: AccountModel) -> SQLModel:
+    async def create_account(self, account: AccountModel) -> AccountModel:
         new_account = await self.add_one(account)
 
-        return new_account
+        return cast(AccountModel, new_account)
 
-    async def get_accounts(self, params: dict[str, Any]) -> list[RowMapping]:
+    async def get_accounts(self, params: dict[str, Any]) -> list[AccountModel] | None:
         stmt = select(AccountModel)
 
         for key, value in params.items():
@@ -29,18 +31,18 @@ class AccountManager(BaseDataManager):
 
         accounts: list[RowMapping] = await self.get_all(stmt, unique_result=True)
 
-        return accounts
+        return [account['AccountModel'] for account in accounts] if accounts else None
 
-    async def update_account(self, account: SQLModel, fields: dict[str, Any]) -> SQLModel:
-        stmt = (
+    async def update_account(self, account: SQLModel, fields: dict[str, Any]) -> AccountModel:
+        query = (
             update(AccountModel)
             .where(AccountModel.id == account.id)
             .values(**fields)
         )
 
-        updated_account = await self.update_one(sql_statement=stmt, sql_model=account)
+        updated_account = await self.update_one(sql_statement=query, sql_model=account)
 
-        return updated_account
+        return cast(AccountModel, updated_account)
 
     async def get_account_by_id(self, account_id: uuid.UUID, raise_exception: bool = False) -> AccountModel | None:
         account = await self.get_by_id(sql_model=AccountModel, object_id=account_id)
@@ -48,35 +50,58 @@ class AccountManager(BaseDataManager):
         if not account and raise_exception:
             raise HTTPException(status.HTTP_404_NOT_FOUND, detail='Account not found')
 
-        account = cast(AccountModel, account)
+        return cast(AccountModel, account) if account else None
 
-        return account
-
-    # Statement
-    async def create_statement(self, statement: AccountTransactionModel) -> SQLModel:
+    # Transactions
+    async def create_transaction(self, statement: AccountTransactionModel) -> AccountTransactionModel:
         new_statement = await self.add_one(statement)
 
-        return new_statement
+        return cast(AccountTransactionModel, new_statement)
 
-    async def get_statement(self, sql_statement: Executable) -> list[RowMapping]:
-        statements_entries: list[RowMapping] = await self.get_all(sql_statement)
+    async def get_transactions(self, sql_statement: Executable) -> list[AccountTransactionModel]:
+        transactions: list[RowMapping] = await self.get_all(sql_statement)
 
-        return statements_entries
+        return [transaction['AccountTransactionModel'] for transaction in transactions] if transactions else None
 
+    async def get_balance(self, account_id: uuid.UUID = None,
+                          start_period: int = None, end_period: int = None,
+                          current_period: bool = False) -> list[RowMapping]:
+        """
+        Created by: Lucas Penha de Moura - 29/09/2024
 
-    async def get_balance(self, account_id: uuid.UUID, start_period: int, end_period: int) -> list[RowMapping]:
-        sql_statement = select(AccountBalanceModel).order_by(AccountBalanceModel.period)
+        :param account_id: The id of the account
+        :param start_period: The start period for the balance
+        :param end_period:  The end period for the balance
+        :param current_period: Return the balance for the current period
 
-        if start_period:
-            sql_statement = sql_statement.where(AccountBalanceModel.period >= start_period)
+        :return: 
+        """
+        query = (
+            select(
+                AccountBalanceModel.period,
+                func.sum(AccountBalanceModel.balance).label('total_balance'),
+                func.sum(AccountBalanceModel.incoming).label('total_incoming'),
+                func.sum(AccountBalanceModel.outgoing).label('total_outgoing'),
+            )
+            .group_by(AccountBalanceModel.period)
+            .order_by(AccountBalanceModel.period)
+        )
 
-        if end_period:
-            sql_statement = sql_statement.where(AccountBalanceModel.period <= end_period)
+        if start_period and not current_period:
+            query = query.where(AccountBalanceModel.period >= start_period)
 
-        balance = await self.get_all(sql_statement)
+        if end_period and not current_period:
+            query = query.where(AccountBalanceModel.period <= end_period)
+
+        if account_id is not None:
+            query = query.where(AccountBalanceModel.account_id == account_id)
+
+        if current_period:
+            query = query.where(AccountBalanceModel.period == get_current_period())
+
+        balance = await self.get_all(query)
 
         return balance
-
 
     async def get_consolidated_transactions_by_period(self, account_id: uuid.UUID, period_range: list[int]) -> list[RowMapping] | None:
         """
@@ -89,10 +114,7 @@ class AccountManager(BaseDataManager):
         :return: A list of RowMapping containing the incoming and outgoing transactions
         """
         # TODO: create a relation that the user can choose its own 'earning' category, then add a parameter to that case
-        # period_series = (
-        #     select(func.unnest(literal_column(f'ARRAY{period_range}')).label('period'))
-        #     .cte('integer_series')
-        # )
+        # TODO: add group by currency_id and create a new field in balance model to save amounts in other currencies
         integer_series_cte = (
             select(literal_column(str(value)).label('period'))
             for value in period_range
@@ -138,8 +160,55 @@ class AccountManager(BaseDataManager):
             .order_by(period_series.c.period)
         )
 
-        print(sql_statement)
-
         transactions = await self.get_all(sql_statement)
 
         return transactions
+
+    async def get_consolidate_transactions_by_date_range(self, start_date: datetime.date | None = None,
+                                                         end_date: datetime.date | None = None,
+                                                         account_id: uuid.UUID | None = None) -> list[RowMapping] | None:
+        query = (
+            select(
+                AccountTransactionModel.currency_id,
+                func.coalesce(
+                    func.sum(
+                        case(
+                            (AccountTransactionModel.amount > 0, AccountTransactionModel.amount),
+                            else_=0
+                        )
+                    ), 0
+                ).label("incoming"),
+                func.coalesce(
+                    func.sum(
+                        case(
+                            (AccountTransactionModel.amount < 0, AccountTransactionModel.amount),
+                            else_=0
+                        )
+                    ), 0
+                ).label("outgoing"),
+                func.coalesce(
+                    func.sum(
+                        case(
+                            (AccountTransactionModel.category_id == uuid.UUID('dcef92cb-9664-4dc4-9adb-afe556016fe2'), AccountTransactionModel.amount),
+                            else_=0
+                        )
+                    ), 0
+                ).label('earnings'),
+                func.sum(AccountTransactionModel.amount).label('balance')
+            )
+            .select_from(AccountTransactionModel)
+            .group_by(AccountTransactionModel.currency_id)
+        )
+
+        if start_date is not None:
+            query = query.where(AccountTransactionModel.transaction_date >= start_date)
+
+        if end_date is not None:
+            query = query.where(AccountTransactionModel.transaction_date <= end_date)
+
+        if account_id is not None:
+            query = query.where(AccountTransactionModel.account_id == account_id)
+
+        response = await self.get_all(query)
+
+        return response

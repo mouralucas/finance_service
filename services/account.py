@@ -56,6 +56,7 @@ class AccountService(BaseService):
             await CreditCardManager(session=self.session).update_credit_card(cast(CreditCardModel, credit_card), credit_card_fields)
 
         # Refresh account object with the cancelled credit cards
+        # TODO: add a function to manager, not use session here
         await self.session.refresh(closed_account)
 
         response = CloseAccountResponse(
@@ -68,17 +69,17 @@ class AccountService(BaseService):
         params = params.model_dump()
         params['owner_id'] = self.user['user_id']
 
-        accounts: list[RowMapping] = await self.account_manager.get_accounts(params=params)
+        accounts: list[AccountModel] = await self.account_manager.get_accounts(params=params)
 
         response = GetAccountResponse(
             quantity=len(accounts) if accounts else 0,
-            accounts=[AccountSchema.model_validate(data["AccountModel"]) for data in accounts]
+            accounts=[AccountSchema.model_validate(data) for data in accounts]
         )
 
         return response
 
     # Statement
-    async def create_statement(self, statement_entry: CreateAccountTransactionRequest) -> CreateAccountTransactionResponse:
+    async def create_transaction(self, statement_entry: CreateAccountTransactionRequest) -> CreateAccountTransactionResponse:
         account = await self.account_manager.get_account_by_id(statement_entry.account_id)
         if not account.active:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Account is not active')
@@ -93,7 +94,7 @@ class AccountService(BaseService):
             new_statement.transaction_currency = new_statement.currency
             new_statement.transaction_amount = new_statement.amount
 
-        new_statement = await self.account_manager.create_statement(statement=new_statement)
+        new_statement = await self.account_manager.create_transaction(statement=new_statement)
 
         response = CreateAccountTransactionResponse(
             transaction=AccountTransactionSchema.model_validate(new_statement),

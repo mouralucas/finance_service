@@ -47,7 +47,7 @@ async def close(
 async def create_statement(statement_entry: CreateAccountTransactionRequest,
                            session: AsyncSession = Depends(db_session),
                            user: RequiredUser = Security(get_user)):
-    return await AccountService(session=session, user=user).create_statement(statement_entry=statement_entry)
+    return await AccountService(session=session, user=user).create_transaction(statement_entry=statement_entry)
 
 
 @router.get('/transaction', status_code=status.HTTP_501_NOT_IMPLEMENTED)

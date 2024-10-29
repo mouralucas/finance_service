@@ -199,7 +199,6 @@ class InvestmentManager(BaseDataManager):
                 InvestmentCategoryModel.name.label('name'),
                 func.sum(InvestmentStatementModel.gross_amount).label('total')
             )
-            # Estabelece explicitamente a origem para o JOIN, removendo a ambiguidade
             .select_from(InvestmentStatementModel)
             .join(InvestmentModel, InvestmentModel.id == InvestmentStatementModel.investment_id)
             .join(InvestmentTypeModel, InvestmentTypeModel.id == InvestmentModel.type_id)

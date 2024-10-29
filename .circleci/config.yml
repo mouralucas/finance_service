@@ -33,7 +33,6 @@ jobs:
       - store_test_results:
           path: junit.xml
 
-
 workflows:
   build-and-test:
     jobs:

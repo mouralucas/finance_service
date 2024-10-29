@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
 from backend.settings import settings
-from routers import account, credit_card, investment, integration
+from routers import account, credit_card, investment, integration, finance
 
 app = FastAPI(
     title=settings.project_name,
@@ -28,3 +28,4 @@ app.include_router(account.router)
 app.include_router(credit_card.router)
 app.include_router(investment.router)
 app.include_router(integration.router)
+app.include_router(finance.router)

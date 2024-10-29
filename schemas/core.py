@@ -12,7 +12,6 @@ class BankSchema(BaseModel):
     code: int | None = Field(None, description='The code of the bank')
 
 
-
 class CountrySchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
