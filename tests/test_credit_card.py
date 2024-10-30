@@ -293,7 +293,7 @@ async def test_create_transaction_cancelled_card(client, create_cancelled_card, 
         'operationType': 'OUTGOING'
     }
 
-    response = await client.post('/creditcard/bill', json=payload)
+    response = await client.post('/creditcard/transaction', json=payload)
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
 

@@ -19,3 +19,12 @@ class GetCreditCardResponse(SuccessResponseBase):
 
 class CreateCreditCardTransactionResponse(SuccessResponseBase):
     transaction: list[CreditCardTransactionSchema] = Field(..., serialization_alias='transaction', description='The transaction(s) created. If installments transaction, will return more than one transaction')
+
+
+class GetCreditCardBillResponse(SuccessResponseBase):
+    average: float = Field(..., description='The average credit card bill')
+    goal: float = Field(..., description='The goal credit card bill')
+    period_range: list[int] = Field(..., serialization_alias='periodRange', description='The range of available bill periods')
+    bill: list[dict] = Field(..., description='The list bill by period')
+
+

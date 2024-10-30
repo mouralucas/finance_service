@@ -10,15 +10,16 @@ from starlette import status
 from managers.credit_card import CreditCardManager
 from models.credit_card import CreditCardModel, CreditCardTransactionModel
 from schemas.credit_card import CreditCardSchema
-from schemas.request.credit_card import CreateCreditCardRequest, GetCreditCardRequest, CreateCreditCardTransactionRequest, CancelCreditCardRequest
-from schemas.response.credit_card import CreateCreditCardResponse, GetCreditCardResponse, CreateCreditCardTransactionResponse, CancelCreditCardResponse
-from services.utils.datetime import get_period
+from schemas.request.credit_card import CreateCreditCardRequest, GetCreditCardRequest, CreateCreditCardTransactionRequest, CancelCreditCardRequest, GetCreditCardBillRequest
+from schemas.response.credit_card import CreateCreditCardResponse, GetCreditCardResponse, CreateCreditCardTransactionResponse, CancelCreditCardResponse, GetCreditCardBillResponse
+from services.utils.datetime import get_period, get_period_range
 
 
 class CreditCardService(BaseService):
     def __init__(self, session: AsyncSession, user: RequiredUser):
         super().__init__(session)
         self.user = user.model_dump()
+        self.credit_card_manager = CreditCardManager(session=self.session)
 
     async def create_credit_card(self, credit_card: CreateCreditCardRequest) -> CreateCreditCardResponse:
         new_credit_card = CreditCardModel(**credit_card.model_dump())
@@ -56,13 +57,13 @@ class CreditCardService(BaseService):
 
         response = GetCreditCardResponse(
             quantity=len(credit_cards) if credit_cards else 0,
-            credit_cards=[CreditCardSchema.model_validate(data["CreditCardModel"]) for data in credit_cards]
+            credit_cards=[CreditCardSchema.model_validate(data) for data in credit_cards]
         )
 
         return response
 
-    # Bill entries
-    async def create_bill_entry(self, bill_entry: CreateCreditCardTransactionRequest) -> CreateCreditCardTransactionResponse:
+    # Credit card transactions
+    async def create_transaction(self, bill_entry: CreateCreditCardTransactionRequest) -> CreateCreditCardTransactionResponse:
         credit_card = await CreditCardManager(session=self.session).get_credit_card_by_id(bill_entry.credit_card_id)
         if not credit_card or not credit_card.active:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Credit card not valid')
@@ -97,6 +98,19 @@ class CreditCardService(BaseService):
 
         response = CreateCreditCardTransactionResponse(
             transaction=created_entries
+        )
+
+        return response
+
+    async def   get_credit_card_bill(self, params: GetCreditCardBillRequest) -> GetCreditCardBillResponse:
+        bill_consolidated = await self.credit_card_manager.get_bill(owner_id=self.user['user_id'], start_period=params.start_period, end_period=params.end_period)
+        average = sum(item['total_amount'] for item in bill_consolidated) / len(bill_consolidated) if bill_consolidated else 0
+
+        response = GetCreditCardBillResponse(
+            bill=bill_consolidated,
+            average=average,
+            period_range=get_period_range(201810, 202506),
+            goal=2300,
         )
 
         return response

@@ -54,3 +54,8 @@ class CreateCreditCardTransactionRequest(BaseModel):
 
     origin: str = Field('SYSTEM', alias='origin', description='The origin of the transaction')
     operation_type: str = Field(None, alias="operationType", description="The type of the transaction")
+
+
+class GetCreditCardBillRequest(BaseModel):
+    start_period: int = Field(None, alias="startPeriod", description='The start period of the bill')
+    end_period: int = Field(None, alias="endPeriod", description='The end period of the bill')
