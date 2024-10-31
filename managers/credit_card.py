@@ -6,6 +6,7 @@ from rolf_common.models import SQLModel
 from sqlalchemy import select, update, RowMapping, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from models.core import CategoryModel
 from models.credit_card import CreditCardModel, CreditCardTransactionModel
 
 
@@ -50,11 +51,33 @@ class CreditCardManager(BaseDataManager):
         return [credit_card['CreditCardModel'] for credit_card in credit_cards] if credit_cards else None
 
     # Transactions
-    async def create_bill_entry(self, bill_entries: list[CreditCardTransactionModel]) -> list[SQLModel]:
-        new_bill_entries = await self.add_all(bill_entries)
+    async def create_credit_card_transaction(self, transactions: list[CreditCardTransactionModel]) -> list[SQLModel]:
+        new_bill_entries = await self.add_all(transactions)
         [await self.session.refresh(i) for i in new_bill_entries]
 
         return new_bill_entries
+
+    async def get_credit_card_transactions(self, owner_id: uuid.UUID, params: dict[str, Any]) -> list[dict[str, Any]]:
+        query = (
+            select(
+                CreditCardTransactionModel.period,
+                CreditCardTransactionModel.transaction_date,
+                CreditCardTransactionModel.amount,
+                CreditCardTransactionModel.credit_card,
+                CreditCardTransactionModel.description,
+                CreditCardTransactionModel.due_date,
+                CreditCardModel.nickname.label('credit_card_nickname'),
+                CategoryModel.name.label('category_name')
+            )
+            .select_from(CreditCardTransactionModel)
+            .join(CreditCardModel, CreditCardTransactionModel.credit_card_id == CreditCardModel.id)
+            .join(CategoryModel, CreditCardTransactionModel.category_id == CategoryModel.id)
+            .order_by(CreditCardTransactionModel.transaction_date)
+        )
+
+        transactions = await self.get_all(query)
+
+        return [dict(transaction.items()) for transaction in transactions] if transactions else None
 
     # Bill
     async def get_bill_history_aggregated(self, owner_id: uuid.UUID, start_period: int, end_period: int) -> list[dict[str, Any]]:

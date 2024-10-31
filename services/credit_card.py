@@ -9,9 +9,9 @@ from starlette import status
 
 from managers.credit_card import CreditCardManager
 from models.credit_card import CreditCardModel, CreditCardTransactionModel
-from schemas.credit_card import CreditCardSchema
-from schemas.request.credit_card import CreateCreditCardRequest, GetCreditCardRequest, CreateCreditCardTransactionRequest, CancelCreditCardRequest, GetCreditCardBillRequest
-from schemas.response.credit_card import CreateCreditCardResponse, GetCreditCardResponse, CreateCreditCardTransactionResponse, CancelCreditCardResponse, GetCreditCardBillResponse
+from schemas.credit_card import CreditCardSchema, CreditCardTransactionSchema
+from schemas.request.credit_card import CreateCreditCardRequest, GetCreditCardRequest, CreateCreditCardTransactionRequest, CancelCreditCardRequest, GetCreditCardBillRequest, GetCreditCardTransactionsRequest
+from schemas.response.credit_card import CreateCreditCardResponse, GetCreditCardResponse, CreateCreditCardTransactionResponse, CancelCreditCardResponse, GetCreditCardBillResponse, GetCreditCardTransactionResponse
 from services.utils.datetime import get_period, get_period_range
 
 
@@ -94,10 +94,19 @@ class CreditCardService(BaseService):
 
             entry_list.append(new_bill_entry)
 
-        created_entries = await CreditCardManager(session=self.session).create_bill_entry(entry_list)
+        created_entries = await CreditCardManager(session=self.session).create_credit_card_transaction(entry_list)
 
         response = CreateCreditCardTransactionResponse(
             transaction=created_entries
+        )
+
+        return response
+
+    async def get_transactions(self, params: GetCreditCardTransactionsRequest):
+        results = await CreditCardManager(session=self.session).get_credit_card_transactions(owner_id=self.user['user_id'], params=params.model_dump())
+
+        response = GetCreditCardTransactionResponse(
+            transactions=[CreditCardTransactionSchema(**result) for result in results]
         )
 
         return response

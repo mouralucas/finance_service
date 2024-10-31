@@ -21,6 +21,10 @@ class CreateCreditCardTransactionResponse(SuccessResponseBase):
     transaction: list[CreditCardTransactionSchema] = Field(..., serialization_alias='transaction', description='The transaction(s) created. If installments transaction, will return more than one transaction')
 
 
+class GetCreditCardTransactionResponse(SuccessResponseBase):
+    transactions: list[CreditCardTransactionSchema] = Field(..., serialization_alias='transactions', description='The list of the credit transactions')
+
+
 class GetCreditCardBillResponse(SuccessResponseBase):
     # TODO: separate response for aggregated and creds
     average: float | None = Field(None, description='The average credit card bill')
@@ -28,5 +32,3 @@ class GetCreditCardBillResponse(SuccessResponseBase):
     period_range: list[int] | None = Field(None, serialization_alias='periodRange', description='The range of available bill periods')
     cards: list[str] | None = Field(None, description='The list of available cards')
     bill: list[dict] = Field(..., description='The list bill by period')
-
-

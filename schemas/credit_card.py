@@ -28,12 +28,14 @@ class CreditCardTransactionSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int = Field(..., serialization_alias='transactionId', description='The id of the bill entry')
+    credit_card_nickname: str | None = Field(None, serialization_alias='creditCardNick', description='The nickname of the card')
     credit_card_id: uuid.UUID = Field(..., serialization_alias='creditCardId', description='The id of the credit card')
     period: int = Field(..., serialization_alias='period', description='The period of the bill entry')
     due_date: datetime.date = Field(..., serialization_alias='dueDate', description='The due date of the bill entry')
     transaction_date: datetime.date = Field(..., serialization_alias='transactionDate', description='The date of the bill entry transaction')
     amount: float = Field(..., serialization_alias='amount', description='The amount of the bill entry')
     # category: CategorySchema = Field(..., serialization_alias='category', description='The category of the bill entry')
+    category_name: str | None = Field(None, serialization_alias='categoryName', description='The category name of the transaction')
     category_id: uuid.UUID | None = Field(None, serialization_alias='categoryId', description='The id of the bill entry')
     currency_id: str = Field(..., serialization_alias='currencyId', description='The id of the currency of the bill entry')
 
