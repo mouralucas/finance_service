@@ -102,8 +102,9 @@ class CreditCardService(BaseService):
 
         return response
 
-    async def   get_credit_card_bill(self, params: GetCreditCardBillRequest) -> GetCreditCardBillResponse:
-        bill_consolidated = await self.credit_card_manager.get_bill(owner_id=self.user['user_id'], start_period=params.start_period, end_period=params.end_period)
+    async def get_credit_card_bill_consolidated(self, params: GetCreditCardBillRequest) -> GetCreditCardBillResponse:
+        bill_consolidated = await self.credit_card_manager.get_bill_history_aggregated(owner_id=self.user['user_id'], start_period=params.start_period, end_period=params.end_period)
+        # bill_consolidated = await self.credit_card_manager.get_bill_history_by_card(owner_id=self.user['user_id'], start_period=params.start_period, end_period=params.end_period)
         average = sum(item['total_amount'] for item in bill_consolidated) / len(bill_consolidated) if bill_consolidated else 0
 
         response = GetCreditCardBillResponse(
@@ -111,6 +112,35 @@ class CreditCardService(BaseService):
             average=average,
             period_range=get_period_range(201810, 202506),
             goal=2300,
+        )
+
+        return response
+
+    async def get_credit_card_bill_by_card(self, params: GetCreditCardBillRequest):
+        bill_by_card = await self.credit_card_manager.get_bill_history_by_card(owner_id=self.user['user_id'], start_period=params.start_period, end_period=params.end_period)
+        distinct_cards = set(d['credit_card'] for d in bill_by_card)
+
+        a = {}
+        for i in bill_by_card:
+            period = i['period']
+            card = i['credit_card']
+            total_amount = i['total_amount']
+
+            if period not in a:
+                a[period] = {
+                    'id': period,
+                    'period': period,
+                    'total': 0
+                }
+
+            a[period][card] = total_amount
+            a[period]['total'] += total_amount
+
+        b = list(a.values())
+
+        response = GetCreditCardBillResponse(
+            bill=b,
+            cards=list(distinct_cards)
         )
 
         return response

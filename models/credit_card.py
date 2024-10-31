@@ -2,7 +2,7 @@ import datetime
 import uuid
 
 from rolf_common.models import SQLModel
-from sqlalchemy import String, ForeignKey, SmallInteger, Integer, JSON
+from sqlalchemy import String, ForeignKey, SmallInteger, Integer, JSON, DECIMAL
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
@@ -31,7 +31,7 @@ class CreditCardTransactionModel(SQLModel):
     period: Mapped[int] = mapped_column('period', Integer)
     due_date: Mapped[datetime.date] = mapped_column('due_date')
     transaction_date: Mapped[datetime.date] = mapped_column('transaction_date')
-    amount: Mapped[float] = mapped_column('amount')  # The amount show on the credit card bill
+    amount: Mapped[float] = mapped_column('amount', DECIMAL(precision=15, scale=5))  # The amount show on the credit card bill
     category_id_old: Mapped[str] = mapped_column('category_id_old', nullable=True)
     category_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('category.id'), nullable=True) # TODO: set to not null after migration
     category: Mapped['CategoryModel'] = relationship(foreign_keys=[category_id], lazy='subquery')

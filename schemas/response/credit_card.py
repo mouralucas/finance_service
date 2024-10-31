@@ -22,9 +22,11 @@ class CreateCreditCardTransactionResponse(SuccessResponseBase):
 
 
 class GetCreditCardBillResponse(SuccessResponseBase):
-    average: float = Field(..., description='The average credit card bill')
-    goal: float = Field(..., description='The goal credit card bill')
-    period_range: list[int] = Field(..., serialization_alias='periodRange', description='The range of available bill periods')
+    # TODO: separate response for aggregated and creds
+    average: float | None = Field(None, description='The average credit card bill')
+    goal: float | None = Field(None, description='The goal credit card bill')
+    period_range: list[int] | None = Field(None, serialization_alias='periodRange', description='The range of available bill periods')
+    cards: list[str] | None = Field(None, description='The list of available cards')
     bill: list[dict] = Field(..., description='The list bill by period')
 
 

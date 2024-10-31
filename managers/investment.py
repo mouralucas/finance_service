@@ -1,5 +1,5 @@
 import uuid
-from typing import Any, cast, List
+from typing import Any, cast
 
 from fastapi import HTTPException
 from rolf_common.managers import BaseDataManager
@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 from starlette import status
 
-from models.core import IndexerModel, PeriodicityModel, IndexerSeriesModel
+from models.core import IndexerSeriesModel
 from models.investment import InvestmentModel, InvestmentTypeModel, InvestmentStatementModel, InvestmentObjectiveModel, InvestmentCategoryModel
 from services.utils.datetime import get_previous_period
 

@@ -57,9 +57,15 @@ class CreditCardManager(BaseDataManager):
         return new_bill_entries
 
     # Bill
-    async def get_bill(self, owner_id: uuid.UUID,
-                       start_period: int, end_period: int, credit_card_id: uuid.UUID = None) -> list[dict[str, Any]]:
+    async def get_bill_history_aggregated(self, owner_id: uuid.UUID, start_period: int, end_period: int) -> list[dict[str, Any]]:
+        """
+        Created by: Lucas Penha de Moura - 29/10/2024
 
+        :param owner_id: The id og the owner of the transactions
+        :param start_period: the start period of the transactions
+        :param end_period: the end period of the transactions
+        :return: A dict with the total spent with all credit cards by period
+        """
         query = (
             select(
                 CreditCardTransactionModel.period,
@@ -77,16 +83,42 @@ class CreditCardManager(BaseDataManager):
             .order_by(CreditCardTransactionModel.period)
         )
 
-        # .select_from(CreditCardTransactionModel))
-        # .where(CreditCardTransactionModel.owner_id == owner_id)
-        # .group_by(CreditCardTransactionModel.period)
-
-        if credit_card_id:
-            query = query.where(CreditCardTransactionModel.credit_card_id == credit_card_id)
-
         result = await self.get_all(query)
 
         return [dict(i.items()) for i in result] if result else None
 
+    async def get_bill_history_by_card(self, owner_id: uuid.UUID, start_period: int, end_period: int) -> list[dict[str, Any]] | None:
+        """
+        Created by: Lucas Penha de Moura - 30/10/2024
 
+        :param owner_id: The id og the owner of the transactions
+        :param start_period: the start period of the transactions
+        :param end_period: the end period of the transactions
+        :return: A dict with the total spent by credit card/period
+        """
+        query = (
+            select(
+                CreditCardTransactionModel.period,
+                CreditCardModel.nickname.label('credit_card'),
+                func.round_(
+                    func.sum(CreditCardTransactionModel.amount * -1).label('total_amount')
+                    , 2
+                )
+            )
+            .select_from(CreditCardTransactionModel)
+            .join(CreditCardModel, CreditCardModel.id == CreditCardTransactionModel.credit_card_id)
+            .where(
+                CreditCardTransactionModel.owner_id == owner_id,
+                CreditCardTransactionModel.period >= start_period,
+                CreditCardTransactionModel.period <= end_period
+            )
+            .group_by(
+                CreditCardTransactionModel.period,
+                CreditCardModel.nickname
+            )
+            .order_by(CreditCardTransactionModel.period)
+        )
 
+        result = await self.get_all(query)
+
+        return [dict(i.items()) for i in result] if result else None
