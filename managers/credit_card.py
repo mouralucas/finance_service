@@ -101,9 +101,9 @@ class CreditCardManager(BaseDataManager):
                 CreditCardTransactionModel.period,
                 CreditCardModel.nickname.label('credit_card'),
                 func.round_(
-                    func.sum(CreditCardTransactionModel.amount * -1).label('total_amount')
+                    func.sum(CreditCardTransactionModel.amount * -1)
                     , 2
-                )
+                ).label('total_amount')
             )
             .select_from(CreditCardTransactionModel)
             .join(CreditCardModel, CreditCardModel.id == CreditCardTransactionModel.credit_card_id)

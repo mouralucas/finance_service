@@ -1,7 +1,7 @@
 import uuid
 import datetime
 from rolf_common.models import SQLModel
-from sqlalchemy import String, ForeignKey, JSON
+from sqlalchemy import String, ForeignKey, JSON, DECIMAL
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 
@@ -58,9 +58,9 @@ class InvestmentModel(SQLModel):
     transaction_date: Mapped[datetime.date] = mapped_column('transaction_date')
     maturity_date: Mapped[datetime.date] = mapped_column('maturity_date', nullable=True)
 
-    quantity: Mapped[float] = mapped_column('quantity', nullable=True)
-    price: Mapped[float] = mapped_column('price', nullable=True)
-    amount: Mapped[float] = mapped_column('amount')  # quantity*price
+    quantity: Mapped[float] = mapped_column('quantity', DECIMAL(precision=9, scale=3), nullable=True)
+    price: Mapped[float] = mapped_column('price', DECIMAL(precision=15, scale=5), nullable=True)
+    amount: Mapped[float] = mapped_column('amount', DECIMAL(precision=15, scale=5))  # quantity*price
     contracted_rate: Mapped[str] = mapped_column('contracted_rate', String(50), nullable=True)
 
     currency_id: Mapped[str] = mapped_column(ForeignKey('currency.id'))
@@ -73,7 +73,7 @@ class InvestmentModel(SQLModel):
     liquidity: Mapped['LiquidityModel'] = relationship(foreign_keys=[liquidity_id], lazy='subquery')
     is_liquidated: Mapped[bool] = mapped_column('is_liquidated', default=False)
     liquidation_date: Mapped[datetime.date] = mapped_column('liquidation_date', nullable=True)
-    liquidation_amount: Mapped[float] = mapped_column('liquidation_amount', nullable=True)
+    liquidation_amount: Mapped[float] = mapped_column('liquidation_amount', DECIMAL(precision=15, scale=5), nullable=True)
 
     country_id: Mapped[str] = mapped_column('country_id')  # Will tell what kind of tax will be charged
 
@@ -92,19 +92,19 @@ class InvestmentStatementModel(SQLModel):
     investment_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('investment.id'))
     investment: Mapped['InvestmentModel'] = relationship(foreign_keys=[investment_id], lazy='subquery')
     period: Mapped[int] = mapped_column('period')
-    previous_amount: Mapped[float] = mapped_column('start_amount', default=0)
+    previous_amount: Mapped[float] = mapped_column('start_amount', DECIMAL(precision=15, scale=5), default=0)
     gross_amount: Mapped[float] = mapped_column('gross_amount')
-    total_tax: Mapped[float] = mapped_column('total_tax', default=0)
-    total_fee: Mapped[float] = mapped_column('total_fee', default=0)
-    net_amount: Mapped[float] = mapped_column('net_amount')
+    total_tax: Mapped[float] = mapped_column('total_tax', DECIMAL(precision=15, scale=5), default=0)
+    total_fee: Mapped[float] = mapped_column('total_fee', DECIMAL(precision=15, scale=5), default=0)
+    net_amount: Mapped[float] = mapped_column('net_amount', DECIMAL(precision=15, scale=5))
     tax_detail: Mapped[dict] = mapped_column('tax_detail', JSON, nullable=True)
     fee_detail: Mapped[dict] = mapped_column('fee_detail', JSON, nullable=True)
     reference_date: Mapped[datetime.date] = mapped_column('reference_date', nullable=True) # TODO: Add not null after migration
     at_maturity: Mapped[bool] = mapped_column('at_maturity', default=False)
     # TODO: decide if persist this data or calculate when needed
-    value_change: Mapped[float] = mapped_column('value_change', nullable=True)
-    percentage_change: Mapped[float] = mapped_column('percentage_change', nullable=True)
-    index_percent_change: Mapped[float] = mapped_column('index_change', nullable=True)  # how much the index changed in the period
+    value_change: Mapped[float] = mapped_column('value_change', DECIMAL(precision=15, scale=5), nullable=True)
+    percentage_change: Mapped[float] = mapped_column('percentage_change', DECIMAL(precision=9, scale=3), nullable=True)
+    index_percent_change: Mapped[float] = mapped_column('index_change', DECIMAL(precision=9, scale=3), nullable=True)  # how much the index changed in the period
 
 
 class InvestmentObjectiveModel(SQLModel):
@@ -113,7 +113,7 @@ class InvestmentObjectiveModel(SQLModel):
     owner_id: Mapped[uuid.UUID] = mapped_column('owner_id')
     title: Mapped[str] = mapped_column('title', String(100))
     description: Mapped[str] = mapped_column('description', String(500), nullable=True)
-    amount: Mapped[float] = mapped_column('amount')
+    amount: Mapped[float] = mapped_column('amount', DECIMAL(precision=15, scale=5))
     estimated_deadline: Mapped[datetime.date] = mapped_column('estimated_deadline', nullable=True)
 
     # Investment reverse relation

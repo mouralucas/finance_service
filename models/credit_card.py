@@ -41,19 +41,19 @@ class CreditCardTransactionModel(SQLModel):
 
     transaction_currency_id: Mapped[str] = mapped_column(ForeignKey('currency.id'))
     transaction_currency: Mapped['CurrencyModel'] = relationship(foreign_keys=[transaction_currency_id], lazy='subquery')  # The currency of transaction
-    transaction_amount: Mapped[float] = mapped_column('transaction_amount')
+    transaction_amount: Mapped[float] = mapped_column('transaction_amount', DECIMAL(precision=15, scale=5))
 
     # This fields only required when transaction currency is different from the bill currency
     # In the front-end put a check-box "compra internacional" then open a box with this info
-    dollar_exchange_rate: Mapped[float] = mapped_column('dollar_exchange_rate', nullable=True)  # the dollar rate with the currency on the bill
-    currency_dollar_exchange_rate: Mapped[float] = mapped_column('currency_dollar_ex_rate', nullable=True)  # The rate between transaction currency and dollar
-    total_tax: Mapped[float] = mapped_column('total_tax', nullable=True)
+    dollar_exchange_rate: Mapped[float] = mapped_column('dollar_exchange_rate', DECIMAL(precision=15, scale=5), nullable=True)  # the dollar rate with the currency on the bill
+    currency_dollar_exchange_rate: Mapped[float] = mapped_column('currency_dollar_ex_rate', DECIMAL(precision=15, scale=5), nullable=True)  # The rate between transaction currency and dollar
+    total_tax: Mapped[float] = mapped_column('total_tax', DECIMAL(precision=15, scale=5), nullable=True)
     tax_details: Mapped[dict] = mapped_column('tax_details', JSON, nullable=True)
 
     is_installment: Mapped[bool] = mapped_column('is_installment', default=False)
     current_installment: Mapped[int] = mapped_column('current_installment', SmallInteger, default=1)
     installments: Mapped[int] = mapped_column('installments', SmallInteger, default=1)
-    total_amount: Mapped[float] = mapped_column('total_amount')  # The total amount of transaction
+    total_amount: Mapped[float] = mapped_column('total_amount', DECIMAL(precision=15, scale=5))  # The total amount of transaction
     parent_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('credit_card_transaction.id'), nullable=True)
     parent: Mapped['CreditCardTransactionModel'] = relationship(foreign_keys=[parent_id], lazy='subquery')
 

@@ -46,7 +46,7 @@ class AccountTransactionModel(SQLModel):
     period: Mapped[int] = mapped_column('period', Integer)
     currency_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('currency.id'))
     currency: Mapped['CurrencyModel'] = relationship(foreign_keys=[currency_id], lazy='subquery')  # Should be always the same as the account currency
-    amount: Mapped[float] = mapped_column('amount')
+    amount: Mapped[float] = mapped_column('amount', DECIMAL(precision=15, scale=5))
     transaction_date: Mapped[datetime.date] = mapped_column('transaction_date')
     category_id_old: Mapped[str] = mapped_column('category_id_old', nullable=True)
     category_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('category.id'), nullable=True)  # TODO: Set to null, return to not null after migration
@@ -57,15 +57,15 @@ class AccountTransactionModel(SQLModel):
     # Fields for international transactions, like exchange money or by in a currency different from the account
     transaction_currency_id: Mapped[str] = mapped_column(ForeignKey('currency.id'))
     transaction_currency: Mapped['CurrencyModel'] = relationship(foreign_keys=[transaction_currency_id], lazy='subquery')  # The currency of transaction
-    transaction_amount: Mapped[float] = mapped_column('transaction_amount')
+    transaction_amount: Mapped[float] = mapped_column('transaction_amount', DECIMAL(precision=15, scale=5))
 
     # Fields for exchange rates and applicable tax and fees
-    exchange_rate: Mapped[float] = mapped_column('exchange_rate', nullable=True)  # the rate between default currency and transaction currency
-    tax_perc: Mapped[float] = mapped_column('perc_tax', nullable=True)  # the total tax percentage
-    tax: Mapped[float] = mapped_column('tax', nullable=True)  # the exchange_rate * tax_perc
-    spread_perc: Mapped[float] = mapped_column('spread_perc', nullable=True)  # the percentage of spread applied
-    spread: Mapped[float] = mapped_column('spread', nullable=True)  # the exchange_rate * spread_perc
-    effective_rate: Mapped[float] = mapped_column('effective_rate', nullable=True)  # the final exchange rate, with tax and fees
+    exchange_rate: Mapped[float] = mapped_column('exchange_rate', DECIMAL(precision=15, scale=5), nullable=True)  # the rate between default currency and transaction currency
+    tax_perc: Mapped[float] = mapped_column('perc_tax', DECIMAL(precision=10, scale=4), nullable=True)  # the total tax percentage
+    tax: Mapped[float] = mapped_column('tax', DECIMAL(precision=15, scale=5), nullable=True)  # the exchange_rate * tax_perc
+    spread_perc: Mapped[float] = mapped_column('spread_perc', DECIMAL(precision=15, scale=5), nullable=True)  # the percentage of spread applied
+    spread: Mapped[float] = mapped_column('spread', DECIMAL(precision=15, scale=5), nullable=True)  # the exchange_rate * spread_perc
+    effective_rate: Mapped[float] = mapped_column('effective_rate', DECIMAL(precision=15, scale=5), nullable=True)  # the final exchange rate, with tax and fees
 
     origin: Mapped[str] = mapped_column('origin', String(10))
     is_validated: Mapped[bool] = mapped_column('is_validated', default=True)
