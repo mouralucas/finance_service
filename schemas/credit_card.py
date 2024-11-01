@@ -35,8 +35,9 @@ class CreditCardTransactionSchema(BaseModel):
     transaction_date: datetime.date = Field(..., serialization_alias='transactionDate', description='The date of the bill entry transaction')
     amount: float = Field(..., serialization_alias='amount', description='The amount of the bill entry')
     # category: CategorySchema = Field(..., serialization_alias='category', description='The category of the bill entry')
-    category_name: str | None = Field(None, serialization_alias='categoryName', description='The category name of the transaction')
+
     category_id: uuid.UUID = Field(..., serialization_alias='categoryId', description='The id of the bill entry')
+    category_name: str | None = Field(None, serialization_alias='categoryName', description='The category name of the transaction')
     currency_id: str = Field(..., serialization_alias='currencyId', description='The id of the currency of the bill entry')
     currency_symbol: str | None = Field(None, serialization_alias='currencySymbol', description='The currency symbol')
 

@@ -13,7 +13,7 @@ from models.account import AccountModel, AccountTransactionModel, AccountBalance
 from models.credit_card import CreditCardModel
 from schemas.account import AccountSchema, AccountTransactionSchema, BalanceSchema
 from schemas.request.account import CreateAccountRequest, GetAccountRequest, CreateAccountTransactionRequest, CloseAccountRequest, CreateBalanceRequest, GetBalanceRequest
-from schemas.response.account import CreateAccountResponse, GetAccountResponse, CloseAccountResponse, CreateBalanceResponse, GetBalanceResponse
+from schemas.response.account import CreateAccountResponse, GetAccountResponse, CloseAccountResponse, CreateBalanceResponse, GetBalanceResponse, GetAccountTransactionResponse
 from schemas.response.account import CreateAccountTransactionResponse
 from services.utils.datetime import get_period, get_current_period, get_period_range
 
@@ -78,7 +78,7 @@ class AccountService(BaseService):
 
         return response
 
-    # Statement
+    # Transactions
     async def create_transaction(self, statement_entry: CreateAccountTransactionRequest) -> CreateAccountTransactionResponse:
         account = await self.account_manager.get_account_by_id(statement_entry.account_id)
         if not account.active:
@@ -98,6 +98,16 @@ class AccountService(BaseService):
 
         response = CreateAccountTransactionResponse(
             transaction=AccountTransactionSchema.model_validate(new_statement),
+        )
+
+        return response
+
+    async def get_transactions(self) -> GetAccountTransactionResponse:
+        transactions = await self.account_manager.get_transactions(owner_id=self.user['user_id'], start_period=202401, end_period=202412)
+
+        response = GetAccountTransactionResponse(
+            quantity=len(transactions) if transactions else 0,
+            transactions=[AccountTransactionSchema(**transaction) for transaction in transactions]
         )
 
         return response
@@ -130,7 +140,6 @@ class AccountService(BaseService):
 
         balance_entries = []
         for period_data in transactions_by_period:
-
             period = period_data.period
             earnings = period_data.earnings
             incoming = period_data.incoming - earnings

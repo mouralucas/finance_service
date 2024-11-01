@@ -6,7 +6,7 @@ from starlette import status
 
 from backend.database import db_session
 from schemas.request.account import CreateAccountRequest, GetAccountRequest, CreateAccountTransactionRequest, CloseAccountRequest, CreateBalanceRequest, GetBalanceRequest
-from schemas.response.account import CreateAccountResponse, GetAccountResponse, CloseAccountResponse
+from schemas.response.account import CreateAccountResponse, GetAccountResponse, CloseAccountResponse, GetAccountTransactionResponse
 from services.account import AccountService
 
 router = APIRouter(prefix="/account", tags=['Account'])
@@ -50,12 +50,14 @@ async def create_statement(statement_entry: CreateAccountTransactionRequest,
     return await AccountService(session=session, user=user).create_transaction(statement_entry=statement_entry)
 
 
-@router.get('/transaction', status_code=status.HTTP_501_NOT_IMPLEMENTED)
+@router.get('/transaction',  summary='Get account transactions')
 async def get_transactions(
         session: AsyncSession = Depends(db_session),
-        user: RequiredUser = Security(get_user)
-):
-    return None
+        # user: RequiredUser = Security(get_user)
+) -> GetAccountTransactionResponse:
+    user = RequiredUser(user_id='adf52a1e-7a19-11ed-a1eb-0242ac120002')
+    return await AccountService(session=session, user=user).get_transactions()
+
 
 
 @router.post('/balance', summary='Generate the balance for the account', status_code=status.HTTP_201_CREATED)

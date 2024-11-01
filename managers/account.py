@@ -6,10 +6,12 @@ from fastapi import HTTPException
 from rolf_common.managers import BaseDataManager
 from rolf_common.models import SQLModel
 from sqlalchemy import select, update, Executable, func, case, RowMapping, literal_column, union_all
+from sqlalchemy.orm import aliased, join
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from models.account import AccountModel, AccountTransactionModel, AccountBalanceModel
+from models.core import CurrencyModel, CategoryModel
 from services.utils.datetime import get_current_period
 
 
@@ -58,10 +60,49 @@ class AccountManager(BaseDataManager):
 
         return cast(AccountTransactionModel, new_statement)
 
-    async def get_transactions(self, sql_statement: Executable) -> list[AccountTransactionModel]:
-        transactions: list[RowMapping] = await self.get_all(sql_statement)
+    async def get_transactions(self, owner_id: uuid.UUID, start_period: int, end_period: int) -> list[dict[str, Any]]:
+        transaction_alias = aliased(AccountTransactionModel)
+        account_alias = aliased(AccountModel)
+        currency_alias = aliased(CurrencyModel)
+        transaction_currency_alias = aliased(CurrencyModel)
+        category_alias = aliased(CategoryModel)
 
-        return [transaction['AccountTransactionModel'] for transaction in transactions] if transactions else None
+        query = (
+            select(
+                transaction_alias.owner_id,
+                transaction_alias.id,
+                transaction_alias.account_id,
+                account_alias.nickname.label('account_nickname'),
+                transaction_alias.currency_id,
+                currency_alias.symbol.label('currency_symbol'),
+                transaction_alias.amount,
+                transaction_alias.period,
+                transaction_alias.transaction_date,
+                transaction_alias.category_id,
+                category_alias.name.label('category_name'),
+                transaction_alias.description,
+                transaction_alias.transaction_currency_id,
+                transaction_currency_alias.symbol.label('transaction_currency_symbol'),
+                transaction_alias.transaction_amount,
+                transaction_alias.exchange_rate,
+                transaction_alias.tax_perc,
+                transaction_alias.tax,
+                transaction_alias.spread_perc,
+                transaction_alias.spread,
+                transaction_alias.effective_rate,
+            )
+            .select_from(transaction_alias)
+            .join(account_alias, transaction_alias.account_id == account_alias.id)
+            .join(currency_alias, transaction_alias.currency_id == currency_alias.id)
+            .join(transaction_currency_alias, transaction_alias.transaction_currency_id == transaction_currency_alias.id)
+            .join(category_alias, transaction_alias.category_id == category_alias.id)
+            .order_by(transaction_alias.transaction_date)
+        )
+
+        print(query)
+        transactions: list[RowMapping] = await self.get_all(query)
+
+        return [dict(transaction.items()) for transaction in transactions]
 
     async def get_balance(self, account_id: uuid.UUID = None,
                           start_period: int = None, end_period: int = None,

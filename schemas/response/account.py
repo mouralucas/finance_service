@@ -21,6 +21,10 @@ class CreateAccountTransactionResponse(SuccessResponseBase):
     transaction: AccountTransactionSchema = Field(..., serialization_alias='transaction', description='The entry statement created by the user')
 
 
+class GetAccountTransactionResponse(SuccessResponseBase):
+    quantity: int = Field(..., description='The number of transactions')
+    transactions: list[AccountTransactionSchema] = Field(..., description='The account transactions')
+
 class CreateBalanceResponse(SuccessResponseBase):
     accountNickname: str = Field(..., description='The account nickname')
     periods_saved: int = Field(..., serialization_alias='periodsSaved', description='The number of periods saved')
