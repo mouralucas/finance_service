@@ -51,5 +51,5 @@ class CreditCardTransactionSchema(BaseModel):
 
     description: str | None = Field(None, description='The description of the bill entry')
 
-    created_at: datetime.date = Field(..., description='The date that the transaction was created')
-    edited_at: datetime.date | None = Field(None, description='The date that the transaction was edited')
+    created_at: datetime.datetime = Field(..., description='The date that the transaction was created')
+    edited_at: datetime.datetime | None = Field(None, description='The date that the transaction was edited')

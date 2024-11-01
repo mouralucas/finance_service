@@ -58,7 +58,8 @@ class CreditCardManager(BaseDataManager):
 
         return new_bill_entries
 
-    async def get_credit_card_transactions(self, owner_id: uuid.UUID, params: dict[str, Any]) -> list[dict[str, Any]]:
+    async def get_credit_card_transactions(self, owner_id: uuid.UUID,
+                                           start_period: int, end_period: int) -> list[dict[str, Any]]:
         transaction_alias = aliased(CreditCardTransactionModel)
         category_alias = aliased(CategoryModel)
         card_alias = aliased(CreditCardModel)
@@ -71,7 +72,6 @@ class CreditCardManager(BaseDataManager):
                 transaction_alias.period,
                 transaction_alias.transaction_date,
                 func.round_(transaction_alias.amount, 2).label('amount'),
-                transaction_alias.credit_card,
                 transaction_alias.description,
                 transaction_alias.due_date,
                 transaction_alias.credit_card_id,
@@ -90,6 +90,11 @@ class CreditCardManager(BaseDataManager):
                 transaction_alias.edited_at
             )
             .select_from(transaction_alias)
+            .where(
+                transaction_alias.owner_id == owner_id,
+                transaction_alias.period >= start_period,
+                transaction_alias.period <= end_period,
+            )
             .join(card_alias, transaction_alias.credit_card_id == card_alias.id)
             .join(category_alias, transaction_alias.category_id == category_alias.id)
             .join(currency_alias, transaction_alias.currency_id == currency_alias.id)

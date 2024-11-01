@@ -6,7 +6,7 @@ from starlette import status
 
 from backend.database import db_session
 from schemas.request.credit_card import CreateCreditCardRequest, CreateCreditCardTransactionRequest, GetCreditCardRequest, CancelCreditCardRequest, GetCreditCardBillRequest, GetCreditCardTransactionsRequest
-from schemas.response.credit_card import CreateCreditCardResponse, CreateCreditCardTransactionResponse, GetCreditCardBillResponse
+from schemas.response.credit_card import CreateCreditCardResponse, CreateCreditCardTransactionResponse, GetCreditCardBillResponse, GetCreditCardTransactionResponse
 from services.credit_card import CreditCardService
 
 router = APIRouter(prefix="/creditcard", tags=['Credit cards'])
@@ -59,11 +59,12 @@ async def get_transactions(
         params: GetCreditCardTransactionsRequest = Depends(),
         session: AsyncSession = Depends(db_session),
         # user: RequiredUser = Security(get_user)
-):
+) -> GetCreditCardTransactionResponse:
     user = RequiredUser(user_id='adf52a1e-7a19-11ed-a1eb-0242ac120002')
     return await CreditCardService(session=session, user=user).get_transactions(params)
 
-@router.get('/bill/consolidated',)
+
+@router.get('/bill/consolidated', )
 async def get_bill(
         params: GetCreditCardBillRequest = Depends(),
         session: AsyncSession = Depends(db_session),
@@ -73,7 +74,7 @@ async def get_bill(
     return await CreditCardService(session, user).get_credit_card_bill_consolidated(params=params)
 
 
-@router.get('/bill/card',)
+@router.get('/bill/card', )
 async def get_bill(
         params: GetCreditCardBillRequest = Depends(),
         session: AsyncSession = Depends(db_session),

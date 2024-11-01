@@ -58,8 +58,8 @@ class CreateCreditCardTransactionRequest(BaseModel):
 
 class GetCreditCardTransactionsRequest(BaseModel):
     credit_card_id: uuid.UUID | None = Field(None, alias='creditCardId', description='The id of the credit card')
-    start_period: int | None = Field(None, alias='startPeriod', description='The start period of the transaction')
-    end_period: int | None = Field(None, alias='endPeriod', description='The end period of the transaction')
+    start_period: int = Field(None, alias='startPeriod', description='The start period of the transaction')
+    end_period: int = Field(None, alias='endPeriod', description='The end period of the transaction')
 
 class GetCreditCardBillRequest(BaseModel):
     start_period: int = Field(None, alias="startPeriod", description='The start period of the bill')

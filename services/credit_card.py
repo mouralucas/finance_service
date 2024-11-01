@@ -102,8 +102,10 @@ class CreditCardService(BaseService):
 
         return response
 
-    async def get_transactions(self, params: GetCreditCardTransactionsRequest):
-        transactions = await CreditCardManager(session=self.session).get_credit_card_transactions(owner_id=self.user['user_id'], params=params.model_dump())
+    async def get_transactions(self, params: GetCreditCardTransactionsRequest) -> GetCreditCardTransactionResponse:
+        transactions = await CreditCardManager(session=self.session).get_credit_card_transactions(owner_id=self.user['user_id'],
+                                                                                                  start_period=params.start_period,
+                                                                                                  end_period=params.end_period)
 
         response = GetCreditCardTransactionResponse(
             quantity=len(transactions),
