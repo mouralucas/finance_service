@@ -103,17 +103,17 @@ class CreditCardService(BaseService):
         return response
 
     async def get_transactions(self, params: GetCreditCardTransactionsRequest):
-        results = await CreditCardManager(session=self.session).get_credit_card_transactions(owner_id=self.user['user_id'], params=params.model_dump())
+        transactions = await CreditCardManager(session=self.session).get_credit_card_transactions(owner_id=self.user['user_id'], params=params.model_dump())
 
         response = GetCreditCardTransactionResponse(
-            transactions=[CreditCardTransactionSchema(**result) for result in results]
+            quantity=len(transactions),
+            transactions=[CreditCardTransactionSchema(**transaction) for transaction in transactions]
         )
 
         return response
 
     async def get_credit_card_bill_consolidated(self, params: GetCreditCardBillRequest) -> GetCreditCardBillResponse:
         bill_consolidated = await self.credit_card_manager.get_bill_history_aggregated(owner_id=self.user['user_id'], start_period=params.start_period, end_period=params.end_period)
-        # bill_consolidated = await self.credit_card_manager.get_bill_history_by_card(owner_id=self.user['user_id'], start_period=params.start_period, end_period=params.end_period)
         average = sum(item['total_amount'] for item in bill_consolidated) / len(bill_consolidated) if bill_consolidated else 0
 
         response = GetCreditCardBillResponse(

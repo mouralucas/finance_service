@@ -4,9 +4,10 @@ from typing import Any, cast
 from rolf_common.managers import BaseDataManager
 from rolf_common.models import SQLModel
 from sqlalchemy import select, update, RowMapping, func
+from sqlalchemy.orm import aliased
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models.core import CategoryModel
+from models.core import CategoryModel, CurrencyModel
 from models.credit_card import CreditCardModel, CreditCardTransactionModel
 
 
@@ -58,21 +59,37 @@ class CreditCardManager(BaseDataManager):
         return new_bill_entries
 
     async def get_credit_card_transactions(self, owner_id: uuid.UUID, params: dict[str, Any]) -> list[dict[str, Any]]:
+        currency_alias = aliased(CurrencyModel)
+        transaction_currency_alias = aliased(CurrencyModel)
+
         query = (
             select(
+                CreditCardTransactionModel.id,
                 CreditCardTransactionModel.period,
                 CreditCardTransactionModel.transaction_date,
-                CreditCardTransactionModel.amount,
+                func.round_(CreditCardTransactionModel.amount, 2).label('amount'),
                 CreditCardTransactionModel.credit_card,
                 CreditCardTransactionModel.description,
                 CreditCardTransactionModel.due_date,
+                CreditCardTransactionModel.credit_card_id,
                 CreditCardModel.nickname.label('credit_card_nickname'),
-                CategoryModel.name.label('category_name')
+                CreditCardTransactionModel.category_id,
+                CategoryModel.name.label('category_name'),
+                CreditCardTransactionModel.currency_id,
+                currency_alias.symbol.label('currency_symbol'),
+                func.round_(CreditCardTransactionModel.transaction_amount, 2).label('transaction_amount'),
+                CreditCardTransactionModel.transaction_currency_id,
+                transaction_currency_alias.symbol.label('transaction_currency_symbol'),
+                CreditCardTransactionModel.is_installment,
+                CreditCardTransactionModel.current_installment,
+                CreditCardTransactionModel.installments,
             )
             .select_from(CreditCardTransactionModel)
             .join(CreditCardModel, CreditCardTransactionModel.credit_card_id == CreditCardModel.id)
             .join(CategoryModel, CreditCardTransactionModel.category_id == CategoryModel.id)
-            .order_by(CreditCardTransactionModel.transaction_date)
+            .join(currency_alias, CreditCardTransactionModel.currency_id == currency_alias.id)
+            .join(transaction_currency_alias, CreditCardTransactionModel.transaction_currency_id == transaction_currency_alias.id)
+            .order_by(CreditCardTransactionModel.transaction_date.desc())
         )
 
         transactions = await self.get_all(query)

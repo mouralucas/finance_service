@@ -28,7 +28,7 @@ class CreditCardTransactionSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int = Field(..., serialization_alias='transactionId', description='The id of the bill entry')
-    credit_card_nickname: str | None = Field(None, serialization_alias='creditCardNick', description='The nickname of the card')
+    credit_card_nickname: str | None = Field(None, serialization_alias='creditCardNickname', description='The nickname of the card')
     credit_card_id: uuid.UUID = Field(..., serialization_alias='creditCardId', description='The id of the credit card')
     period: int = Field(..., serialization_alias='period', description='The period of the bill entry')
     due_date: datetime.date = Field(..., serialization_alias='dueDate', description='The due date of the bill entry')
@@ -36,15 +36,17 @@ class CreditCardTransactionSchema(BaseModel):
     amount: float = Field(..., serialization_alias='amount', description='The amount of the bill entry')
     # category: CategorySchema = Field(..., serialization_alias='category', description='The category of the bill entry')
     category_name: str | None = Field(None, serialization_alias='categoryName', description='The category name of the transaction')
-    category_id: uuid.UUID | None = Field(None, serialization_alias='categoryId', description='The id of the bill entry')
+    category_id: uuid.UUID = Field(..., serialization_alias='categoryId', description='The id of the bill entry')
     currency_id: str = Field(..., serialization_alias='currencyId', description='The id of the currency of the bill entry')
+    currency_symbol: str | None = Field(None, serialization_alias='currencySymbol', description='The currency symbol')
 
     transaction_currency_id: str | None = Field(None, serialization_alias='transactionCurrencyId', description='The id of original currency of transaction')
+    transaction_currency_symbol: str | None = Field(None, serialization_alias='transactionCurrencySymbol', description='The transaction currency symbol')
     transaction_amount: float = Field(..., serialization_alias='transactionAmount', description='The amount of the bill entry')
 
     is_installment: bool = Field(..., serialization_alias='isInstallment', description='Whether the bill entry is installment')
     current_installment: int = Field(..., serialization_alias='currentInstallment', description='The installment of the bill entry')
     installments: int = Field(..., serialization_alias='installments', description='The number of installments of the bill entry')
-    total_amount: float = Field(..., serialization_alias='totalAmount', description='The total amount of the bill entry')
+    total_amount: float | None = Field(None, serialization_alias='totalAmount', description='The total amount of the bill entry')
 
     description: str | None = Field(None, description='The description of the bill entry')

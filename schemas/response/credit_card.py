@@ -22,6 +22,7 @@ class CreateCreditCardTransactionResponse(SuccessResponseBase):
 
 
 class GetCreditCardTransactionResponse(SuccessResponseBase):
+    quantity: int = Field(..., serialization_alias='quantity', description='The number of credit cards transactions')
     transactions: list[CreditCardTransactionSchema] = Field(..., serialization_alias='transactions', description='The list of the credit transactions')
 
 
