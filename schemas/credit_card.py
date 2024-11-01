@@ -50,3 +50,6 @@ class CreditCardTransactionSchema(BaseModel):
     total_amount: float | None = Field(None, serialization_alias='totalAmount', description='The total amount of the bill entry')
 
     description: str | None = Field(None, description='The description of the bill entry')
+
+    created_at: datetime.date = Field(..., description='The date that the transaction was created')
+    edited_at: datetime.date | None = Field(None, description='The date that the transaction was edited')

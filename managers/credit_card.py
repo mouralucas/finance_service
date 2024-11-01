@@ -59,37 +59,42 @@ class CreditCardManager(BaseDataManager):
         return new_bill_entries
 
     async def get_credit_card_transactions(self, owner_id: uuid.UUID, params: dict[str, Any]) -> list[dict[str, Any]]:
+        transaction_alias = aliased(CreditCardTransactionModel)
+        category_alias = aliased(CategoryModel)
+        card_alias = aliased(CreditCardModel)
         currency_alias = aliased(CurrencyModel)
         transaction_currency_alias = aliased(CurrencyModel)
 
         query = (
             select(
-                CreditCardTransactionModel.id,
-                CreditCardTransactionModel.period,
-                CreditCardTransactionModel.transaction_date,
-                func.round_(CreditCardTransactionModel.amount, 2).label('amount'),
-                CreditCardTransactionModel.credit_card,
-                CreditCardTransactionModel.description,
-                CreditCardTransactionModel.due_date,
-                CreditCardTransactionModel.credit_card_id,
-                CreditCardModel.nickname.label('credit_card_nickname'),
-                CreditCardTransactionModel.category_id,
-                CategoryModel.name.label('category_name'),
-                CreditCardTransactionModel.currency_id,
+                transaction_alias.id,
+                transaction_alias.period,
+                transaction_alias.transaction_date,
+                func.round_(transaction_alias.amount, 2).label('amount'),
+                transaction_alias.credit_card,
+                transaction_alias.description,
+                transaction_alias.due_date,
+                transaction_alias.credit_card_id,
+                card_alias.nickname.label('credit_card_nickname'),
+                transaction_alias.category_id,
+                category_alias.name.label('category_name'),
+                transaction_alias.currency_id,
                 currency_alias.symbol.label('currency_symbol'),
-                func.round_(CreditCardTransactionModel.transaction_amount, 2).label('transaction_amount'),
-                CreditCardTransactionModel.transaction_currency_id,
+                func.round_(transaction_alias.transaction_amount, 2).label('transaction_amount'),
+                transaction_alias.transaction_currency_id,
                 transaction_currency_alias.symbol.label('transaction_currency_symbol'),
-                CreditCardTransactionModel.is_installment,
-                CreditCardTransactionModel.current_installment,
-                CreditCardTransactionModel.installments,
+                transaction_alias.is_installment,
+                transaction_alias.current_installment,
+                transaction_alias.installments,
+                transaction_alias.created_at,
+                transaction_alias.edited_at
             )
-            .select_from(CreditCardTransactionModel)
-            .join(CreditCardModel, CreditCardTransactionModel.credit_card_id == CreditCardModel.id)
-            .join(CategoryModel, CreditCardTransactionModel.category_id == CategoryModel.id)
-            .join(currency_alias, CreditCardTransactionModel.currency_id == currency_alias.id)
-            .join(transaction_currency_alias, CreditCardTransactionModel.transaction_currency_id == transaction_currency_alias.id)
-            .order_by(CreditCardTransactionModel.transaction_date.desc())
+            .select_from(transaction_alias)
+            .join(card_alias, transaction_alias.credit_card_id == card_alias.id)
+            .join(category_alias, transaction_alias.category_id == category_alias.id)
+            .join(currency_alias, transaction_alias.currency_id == currency_alias.id)
+            .join(transaction_currency_alias, transaction_alias.transaction_currency_id == transaction_currency_alias.id)
+            .order_by(transaction_alias.transaction_date.desc())
         )
 
         transactions = await self.get_all(query)
