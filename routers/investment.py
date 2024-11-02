@@ -30,11 +30,11 @@ async def create_investment(
 
 @router.get('', summary='Get investments', description='Get investment base on filters')
 async def get_investments(
-        params: GetInvestmentRequest,
+        params: GetInvestmentRequest = Depends(),
         session: AsyncSession = Depends(db_session),
         user: RequiredUser = Security(get_user)
 ) -> GetInvestmentResponse:
-    pass
+    return await InvestmentService(session=session, user=user).get_investments(params=params)
 
 
 @router.post('/liquidate', summary='Liquidate an investment', description='Liquidate an investment')
@@ -112,6 +112,7 @@ async def get_investments_without_objectives(
 ) -> GetInvestmentWithoutObjectives:
     return await InvestmentService(session=session, user=user).get_investment_without_objective()
 
+
 @router.get('/allocation', summary='Get investment allocation', description='Get the investment distribution between investment types')
 async def get_allocation(
         session: AsyncSession = Depends(db_session),
@@ -126,7 +127,4 @@ async def get_performance(
         session: AsyncSession = Depends(db_session),
         user: RequiredUser = Security(get_user)
 ) -> GetInvestmentPerformanceResponse:
-    # user = RequiredUser(user_id='adf52a1e-7a19-11ed-a1eb-0242ac120002')
     return await InvestmentService(session=session, user=user).get_performance(params=params)
-
-

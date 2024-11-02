@@ -53,9 +53,8 @@ async def create_statement(statement_entry: CreateAccountTransactionRequest,
 @router.get('/transaction',  summary='Get account transactions')
 async def get_transactions(
         session: AsyncSession = Depends(db_session),
-        # user: RequiredUser = Security(get_user)
+        user: RequiredUser = Security(get_user)
 ) -> GetAccountTransactionResponse:
-    user = RequiredUser(user_id='adf52a1e-7a19-11ed-a1eb-0242ac120002')
     return await AccountService(session=session, user=user).get_transactions()
 
 

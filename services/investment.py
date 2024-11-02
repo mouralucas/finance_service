@@ -45,11 +45,11 @@ class InvestmentService(BaseService):
         return response
 
     async def get_investments(self, params: GetInvestmentRequest) -> GetInvestmentResponse:
-        investments = await InvestmentManager(self.session).get_investments(params.model_dump())
+        investments = await InvestmentManager(self.session).get_investments(owner_id=self.user['user_id'])
 
         response = GetInvestmentResponse(
-            quantity=len(investments),
-            investments=InvestmentSchema.model_validate(investments),
+            quantity=len(investments) if investments else 0,
+            investments=[InvestmentSchema.model_validate(investment) for investment in investments] if investments else [],
         )
 
         return response

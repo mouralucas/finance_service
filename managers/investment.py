@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 from starlette import status
 
-from models.core import IndexerSeriesModel
+from models.core import IndexerSeriesModel, CurrencyModel
 from models.investment import InvestmentModel, InvestmentTypeModel, InvestmentStatementModel, InvestmentObjectiveModel, InvestmentCategoryModel
 from services.utils.datetime import get_previous_period
 
@@ -44,16 +44,48 @@ class InvestmentManager(BaseDataManager):
 
         return investment
 
-    async def get_investments(self, params: dict[str, Any]) -> list[RowMapping]:
-        query = select(InvestmentModel).order_by(InvestmentModel.transaction_date)
+    async def get_investments(self, owner_id: uuid.UUID, is_liquidated: bool = False) -> list[dict[str, Any]]:
+        # # Get the latest statement period for the investments
+        # subquery = (
+        #     select(
+        #         InvestmentStatementModel.investment_id,
+        #         func.max(InvestmentStatementModel.period).label('latest_period')
+        #     )
+        #     .where(InvestmentStatementModel.investment_id.in_(investment_ids))
+        #     .group_by(InvestmentStatementModel.investment_id)
+        #     .subquery()
+        # )
 
-        for key, value in params.items():
-            if value:
-                query = query.where(getattr(InvestmentModel, key) == value)
+        investment_alias = aliased(InvestmentModel)
+        currency_alias = aliased(CurrencyModel)
+        type_alias = aliased(InvestmentTypeModel)
 
-        investments: list[RowMapping] = await self.get_all(query, unique_result=True)
+        query = (
+            select(
+                investment_alias.id,
+                investment_alias.name,
+                investment_alias.transaction_date,
+                investment_alias.maturity_date,
+                investment_alias.quantity,
+                investment_alias.amount,
+                investment_alias.contracted_rate,
+                investment_alias.currency_id,
+                currency_alias.symbol.label('currency_symbol'),
+                investment_alias.type_id,
+                type_alias.name.label('investment_type_name')
+            )
+            .where(
+                InvestmentModel.owner_id == owner_id,
+                InvestmentModel.is_liquidated == is_liquidated,
+            )
+            .join(currency_alias, investment_alias.currency_id == currency_alias.id)
+            .join(type_alias, investment_alias.type_id == type_alias.id)
+            .order_by(InvestmentModel.transaction_date)
+        )
 
-        return investments
+        investments: list[RowMapping] = await self.get_all(query)
+
+        return [dict(investment.items()) for investment in investments]
 
     # Investment statement
     async def create_statement(self, statement: InvestmentStatementModel) -> SQLModel:
@@ -248,9 +280,9 @@ class InvestmentManager(BaseDataManager):
             .select_from(InvestmentStatementModel)
             .join(InvestmentModel, InvestmentModel.id == InvestmentStatementModel.investment_id)
             .outerjoin(IndexerSeriesModel,
-                  (IndexerSeriesModel.period == InvestmentStatementModel.period) &
-                  (IndexerSeriesModel.indexer_id == indexer_id)
-                  )
+                       (IndexerSeriesModel.period == InvestmentStatementModel.period) &
+                       (IndexerSeriesModel.indexer_id == indexer_id)
+                       )
             .where(
                 InvestmentModel.is_liquidated == False,
                 InvestmentModel.owner_id == owner_id

@@ -58,9 +58,8 @@ async def create_bill_entry(
 async def get_transactions(
         params: GetCreditCardTransactionsRequest = Depends(),
         session: AsyncSession = Depends(db_session),
-        # user: RequiredUser = Security(get_user)
+        user: RequiredUser = Security(get_user)
 ) -> GetCreditCardTransactionResponse:
-    user = RequiredUser(user_id='adf52a1e-7a19-11ed-a1eb-0242ac120002')
     return await CreditCardService(session=session, user=user).get_transactions(params)
 
 
@@ -68,9 +67,8 @@ async def get_transactions(
 async def get_bill(
         params: GetCreditCardBillRequest = Depends(),
         session: AsyncSession = Depends(db_session),
-        # user: RequiredUser = Security(get_user)
+        user: RequiredUser = Security(get_user)
 ) -> GetCreditCardBillResponse:
-    user = RequiredUser(user_id='adf52a1e-7a19-11ed-a1eb-0242ac120002')
     return await CreditCardService(session, user).get_credit_card_bill_consolidated(params=params)
 
 
@@ -78,7 +76,6 @@ async def get_bill(
 async def get_bill(
         params: GetCreditCardBillRequest = Depends(),
         session: AsyncSession = Depends(db_session),
-        # user: RequiredUser = Security(get_user)
+        user: RequiredUser = Security(get_user)
 ):
-    user = RequiredUser(user_id='adf52a1e-7a19-11ed-a1eb-0242ac120002')
     return await CreditCardService(session, user).get_credit_card_bill_by_card(params=params)

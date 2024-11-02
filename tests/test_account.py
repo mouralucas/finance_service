@@ -195,7 +195,7 @@ async def test_create_transaction_closed_account(client, create_closed_account, 
 async def test_get_transactions(client, create_account_transaction):
     response = await client.get('/account/transaction')
 
-    assert response.status_code == status.HTTP_501_NOT_IMPLEMENTED
+    assert response.status_code == status.HTTP_200_OK
 
 
 @pytest.mark.asyncio

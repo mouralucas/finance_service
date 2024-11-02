@@ -145,7 +145,7 @@ class AccountService(BaseService):
             incoming = period_data.incoming - earnings
             outgoing = period_data.outgoing
             transactions = incoming - abs(outgoing)
-            balance = previous_balance + transactions + earnings
+            balance = previous_balance + float(transactions) + float(earnings)
 
             account_balance = AccountBalanceModel(
                 account_id=params.account_id,

@@ -35,10 +35,9 @@ class CreateInvestmentRequest(BaseModel):
 
 
 class GetInvestmentRequest(BaseModel):
-    id: uuid.UUID = Field(None, alias='investmentId', description='The id of the investment')
-    owner_id: uuid.UUID = Field(None, alias='ownerId', description='The id of the owner of the investment')
-    start_date: datetime.date = Field(None, alias='startDate', description='The start date of the filter')
-    end_date: datetime.date = Field(None, alias='end_date', description='The end date of the filter')
+    id: uuid.UUID | None = Field(None, alias='investmentId', description='The id of the investment')
+    start_date: datetime.date | None = Field(None, alias='startDate', description='The start date of the filter')
+    end_date: datetime.date | None = Field(None, alias='end_date', description='The end date of the filter')
     # other fields...
 
 

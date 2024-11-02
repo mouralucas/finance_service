@@ -15,7 +15,6 @@ router = APIRouter(prefix="/finance", tags=['Finance'])
 async def get_summary(
         params: GetSummaryRequest = Depends(),
         session: AsyncSession = Depends(db_session),
-        # user: RequiredUser = Security(get_user)
+        user: RequiredUser = Security(get_user)
 ):
-    user = RequiredUser(user_id='adf52a1e-7a19-11ed-a1eb-0242ac120002')
     response = await FinanceService(session=session, user=user).get_summary(params=params)
