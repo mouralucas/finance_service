@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 from starlette import status
 
-from models.core import IndexerSeriesModel, CurrencyModel
+from models.core import IndexerSeriesModel, CurrencyModel, BankModel
 from models.investment import InvestmentModel, InvestmentTypeModel, InvestmentStatementModel, InvestmentObjectiveModel, InvestmentCategoryModel
 from services.utils.datetime import get_previous_period
 
@@ -45,24 +45,16 @@ class InvestmentManager(BaseDataManager):
         return investment
 
     async def get_investments(self, owner_id: uuid.UUID, is_liquidated: bool = False) -> list[dict[str, Any]]:
-        # # Get the latest statement period for the investments
-        # subquery = (
-        #     select(
-        #         InvestmentStatementModel.investment_id,
-        #         func.max(InvestmentStatementModel.period).label('latest_period')
-        #     )
-        #     .where(InvestmentStatementModel.investment_id.in_(investment_ids))
-        #     .group_by(InvestmentStatementModel.investment_id)
-        #     .subquery()
-        # )
-
         investment_alias = aliased(InvestmentModel)
         currency_alias = aliased(CurrencyModel)
         type_alias = aliased(InvestmentTypeModel)
+        bank_alias = aliased(BankModel)
 
         query = (
             select(
                 investment_alias.id,
+                investment_alias.custodian_id,
+                bank_alias.name.label('custodian_name'),
                 investment_alias.name,
                 investment_alias.transaction_date,
                 investment_alias.maturity_date,
@@ -80,6 +72,7 @@ class InvestmentManager(BaseDataManager):
             )
             .join(currency_alias, investment_alias.currency_id == currency_alias.id)
             .join(type_alias, investment_alias.type_id == type_alias.id)
+            .join(bank_alias, investment_alias.custodian_id == bank_alias.id)
             .order_by(InvestmentModel.transaction_date)
         )
 
@@ -152,7 +145,7 @@ class InvestmentManager(BaseDataManager):
 
         return new_objective
 
-    async def get_investment_objectives(self, params: dict[str, Any]) -> list[RowMapping] | None:
+    async def get_objectives(self, params: dict[str, Any]) -> list[RowMapping] | None:
         query = select(InvestmentObjectiveModel)
 
         for key, value in params.items():
@@ -167,6 +160,27 @@ class InvestmentManager(BaseDataManager):
         objective = await self.get_by_id(InvestmentObjectiveModel, objective_id)
 
         return cast(InvestmentObjectiveModel, objective)
+
+    async def get_objective_investments(self, objective_id: uuid.UUID = None, with_objective: bool = None) -> list[InvestmentModel]:
+        """
+        Created by: Lucas Penha de Moura
+
+            Get investments based on objectives.
+        :param objective_id: The objective identification
+        :param with_objective: If true return all investments with an objective, if false return all investments without an objective set.
+        :return:
+        """
+        query = select(InvestmentModel)
+
+        if objective_id:
+            query = query.where(InvestmentModel.objective_id == objective_id)
+
+        if with_objective:
+            query = query.where(InvestmentModel.objective.is_null(with_objective))
+
+        investments = await self.get_all(query)
+
+        return [investment['InvestmentModel'] for investment in investments]
 
     # Dashboard
     async def get_allocation_by_investment_type(self, owner_id: uuid.UUID) -> list[RowMapping] | None:

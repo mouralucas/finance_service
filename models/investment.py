@@ -93,7 +93,7 @@ class InvestmentStatementModel(SQLModel):
     investment: Mapped['InvestmentModel'] = relationship(foreign_keys=[investment_id], lazy='subquery')
     period: Mapped[int] = mapped_column('period')
     previous_amount: Mapped[float] = mapped_column('start_amount', DECIMAL(precision=15, scale=5), default=0)
-    gross_amount: Mapped[float] = mapped_column('gross_amount')
+    gross_amount: Mapped[float] = mapped_column('gross_amount', DECIMAL(precision=15, scale=5))
     total_tax: Mapped[float] = mapped_column('total_tax', DECIMAL(precision=15, scale=5), default=0)
     total_fee: Mapped[float] = mapped_column('total_fee', DECIMAL(precision=15, scale=5), default=0)
     net_amount: Mapped[float] = mapped_column('net_amount', DECIMAL(precision=15, scale=5))

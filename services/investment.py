@@ -155,7 +155,7 @@ class InvestmentService(BaseService):
         return response
 
     async def get_objectives(self, params: GetObjectiveRequest):
-        objectives = await InvestmentManager(self.session).get_investment_objectives(params=params.model_dump())
+        objectives = await InvestmentManager(self.session).get_objectives(params=params.model_dump())
 
         response = GetObjectiveResponse(
             objectives=[InvestmentObjectiveSchema.model_validate(data['InvestmentObjectiveModel']) for data in objectives]
@@ -164,18 +164,11 @@ class InvestmentService(BaseService):
         return response
 
     async def get_investment_without_objective(self) -> GetInvestmentWithoutObjectives:
-        # TODO: how to change the manager to accept None in specific cases like this one?
-        investments: list[RowMapping] = await self.investment_manager.get_investments(
-            {
-                'objective_id': None,
-                'owner_id': self.user['user_id'],
-                'active': True
-            }
-        )
+        investments: list[InvestmentModel] = await self.investment_manager.get_objective_investments(with_objective=False)
 
         response = GetInvestmentWithoutObjectives(
             quantity=len(investments),
-            investments=[InvestmentSchema.model_validate(data["InvestmentModel"]) for data in investments],
+            investments=[InvestmentSchema.model_validate(data) for data in investments],
         )
         return response
 

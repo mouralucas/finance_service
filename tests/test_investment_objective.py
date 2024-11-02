@@ -33,6 +33,7 @@ async def test_create_objective(client):
 
 @pytest.mark.asyncio
 async def test_get_open_objectives(client, create_open_investment_objectives):
+    # TODO: add tests
     response = await client.get('/investment/objective')
 
     assert response.status_code == status.HTTP_200_OK
