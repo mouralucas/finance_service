@@ -1,6 +1,6 @@
 import datetime
 import uuid
-from gzip import FEXTRA
+from decimal import Decimal
 
 from pydantic import BaseModel, Field, ConfigDict
 
@@ -16,19 +16,20 @@ class InvestmentTypeSchema(BaseModel):
 
 
 class InvestmentSchema(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, json_encoders={Decimal: float})
 
     id: uuid.UUID = Field(..., serialization_alias='investmentId', description='Unique identifier of the investment')
     custodian_id: uuid.UUID = Field(..., serialization_alias='custodianId', description='The id of the custodian bank')
-    account_id: uuid.UUID = Field(..., serialization_alias='accountId', description='The id of the account')
+    account_id: uuid.UUID | None = Field(None, serialization_alias='accountId', description='The id of the account')
     name: str = Field(..., description='The name of the investment')
     description: str | None = Field(None, description='Optional description of the investment')
     type_id: uuid.UUID = Field(..., serialization_alias='typeId', description='The id of the investment type')
     transaction_date: datetime.date = Field(..., serialization_alias='transactionDate', description='The date of the investment')
     maturity_date: datetime.date | None = Field(None, serialization_alias='maturityDate', description='The date that the investment will be liquidated')
-    quantity: float = Field(None, description='The quantity of the investment bought')
-    price: float = Field(None, description='The unit price for the investment')
-    amount: float = Field(None, description='The total bought. Quantity * price')
+    quantity: Decimal = Field(None, description='The quantity of the investment bought')
+    price: Decimal = Field(None, description='The unit price for the investment')
+    amount: Decimal = Field(None, description='The total bought. Quantity * price')
+    contracted_rate: str | None = Field(None, serialization_alias='contractedRate', description='The rate of the investment')
     currency_id: str = Field(..., serialization_alias='currencyId', description='The id of the currency')
     indexer_type_id: uuid.UUID = Field(..., serialization_alias='indexerTypeId', description='The id of index type for the investment')
 
@@ -36,11 +37,13 @@ class InvestmentSchema(BaseModel):
     liquidity_id: uuid.UUID = Field(..., serialization_alias='liquidityId', description='The id of investment liquidity')
     is_liquidated: bool = Field(None, serialization_alias='isLiquidated', description='Whether the investment is liquidated')
     liquidation_date: datetime.date | None = Field(None, serialization_alias='liquidationDate', description='The date that the investment was liquidated')
-    liquidation_amount: float | None = Field(None, serialization_alias='liquidationAmount', description='The amount liquidated, after tax')
+    liquidation_amount: Decimal | None = Field(None, serialization_alias='liquidationAmount', description='The amount liquidated, after tax')
 
-    country_id: str = Field(..., serialization_alias='countryId', description='The id of the country')
+    country_id: str | None = Field(None, serialization_alias='countryId', description='The id of the country')
 
     objective_id: uuid.UUID | None = Field(None, serialization_alias='objectiveId', description='The id of the objective')
+
+    gross_amount: Decimal | None = Field(None, serialization_alias='grossAmount', description='The gross amount of last period available')
 
 
 class TaxFeeResponse(BaseModel):
@@ -50,18 +53,18 @@ class TaxFeeResponse(BaseModel):
 
 
 class InvestmentStatementSchema(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, json_encoders={Decimal: float})
 
     id: uuid.UUID = Field(..., serialization_alias='investmentStatementId', description='The id of the statement')
     investment_id: uuid.UUID = Field(..., serialization_alias='investmentId', description='The id of the investment')
     investment: InvestmentSchema = Field(..., serialization_alias='investment', description='The object of the investment')
     period: int = Field(..., serialization_alias='period', description='The period of the statement')
-    gross_amount: float = Field(..., serialization_alias='grossAmount', description='The gross amount of the investment in the period')
-    total_tax: float = Field(..., serialization_alias='totalTax', description='The total tax amount of the investment in the period')
+    gross_amount: Decimal = Field(..., serialization_alias='grossAmount', description='The gross amount of the investment in the period')
+    total_tax: Decimal = Field(..., serialization_alias='totalTax', description='The total tax amount of the investment in the period')
     tax_detail: list[TaxFeeResponse] | None = Field(..., serialization_alias='taxDetail', description='The detail of taxes')
-    total_fee: float = Field(..., serialization_alias='totalFee', description='The total fee of the investment in the period')
+    total_fee: Decimal = Field(..., serialization_alias='totalFee', description='The total fee of the investment in the period')
     fee_detail: list[TaxFeeResponse] | None = Field(..., serialization_alias='feeDetail', description='The detail of fees')
-    net_amount: float = Field(..., serialization_alias='netAmount', description='The net amount of the investment in the period')
+    net_amount: Decimal = Field(..., serialization_alias='netAmount', description='The net amount of the investment in the period')
 
 
 class InvestmentObjectiveSchema(BaseModel):

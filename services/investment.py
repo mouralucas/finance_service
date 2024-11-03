@@ -36,7 +36,7 @@ class InvestmentService(BaseService):
 
         # TODO: if liquidation date <= today and liquidation amount set is_liquidated to true
         # TODO: Maybe when creating a new investment, create the first line of the statement, with zero tax/fee and the invested value, when set the first statement just update
-        new_investment = await self.investment_manager.create(new_investment)
+        new_investment = await self.investment_manager.create_investment(new_investment)
 
         response = CreateInvestmentResponse(
             investment=InvestmentSchema.model_validate(new_investment),
@@ -60,7 +60,7 @@ class InvestmentService(BaseService):
         fields = investment.model_dump()
         fields['is_liquidated'] = True
 
-        liquidated_investment = await self.investment_manager.update(current_investment, fields)
+        liquidated_investment = await self.investment_manager.update_investment(current_investment, fields)
 
         response = LiquidateInvestmentResponse(
             investment=InvestmentSchema.model_validate(liquidated_investment),

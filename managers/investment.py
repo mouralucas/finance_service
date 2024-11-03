@@ -18,12 +18,12 @@ class InvestmentManager(BaseDataManager):
     def __init__(self, session: AsyncSession):
         super().__init__(session)
 
-    async def create(self, investment: InvestmentModel) -> SQLModel:
+    async def create_investment(self, investment: InvestmentModel) -> SQLModel:
         await self.add_one(investment)
 
         return investment
 
-    async def update(self, investment: SQLModel, fields: dict[str, Any]) -> SQLModel:
+    async def update_investment(self, investment: SQLModel, fields: dict[str, Any]) -> SQLModel:
         query = (
             update(InvestmentModel)
             .where(InvestmentModel.id == investment.id)
@@ -46,9 +46,19 @@ class InvestmentManager(BaseDataManager):
 
     async def get_investments(self, owner_id: uuid.UUID, is_liquidated: bool = False) -> list[dict[str, Any]]:
         investment_alias = aliased(InvestmentModel)
+        statement_alias = aliased(InvestmentStatementModel)
         currency_alias = aliased(CurrencyModel)
         type_alias = aliased(InvestmentTypeModel)
         bank_alias = aliased(BankModel)
+
+        subquery = (
+            select(
+                statement_alias.investment_id,
+                func.max(statement_alias.period).label('latest_period')
+            )
+            .group_by(statement_alias.investment_id)
+            .subquery()
+        )
 
         query = (
             select(
@@ -64,18 +74,30 @@ class InvestmentManager(BaseDataManager):
                 investment_alias.currency_id,
                 currency_alias.symbol.label('currency_symbol'),
                 investment_alias.type_id,
-                type_alias.name.label('investment_type_name')
+                type_alias.name.label('investment_type_name'),
+                investment_alias.liquidity_id,
+                investment_alias.indexer_id,
+                investment_alias.indexer_type_id,
+                statement_alias.gross_amount,
+                statement_alias.period
             )
             .where(
-                InvestmentModel.owner_id == owner_id,
-                InvestmentModel.is_liquidated == is_liquidated,
+                investment_alias.owner_id == owner_id,
+                investment_alias.is_liquidated == is_liquidated,
             )
             .join(currency_alias, investment_alias.currency_id == currency_alias.id)
             .join(type_alias, investment_alias.type_id == type_alias.id)
             .join(bank_alias, investment_alias.custodian_id == bank_alias.id)
-            .order_by(InvestmentModel.transaction_date)
+            .join(statement_alias, statement_alias.investment_id == investment_alias.id)
+            .join(
+                subquery,
+                (statement_alias.investment_id == subquery.c.investment_id) &
+                (statement_alias.period == subquery.c.latest_period)
+            )
+            .order_by(investment_alias.transaction_date)
         )
 
+        print(query)
         investments: list[RowMapping] = await self.get_all(query)
 
         return [dict(investment.items()) for investment in investments]
