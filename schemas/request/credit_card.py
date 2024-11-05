@@ -62,6 +62,7 @@ class GetCreditCardTransactionsRequest(BaseModel):
     start_period: int = Field(None, alias='startPeriod', description='The start period of the transaction')
     end_period: int = Field(None, alias='endPeriod', description='The end period of the transaction')
 
+
 class GetCreditCardBillRequest(BaseModel):
     start_period: int = Field(None, alias="startPeriod", description='The start period of the bill')
     end_period: int = Field(None, alias="endPeriod", description='The end period of the bill')

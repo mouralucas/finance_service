@@ -46,15 +46,15 @@ class InvestmentManager(BaseDataManager):
 
     async def get_investments(self, owner_id: uuid.UUID, is_liquidated: bool = False) -> list[dict[str, Any]]:
         investment_alias = aliased(InvestmentModel)
-        statement_alias = aliased(InvestmentStatementModel)
         currency_alias = aliased(CurrencyModel)
         type_alias = aliased(InvestmentTypeModel)
         bank_alias = aliased(BankModel)
+        statement_alias = aliased(InvestmentStatementModel)
 
         subquery = (
             select(
-                statement_alias.investment_id,
-                func.max(statement_alias.period).label('latest_period')
+                statement_alias.investment_id.label("investment_id"),
+                func.max(statement_alias.period).label("latest_period")
             )
             .group_by(statement_alias.investment_id)
             .subquery()
@@ -68,6 +68,7 @@ class InvestmentManager(BaseDataManager):
                 investment_alias.name,
                 investment_alias.transaction_date,
                 investment_alias.maturity_date,
+                investment_alias.price,
                 investment_alias.quantity,
                 investment_alias.amount,
                 investment_alias.contracted_rate,
@@ -78,29 +79,39 @@ class InvestmentManager(BaseDataManager):
                 investment_alias.liquidity_id,
                 investment_alias.indexer_id,
                 investment_alias.indexer_type_id,
-                statement_alias.gross_amount,
+                investment_alias.country_id,
+                func.coalesce(investment_alias.liquidation_amount, 0).label('liquidation_amount'),
+                func.coalesce(statement_alias.gross_amount, 0.0).label('gross_amount'),
+                case(
+                    (statement_alias.gross_amount != None,
+                     ((statement_alias.gross_amount - investment_alias.amount)/investment_alias.amount) * 100
+                     ),
+                    else_=0
+                ).label('percentage_change'),
                 statement_alias.period
-            )
-            .where(
-                investment_alias.owner_id == owner_id,
-                investment_alias.is_liquidated == is_liquidated,
-            )
-            .join(currency_alias, investment_alias.currency_id == currency_alias.id)
-            .join(type_alias, investment_alias.type_id == type_alias.id)
-            .join(bank_alias, investment_alias.custodian_id == bank_alias.id)
-            .join(statement_alias, statement_alias.investment_id == investment_alias.id)
-            .join(
-                subquery,
-                (statement_alias.investment_id == subquery.c.investment_id) &
-                (statement_alias.period == subquery.c.latest_period)
-            )
-            .order_by(investment_alias.transaction_date)
+        )
+        .join(currency_alias, investment_alias.currency_id == currency_alias.id)
+        .join(type_alias, investment_alias.type_id == type_alias.id)
+        .join(bank_alias, investment_alias.custodian_id == bank_alias.id)
+        .outerjoin(
+            subquery,
+            investment_alias.id == subquery.c.investment_id
+        )
+        .outerjoin(
+            statement_alias,
+            (statement_alias.investment_id == investment_alias.id) &
+            (statement_alias.period == subquery.c.latest_period)
+        )
+        .where(
+            investment_alias.owner_id == "adf52a1e-7a19-11ed-a1eb-0242ac120002",
+            investment_alias.is_liquidated == False
+        )
+        .order_by(investment_alias.transaction_date)
         )
 
-        print(query)
         investments: list[RowMapping] = await self.get_all(query)
 
-        return [dict(investment.items()) for investment in investments]
+        return [dict(investment.items()) for investment in investments] if investments else None
 
     # Investment statement
     async def create_statement(self, statement: InvestmentStatementModel) -> SQLModel:

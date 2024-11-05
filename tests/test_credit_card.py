@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import pytest
 from starlette import status
 import datetime
@@ -251,7 +253,7 @@ async def test_create_transaction_with_installment(client, create_valid_credit_c
         period = get_period(due_date)
 
         assert 'amount' in entry
-        assert entry['amount'] == total_amount / total_installments
+        assert entry['amount'] == round(total_amount / total_installments, 5)
 
         assert 'period' in entry
         assert entry['period'] == period

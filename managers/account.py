@@ -99,7 +99,6 @@ class AccountManager(BaseDataManager):
             .order_by(transaction_alias.transaction_date)
         )
 
-        print(query)
         transactions: list[RowMapping] = await self.get_all(query)
 
         return [dict(transaction.items()) for transaction in transactions]
