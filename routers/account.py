@@ -16,7 +16,7 @@ router = APIRouter(prefix="/account", tags=['Account'])
              summary='Create an account',
              description='Create a new bank account for the user',
              status_code=status.HTTP_201_CREATED)
-async def create(
+async def create_account(
         account: CreateAccountRequest,
         session: AsyncSession = Depends(db_session),
         user: RequiredUser = Security(get_user)
@@ -25,7 +25,7 @@ async def create(
 
 
 @router.get('', summary='List all accounts', description='Get user accounts base on filters chosen')
-async def get(
+async def get_account(
         params: GetAccountRequest = Depends(),
         session: AsyncSession = Depends(db_session),
         user: RequiredUser = Security(get_user)
@@ -34,7 +34,7 @@ async def get(
 
 
 @router.patch('/close', summary='Close an account', description='Close an account and its relations (credit cards)')
-async def close(
+async def close_account(
         account: CloseAccountRequest,
         session: AsyncSession = Depends(db_session),
         user: RequiredUser = Security(get_user)

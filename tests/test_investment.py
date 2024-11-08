@@ -74,13 +74,13 @@ async def test_create_investment(client, create_open_account, create_investment_
     assert data['investment']['maturityDate'] == maturity_date
 
     assert 'quantity' in data['investment']
-    assert data['investment']['quantity'] == quantity
+    assert float(data['investment']['quantity']) == quantity
 
     assert 'price' in data['investment']
-    assert data['investment']['price'] == price
+    assert float(data['investment']['price']) == price
 
     assert 'amount' in data['investment']
-    assert data['investment']['amount'] == amount
+    assert float(data['investment']['amount']) == amount
 
     assert 'indexerTypeId' in data['investment']
     assert data['investment']['indexerTypeId'] == str(indexer_type_id)
@@ -147,7 +147,7 @@ async def test_create_liquidated_investment(client, create_open_account, create_
     assert 'liquidationDate' in data['investment']
     assert data['investment']['liquidationDate'] == liquidation_date
     assert 'liquidationAmount' in data['investment']
-    assert data['investment']['liquidationAmount'] == liquidation_amount
+    assert float(data['investment']['liquidationAmount']) == liquidation_amount
     assert 'isLiquidated' in data['investment']
     assert data['investment']['isLiquidated'] is True
 
@@ -177,10 +177,4 @@ async def test_liquidate_investment(client, create_investment):
     assert 'liquidationDate' in data['investment']
     assert data['investment']['liquidationDate'] == liquidation_date
     assert 'liquidationAmount' in data['investment']
-    assert data['investment']['liquidationAmount'] == liquidation_amount
-
-
-
-
-
-
+    assert float(data['investment']['liquidationAmount']) == liquidation_amount

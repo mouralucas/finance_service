@@ -7,14 +7,22 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from models.core import IndexerModel, PeriodicityModel, IndexerSeriesModel
+from models.core import IndexerModel, PeriodicityModel, IndexerSeriesModel, CategoryModel, CurrencyModel
+from schemas.core import CategorySchema
 
 
 class CoreManager(BaseDataManager):
     def __init__(self, session: AsyncSession):
         super().__init__(session=session)
 
-    # TODO: indexer and periodicity is not investment but core in Finance
+    async def get_categories(self) -> list[CategoryModel]:
+        query = select(CategoryModel)
+
+        categories = await self.get_all(query)
+
+        return [category['CategoryModel'] for category in categories]
+
+
     async def get_indexer_by_id(self, indexer_id: uuid.UUID, raise_exception=False) -> IndexerModel:
         indexer = await self.get_by_id(IndexerModel, indexer_id)
 
