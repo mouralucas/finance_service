@@ -26,6 +26,7 @@ class CloseAccountRequest(BaseModel):
 class GetAccountRequest(BaseModel):
     id: uuid.UUID | None = Field(Query(None, alias="accountId", description="The id of the account"))
     currency_id: str | None = Field(Query(None, alias="currencyId", description="The currency of the account"))
+    active: bool = Field(Query(True, description="Whether the account is active"))
 
 
 class CreateAccountTransactionRequest(BaseModel):

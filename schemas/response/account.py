@@ -15,7 +15,6 @@ class CloseAccountResponse(CreateAccountResponse):
 class GetAccountResponse(SuccessResponseBase):
     quantity: int = Field(..., serialization_alias='quantity', description='The number of accounts fetched')
     accounts: list[AccountSchema] = Field(..., serialization_alias='accounts', description='The accounts of the user')
-    active: bool = Field(True, description='Whether the account is active')
 
 
 class CreateAccountTransactionResponse(SuccessResponseBase):
