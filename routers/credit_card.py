@@ -4,7 +4,7 @@ from rolf_common.services import get_user
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from backend.database import db_session
+from backend.database import get_session
 from schemas.request.credit_card import CreateCreditCardRequest, CreateCreditCardTransactionRequest, GetCreditCardRequest, CancelCreditCardRequest, GetCreditCardBillRequest, GetCreditCardTransactionsRequest
 from schemas.response.credit_card import CreateCreditCardResponse, CreateCreditCardTransactionResponse, GetCreditCardBillResponse, GetCreditCardTransactionResponse
 from services.credit_card import CreditCardService
@@ -17,7 +17,7 @@ router = APIRouter(prefix="/creditcard", tags=['Credit cards'])
              status_code=status.HTTP_201_CREATED)
 async def create_credit_card(
         credit_card: CreateCreditCardRequest,
-        session: AsyncSession = Depends(db_session),
+        session: AsyncSession = Depends(get_session),
         user: RequiredUser = Security(get_user)
 ) -> CreateCreditCardResponse:
     return await CreditCardService(session=session, user=user).create_credit_card(credit_card)
@@ -26,7 +26,7 @@ async def create_credit_card(
 @router.patch('/cancel', summary='Cancel a credit card', description='Cancel a credit card')
 async def cancel_credit_card(
         credit_card: CancelCreditCardRequest,
-        session: AsyncSession = Depends(db_session),
+        session: AsyncSession = Depends(get_session),
         user: RequiredUser = Security(get_user)
 ):
     return await CreditCardService(session=session, user=user).cancel_credit_card(credit_card)
@@ -35,21 +35,30 @@ async def cancel_credit_card(
 @router.get('', summary='Get credit cards', description='Get all credit cards for a user filter by params')
 async def get_credit_cards(
         params: GetCreditCardRequest = Depends(),
-        session: AsyncSession = Depends(db_session),
+        session: AsyncSession = Depends(get_session),
         user: RequiredUser = Security(get_user)
 ):
     return await CreditCardService(session=session, user=user).get_credit_cards(params)
 
 
 @router.post('/transaction',
-             summary='Create a bill entry', description='Create a bill entry in selected credit card',
+             summary='Create a transaction', description='Create a transaction for the selected credit card',
              status_code=status.HTTP_201_CREATED)
-async def create_bill_entry(
-        bill_entry: CreateCreditCardTransactionRequest,
-        session: AsyncSession = Depends(db_session),
+async def create_transaction(
+        transaction: CreateCreditCardTransactionRequest,
+        session: AsyncSession = Depends(get_session),
         user: RequiredUser = Security(get_user)
 ) -> CreateCreditCardTransactionResponse:
-    return await CreditCardService(session=session, user=user).create_transaction(bill_entry)
+    return await CreditCardService(session=session, user=user).create_transaction(transaction)
+
+
+@router.patch('/transaction')
+async def update_transaction(
+        transaction: CreateCreditCardTransactionRequest,
+        session: AsyncSession = Depends(get_session),
+        user: RequiredUser = Security(get_user)
+) -> CreateCreditCardTransactionResponse:
+    pass
 
 
 @router.get('/transaction',
@@ -57,7 +66,7 @@ async def create_bill_entry(
             description='Get all credit card transactions for a user filter by params')
 async def get_transactions(
         params: GetCreditCardTransactionsRequest = Depends(),
-        session: AsyncSession = Depends(db_session),
+        session: AsyncSession = Depends(get_session),
         user: RequiredUser = Security(get_user)
 ) -> GetCreditCardTransactionResponse:
     return await CreditCardService(session=session, user=user).get_transactions(params)
@@ -66,7 +75,7 @@ async def get_transactions(
 @router.get('/bill/consolidated', )
 async def get_bill(
         params: GetCreditCardBillRequest = Depends(),
-        session: AsyncSession = Depends(db_session),
+        session: AsyncSession = Depends(get_session),
         user: RequiredUser = Security(get_user)
 ) -> GetCreditCardBillResponse:
     return await CreditCardService(session, user).get_credit_card_bill_consolidated(params=params)
@@ -75,7 +84,7 @@ async def get_bill(
 @router.get('/bill/card', )
 async def get_bill(
         params: GetCreditCardBillRequest = Depends(),
-        session: AsyncSession = Depends(db_session),
+        session: AsyncSession = Depends(get_session),
         user: RequiredUser = Security(get_user)
 ):
     return await CreditCardService(session, user).get_credit_card_bill_by_card(params=params)

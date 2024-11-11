@@ -5,7 +5,7 @@ from httpx import AsyncClient
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import get_user
 
-from backend.database import db_session
+from backend.database import get_session
 from backend.database import test_sessionmanager
 from main import app
 from rolf_common.models import Base
@@ -42,7 +42,7 @@ def override_db_session(test_session):
     Overrides the database session, in this case using test_sessionmanager.
     In session end it rolls back all database operations.
     """
-    app.dependency_overrides[db_session] = lambda: test_session
+    app.dependency_overrides[get_session] = lambda: test_session
 
 
 def get_mock_user():

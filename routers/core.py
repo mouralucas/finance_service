@@ -4,7 +4,7 @@ from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import get_user
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.database import db_session
+from backend.database import get_session
 from schemas.response.core import GetCategoryResponse
 from services.core import CoreService
 
@@ -13,7 +13,7 @@ router = APIRouter(prefix='/core', tags=['Core'])
 
 @router.get('/category', summary='Get transaction categories')
 async def get_categories(
-        session: AsyncSession = Depends(db_session),
+        session: AsyncSession = Depends(get_session),
         user: RequiredUser = Security(get_user)
 ) -> GetCategoryResponse:
     return await CoreService(session=session, user=user).get_categories()

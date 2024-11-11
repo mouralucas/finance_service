@@ -26,7 +26,7 @@ async def test_create_objective(client):
     assert 'description' in data['objective']
     assert data['objective']['description'] == payload['description']
     assert 'amount' in data['objective']
-    assert data['objective']['amount'] == payload['amount']
+    assert float(data['objective']['amount']) == payload['amount']
     assert 'estimatedDeadline' in data['objective']
     assert data['objective']['estimatedDeadline'] == payload['estimatedDeadline']
 

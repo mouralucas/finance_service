@@ -62,13 +62,13 @@ async def test_create_first_investment_statement(client, create_investment, crea
     assert 'period' in data['investmentStatement']
     assert data['investmentStatement']['period'] == period
     assert 'grossAmount' in data['investmentStatement']
-    assert data['investmentStatement']['grossAmount'] == gross_amount
+    assert float(data['investmentStatement']['grossAmount']) == gross_amount
     assert 'totalTax' in data['investmentStatement']
-    assert data['investmentStatement']['totalTax'] == sum(tax['amount'] for tax in tax_detail)
+    assert float( data['investmentStatement']['totalTax']) == sum(tax['amount'] for tax in tax_detail)
     assert 'totalFee' in data['investmentStatement']
-    assert data['investmentStatement']['totalFee'] == 0
+    assert float(data['investmentStatement']['totalFee']) == 0
     assert 'netAmount' in data['investmentStatement']
-    assert data['investmentStatement']['netAmount'] == net_amount
+    assert float(data['investmentStatement']['netAmount']) == net_amount
 
     assert 'taxDetail' in data['investmentStatement']
     assert type(data['investmentStatement']['taxDetail']) is list

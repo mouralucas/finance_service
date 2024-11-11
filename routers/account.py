@@ -4,9 +4,9 @@ from rolf_common.services import get_user
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from backend.database import db_session
+from backend.database import get_session
 from schemas.request.account import CreateAccountRequest, GetAccountRequest, CreateAccountTransactionRequest, CloseAccountRequest, CreateBalanceRequest, GetBalanceRequest
-from schemas.response.account import CreateAccountResponse, GetAccountResponse, CloseAccountResponse, GetAccountTransactionResponse
+from schemas.response.account import CreateAccountResponse, GetAccountResponse, CloseAccountResponse, GetAccountTransactionResponse, CreateAccountTransactionResponse
 from services.account import AccountService
 
 router = APIRouter(prefix="/account", tags=['Account'])
@@ -18,7 +18,7 @@ router = APIRouter(prefix="/account", tags=['Account'])
              status_code=status.HTTP_201_CREATED)
 async def create_account(
         account: CreateAccountRequest,
-        session: AsyncSession = Depends(db_session),
+        session: AsyncSession = Depends(get_session),
         user: RequiredUser = Security(get_user)
 ) -> CreateAccountResponse:
     return await AccountService(session=session, user=user).create_account(account=account)
@@ -27,7 +27,7 @@ async def create_account(
 @router.get('', summary='List all accounts', description='Get user accounts base on filters chosen')
 async def get_account(
         params: GetAccountRequest = Depends(),
-        session: AsyncSession = Depends(db_session),
+        session: AsyncSession = Depends(get_session),
         user: RequiredUser = Security(get_user)
 ) -> GetAccountResponse:
     return await AccountService(session=session, user=user).get_accounts(params=params)
@@ -36,23 +36,33 @@ async def get_account(
 @router.patch('/close', summary='Close an account', description='Close an account and its relations (credit cards)')
 async def close_account(
         account: CloseAccountRequest,
-        session: AsyncSession = Depends(db_session),
+        session: AsyncSession = Depends(get_session),
         user: RequiredUser = Security(get_user)
 ) -> CloseAccountResponse:
     return await AccountService(session=session, user=user).close_account(account=account)
 
 
 @router.post('/transaction', status_code=status.HTTP_201_CREATED,
-             summary='Create a statement entry', description='Create a statement entry for an account')
-async def create_statement(statement_entry: CreateAccountTransactionRequest,
-                           session: AsyncSession = Depends(db_session),
-                           user: RequiredUser = Security(get_user)):
-    return await AccountService(session=session, user=user).create_transaction(statement_entry=statement_entry)
+             summary='Create a transaction', description='Create a transaction for an account')
+async def create_transaction(transaction: CreateAccountTransactionRequest,
+                             session: AsyncSession = Depends(get_session),
+                             user: RequiredUser = Security(get_user)) -> CreateAccountTransactionResponse:
+    return await AccountService(session=session, user=user).create_transaction(statement_entry=transaction)
+
+
+@router.patch('/transaction')
+async def update_transaction(
+        transaction: CreateAccountTransactionRequest,
+        session: AsyncSession = Depends(get_session),
+        user: RequiredUser = Security(get_user)
+):
+    print(transaction)
+    return
 
 
 @router.get('/transaction',  summary='Get account transactions')
 async def get_transactions(
-        session: AsyncSession = Depends(db_session),
+        session: AsyncSession = Depends(get_session),
         user: RequiredUser = Security(get_user)
 ) -> GetAccountTransactionResponse:
     return await AccountService(session=session, user=user).get_transactions()
@@ -62,7 +72,7 @@ async def get_transactions(
 @router.post('/balance', summary='Generate the balance for the account', status_code=status.HTTP_201_CREATED)
 async def create_balance(
         params: CreateBalanceRequest,
-        session: AsyncSession = Depends(db_session),
+        session: AsyncSession = Depends(get_session),
         user: RequiredUser = Security(get_user)
 ):
     return await AccountService(session=session, user=user).create_balance(params=params)
@@ -72,7 +82,7 @@ async def create_balance(
                                                                'the range is from the first period with transaction to close account or current period')
 async def get_balance(
         params: GetBalanceRequest = Depends(),
-        session: AsyncSession = Depends(db_session),
+        session: AsyncSession = Depends(get_session),
         user: RequiredUser = Security(get_user)
 ):
     return await AccountService(session, user).get_balance(params=params)

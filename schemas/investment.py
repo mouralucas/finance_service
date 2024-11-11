@@ -69,7 +69,7 @@ class TaxFeeResponse(BaseModel):
 
 
 class InvestmentStatementSchema(BaseModel):
-    model_config = ConfigDict(from_attributes=True, json_encoders={Decimal: float}, alias_generator=AliasGenerator(
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
         validation_alias=to_snake,
         serialization_alias=to_camel,
     ))
@@ -87,7 +87,7 @@ class InvestmentStatementSchema(BaseModel):
 
 
 class InvestmentObjectiveSchema(BaseModel):
-    model_config = ConfigDict(from_attributes=True, json_encoders={Decimal: float}, alias_generator=AliasGenerator(
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
         validation_alias=to_snake,
         serialization_alias=to_camel,
     ))
@@ -102,7 +102,7 @@ class InvestmentObjectiveSchema(BaseModel):
 
 # Allocation
 class InvestmentAllocationSchema(BaseModel):
-    model_config = ConfigDict(from_attributes=True, json_encoders={Decimal: float}, alias_generator=AliasGenerator(
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
         validation_alias=to_snake,
         serialization_alias=to_camel,
     ))

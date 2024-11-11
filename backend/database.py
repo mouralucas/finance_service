@@ -64,6 +64,6 @@ sessionmanager = DatabaseSessionManager(settings.finance_database_url, {"echo": 
 test_sessionmanager = DatabaseSessionManager(settings.test_database_url, {"echo": settings.echo_test_sql}, test_db=True)
 
 
-async def db_session():
+async def get_session():
     async with sessionmanager.session() as session:
         yield session
