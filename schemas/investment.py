@@ -2,8 +2,8 @@ import datetime
 import uuid
 from decimal import Decimal
 
-from pydantic import BaseModel, Field, ConfigDict, field_validator, AliasGenerator
-from pydantic.alias_generators import to_camel, to_pascal, to_snake
+from pydantic import BaseModel, Field, ConfigDict, AliasGenerator
+from pydantic.alias_generators import to_camel, to_snake
 
 
 class InvestmentTypeSchema(BaseModel):
@@ -22,6 +22,7 @@ class InvestmentTypeSchema(BaseModel):
 class InvestmentSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True,
                               alias_generator=AliasGenerator(
+                                  alias=to_camel,
                                   validation_alias=to_snake,
                                   serialization_alias=to_camel,
                               ))

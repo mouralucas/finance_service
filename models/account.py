@@ -52,7 +52,7 @@ class AccountTransactionModel(SQLModel):
     category_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('category.id'), nullable=True)  # TODO: Set to null, return to not null after migration
     category: Mapped['CategoryModel'] = relationship(foreign_keys=[category_id], lazy='subquery')
     description: Mapped[str] = mapped_column('description', String(500), nullable=True)
-    operation_type: Mapped[str] = mapped_column('operation_type', String(15))  # whether is incoming or outgoing
+    operation_type: Mapped[str] = mapped_column('operation_type', String(15), nullable=True)  # deprecated, now just input positive or negative values
 
     # Fields for international transactions, like exchange money or by in a currency different from the account
     transaction_currency_id: Mapped[str] = mapped_column(ForeignKey('currency.id'))

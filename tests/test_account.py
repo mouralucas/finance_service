@@ -127,6 +127,7 @@ async def test_create_transaction(client, create_open_account, create_category, 
 
     payload = {
         'accountId': str(user_account.id),
+        'currencyId': currency_id,
         'amount': amount,
         'transactionDate': transaction_date,
         'categoryId': str(category_id),
@@ -148,7 +149,7 @@ async def test_create_transaction(client, create_open_account, create_category, 
     assert 'period' in data['transaction']
     assert data['transaction']['period'] == 202408  # add function to calc period
     assert 'currencyId' in data['transaction']
-    assert data['transaction']['currencyId'] == str(currency_id)
+    assert data['transaction']['currencyId'] == currency_id
     assert 'amount' in data['transaction']
     assert data['transaction']['amount'] == amount
     assert 'transactionDate' in data['transaction']
@@ -169,9 +170,11 @@ async def test_create_transaction(client, create_open_account, create_category, 
 async def test_create_transaction_closed_account(client, create_closed_account, create_category, create_currency):
     accounts = create_closed_account
     categories = create_category
+    currencies = create_currency
 
     # Data only for local transaction, that means in the same currency as the account
     user_account = accounts[0]
+    currency_id = currencies[0].id
     amount = 37.89
     transaction_date = '2024-08-25'
     category_id = categories[1].id
@@ -180,6 +183,7 @@ async def test_create_transaction_closed_account(client, create_closed_account, 
 
     payload = {
         'accountId': str(user_account.id),
+        'currencyId': currency_id,
         'amount': amount,
         'transactionDate': transaction_date,
         'categoryId': str(category_id),

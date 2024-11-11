@@ -12,7 +12,7 @@ from managers.credit_card import CreditCardManager
 from models.account import AccountModel, AccountTransactionModel, AccountBalanceModel
 from models.credit_card import CreditCardModel
 from schemas.account import AccountSchema, AccountTransactionSchema, BalanceSchema
-from schemas.request.account import CreateAccountRequest, GetAccountRequest, CreateAccountTransactionRequest, CloseAccountRequest, CreateBalanceRequest, GetBalanceRequest
+from schemas.request.account import CreateAccountRequest, GetAccountRequest, CreateAccountTransactionRequest, CloseAccountRequest, CreateBalanceRequest, GetBalanceRequest, UpdateAccountTransactionRequest
 from schemas.response.account import CreateAccountResponse, GetAccountResponse, CloseAccountResponse, CreateBalanceResponse, GetBalanceResponse, GetAccountTransactionResponse
 from schemas.response.account import CreateAccountTransactionResponse
 from services.utils.datetime import get_period, get_current_period, get_period_range
@@ -101,6 +101,9 @@ class AccountService(BaseService):
         )
 
         return response
+
+    async def update_transaction(self, transaction: UpdateAccountTransactionRequest):
+        pass
 
     async def get_transactions(self) -> GetAccountTransactionResponse:
         transactions = await self.account_manager.get_transactions(owner_id=self.user['user_id'], start_period=202401, end_period=202412)

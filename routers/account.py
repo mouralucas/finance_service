@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from backend.database import get_session
-from schemas.request.account import CreateAccountRequest, GetAccountRequest, CreateAccountTransactionRequest, CloseAccountRequest, CreateBalanceRequest, GetBalanceRequest
+from schemas.request.account import CreateAccountRequest, GetAccountRequest, CreateAccountTransactionRequest, CloseAccountRequest, CreateBalanceRequest, GetBalanceRequest, UpdateAccountTransactionRequest
 from schemas.response.account import CreateAccountResponse, GetAccountResponse, CloseAccountResponse, GetAccountTransactionResponse, CreateAccountTransactionResponse
 from services.account import AccountService
 
@@ -52,11 +52,12 @@ async def create_transaction(transaction: CreateAccountTransactionRequest,
 
 @router.patch('/transaction')
 async def update_transaction(
-        transaction: CreateAccountTransactionRequest,
+        transaction: UpdateAccountTransactionRequest,
         session: AsyncSession = Depends(get_session),
         user: RequiredUser = Security(get_user)
 ):
-    print(transaction)
+    original_values = transaction.model_dump()
+    setted_values = transaction.model_dump(exclude_unset=True)
     return
 
 
