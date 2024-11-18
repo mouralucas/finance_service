@@ -26,9 +26,9 @@ class CloseAccountRequest(DefaultModel):
 
 
 class GetAccountRequest(DefaultModel):
-    id: uuid.UUID | None = Field(Query(None, alias="accountId", description="The id of the account"))
-    currency_id: str | None = Field(Query(None, description="The currency of the account"))
-    active: bool = Field(Query(True, description="Whether the account is active"))
+    id: uuid.UUID | None = Field(None, alias="accountId", description="The id of the account")
+    currency_id: str | None = Field(None, description="The currency of the account")
+    active: bool = Field(True, description="Whether the account is active")
 
 
 class CreateAccountTransactionRequest(DefaultModel):
@@ -72,6 +72,11 @@ class UpdateAccountTransactionRequest(DefaultModel):
     origin: str = Field("SYSTEM", description="The origin of the entry")
     is_validated: bool | None = Field(None, description="Whether the transaction is validated by the user")
 
+
+class GetAccountTransactionRequest(DefaultModel):
+    account_id: uuid.UUID = Field(None, description="The id of the account")
+    startPeriod: int = Field(None, description="The start period of the transaction")
+    endPeriod: int = Field(None, description="The end period of the transaction")
 
 class CreateBalanceRequest(DefaultModel):
     account_id: uuid.UUID = Field(None, description='The id of the account')

@@ -38,5 +38,19 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data:cached
 
+  mongo_finance_logs:
+    container_name: 'mongo_finance_logs'
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: dev-user-logs
+      MONGO_INITDB_ROOT_PASSWORD: password
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+    command: ["mongod", "--auth"]
+
 volumes:
   db-data:
+  mongodb-data:

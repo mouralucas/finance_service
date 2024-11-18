@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
+from backend.nosql_database import mongo_session_manager
 from backend.settings import settings
 from routers import (account, credit_card, core,
                      investment, integration, finance)
@@ -23,6 +24,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.on_event("startup")
+async def startup():
+    await mongo_session_manager.initialize()
+
+@app.on_event("shutdown")
+async def shutdown():
+    await mongo_session_manager.close()
 
 # Include all routers
 app.include_router(account.router)

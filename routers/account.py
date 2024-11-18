@@ -1,3 +1,5 @@
+import datetime
+
 from fastapi import APIRouter, Depends, Security
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import get_user
@@ -5,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from backend.database import get_session
+from backend.nosql_database import mongo_session_manager
 from schemas.request.account import CreateAccountRequest, GetAccountRequest, CreateAccountTransactionRequest, CloseAccountRequest, CreateBalanceRequest, GetBalanceRequest, UpdateAccountTransactionRequest
 from schemas.response.account import CreateAccountResponse, GetAccountResponse, CloseAccountResponse, GetAccountTransactionResponse, CreateAccountTransactionResponse
 from services.account import AccountService
@@ -44,9 +47,11 @@ async def close_account(
 
 @router.post('/transaction', status_code=status.HTTP_201_CREATED,
              summary='Create a transaction', description='Create a transaction for an account')
-async def create_transaction(transaction: CreateAccountTransactionRequest,
+async def create_transaction(
+        transaction: CreateAccountTransactionRequest,
                              session: AsyncSession = Depends(get_session),
-                             user: RequiredUser = Security(get_user)) -> CreateAccountTransactionResponse:
+                             user: RequiredUser = Security(get_user)
+) -> CreateAccountTransactionResponse:
     return await AccountService(session=session, user=user).create_transaction(statement_entry=transaction)
 
 
@@ -56,6 +61,15 @@ async def update_transaction(
         session: AsyncSession = Depends(get_session),
         user: RequiredUser = Security(get_user)
 ):
+    async with mongo_session_manager.session() as log_session:
+        result = await log_session["logs"].insert_one({
+            "message": "This is another test log",
+            "level": "SQL",
+            "created_at": datetime.datetime.now(datetime.timezone.utc),
+        })
+        return {"log_id": str(result.inserted_id)}
+
+
     original_values = transaction.model_dump()
     setted_values = transaction.model_dump(exclude_unset=True)
     return

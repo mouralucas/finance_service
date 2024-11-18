@@ -196,7 +196,11 @@ async def test_create_transaction_closed_account(client, create_closed_account, 
 
 
 @pytest.mark.asyncio
-async def test_get_transactions(client, create_account_transaction):
+async def test_get_transactions_no_filter(client, create_account_transaction):
+    transactions = create_account_transaction
+
+    qtd_transactions = len(transactions)
+
     response = await client.get('/account/transaction')
 
     assert response.status_code == status.HTTP_200_OK

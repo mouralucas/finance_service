@@ -103,6 +103,7 @@ def get_account_transaction_mock() -> list[dict[str, Any]]:
     account_transactions: list[dict[str, Any]] = []
     start_date = datetime.datetime.now(datetime.timezone.utc)-relativedelta(months=3)
     end_date = datetime.datetime.now(datetime.timezone.utc)
+
     for i in range(0, 35):
         transaction_date = get_randon_date(start_date, end_date)
         amount = -random.uniform(0, 100)
@@ -119,7 +120,6 @@ def get_account_transaction_mock() -> list[dict[str, Any]]:
                 'transaction_date': transaction_date,
                 'category_id': categories[0]['id'],
                 'description': 'Transaction {number}'.format(number=i),
-                'operation_type': 'OUTGOING',
                 'transaction_currency_id': currencies[0]['id'],
                 'origin': 'TEST',
             }
