@@ -8,6 +8,7 @@ from starlette import status
 
 from backend.database import get_session
 from backend.nosql_database import mongo_session_manager
+# from main import mongo_session_manager
 from schemas.request.account import CreateAccountRequest, GetAccountRequest, CreateAccountTransactionRequest, CloseAccountRequest, CreateBalanceRequest, GetBalanceRequest, UpdateAccountTransactionRequest
 from schemas.response.account import CreateAccountResponse, GetAccountResponse, CloseAccountResponse, GetAccountTransactionResponse, CreateAccountTransactionResponse
 from services.account import AccountService
@@ -70,9 +71,9 @@ async def update_transaction(
         return {"log_id": str(result.inserted_id)}
 
 
-    original_values = transaction.model_dump()
-    setted_values = transaction.model_dump(exclude_unset=True)
-    return
+    # original_values = transaction.model_dump()
+    # setted_values = transaction.model_dump(exclude_unset=True)
+    # return
 
 
 @router.get('/transaction',  summary='Get account transactions')
