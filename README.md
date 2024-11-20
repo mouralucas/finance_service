@@ -7,11 +7,11 @@ Microservice for financial management
 There are two ways to run the project. 
 
 ```bash
-sudo docker compose build
+docker compose build
 ```
 
 ```bash
-sudo docker compose up
+docker compose up
 ```
 
 This two commands will create the development database and run the project in port 8001.

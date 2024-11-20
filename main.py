@@ -2,29 +2,13 @@ import asyncio
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
-from rolf_common.backend.nosql_database import NoSqlDatabaseSessionManager
 from starlette.middleware.cors import CORSMiddleware
 
 from backend.nosql_database import mongo_session_manager
 from backend.settings import settings
+from lifespan import start_log_database, shutdown_log_database
 from routers import (account, credit_card, core,
                      investment, integration, finance)
-
-
-# TODO: maybe create a file with all startup functions
-async def start_log_database():
-    if settings.log_database_url is None and settings.log_database_name is None:
-        print('Log database not defined')
-        return
-    else:
-        await mongo_session_manager.initialize()
-
-
-async def shutdown_log_database():
-    if settings.log_database_url is None and settings.log_database_name is None:
-        return
-    else:
-        await mongo_session_manager.close()
 
 
 @asynccontextmanager
