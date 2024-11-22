@@ -18,6 +18,7 @@ class FinanceSettings(Settings):
 
     # Log database
     log_database_name: str = 'finance_dev_log'
+    log_collection_name: str = 'finance_logs'
     log_database_url: str = 'mongodb://dev-user-logs:password@localhost:27017/finance_dev_log?authSource=admin'
 
 settings = FinanceSettings()

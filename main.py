@@ -4,9 +4,9 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from backend.nosql_database import mongo_session_manager
 from backend.settings import settings
-from lifespan import start_log_database, shutdown_log_database
+from lifespan import start_log_service, shutdown_log_service
+from middleware import LogsMiddleware
 from routers import (account, credit_card, core,
                      investment, integration, finance)
 
@@ -14,14 +14,14 @@ from routers import (account, credit_card, core,
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await asyncio.gather(
-        start_log_database(),
+        start_log_service(),
     )
 
     try:
         yield
     finally:
         await asyncio.gather(
-            shutdown_log_database(),
+            shutdown_log_service(),
         )
 
 
@@ -44,6 +44,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+# app.add_middleware(LogsMiddleware)
+
 
 # Include all routers
 app.include_router(account.router)

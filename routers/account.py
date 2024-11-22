@@ -1,16 +1,16 @@
-import datetime
-
 from fastapi import APIRouter, Depends, Security
+from rolf_common.backend.logger import get_logger
+# from rolf_common.backend.logger import logger
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import get_user
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from backend.database import get_session
-from backend.nosql_database import mongo_session_manager
-# from main import mongo_session_manager
-from schemas.request.account import CreateAccountRequest, GetAccountRequest, CreateAccountTransactionRequest, CloseAccountRequest, CreateBalanceRequest, GetBalanceRequest, UpdateAccountTransactionRequest
-from schemas.response.account import CreateAccountResponse, GetAccountResponse, CloseAccountResponse, GetAccountTransactionResponse, CreateAccountTransactionResponse
+from schemas.request.account import CreateAccountRequest, GetAccountRequest, CreateAccountTransactionRequest, \
+    CloseAccountRequest, CreateBalanceRequest, GetBalanceRequest, UpdateAccountTransactionRequest
+from schemas.response.account import CreateAccountResponse, GetAccountResponse, CloseAccountResponse, \
+    GetAccountTransactionResponse, CreateAccountTransactionResponse
 from services.account import AccountService
 
 router = APIRouter(prefix="/account", tags=['Account'])
@@ -60,20 +60,12 @@ async def create_transaction(
 async def update_transaction(
         transaction: UpdateAccountTransactionRequest,
         session: AsyncSession = Depends(get_session),
-        user: RequiredUser = Security(get_user)
+        # user: RequiredUser = Security(get_user)
 ):
-    async with mongo_session_manager.session() as log_session:
-        result = await log_session["logs"].insert_one({
-            "message": "This is another test log",
-            "level": "SQL",
-            "created_at": datetime.datetime.now(datetime.timezone.utc),
-        })
-        return {"log_id": str(result.inserted_id)}
-
-
-    # original_values = transaction.model_dump()
-    # setted_values = transaction.model_dump(exclude_unset=True)
-    # return
+    get_logger().warning('Mais um teste de log, dessa vez com o rolf correto')
+    original_values = transaction.model_dump()
+    setted_values = transaction.model_dump(exclude_unset=True)
+    return
 
 
 @router.get('/transaction',  summary='Get account transactions')

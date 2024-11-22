@@ -39,6 +39,59 @@ pip3 install -r requirements
 
 ....
 
+## Logging
+
+For logging errors and information throughout the system some configuration is needed
+
+    1 - Configure lifespan functions to start the process
+```python
+"""
+    This function creates the database connection and set the base logger
+    Each microservice defines its own database, and its connection url and name are set in settings
+"""
+
+# Instantiate the log database from Rolf Common
+mongo_session_manager = NoSqlDatabaseSessionManager(host=settings.log_database_url,
+                                                    db_name=settings.log_database_name)
+async def start_log_service():
+    if settings.log_database_url is None and settings.log_database_name is None:
+        return
+    else:
+        set_db_connection(mongo_session_manager)
+        await get_db_connection().initialize()
+        set_log_handler(BaseLogDataManager(get_db_connection()))
+
+async def shutdown_log_service():
+    if settings.log_database_url is None and settings.log_database_name is None:
+        return
+    else:
+        await mongo_session_manager.close()
+```
+    
+    2 - Then add to the lifespan itself
+
+```python
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await asyncio.gather(
+        start_log_service(),
+    )
+
+    try:
+        yield
+    finally:
+        await asyncio.gather(
+            shutdown_log_service(),
+        )
+```
+
+```python
+app = FastAPI(
+    # other params
+    lifespan=lifespan,
+)
+```
+
 ## Migrations
 
 To run migrations, first create the file with the database changes:
