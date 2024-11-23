@@ -73,7 +73,7 @@ class AccountService(BaseService):
 
         response = GetAccountResponse(
             quantity=len(accounts) if accounts else 0,
-            accounts=[AccountSchema.model_validate(data) for data in accounts]
+            accounts=[AccountSchema.model_validate(data) for data in accounts] if accounts else None
         )
 
         return response

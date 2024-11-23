@@ -2,11 +2,11 @@ import asyncio
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from rolf_common.middleware import LogsMiddleware
 from starlette.middleware.cors import CORSMiddleware
 
 from backend.settings import settings
 from lifespan import start_log_service, shutdown_log_service
-from middleware import LogsMiddleware
 from routers import (account, credit_card, core,
                      investment, integration, finance)
 
@@ -44,7 +44,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-# app.add_middleware(LogsMiddleware)
+app.add_middleware(LogsMiddleware)
 
 
 # Include all routers
