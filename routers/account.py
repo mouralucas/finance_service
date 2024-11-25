@@ -65,7 +65,7 @@ async def update_transaction(
         session: AsyncSession = Depends(get_session),
         # user: RequiredUser = Security(get_user)
 ):
-    get_logger().warning('Mais um teste de log, dessa vez com o rolf correto')
+    # get_logger().warning('Mais um teste de log, dessa vez com o rolf correto')
     original_values = transaction.model_dump()
     setted_values = transaction.model_dump(exclude_unset=True)
     return

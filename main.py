@@ -2,7 +2,7 @@ import asyncio
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
-from rolf_common.middleware import LogsMiddleware
+from rolf_common.base_middleware import LogsMiddleware
 from starlette.middleware.cors import CORSMiddleware
 
 from backend.settings import settings
