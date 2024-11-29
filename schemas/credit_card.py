@@ -1,7 +1,10 @@
 import datetime
 import uuid
+from tkinter.scrolledtext import example
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, AliasGenerator
+from pydantic.alias_generators import to_camel
+from decimal import Decimal
 
 from schemas.core import CurrencySchema
 
@@ -54,3 +57,24 @@ class CreditCardTransactionSchema(BaseModel):
 
     created_at: datetime.datetime = Field(..., description='The date that the transaction was created')
     edited_at: datetime.datetime | None = Field(None, description='The date that the transaction was edited')
+
+
+class CreditCardBillSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True,
+                              alias_generator=AliasGenerator(serialization_alias=to_camel))
+
+    period: int = Field(..., description='The period of the bill')
+    total_amount: Decimal = Field(..., description='The total amount of the bill')
+
+
+class CreditCardBillSchemaByCard(BaseModel):
+    model_config = ConfigDict(from_attributes=True,
+                              alias_generator=AliasGenerator(serialization_alias=to_camel),
+                              extra="allow",
+                              )
+
+    id: int = Field(..., description='The id of the bill, usually the period')
+    period: int = Field(..., description='The period of the bill')
+    total: Decimal = Field(..., description='The total amount of the bill for that card')
+    # The total by card is add dynamically, the key is the name of the card.
+    # That's the reason the "extra" config is set to 'allow'

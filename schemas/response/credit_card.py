@@ -1,7 +1,8 @@
-from pydantic import Field
+from pydantic import Field, BaseModel, ConfigDict, AliasGenerator
+from pydantic.alias_generators import to_camel
 from rolf_common.schemas import SuccessResponseBase
 
-from schemas.credit_card import CreditCardSchema, CreditCardTransactionSchema
+from schemas.credit_card import CreditCardSchema, CreditCardTransactionSchema, CreditCardBillSchema, CreditCardBillSchemaByCard
 
 
 class CreateCreditCardResponse(SuccessResponseBase):
@@ -26,10 +27,19 @@ class GetCreditCardTransactionResponse(SuccessResponseBase):
     transactions: list[CreditCardTransactionSchema] = Field(..., serialization_alias='transactions', description='The list of the credit transactions')
 
 
-class GetCreditCardBillResponse(SuccessResponseBase):
-    # TODO: separate response for aggregated and creds
+class GetCreditCardBillConsolidatedResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True,
+                              alias_generator=AliasGenerator(serialization_alias=to_camel))
+
     average: float | None = Field(None, description='The average credit card bill')
     goal: float | None = Field(None, description='The goal credit card bill')
-    period_range: list[int] | None = Field(None, serialization_alias='periodRange', description='The range of available bill periods')
+    period_range: list[int] | None = Field(None, description='The range of available bill periods')
+    bill: list[CreditCardBillSchema] = Field(..., description='The list bill by period')
+
+
+class GetCreditCardBillByCardResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True,
+                              alias_generator=AliasGenerator(serialization_alias=to_camel))
+
     cards: list[str] | None = Field(None, description='The list of available cards')
-    bill: list[dict] = Field(..., description='The list bill by period')
+    bill: list[CreditCardBillSchemaByCard] = Field(..., description='The list bill by period')

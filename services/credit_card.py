@@ -9,9 +9,9 @@ from starlette import status
 
 from managers.credit_card import CreditCardManager
 from models.credit_card import CreditCardModel, CreditCardTransactionModel
-from schemas.credit_card import CreditCardSchema, CreditCardTransactionSchema
+from schemas.credit_card import CreditCardSchema, CreditCardTransactionSchema, CreditCardBillSchema
 from schemas.request.credit_card import CreateCreditCardRequest, GetCreditCardRequest, CreateCreditCardTransactionRequest, CancelCreditCardRequest, GetCreditCardBillRequest, GetCreditCardTransactionsRequest
-from schemas.response.credit_card import CreateCreditCardResponse, GetCreditCardResponse, CreateCreditCardTransactionResponse, CancelCreditCardResponse, GetCreditCardBillResponse, GetCreditCardTransactionResponse
+from schemas.response.credit_card import CreateCreditCardResponse, GetCreditCardResponse, CreateCreditCardTransactionResponse, CancelCreditCardResponse, GetCreditCardTransactionResponse, GetCreditCardBillConsolidatedResponse, GetCreditCardBillByCardResponse
 from services.utils.datetime import get_period, get_period_range
 
 
@@ -114,20 +114,20 @@ class CreditCardService(BaseService):
 
         return response
 
-    async def get_credit_card_bill_consolidated(self, params: GetCreditCardBillRequest) -> GetCreditCardBillResponse:
+    async def get_credit_card_bill_consolidated(self, params: GetCreditCardBillRequest) -> GetCreditCardBillConsolidatedResponse:
         bill_consolidated = await self.credit_card_manager.get_bill_history_aggregated(owner_id=self.user['user_id'], start_period=params.start_period, end_period=params.end_period)
         average = sum(item['total_amount'] for item in bill_consolidated) / len(bill_consolidated) if bill_consolidated else 0
 
-        response = GetCreditCardBillResponse(
-            bill=bill_consolidated,
+        response = GetCreditCardBillConsolidatedResponse(
+            bill=[CreditCardBillSchema.model_validate(bill) for bill in bill_consolidated],
             average=average,
-            period_range=get_period_range(201810, 202506),
+            period_range=get_period_range(201801, 202506),
             goal=2300,
         )
 
         return response
 
-    async def get_credit_card_bill_by_card(self, params: GetCreditCardBillRequest):
+    async def get_credit_card_bill_by_card(self, params: GetCreditCardBillRequest) -> GetCreditCardBillByCardResponse:
         bill_by_card = await self.credit_card_manager.get_bill_history_by_card(owner_id=self.user['user_id'], start_period=params.start_period, end_period=params.end_period)
         distinct_cards = set(d['credit_card'] for d in bill_by_card)
 
@@ -149,7 +149,7 @@ class CreditCardService(BaseService):
 
         b = list(a.values())
 
-        response = GetCreditCardBillResponse(
+        response = GetCreditCardBillByCardResponse(
             bill=b,
             cards=list(distinct_cards)
         )
