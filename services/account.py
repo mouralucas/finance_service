@@ -168,14 +168,14 @@ class AccountService(BaseService):
         self.session.add_all(balance_entries)
 
         response = CreateBalanceResponse(
-            accountNickname=account.nickname,
+            account_nickname=account.nickname,
             periods_saved=len(balance_entries),
         )
 
         return response
 
     async def get_balance(self, params: GetBalanceRequest) -> GetBalanceResponse:
-        account = await self.account_manager.get_account_by_id(account_id=params.account_id, raise_exception=True)
+        account: AccountModel = await self.account_manager.get_account_by_id(account_id=params.account_id, raise_exception=True)
         balance = await self.account_manager.get_balance(params.account_id, params.start_period, params.end_period)
 
         response = GetBalanceResponse(

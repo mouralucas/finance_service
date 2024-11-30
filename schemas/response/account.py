@@ -1,4 +1,5 @@
-from pydantic import Field
+from pydantic import Field, ConfigDict, AliasGenerator, BaseModel
+from pydantic.alias_generators import to_camel
 from rolf_common.schemas import SuccessResponseBase
 
 from schemas.account import AccountSchema, AccountTransactionSchema, BalanceSchema
@@ -26,9 +27,12 @@ class GetAccountTransactionResponse(SuccessResponseBase):
     transactions: list[AccountTransactionSchema] = Field(..., description='The account transactions')
 
 
-class CreateBalanceResponse(SuccessResponseBase):
-    accountNickname: str = Field(..., description='The account nickname')
-    periods_saved: int = Field(..., serialization_alias='periodsSaved', description='The number of periods saved')
+class CreateBalanceResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True,
+                              alias_generator=AliasGenerator(serialization_alias=to_camel))
+
+    account_nickname: str = Field(..., description='The account nickname')
+    periods_saved: int = Field(..., description='The number of periods saved')
 
 
 class GetBalanceResponse(SuccessResponseBase):

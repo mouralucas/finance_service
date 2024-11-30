@@ -125,5 +125,27 @@ def get_account_transaction_mock() -> list[dict[str, Any]]:
             }
         )
 
+    # Create incoming transactions
+    for i in range(0, 5):
+        transaction_date = get_randon_date(start_date, end_date)
+        amount = random.uniform(0, 100)
+
+        account_transactions.append(
+            {
+                **default_model_dict,
+                'owner_id': uuid.UUID("adf52a1e-7a19-11ed-a1eb-0242ac120002"),
+                'account_id': accounts[0]['id'],
+                'period': get_period(transaction_date),
+                'currency_id': currencies[0]['id'],
+                'amount': amount,
+                'transaction_amount': amount,
+                'transaction_date': transaction_date,
+                'category_id': categories[0]['id'],
+                'description': 'Transaction {number}'.format(number=i),
+                'transaction_currency_id': currencies[0]['id'],
+                'origin': 'TEST',
+            }
+        )
+
     return account_transactions
 
