@@ -3,7 +3,8 @@ import uuid
 from decimal import Decimal
 
 from fastapi import Query
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, model_validator, ConfigDict, AliasGenerator
+from pydantic.alias_generators import to_snake, to_camel
 
 
 class CreateInvestmentRequest(BaseModel):
@@ -55,13 +56,20 @@ class TaxFeeRequest(BaseModel):
 
 
 class CreateStatementRequest(BaseModel):
-    investment_id: uuid.UUID = Field(..., alias='investmentId', description='The unique identifier of the investment')
+    model_config = ConfigDict(from_attributes=True,
+                              alias_generator=AliasGenerator(alias=to_camel))
+
+    investment_id: uuid.UUID = Field(..., description='The unique identifier of the investment')
     period: int = Field(..., alias='period', description='The period of the statement', examples=['202408'])
-    reference_date: datetime.date = Field(..., alias='referenceDate', description='The date when the statement was calculated, usually the last business of the month')
-    gross_amount: Decimal = Field(..., alias='grossAmount', description='The gross amount of the period')
-    net_amount: Decimal = Field(..., alias='netAmount', description='The net amount of the period')
-    tax_detail: list[TaxFeeRequest] | None = Field(None, alias='taxDetail', description='The tax details of the investment tax')
-    fee_detail: list[TaxFeeRequest] | None = Field(None, alias='feeDetail', description='The fee details of the investment fee')
+    reference_date: datetime.date = Field(..., description='The date when the statement was calculated, usually the last business of the month')
+    gross_amount: Decimal = Field(..., description='The gross amount of the period')
+    net_amount: Decimal = Field(..., description='The net amount of the period')
+    tax_detail: list[TaxFeeRequest] | None = Field(None, description='The tax details of the investment tax')
+    fee_detail: list[TaxFeeRequest] | None = Field(None, description='The fee details of the investment fee')
+
+
+class CreateBatchStatementRequest(BaseModel):
+    statements: list[CreateStatementRequest] = Field(...)
 
 
 class GetStatementRequest(BaseModel):
