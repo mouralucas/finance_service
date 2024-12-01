@@ -38,6 +38,7 @@ class CreditCardService(BaseService):
         if not current_credit_card or not current_credit_card.active:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Credit card not found or not valid')
 
+        # TODO: user model_dump(exclude_unset=True)
         clean_fields = {}
         for key, value in credit_card.model_dump().items():
             if value:

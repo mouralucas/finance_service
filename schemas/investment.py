@@ -6,6 +6,17 @@ from pydantic import BaseModel, Field, ConfigDict, AliasGenerator
 from pydantic.alias_generators import to_camel, to_snake
 
 
+class InvestmentCategorySchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
+        validation_alias=to_snake,
+        serialization_alias=to_camel,
+    ))
+
+    id: uuid.UUID = Field(...)
+    name: str = Field(...)
+    description: str | None = Field(None)
+
+
 class InvestmentTypeSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
         validation_alias=to_snake,
@@ -32,7 +43,7 @@ class InvestmentSchema(BaseModel):
     account_id: uuid.UUID | None = Field(None, description='The id of the account')
     name: str = Field(..., description='The name of the investment')
     description: str | None = Field(None, description='Optional description of the investment')
-    type_id: uuid.UUID = Field(..., description='The id of the investment type')                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+    type_id: uuid.UUID = Field(..., description='The id of the investment type')
     transaction_date: datetime.date = Field(..., description='The date of the investment')
     maturity_date: datetime.date | None = Field(None, serialization_alias='maturityDate', description='The date that the investment will be liquidated')
     quantity: Decimal = Field(..., description='The quantity of the investment bought')
@@ -55,7 +66,7 @@ class InvestmentSchema(BaseModel):
     objective_id: uuid.UUID | None = Field(None, description='The id of the objective')
 
     gross_amount: Decimal | None = Field(None, description='The gross amount of last period available')
-    percentage_change: Decimal | None  = Field(None, description='The percentage change from start to last period available')
+    percentage_change: Decimal | None = Field(None, description='The percentage change from start to last period available')
 
 
 class TaxFeeResponse(BaseModel):
