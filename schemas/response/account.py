@@ -22,6 +22,9 @@ class CreateAccountTransactionResponse(SuccessResponseBase):
     transaction: AccountTransactionSchema = Field(..., serialization_alias='transaction', description='The entry statement created by the user')
 
 
+class UpdateTransactionResponse(CreateAccountTransactionResponse):
+    pass
+
 class GetAccountTransactionResponse(SuccessResponseBase):
     quantity: int = Field(..., description='The number of transactions')
     transactions: list[AccountTransactionSchema] = Field(..., description='The account transactions')
