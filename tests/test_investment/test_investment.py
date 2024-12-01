@@ -28,7 +28,6 @@ async def test_create_investment(client, create_open_account, create_investment_
     country_id = 'BR'
 
     payload = {
-        'custodianId': str(custodian_id),
         'accountId': str(account.id),
         'name': name,
         'typeId': str(type_id),

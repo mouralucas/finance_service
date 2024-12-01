@@ -8,7 +8,6 @@ from pydantic.alias_generators import to_snake, to_camel
 
 
 class CreateInvestmentRequest(BaseModel):
-    custodian_id: uuid.UUID = Field(..., alias='custodianId', description='The id of the custodian bank')
     account_id: uuid.UUID = Field(..., alias='accountId', description='The id of the account')
     name: str = Field(..., description='The name of the investment')
     description: str = Field(None, description='Optional description of the investment')

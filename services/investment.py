@@ -11,6 +11,7 @@ from sqlalchemy import RowMapping
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
+from managers.account import AccountManager
 from managers.core import CoreManager
 from managers.investment import InvestmentManager
 from models.investment import InvestmentModel, InvestmentStatementModel, InvestmentObjectiveModel
@@ -28,14 +29,16 @@ class InvestmentService(BaseService):
 
     # Investments
     async def create_investment(self, investment: CreateInvestmentRequest) -> CreateInvestmentResponse:
+        account = await AccountManager(session=self.session).get_account_by_id(account_id=investment.account_id)
+        custodian_id = account.bank_id
+
         new_investment = InvestmentModel(**investment.model_dump())
         new_investment.owner_id = self.user['user_id']
+        new_investment.custodian_id = custodian_id
 
         if investment.liquidation_date and investment.liquidation_date <= datetime.date.today() and investment.liquidation_amount:
             new_investment.is_liquidated = True
 
-        # TODO: if liquidation date <= today and liquidation amount set is_liquidated to true
-        # TODO: Maybe when creating a new investment, create the first line of the statement, with zero tax/fee and the invested value, when set the first statement just update
         new_investment = await self.investment_manager.create_investment(new_investment)
 
         response = CreateInvestmentResponse(
@@ -76,7 +79,8 @@ class InvestmentService(BaseService):
         investment_types: list[RowMapping] = await self.investment_manager.get_investment_type()
 
         response = GetInvestmentTypeResponse(
-            investment_types=[InvestmentTypeSchema.model_validate(data['InvestmentTypeModel']) for data in investment_types],
+            quantity=len(investment_types) if investment_types else 0,
+            investment_types=[InvestmentTypeSchema.model_validate(data['InvestmentTypeModel']) for data in investment_types] if investment_types else [],
         )
 
         return response

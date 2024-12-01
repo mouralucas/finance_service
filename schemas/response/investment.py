@@ -1,7 +1,8 @@
 import uuid
 from typing import AnyStr, Any
 
-from pydantic import Field
+from pydantic import Field, BaseModel, ConfigDict, AliasGenerator
+from pydantic.alias_generators import to_camel
 from rolf_common.schemas import SuccessResponseBase
 
 from schemas.investment import InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema, InvestmentTypeSchema, InvestmentAllocationSchema
@@ -16,8 +17,13 @@ class GetInvestmentResponse(SuccessResponseBase):
     investments: list[InvestmentSchema] = Field(..., description='The list of investments')
 
 
-class GetInvestmentTypeResponse(SuccessResponseBase):
-    investment_types: list[InvestmentTypeSchema] = Field(..., serialization_alias='investmentType', description='The list of investment types')
+class GetInvestmentTypeResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
+        serialization_alias=to_camel
+    ))
+
+    quantity: int = Field(..., description='The number of types returned')
+    investment_types: list[InvestmentTypeSchema] = Field(..., description='The list of investment types')
 
 
 class LiquidateInvestmentResponse(CreateInvestmentResponse):
