@@ -1,7 +1,7 @@
-from pydantic import Field
+from pydantic import Field, BaseModel, ConfigDict
 from rolf_common.schemas import SuccessResponseBase
 
-from schemas.core import CurrencySchema
+from schemas.core import CurrencySchema, BankSchema
 
 
 class GetSummaryResponse(SuccessResponseBase):
@@ -14,3 +14,9 @@ class GetSummaryResponse(SuccessResponseBase):
 
 class GetCurrencyResponse(SuccessResponseBase):
     currencies: list[CurrencySchema]
+
+
+class GetBankResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    banks: list[BankSchema]

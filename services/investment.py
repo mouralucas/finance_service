@@ -76,7 +76,7 @@ class InvestmentService(BaseService):
         investment_types: list[RowMapping] = await self.investment_manager.get_investment_type()
 
         response = GetInvestmentTypeResponse(
-            investment_type=[InvestmentTypeSchema.model_validate(data['InvestmentTypeModel']) for data in investment_types],
+            investment_types=[InvestmentTypeSchema.model_validate(data['InvestmentTypeModel']) for data in investment_types],
         )
 
         return response

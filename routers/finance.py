@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.database import get_session
 from schemas.request.finance import GetSummaryRequest
-from schemas.response.finance import GetCurrencyResponse
+from schemas.response.finance import GetCurrencyResponse, GetBankResponse
 from services.finance import FinanceService
 
 router = APIRouter(prefix="/finance", tags=['Finance'])
@@ -18,6 +18,13 @@ async def get_currencies(
         user: RequiredUser = Security(get_user)
 ) -> GetCurrencyResponse:
     return await FinanceService(session=session, user=user).get_currencies()
+
+@router.get('/bank', summary='Get banks')
+async def get_banks(
+        session: AsyncSession = Depends(get_session),
+        user: RequiredUser = Security(get_user)
+) -> GetBankResponse:
+    return await FinanceService(session, user).get_banks()
 
 
 @router.get('/summary')

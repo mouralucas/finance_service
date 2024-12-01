@@ -19,12 +19,11 @@ class InvestmentCategorySchema(BaseModel):
 
 class InvestmentTypeSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
-        validation_alias=to_snake,
         serialization_alias=to_camel,
     ))
 
     id: uuid.UUID = Field(..., serialization_alias='investmentTypeId', description='The unique identification for the investment type')
-    name: str = Field(..., description='The name of the investment type')
+    name: str = Field(..., serialization_alias='investmentTypeName', description='The name of the investment type')
     description: str | None = Field(None, description='Description of the investment type')
     parent_id: uuid.UUID | None = Field(None, description='The id of the parent investment type')
     investment_category_id: uuid.UUID | None = Field(None, description='The id the category of this type of investment')

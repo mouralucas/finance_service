@@ -17,7 +17,7 @@ class GetInvestmentResponse(SuccessResponseBase):
 
 
 class GetInvestmentTypeResponse(SuccessResponseBase):
-    investment_type: list[InvestmentTypeSchema] = Field(..., serialization_alias='investmentType', description='The list of investment types')
+    investment_types: list[InvestmentTypeSchema] = Field(..., serialization_alias='investmentType', description='The list of investment types')
 
 
 class LiquidateInvestmentResponse(CreateInvestmentResponse):

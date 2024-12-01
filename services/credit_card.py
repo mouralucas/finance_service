@@ -109,8 +109,8 @@ class CreditCardService(BaseService):
                                                                                                   end_period=params.end_period)
 
         response = GetCreditCardTransactionResponse(
-            quantity=len(transactions),
-            transactions=[CreditCardTransactionSchema(**transaction) for transaction in transactions]
+            quantity=len(transactions) if transactions else 0,
+            transactions=[CreditCardTransactionSchema(**transaction) for transaction in transactions] if transactions else []
         )
 
         return response

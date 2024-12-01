@@ -4,9 +4,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from managers.account import AccountManager
 from managers.finance import FinanceManager
-from schemas.core import CurrencySchema
+from schemas.core import CurrencySchema, BankSchema
 from schemas.request.finance import GetSummaryRequest
-from schemas.response.finance import GetCurrencyResponse
+from schemas.response.finance import GetCurrencyResponse, GetBankResponse
 
 
 class FinanceService(BaseService):
@@ -22,11 +22,20 @@ class FinanceService(BaseService):
 
         print(balance)
 
-    async def get_currencies(self):
+    async def get_currencies(self) -> GetCurrencyResponse:
         currencies = await self.finance_manager.get_currencies()
 
         response = GetCurrencyResponse(
             currencies=[CurrencySchema.model_validate(currency) for currency in currencies],
+        )
+
+        return response
+
+    async def get_banks(self) -> GetBankResponse:
+        banks = await self.finance_manager.get_banks()
+
+        response = GetBankResponse(
+            banks=[BankSchema.model_validate(bank) for bank in banks]
         )
 
         return response
