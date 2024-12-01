@@ -8,7 +8,7 @@ default_model_dict = {
 }
 
 
-def get_currency_mocked() -> list[dict[str, Any]]:
+def get_currency_mock() -> list[dict[str, Any]]:
     currencies = [
         {
             **default_model_dict,
@@ -33,7 +33,7 @@ def get_currency_mocked() -> list[dict[str, Any]]:
     return currencies
 
 
-def get_bank_mocked() -> list[dict[str, Any]]:
+def get_bank_mock() -> list[dict[str, Any]]:
     banks = [
         {
             **default_model_dict,
@@ -52,6 +52,11 @@ def get_bank_mocked() -> list[dict[str, Any]]:
             'id': uuid.UUID('5c8297d2-f791-422f-ab37-91b32ea35272'),
             'name': 'XP Investimentos',
             'code': 102
+        },
+        {
+            **default_model_dict,
+            'id': uuid.UUID('81be97b5-bff5-47bf-a2d4-82ccb35a6126'),
+            'name': 'Itaú',
         }
     ]
 
@@ -109,48 +114,49 @@ def get_tax_mocked() -> list[dict[str, Any]]:
     return tax_list
 
 
-def get_category_mocked() -> list[dict[str, Any]]:
+def get_category_mock() -> list[dict[str, Any]]:
     categories: list[dict[str, Any]] = [
         {
             **default_model_dict,
             'id': uuid.UUID('43bc5e7a-02c2-4173-b364-0abcb46950b9'),
-            'name': 'Test category',
-            'description': 'This is a test category',
+            'name': 'Transporte',
+            'description': 'Transações referentes a transporte',
         },
         {
             **default_model_dict,
             'id': uuid.UUID('dd6022bf-ff38-4b2a-8f82-4f645df97a5b'),
-            'name': 'Second test category',
-            'description': 'This is a second test category',
+            'name': 'Habitação',
+            'description': 'Transações referentes a habitação',
         }
     ]
 
     return categories
 
 
-def get_index_type_mocked() -> list[dict[str, Any]]:
+def get_index_type_mock() -> list[dict[str, Any]]:
     index_types: list[dict[str, Any]] = [
         {
             **default_model_dict,
             'id': uuid.UUID('7676d154-4384-4d84-9a17-6d951df80b66'),
-            'name': 'Indexador variável',
+            'name': 'Variável',
             'description': 'O rendimento é variável de acordo com o mercado'
         },
         {
             **default_model_dict,
             'id': uuid.UUID('ddacb442-a487-403b-9419-cab038e53373'),
-            'name': 'Indexador fixo',
+            'name': 'Fixo',
             'description': 'O rendimento é fixo independente de variações do mercado'
         },
         {
             **default_model_dict,
             'id': uuid.UUID('14ece4c4-d168-45de-ad0c-a410e425c7ad'),
-            'name': 'Indexador híbrido'
-            'description' 'O rendimento é baseado em um indexador variável e um fixo. Ex: IPCA + 6%'
+            'name': 'Híbrido'
+                    'description' 'O rendimento é baseado em um indexador variável e um fixo. Ex: IPCA + 6%'
         }
     ]
 
     return index_types
+
 
 def get_investment_category_mocked() -> list[dict[str, Any]]:
     index_types: list[dict[str, Any]] = [
@@ -163,13 +169,18 @@ def get_investment_category_mocked() -> list[dict[str, Any]]:
             **default_model_dict,
             'id': uuid.UUID('954d50fc-3e0b-458f-92b5-fe00f163b3d2'),
             'name': 'Renda variável'
+        },
+        {
+            **default_model_dict,
+            'id': uuid.UUID('bc94b55d-0041-42cf-9b03-2b9e1faabdab'),
+            'name': 'Multimercado'
         }
     ]
 
     return index_types
 
 
-def get_index_mocked() -> list[dict[str, Any]]:
+def get_index_mock() -> list[dict[str, Any]]:
     index_list: list[dict[str, Any]] = [
         {
             **default_model_dict,
@@ -194,13 +205,19 @@ def get_index_mocked() -> list[dict[str, Any]]:
     return index_list
 
 
-def get_liquidity_mocked() -> list[dict[str, Any]]:
+def get_liquidity_mock() -> list[dict[str, Any]]:
     liquidity: list[dict[str, Any]] = [
         {
             **default_model_dict,
             'id': uuid.UUID('465d74a7-941e-4dc9-b2db-c94a0e686e15'),
             'name': 'Diária',
             'description': 'Liquidez diária'
+        },
+        {
+            **default_model_dict,
+            'id': uuid.UUID('d9d6b647-7ec1-4e6c-83e4-de3688a7ce4f'),
+            'name': 'D+1',
+            'description': 'Liquidez em D+1',
         },
         {
             **default_model_dict,

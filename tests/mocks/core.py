@@ -1,15 +1,15 @@
 import pytest_asyncio
 from rolf_common.managers import BaseDataManager
 
-from data_mock.core import get_country_mocked, get_tax_mocked, get_currency_mocked, get_bank_mocked, get_category_mocked, get_liquidity_mocked
-from data_mock.core import get_index_mocked, get_index_type_mocked
+from data_mock.core import get_country_mocked, get_tax_mocked, get_currency_mock, get_bank_mock, get_category_mock, get_liquidity_mock
+from data_mock.core import get_index_mock, get_index_type_mock
 from models.core import BankModel, CurrencyModel, CategoryModel, CountryModel, TaxFeeModel, IndexerTypeModel, IndexerModel, LiquidityModel
 from schemas.core import CurrencySchema, BankSchema, CountrySchema, TaxSchema, CategorySchema, IndexerTypeSchema, IndexerSchema, LiquiditySchema
 
 
 @pytest_asyncio.fixture
 async def create_bank(test_session) -> list[BankSchema]:
-    data_ = await BaseDataManager(test_session).add_or_ignore_all(BankModel, get_bank_mocked())
+    data_ = await BaseDataManager(test_session).add_or_ignore_all(BankModel, get_bank_mock())
     banks: list[BankSchema] = [BankSchema.model_validate(data["BankModel"]) for data in data_]
 
     return banks
@@ -17,7 +17,7 @@ async def create_bank(test_session) -> list[BankSchema]:
 
 @pytest_asyncio.fixture
 async def create_currency(test_session) -> list[CurrencySchema]:
-    data_ = await BaseDataManager(test_session).add_or_ignore_all(CurrencyModel, get_currency_mocked())
+    data_ = await BaseDataManager(test_session).add_or_ignore_all(CurrencyModel, get_currency_mock())
     currencies: list[CurrencySchema] = [CurrencySchema.model_validate(data["CurrencyModel"]) for data in data_]
 
     return currencies
@@ -25,7 +25,7 @@ async def create_currency(test_session) -> list[CurrencySchema]:
 
 @pytest_asyncio.fixture
 async def create_index_type(test_session) -> list[IndexerTypeSchema]:
-    data_ = await BaseDataManager(test_session).add_or_ignore_all(IndexerTypeModel, get_index_type_mocked())
+    data_ = await BaseDataManager(test_session).add_or_ignore_all(IndexerTypeModel, get_index_type_mock())
     index_type = [IndexerTypeSchema.model_validate(data["IndexerTypeModel"]) for data in data_]
 
     return index_type
@@ -33,7 +33,7 @@ async def create_index_type(test_session) -> list[IndexerTypeSchema]:
 
 @pytest_asyncio.fixture
 async def create_index(test_session) -> list[IndexerSchema]:
-    data_ = await BaseDataManager(test_session).add_or_ignore_all(IndexerModel, get_index_mocked())
+    data_ = await BaseDataManager(test_session).add_or_ignore_all(IndexerModel, get_index_mock())
     index = [IndexerSchema.model_validate(data["IndexerModel"]) for data in data_]
 
     return index
@@ -41,7 +41,7 @@ async def create_index(test_session) -> list[IndexerSchema]:
 
 @pytest_asyncio.fixture
 async def create_category(test_session) -> list[CategorySchema]:
-    data_ = await BaseDataManager(test_session).add_or_ignore_all(CategoryModel, get_category_mocked())
+    data_ = await BaseDataManager(test_session).add_or_ignore_all(CategoryModel, get_category_mock())
     categories = [CategorySchema.model_validate(data["CategoryModel"]) for data in data_]
 
     return categories
@@ -65,7 +65,7 @@ async def create_tax(test_session, create_country) -> list[TaxSchema]:
 
 @pytest_asyncio.fixture
 async def create_liquidity(test_session):
-    data_ = await BaseDataManager(test_session).add_or_ignore_all(LiquidityModel, get_liquidity_mocked())
+    data_ = await BaseDataManager(test_session).add_or_ignore_all(LiquidityModel, get_liquidity_mock())
     liquidity = [LiquiditySchema.model_validate(data["LiquidityModel"]) for data in data_]
 
     return liquidity

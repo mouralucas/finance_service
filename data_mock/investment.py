@@ -5,7 +5,7 @@ from typing import Any
 from dateutil.relativedelta import relativedelta
 
 from data_mock.account import get_open_account_mock
-from data_mock.core import get_currency_mocked, get_index_type_mocked, get_index_mocked, get_liquidity_mocked, get_country_mocked
+from data_mock.core import get_currency_mock, get_index_type_mock, get_index_mock, get_liquidity_mock, get_country_mocked
 from models.core import LiquidityModel
 from models.investment import InvestmentModel
 from services.utils.datetime import get_period
@@ -32,10 +32,10 @@ def get_investment_type_mocked() -> list[dict[str, Any]]:
 def get_investment_mocked() -> list[dict[str, Any]]:
     accounts = get_open_account_mock()
     investment_types = get_investment_type_mocked()
-    currencies = get_currency_mocked()
-    index_types = get_index_type_mocked()
-    indexer = get_index_mocked()
-    liquidity = get_liquidity_mocked()
+    currencies = get_currency_mock()
+    index_types = get_index_type_mock()
+    indexer = get_index_mock()
+    liquidity = get_liquidity_mock()
     countries = get_country_mocked()
 
     investments: list[dict[str, Any]] = [
@@ -44,9 +44,9 @@ def get_investment_mocked() -> list[dict[str, Any]]:
             'id': uuid.UUID('a14f064a-c4fb-4b2a-bef3-17b163ed7261'),
             'owner_id': uuid.UUID('be5b2413-a009-455f-bd8d-69ded09b5cb8'),
             'custodian_id': accounts[0]['bank_id'],
-            'account_id': accounts[0]['id'],
-            'name': "Test Investment",
-            'description': "Test Investment",
+            'account_id': accounts[2]['id'], #  XP
+            'name': "CDB Banco XP 12%",
+            'description': "Pré fixado 12%",
             'type_id': investment_types[0]['id'],
             'transaction_date': datetime.date.today() - relativedelta(years=1, months=2, days=5),
             'maturity_date': datetime.date.today() + relativedelta(years=1, months=0, days=17),
@@ -54,7 +54,7 @@ def get_investment_mocked() -> list[dict[str, Any]]:
             'price': 150.65,
             'amount': 1.02 * 150.65,
             'currency_id': currencies[0]['id'],
-            'indexer_type_id': index_types[0]['id'],
+            'indexer_type_id': index_types[1]['id'],
             'indexer_id': indexer[0]['id'],
             'liquidity_id': liquidity[0]['id'],
             'country_id': countries[0]['id'],
@@ -65,8 +65,8 @@ def get_investment_mocked() -> list[dict[str, Any]]:
             'owner_id': uuid.UUID("adf52a1e-7a19-11ed-a1eb-0242ac120002"),
             'custodian_id': accounts[1]['bank_id'],
             'account_id': accounts[1]['id'],
-            'name': "Test Investment 2",
-            'description': "Test Investment 2",
+            'name': "CDB Banco Outro",
+            'description': "110% do CDI",
             'type_id': investment_types[0]['id'],
             'transaction_date': datetime.date.today() - relativedelta(years=4, months=7, days=28),
             'maturity_date': datetime.date.today() + relativedelta(years=0, months=11, days=9),
@@ -75,7 +75,7 @@ def get_investment_mocked() -> list[dict[str, Any]]:
             'amount': 998.3 * 1.50,
             'currency_id': currencies[0]['id'],
             'indexer_type_id': index_types[0]['id'],
-            'indexer_id': indexer[0]['id'],
+            'indexer_id': indexer[1]['id'],
             'liquidity_id': liquidity[0]['id'],
             'country_id': countries[0]['id'],
         }
@@ -92,8 +92,8 @@ def get_investment_statement_mock() -> list[dict[str, Any]]:
             **default_model_dict,
             'investment_id': investments[0]['id'],
             'period': get_period(investments[0]['transaction_date']),
-            'previous_amount': 0,
-            'gross_amount': investments[0]['amount'] + investments[0]['amount'] * 0.001,
+            'previous_amount': investments[0]['amount'],
+            'gross_amount': investments[0]['amount'] + investments[0]['amount'] * 0.01,
             'total_tax': 0.25,
             'total_fee': 0,
             'net_amount': (investments[0]['amount'] + investments[0]['amount'] * 0.001) - 0.25
