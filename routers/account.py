@@ -63,12 +63,9 @@ async def create_transaction(
 async def update_transaction(
         transaction: UpdateAccountTransactionRequest,
         session: AsyncSession = Depends(get_session),
-        # user: RequiredUser = Security(get_user)
+        user: RequiredUser = Security(get_user)
 ):
-    # get_logger().warning('Mais um teste de log, dessa vez com o rolf correto')
-    original_values = transaction.model_dump()
-    setted_values = transaction.model_dump(exclude_unset=True)
-    return
+    return await AccountService(session=session, user=user).update_transaction(transaction=transaction)
 
 
 @router.get('/transaction',  summary='Get account transactions')

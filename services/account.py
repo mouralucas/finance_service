@@ -103,7 +103,15 @@ class AccountService(BaseService):
         return response
 
     async def update_transaction(self, transaction: UpdateAccountTransactionRequest):
-        pass
+        changed_fields = transaction.model_dump(exclude_unset=True)
+        if 'transaction_date' in changed_fields:
+            period = get_period(changed_fields['transaction_date'])
+            changed_fields['period'] = period
+
+        # TODO: check if transaction date change, if so calculate the new period and add to changed fields
+        updated_transaction = await self.account_manager.update_transaction(transaction_id=transaction.id, fields=changed_fields)
+
+        print('')
 
     async def get_transactions(self) -> GetAccountTransactionResponse:
         transactions = await self.account_manager.get_transactions(owner_id=self.user['user_id'], start_period=202401, end_period=202412)

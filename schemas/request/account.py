@@ -52,7 +52,10 @@ class CreateAccountTransactionRequest(DefaultModel):
     is_validated: bool = Field(None, description="Whether the transaction is validated by the user")
 
 
-class UpdateAccountTransactionRequest(DefaultModel):
+class UpdateAccountTransactionRequest(BaseModel):
+    model_config = ConfigDict(from_attributes=True,
+                              alias_generator=AliasGenerator(alias=to_camel))
+
     id: int = Field(..., alias='transactionId', description="The id of the account")
     account_id: uuid.UUID | None = Field(None, description="The id of the account")
     currency_id: str | None = Field(None, description="The currency of the account")

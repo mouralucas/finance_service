@@ -5,9 +5,9 @@ from typing import Any, cast
 from fastapi import HTTPException
 from rolf_common.managers import BaseDataManager
 from rolf_common.models import SQLModel
-from sqlalchemy import select, update, Executable, func, case, RowMapping, literal_column, union_all
-from sqlalchemy.orm import aliased, join
+from sqlalchemy import select, update, func, case, RowMapping, literal_column, union_all
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import aliased
 from starlette import status
 
 from models.account import AccountModel, AccountTransactionModel, AccountBalanceModel
@@ -60,6 +60,20 @@ class AccountManager(BaseDataManager):
 
         return cast(AccountTransactionModel, new_statement)
 
+    async def update_transaction(self, transaction_id, fields) -> AccountTransactionModel:
+        query = (
+            update(AccountTransactionModel)
+            .where(AccountTransactionModel.id == transaction_id)
+            .values(**fields)
+        )
+
+        await self.session.execute(query)
+        await self.session.flush()
+
+        updated_transaction = await self.get_by_id(sql_model=AccountTransactionModel, object_id=transaction_id)
+
+        return cast(AccountTransactionModel, updated_transaction)
+
     async def get_transactions(self, owner_id: uuid.UUID, start_period: int, end_period: int) -> list[dict[str, Any]]:
         transaction_alias = aliased(AccountTransactionModel)
         account_alias = aliased(AccountModel)
@@ -103,6 +117,7 @@ class AccountManager(BaseDataManager):
 
         return [dict(transaction.items()) for transaction in transactions]
 
+    # Balance
     async def get_balance(self, account_id: uuid.UUID = None,
                           start_period: int = None, end_period: int = None,
                           current_period: bool = False) -> list[RowMapping]:
