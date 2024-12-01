@@ -15,23 +15,47 @@ default_model_dict = {
     'active': True
 }
 
+def get_investment_category_mock() -> list[dict[str, Any]]:
+    index_types: list[dict[str, Any]] = [
+        {
+            **default_model_dict,
+            'id': uuid.UUID('f001458a-251f-4f82-9846-a14834e82c68'),
+            'name': 'Renda Fixa',
+        },
+        {
+            **default_model_dict,
+            'id': uuid.UUID('954d50fc-3e0b-458f-92b5-fe00f163b3d2'),
+            'name': 'Renda variável'
+        },
+        {
+            **default_model_dict,
+            'id': uuid.UUID('bc94b55d-0041-42cf-9b03-2b9e1faabdab'),
+            'name': 'Multimercado'
+        }
+    ]
 
-def get_investment_type_mocked() -> list[dict[str, Any]]:
+    return index_types
+
+
+def get_investment_type_mock() -> list[dict[str, Any]]:
+    investment_category = get_investment_category_mock()
+
     investment_types: list[dict[str, Any]] = [
         {
             **default_model_dict,
             'id': uuid.UUID('b9df5e2c-874b-4e7b-a68d-adfdb84dcbe6'),
             'name': 'CDB',
             'description': 'Certificado de Depósito Bancário',
+            'investment_category_id': investment_category[0]['id']
         }
     ]
 
     return investment_types
 
 
-def get_investment_mocked() -> list[dict[str, Any]]:
+def get_investment_mock() -> list[dict[str, Any]]:
     accounts = get_open_account_mock()
-    investment_types = get_investment_type_mocked()
+    investment_types = get_investment_type_mock()
     currencies = get_currency_mock()
     index_types = get_index_type_mock()
     indexer = get_index_mock()
@@ -42,7 +66,7 @@ def get_investment_mocked() -> list[dict[str, Any]]:
         {
             **default_model_dict,
             'id': uuid.UUID('a14f064a-c4fb-4b2a-bef3-17b163ed7261'),
-            'owner_id': uuid.UUID('be5b2413-a009-455f-bd8d-69ded09b5cb8'),
+            'owner_id': uuid.UUID("adf52a1e-7a19-11ed-a1eb-0242ac120002"),
             'custodian_id': accounts[0]['bank_id'],
             'account_id': accounts[2]['id'], #  XP
             'name': "CDB Banco XP 12%",
@@ -85,7 +109,7 @@ def get_investment_mocked() -> list[dict[str, Any]]:
 
 
 def get_investment_statement_mock() -> list[dict[str, Any]]:
-    investments = get_investment_mocked()
+    investments = get_investment_mock()
 
     statements: list[dict[str, Any]] = [
         {
@@ -108,7 +132,7 @@ def get_open_investment_objective_mocked() -> list[dict[str, Any]]:
         {
             **default_model_dict,
             'id': uuid.UUID('97502c10-1dec-48b8-b0d7-0d5a3eef7020'),
-            'owner_id': uuid.UUID('be5b2413-a009-455f-bd8d-69ded09b5cb8'),
+            'owner_id': uuid.UUID("adf52a1e-7a19-11ed-a1eb-0242ac120002"),
             'title': 'Meu objetivo futuro',
             'description': 'Comprar casa na praia',
             'amount': 75500,
@@ -117,7 +141,7 @@ def get_open_investment_objective_mocked() -> list[dict[str, Any]]:
         {
             **default_model_dict,
             'id': uuid.UUID('26c28396-4d6f-454f-bc00-3bb2933a6238'),
-            'owner_id': uuid.UUID('be5b2413-a009-455f-bd8d-69ded09b5cb8'),
+            'owner_id': uuid.UUID("adf52a1e-7a19-11ed-a1eb-0242ac120002"),
             'title': 'Compra um carro novo',
             'description': 'Comprar um carro melhor que meu carro atual',
             'amount': 25000,

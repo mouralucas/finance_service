@@ -158,28 +158,6 @@ def get_index_type_mock() -> list[dict[str, Any]]:
     return index_types
 
 
-def get_investment_category_mocked() -> list[dict[str, Any]]:
-    index_types: list[dict[str, Any]] = [
-        {
-            **default_model_dict,
-            'id': uuid.UUID('f001458a-251f-4f82-9846-a14834e82c68'),
-            'name': 'Renda Fixa',
-        },
-        {
-            **default_model_dict,
-            'id': uuid.UUID('954d50fc-3e0b-458f-92b5-fe00f163b3d2'),
-            'name': 'Renda variável'
-        },
-        {
-            **default_model_dict,
-            'id': uuid.UUID('bc94b55d-0041-42cf-9b03-2b9e1faabdab'),
-            'name': 'Multimercado'
-        }
-    ]
-
-    return index_types
-
-
 def get_index_mock() -> list[dict[str, Any]]:
     index_list: list[dict[str, Any]] = [
         {

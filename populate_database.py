@@ -5,12 +5,12 @@ from rolf_common.managers import BaseDataManager
 from backend.database import sessionmanager
 from data_mock.account import get_account_type_mock, get_open_account_mock, get_closed_account_mock, get_account_transaction_mock
 from data_mock.core import get_bank_mock, get_currency_mock, get_index_type_mock, get_index_mock, get_category_mock, get_liquidity_mock
-from data_mock.credit_card import get_credit_card_mocked, get_cancelled_credit_card_mocked
-from data_mock.investment import get_investment_type_mocked, get_investment_mocked, get_investment_statement_mock
+from data_mock.credit_card import get_credit_card_mock, get_cancelled_credit_card_mock
+from data_mock.investment import get_investment_type_mock, get_investment_mock, get_investment_statement_mock, get_investment_category_mock
 from models.account import AccountTypeModel, AccountModel, AccountTransactionModel
 from models.core import BankModel, CurrencyModel, IndexerTypeModel, IndexerModel, CategoryModel, LiquidityModel
 from models.credit_card import CreditCardModel
-from models.investment import InvestmentTypeModel, InvestmentModel, InvestmentStatementModel
+from models.investment import InvestmentTypeModel, InvestmentModel, InvestmentStatementModel, InvestmentCategoryModel
 
 
 async def populate():
@@ -30,12 +30,13 @@ async def populate():
         await BaseDataManager(session).add_or_ignore_all(AccountTransactionModel, get_account_transaction_mock())
 
         # Credit Card data
-        await BaseDataManager(session).add_or_ignore_all(CreditCardModel, get_credit_card_mocked())
-        await BaseDataManager(session).add_or_ignore_all(CreditCardModel, get_cancelled_credit_card_mocked())
+        await BaseDataManager(session).add_or_ignore_all(CreditCardModel, get_credit_card_mock())
+        await BaseDataManager(session).add_or_ignore_all(CreditCardModel, get_cancelled_credit_card_mock())
 
         # Investment data
-        await BaseDataManager(session).add_or_ignore_all(InvestmentTypeModel, get_investment_type_mocked())
-        await BaseDataManager(session).add_or_ignore_all(InvestmentModel, get_investment_mocked())
+        await BaseDataManager(session).add_or_ignore_all(InvestmentCategoryModel, get_investment_category_mock())
+        await BaseDataManager(session).add_or_ignore_all(InvestmentTypeModel, get_investment_type_mock())
+        await BaseDataManager(session).add_or_ignore_all(InvestmentModel, get_investment_mock())
         await BaseDataManager(session).add_or_ignore_all(InvestmentStatementModel, get_investment_statement_mock())
 
 

@@ -13,7 +13,7 @@ default_model_dict = {
     'active': True
 }
 
-def get_credit_card_mocked() -> list[dict[str, Any]]:
+def get_credit_card_mock() -> list[dict[str, Any]]:
     accounts = get_open_account_mock()
     currencies = get_currency_mock()
 
@@ -32,7 +32,7 @@ def get_credit_card_mocked() -> list[dict[str, Any]]:
     return credit_cards
 
 
-def get_cancelled_credit_card_mocked() -> list[dict[str, Any]]:
+def get_cancelled_credit_card_mock() -> list[dict[str, Any]]:
     accounts = get_open_account_mock()
     currencies = get_currency_mock()
 
