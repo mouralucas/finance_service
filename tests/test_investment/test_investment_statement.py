@@ -14,11 +14,11 @@ async def test_get_investment_type(client, create_investment_type):
     data = response.json()
 
     assert type(data) is dict
-    assert 'investmentType' in data
-    assert type(data['investmentType']) is list
+    assert 'investmentTypes' in data
+    assert type(data['investmentTypes']) is list
 
-    for investmentType in data['investmentType']:
-        assert 'name' in investmentType
+    for investmentType in data['investmentTypes']:
+        assert 'investmentTypeName' in investmentType
 
 
 @pytest.mark.asyncio
