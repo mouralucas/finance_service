@@ -150,8 +150,8 @@ def get_index_type_mock() -> list[dict[str, Any]]:
         {
             **default_model_dict,
             'id': uuid.UUID('14ece4c4-d168-45de-ad0c-a410e425c7ad'),
-            'name': 'Híbrido'
-                    'description' 'O rendimento é baseado em um indexador variável e um fixo. Ex: IPCA + 6%'
+            'name': 'Híbrido',
+            'description': 'O rendimento é baseado em um indexador variável e um fixo. Ex: IPCA + 6%'
         }
     ]
 

@@ -51,34 +51,31 @@ class TaxSchema(BaseModel):
 
 class IndexerTypeSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
-        validation_alias=to_snake,
         serialization_alias=to_camel,
     ))
 
     id: uuid.UUID = Field(..., serialization_alias='indexerTypeId', description='The unique id of the index type')
-    name: str = Field(..., description='The name of the index type')
+    name: str = Field(...,serialization_alias='indexerTypeName', description='The name of the index type')
     description: str | None = Field(None, description='The description of the index type')
 
 
 class IndexerSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
-        validation_alias=to_snake,
         serialization_alias=to_camel,
     ))
 
     id: uuid.UUID = Field(serialization_alias='indexerId', description=' The unique identification of the index', json_schema_extra={'example': uuid.uuid4()})
-    name: str = Field(..., description='The name of the index')
+    name: str = Field(..., serialization_alias='indexerName', description='The name of the index')
     description: str | None = Field(None, description='The description of the index')
 
 
 class LiquiditySchema(BaseModel):
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
-        validation_alias=to_snake,
         serialization_alias=to_camel,
     ))
 
     id: uuid.UUID = Field(..., serialization_alias='liquidityId', description='The unique id of the liquidity')
-    name: str = Field(..., description='The name of the liquidity')
+    name: str = Field(..., serialization_alias='liquidityName', description='The name of the liquidity')
     description: str | None = Field(None, description='The description of the liquidity')
 
 

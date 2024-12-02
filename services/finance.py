@@ -4,9 +4,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from managers.account import AccountManager
 from managers.finance import FinanceManager
-from schemas.core import CurrencySchema, BankSchema, IndexerTypeSchema, IndexerSchema
+from schemas.core import CurrencySchema, BankSchema, IndexerTypeSchema, IndexerSchema, LiquiditySchema
 from schemas.request.finance import GetSummaryRequest
-from schemas.response.finance import GetCurrencyResponse, GetBankResponse, GetIndexerTypeResponse, GetIndexerResponse
+from schemas.response.finance import GetCurrencyResponse, GetBankResponse, GetIndexerTypeResponse, GetIndexerResponse, GetLiquidityResponse
 
 
 class FinanceService(BaseService):
@@ -44,7 +44,8 @@ class FinanceService(BaseService):
         indexer_types = await self.finance_manager.get_indexer_types()
 
         response = GetIndexerTypeResponse(
-            indexer_types=[IndexerTypeSchema.model_validate(indexer_type) for indexer_type in indexer_types],
+            quantity=len(indexer_types) if indexer_types else 0,
+            indexer_types=[IndexerTypeSchema.model_validate(indexer_type) for indexer_type in indexer_types] if indexer_types else [],
         )
 
         return response
@@ -53,7 +54,16 @@ class FinanceService(BaseService):
         indexers = await self.finance_manager.get_indexers()
 
         response = GetIndexerResponse(
-            indexers=[IndexerSchema.model_validate(indexer) for indexer in indexers],
+            quantity=len(indexers) if indexers else 0,
+            indexers=[IndexerSchema.model_validate(indexer) for indexer in indexers] if indexers else [],
         )
 
         return response
+
+    async def get_liquidity(self) -> GetLiquidityResponse:
+        liquidity = self.finance_manager.get_liquidity()
+
+        response = GetLiquidityResponse(
+            quantity=len(liquidity) if liquidity else 0,
+            liquidity=[LiquiditySchema.model_dump(i) for i in liquidity] if liquidity else []
+        )
