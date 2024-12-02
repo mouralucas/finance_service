@@ -4,9 +4,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from managers.account import AccountManager
 from managers.finance import FinanceManager
-from schemas.core import CurrencySchema, BankSchema
+from schemas.core import CurrencySchema, BankSchema, IndexerTypeSchema
 from schemas.request.finance import GetSummaryRequest
-from schemas.response.finance import GetCurrencyResponse, GetBankResponse
+from schemas.response.finance import GetCurrencyResponse, GetBankResponse, GetIndexerTypeResponse
 
 
 class FinanceService(BaseService):
@@ -36,6 +36,15 @@ class FinanceService(BaseService):
 
         response = GetBankResponse(
             banks=[BankSchema.model_validate(bank) for bank in banks]
+        )
+
+        return response
+
+    async def get_indexer_types(self) -> GetIndexerTypeResponse:
+        indexer_types = await self.finance_manager.get_indexer_types()
+
+        response = GetIndexerTypeResponse(
+            indexer_types=[IndexerTypeSchema.model_validate(indexer_type) for indexer_type in indexer_types],
         )
 
         return response
