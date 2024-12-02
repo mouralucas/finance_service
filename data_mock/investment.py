@@ -15,6 +15,7 @@ default_model_dict = {
     'active': True
 }
 
+
 def get_investment_category_mock() -> list[dict[str, Any]]:
     index_types: list[dict[str, Any]] = [
         {
@@ -68,7 +69,7 @@ def get_investment_mock() -> list[dict[str, Any]]:
             'id': uuid.UUID('a14f064a-c4fb-4b2a-bef3-17b163ed7261'),
             'owner_id': uuid.UUID("adf52a1e-7a19-11ed-a1eb-0242ac120002"),
             'custodian_id': accounts[0]['bank_id'],
-            'account_id': accounts[2]['id'], #  XP
+            'account_id': accounts[2]['id'],  # XP
             'name': "CDB Banco XP 12%",
             'description': "Pré fixado 12%",
             'type_id': investment_types[0]['id'],

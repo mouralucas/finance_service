@@ -23,7 +23,7 @@ async def create_investment_type(test_session, create_investment_category) -> li
 
 @pytest_asyncio.fixture
 async def create_investment(test_session, create_open_account, create_investment_type, create_currency,
-                            create_index_type, create_index, create_liquidity, create_country) -> list[InvestmentSchema]:
+                            create_indexer_type, create_indexer, create_liquidity, create_country) -> list[InvestmentSchema]:
 
     data_ = await BaseDataManager(test_session).add_or_ignore_all(InvestmentModel, get_investment_mock())
     investments = [InvestmentSchema.model_validate(data["InvestmentModel"]) for data in data_]

@@ -24,7 +24,7 @@ async def create_currency(test_session) -> list[CurrencySchema]:
 
 
 @pytest_asyncio.fixture
-async def create_index_type(test_session) -> list[IndexerTypeSchema]:
+async def create_indexer_type(test_session) -> list[IndexerTypeSchema]:
     data_ = await BaseDataManager(test_session).add_or_ignore_all(IndexerTypeModel, get_index_type_mock())
     index_type = [IndexerTypeSchema.model_validate(data["IndexerTypeModel"]) for data in data_]
 
@@ -32,7 +32,7 @@ async def create_index_type(test_session) -> list[IndexerTypeSchema]:
 
 
 @pytest_asyncio.fixture
-async def create_index(test_session) -> list[IndexerSchema]:
+async def create_indexer(test_session) -> list[IndexerSchema]:
     data_ = await BaseDataManager(test_session).add_or_ignore_all(IndexerModel, get_index_mock())
     index = [IndexerSchema.model_validate(data["IndexerModel"]) for data in data_]
 

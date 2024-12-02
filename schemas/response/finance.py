@@ -3,7 +3,7 @@ from pydantic.alias_generators import to_camel
 from rolf_common.schemas import SuccessResponseBase
 from sqlalchemy import Alias
 
-from schemas.core import CurrencySchema, BankSchema, IndexerTypeSchema
+from schemas.core import CurrencySchema, BankSchema, IndexerTypeSchema, IndexerSchema
 
 
 class GetSummaryResponse(SuccessResponseBase):
@@ -23,9 +23,18 @@ class GetBankResponse(BaseModel):
 
     banks: list[BankSchema]
 
+
 class GetIndexerTypeResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
         serialization_alias=to_camel
     ))
 
     indexer_types: list[IndexerTypeSchema] = Field(..., description='The list of indexer types')
+
+
+class GetIndexerResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
+        serialization_alias=to_camel
+    ))
+
+    indexers: list[IndexerSchema] = Field(..., description='The list of indexers')
