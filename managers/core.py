@@ -7,8 +7,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from models.core import IndexerModel, PeriodicityModel, IndexerSeriesModel, CategoryModel, CurrencyModel
-from schemas.core import CategorySchema
+from models.core import IndexerModel, PeriodicityModel, IndexerSeriesModel, CategoryModel, CountryModel
 
 
 class CoreManager(BaseDataManager):
@@ -22,7 +21,14 @@ class CoreManager(BaseDataManager):
 
         return [category['CategoryModel'] for category in categories]
 
+    async def get_countries(self) -> list[CountryModel]:
+        query = select(CountryModel)
 
+        countries = await self.get_all(query)
+
+        return [country['CountryModel'] for country in countries] if countries else None
+
+    # TODO: this methods are finance methods
     async def get_indexer_by_id(self, indexer_id: uuid.UUID, raise_exception=False) -> IndexerModel:
         indexer = await self.get_by_id(IndexerModel, indexer_id)
 

@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.database import get_session
 from schemas.request.finance import GetSummaryRequest
-from schemas.response.finance import GetCurrencyResponse, GetBankResponse, GetIndexerTypeResponse, GetIndexerResponse
+from schemas.response.finance import GetCurrencyResponse, GetBankResponse, GetIndexerTypeResponse, GetIndexerResponse, GetLiquidityResponse
 from services.finance import FinanceService
 
 router = APIRouter(prefix="/finance", tags=['Finance'])
@@ -40,6 +40,14 @@ async def get_indexer_type(
         user: RequiredUser = Security(get_user)
 ) -> GetIndexerResponse:
     return await FinanceService(session, user).get_indexers()
+
+
+@router.get('/liquidity', summary='Gey liquidity options')
+async def get_liquidity(
+        session: AsyncSession = Depends(get_session),
+        user: RequiredUser = Security(get_user)
+) -> GetLiquidityResponse:
+    return await FinanceService(session, user).get_liquidity()
 
 
 @router.get('/summary')

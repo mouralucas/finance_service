@@ -2,7 +2,7 @@ from rolf_common.managers import BaseDataManager
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models.core import CurrencyModel, BankModel, IndexerTypeModel, IndexerModel
+from models.core import CurrencyModel, BankModel, IndexerTypeModel, IndexerModel, LiquidityModel
 
 
 class FinanceManager(BaseDataManager):
@@ -23,7 +23,6 @@ class FinanceManager(BaseDataManager):
 
         return [bank['BankModel'] for bank in banks] if banks else None
 
-
     async def get_indexer_types(self) -> list[IndexerTypeModel] | None:
         query = select(IndexerTypeModel)
 
@@ -37,3 +36,10 @@ class FinanceManager(BaseDataManager):
         indexers = await self.get_all(query)
 
         return [indexer_type['IndexerModel'] for indexer_type in indexers] if indexers else None
+
+    async def get_liquidity(self) -> list[LiquidityModel] | None:
+        query = select(LiquidityModel)
+
+        liquidity = await self.get_all(query)
+
+        return [i['LiquidityModel'] for i in liquidity] if liquidity else None
