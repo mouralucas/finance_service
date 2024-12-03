@@ -61,9 +61,11 @@ class FinanceService(BaseService):
         return response
 
     async def get_liquidity(self) -> GetLiquidityResponse:
-        liquidity = self.finance_manager.get_liquidity()
+        liquidity = await  self.finance_manager.get_liquidity()
 
         response = GetLiquidityResponse(
             quantity=len(liquidity) if liquidity else 0,
-            liquidity=[LiquiditySchema.model_dump(i) for i in liquidity] if liquidity else []
+            liquidity=[LiquiditySchema.model_validate(i) for i in liquidity] if liquidity else []
         )
+
+        return response

@@ -47,4 +47,4 @@ class GetLiquidityResponse(BaseModel):
     ))
 
     quantity: int = Field(..., description='How many liquidity options are available in the request')
-    liquidity: LiquiditySchema = Field(..., description='The list of liquidity options')
+    liquidity: list[LiquiditySchema] = Field(..., description='The list of liquidity options')
