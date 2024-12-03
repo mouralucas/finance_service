@@ -8,23 +8,32 @@ from pydantic.alias_generators import to_snake, to_camel
 
 
 class CreateInvestmentRequest(BaseModel):
-    account_id: uuid.UUID = Field(..., alias='accountId', description='The id of the account')
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
+        alias=to_camel
+    ))
+
     name: str = Field(..., description='The name of the investment')
+    account_id: uuid.UUID = Field(..., description='The id of the account')
     description: str = Field(None, description='Optional description of the investment')
-    type_id: uuid.UUID = Field(..., alias='typeId', description='The id of the investment type')
-    transaction_date: datetime.date = Field(..., alias='transactionDate', description='The date of the investment')
-    maturity_date: datetime.date = Field(None, alias='maturityDate', description='The date that the investment will be liquidated')
+    type_id: uuid.UUID = Field(..., description='The id of the investment type')
+    transaction_date: datetime.date = Field(..., description='The date of the investment')
+    maturity_date: datetime.date = Field(None, description='The date that the investment will be liquidated')
+
     quantity: Decimal = Field(None, description='The quantity of the investment bought')
     price: Decimal = Field(None, description='The unit price for the investment')
     amount: Decimal = Field(None, description='The total bought. Quantity * price')
-    currency_id: str = Field(..., alias='currencyId', description='The id of the currency')
-    indexer_type_id: uuid.UUID = Field(..., alias='indexerTypeId', description='The type of the index for the investment')
+    contracted_rate: str = Field(..., description='The rate of the investment')
 
-    indexer_id: uuid.UUID = Field(..., alias='indexerId', description='The id of the investment index')
-    liquidity_id: uuid.UUID = Field(..., alias='liquidityId', description='The id of investment liquidity')
-    liquidation_date: datetime.date = Field(None, alias='liquidationDate', description='The date that the investment was liquidated')
-    liquidation_amount: Decimal = Field(None, alias='liquidationAmount', description='The amount liquidated, after tax')
-    country_id: str = Field(..., alias='countryId', description='The id of the country')
+    currency_id: str = Field(..., description='The id of the currency')
+
+    indexer_type_id: uuid.UUID = Field(..., description='The type of the index for the investment')
+    indexer_id: uuid.UUID = Field(..., description='The id of the investment index')
+    liquidity_id: uuid.UUID = Field(..., description='The id of investment liquidity')
+    liquidation_date: datetime.date = Field(None, description='The date that the investment was liquidated')
+    liquidation_amount: Decimal = Field(None, description='The amount liquidated, after tax')
+    country_id: str = Field(..., description='The id of the country')
+
+    objective_id: uuid.UUID | None = Field(None, description='The id of the objective')
 
     @model_validator(mode='before')
     def check_liquidation(cls, data: dict) -> dict:

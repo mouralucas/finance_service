@@ -21,6 +21,7 @@ async def test_create_investment(client, create_open_account, create_investment_
     quantity = 1.025
     price = 1021.32
     amount = quantity * price
+    contracted_rate = '10%'
     indexer_type_id = indexer_types[0].id
     indexer_id = indexers[0].id
     liquidity_id = liquidity[0].id
@@ -36,6 +37,7 @@ async def test_create_investment(client, create_open_account, create_investment_
         'quantity': quantity,
         'price': price,
         'amount': amount,
+        'contractedRate': contracted_rate,
         'currencyId': str(currency_id),
         'indexerTypeId': str(indexer_type_id),
         'indexerId': str(indexer_id),
@@ -105,6 +107,7 @@ async def test_create_liquidated_investment(client, create_open_account, create_
     quantity = 1
     price = 112.47
     amount = quantity * price
+    contracted_rate = '115% do CDI'
     indexer_type_id = create_indexer_type[0].id
     indexer_id = create_indexer[0].id
     liquidity_id = create_liquidity[0].id
@@ -123,6 +126,7 @@ async def test_create_liquidated_investment(client, create_open_account, create_
         'quantity': quantity,
         'price': price,
         'amount': amount,
+        'contractedRate': contracted_rate,
         'currencyId': str(currency_id),
         'indexerTypeId': str(indexer_type_id),
         'indexerId': str(indexer_id),

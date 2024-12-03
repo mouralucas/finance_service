@@ -47,11 +47,11 @@ class InvestmentModel(SQLModel):
     __tablename__ = 'investment'
 
     owner_id: Mapped[uuid.UUID] = mapped_column('owner_id')
+    name: Mapped[str] = mapped_column('name', String(200))
     custodian_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('bank.id'))
     custodiam: Mapped['BankModel'] = relationship(foreign_keys=[custodian_id], lazy='subquery')
     account_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('account.id'), nullable=True) # TODO: change back to not null after migration
     account: Mapped['AccountModel'] = relationship(foreign_keys=[account_id], lazy='subquery')
-    name: Mapped[str] = mapped_column('name', String(200))
     description: Mapped[str] = mapped_column('description', String(200), nullable=True)
     type_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('investment_type.id'))
     type: Mapped[InvestmentTypeModel] = relationship(foreign_keys=[type_id], lazy='subquery')
