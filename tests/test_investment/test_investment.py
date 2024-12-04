@@ -4,7 +4,7 @@ from starlette import status
 
 @pytest.mark.asyncio
 async def test_create_investment(client, create_open_account, create_investment_type, create_indexer_type,
-                                 create_indexer, create_liquidity):
+                                 create_indexer, create_liquidity, create_country):
     accounts = create_open_account
     account = accounts[0]
     investment_types = create_investment_type
@@ -60,8 +60,8 @@ async def test_create_investment(client, create_open_account, create_investment_
     assert 'name' in data['investment']
     assert data['investment']['name'] == name
 
-    assert 'typeId' in data['investment']
-    assert data['investment']['typeId'] == str(type_id)
+    assert 'investmentTypeId' in data['investment']
+    assert data['investment']['investmentTypeId'] == str(type_id)
 
     assert 'transactionDate' in data['investment']
     assert data['investment']['transactionDate'] == transaction_date
@@ -96,7 +96,7 @@ async def test_create_investment(client, create_open_account, create_investment_
 
 @pytest.mark.asyncio
 async def test_create_liquidated_investment(client, create_open_account, create_investment_type, create_indexer_type,
-                                            create_indexer, create_liquidity, create_currency):
+                                            create_indexer, create_liquidity, create_currency, create_country):
     accounts = create_open_account
 
     custodian_id = accounts[0].bank_id
