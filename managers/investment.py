@@ -85,29 +85,29 @@ class InvestmentManager(BaseDataManager):
                 func.coalesce(statement_alias.gross_amount, 0.0).label('gross_amount'),
                 case(
                     (statement_alias.gross_amount != None,
-                     ((statement_alias.gross_amount - investment_alias.amount)/investment_alias.amount) * 100
+                     ((statement_alias.gross_amount - investment_alias.amount) / investment_alias.amount) * 100
                      ),
                     else_=0
                 ).label('percentage_change'),
                 statement_alias.period
-        )
-        .join(currency_alias, investment_alias.currency_id == currency_alias.id)
-        .join(type_alias, investment_alias.type_id == type_alias.id)
-        .join(bank_alias, investment_alias.custodian_id == bank_alias.id)
-        .outerjoin(
-            subquery,
-            investment_alias.id == subquery.c.investment_id
-        )
-        .outerjoin(
-            statement_alias,
-            (statement_alias.investment_id == investment_alias.id) &
-            (statement_alias.period == subquery.c.latest_period)
-        )
-        .where(
-            investment_alias.owner_id == "adf52a1e-7a19-11ed-a1eb-0242ac120002",
-            investment_alias.is_liquidated == False
-        )
-        .order_by(investment_alias.transaction_date)
+            )
+            .join(currency_alias, investment_alias.currency_id == currency_alias.id)
+            .join(type_alias, investment_alias.type_id == type_alias.id)
+            .join(bank_alias, investment_alias.custodian_id == bank_alias.id)
+            .outerjoin(
+                subquery,
+                investment_alias.id == subquery.c.investment_id
+            )
+            .outerjoin(
+                statement_alias,
+                (statement_alias.investment_id == investment_alias.id) &
+                (statement_alias.period == subquery.c.latest_period)
+            )
+            .where(
+                investment_alias.owner_id == "adf52a1e-7a19-11ed-a1eb-0242ac120002",
+                investment_alias.is_liquidated == False
+            )
+            .order_by(investment_alias.transaction_date)
         )
 
         investments: list[RowMapping] = await self.get_all(query)
