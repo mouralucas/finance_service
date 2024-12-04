@@ -52,7 +52,7 @@ class InvestmentModel(SQLModel):
     custodiam: Mapped['BankModel'] = relationship(foreign_keys=[custodian_id], lazy='subquery')
     account_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('account.id'), nullable=True) # TODO: change back to not null after migration
     account: Mapped['AccountModel'] = relationship(foreign_keys=[account_id], lazy='subquery')
-    description: Mapped[str] = mapped_column('description', String(200), nullable=True)
+
     type_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('investment_type.id'))
     type: Mapped[InvestmentTypeModel] = relationship(foreign_keys=[type_id], lazy='subquery')
     transaction_date: Mapped[datetime.date] = mapped_column('transaction_date')
@@ -77,6 +77,8 @@ class InvestmentModel(SQLModel):
 
     country_id: Mapped[str] = mapped_column(ForeignKey('country.id'))
     country: Mapped['CountryModel'] = relationship(foreign_keys=[country_id], lazy='noload')
+
+    observation: Mapped[str] = mapped_column('observation', String(200), nullable=True)
 
     objective_id: Mapped[str] = mapped_column(ForeignKey('investment_objective.id'), nullable=True)
     objective: Mapped['InvestmentObjectiveModel'] = relationship('InvestmentObjectiveModel', foreign_keys=[objective_id], lazy='subquery')

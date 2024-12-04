@@ -16,8 +16,10 @@ from managers.core import CoreManager
 from managers.investment import InvestmentManager
 from models.investment import InvestmentModel, InvestmentStatementModel, InvestmentObjectiveModel
 from schemas.investment import InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema, InvestmentTypeSchema, InvestmentAllocationSchema
-from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, LiquidateInvestmentRequest, CreateStatementRequest, GetStatementRequest, CreateObjectiveRequest, GetObjectiveRequest, GetObjectiveSummaryRequest, GetPerformanceRequest
-from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, LiquidateInvestmentResponse, CreateStatementResponse, GetStatementResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse, GetInvestmentWithoutObjectives, GetObjectiveSummaryResponse, GetInvestmentAllocationResponse, GetInvestmentPerformanceResponse
+from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, LiquidateInvestmentRequest, CreateStatementRequest, GetStatementRequest, CreateObjectiveRequest, GetObjectiveRequest, GetObjectiveSummaryRequest, \
+    GetPerformanceRequest, UpdateInvestmentRequest
+from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, LiquidateInvestmentResponse, CreateStatementResponse, GetStatementResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse, \
+    GetInvestmentWithoutObjectives, GetObjectiveSummaryResponse, GetInvestmentAllocationResponse, GetInvestmentPerformanceResponse, UpdateInvestmentResponse
 from services.utils.datetime import get_period, get_previous_period
 
 
@@ -43,6 +45,17 @@ class InvestmentService(BaseService):
 
         response = CreateInvestmentResponse(
             investment=InvestmentSchema.model_validate(new_investment),
+        )
+
+        return response
+
+    async def update_investment(self, investment: UpdateInvestmentRequest) -> UpdateInvestmentResponse:
+        fields = investment.model_dump(exclude_unset=True)
+
+        updated_investment: InvestmentModel = await self.investment_manager.update_investment(investment_id=fields['id'], fields=fields)
+
+        response = UpdateInvestmentResponse(
+            investment=InvestmentSchema.model_validate(updated_investment)
         )
 
         return response

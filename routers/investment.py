@@ -8,8 +8,10 @@ from sqlalchemy.util import await_only
 from starlette import status
 
 from backend.database import get_session
-from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, CreateStatementRequest, GetStatementRequest, LiquidateInvestmentRequest, GetObjectiveRequest, CreateObjectiveRequest, GetObjectiveSummaryRequest, GetPerformanceRequest, CreateBatchStatementRequest
-from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, CreateStatementResponse, GetStatementResponse, LiquidateInvestmentResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse, GetInvestmentWithoutObjectives, GetObjectiveSummaryResponse, GetInvestmentAllocationResponse, GetInvestmentPerformanceResponse
+from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, CreateStatementRequest, GetStatementRequest, LiquidateInvestmentRequest, GetObjectiveRequest, CreateObjectiveRequest, GetObjectiveSummaryRequest, \
+    GetPerformanceRequest, CreateBatchStatementRequest, UpdateInvestmentRequest
+from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, CreateStatementResponse, GetStatementResponse, LiquidateInvestmentResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse, \
+    GetInvestmentWithoutObjectives, GetObjectiveSummaryResponse, GetInvestmentAllocationResponse, GetInvestmentPerformanceResponse, UpdateInvestmentResponse
 from services.integration import BcbIntegrationService
 from services.investment import InvestmentService
 
@@ -30,11 +32,11 @@ async def create_investment(
 
 @router.patch('', summary='Update an investment')
 async def update_investment(
-        investment: CreateInvestmentRequest,
+        investment: UpdateInvestmentRequest,
         session: AsyncSession = Depends(get_session),
         user: RequiredUser = Security(get_user)
-) -> None:
-    print(investment.model_dump(exclude_unset=True))
+) -> UpdateInvestmentResponse:
+    return await InvestmentService(session=session, user=user).update_investment(investment=investment)
 
 
 @router.get('', summary='Get investments', description='Get investment base on filters')

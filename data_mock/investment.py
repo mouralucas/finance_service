@@ -71,7 +71,6 @@ def get_investment_mock() -> list[dict[str, Any]]:
             'custodian_id': accounts[0]['bank_id'],
             'account_id': accounts[2]['id'],  # XP
             'name': 'CDB Banco XP 12%',
-            'description': 'Pré fixado 12%',
             'type_id': investment_types[0]['id'],
             'transaction_date': datetime.date.today() - relativedelta(years=1, months=2, days=5),
             'maturity_date': datetime.date.today() + relativedelta(years=1, months=0, days=17),
@@ -92,7 +91,6 @@ def get_investment_mock() -> list[dict[str, Any]]:
             'custodian_id': accounts[1]['bank_id'],
             'account_id': accounts[1]['id'],
             'name': "CDB Banco Outro",
-            'description': '110% do CDI',
             'type_id': investment_types[0]['id'],
             'transaction_date': datetime.date.today() - relativedelta(years=4, months=7, days=28),
             'maturity_date': datetime.date.today() + relativedelta(years=0, months=11, days=9),

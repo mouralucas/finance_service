@@ -14,7 +14,7 @@ class CreateInvestmentRequest(BaseModel):
 
     name: str = Field(..., description='The name of the investment')
     account_id: uuid.UUID = Field(..., description='The id of the account')
-    description: str = Field(None, description='Optional description of the investment')
+
     type_id: uuid.UUID = Field(..., description='The id of the investment type')
     transaction_date: datetime.date = Field(..., description='The date of the investment')
     maturity_date: datetime.date = Field(None, description='The date that the investment will be liquidated')
@@ -32,6 +32,8 @@ class CreateInvestmentRequest(BaseModel):
     liquidation_date: datetime.date = Field(None, description='The date that the investment was liquidated')
     liquidation_amount: Decimal = Field(None, description='The amount liquidated, after tax')
     country_id: str = Field(..., description='The id of the country')
+
+    observation: str = Field(None, description='Observations for the investment')
 
     objective_id: uuid.UUID | None = Field(None, description='The id of the objective')
 
@@ -53,7 +55,7 @@ class UpdateInvestmentRequest(CreateInvestmentRequest):
         alias=to_camel
     ))
 
-    investment_id: uuid.UUID = Field(..., description='The unique identifier of the investment')
+    id: uuid.UUID = Field(..., alias='investmentId', description='The unique identifier of the investment')
     name: str | None = Field(None, description='The name of the investment')
     account_id: uuid.UUID | None = Field(None, description='The id of the account')
     type_id: uuid.UUID | None = Field(None, description='The id of the investment type')

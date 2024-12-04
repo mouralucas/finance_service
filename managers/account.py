@@ -110,12 +110,12 @@ class AccountManager(BaseDataManager):
             .join(currency_alias, transaction_alias.currency_id == currency_alias.id)
             .join(transaction_currency_alias, transaction_alias.transaction_currency_id == transaction_currency_alias.id)
             .join(category_alias, transaction_alias.category_id == category_alias.id)
-            .order_by(transaction_alias.transaction_date)
+            .order_by(transaction_alias.transaction_date.desc())
         )
 
         transactions: list[RowMapping] = await self.get_all(query)
 
-        return [dict(transaction.items()) for transaction in transactions]
+        return [dict(transaction.items()) for transaction in transactions] if transactions else None
 
     # Balance
     async def get_balance(self, account_id: uuid.UUID = None,

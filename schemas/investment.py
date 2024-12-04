@@ -41,7 +41,7 @@ class InvestmentSchema(BaseModel):
     custodian_id: uuid.UUID = Field(..., description='The id of the custodian bank')
     account_id: uuid.UUID | None = Field(None, description='The id of the account')
     name: str = Field(..., description='The name of the investment')
-    description: str | None = Field(None, description='Optional description of the investment')
+
     type_id: uuid.UUID = Field(..., serialization_alias='investmentTypeId', description='The id of the investment type')
     transaction_date: datetime.date = Field(..., description='The date of the investment')
     maturity_date: datetime.date | None = Field(None, serialization_alias='maturityDate', description='The date that the investment will be liquidated')
@@ -62,6 +62,8 @@ class InvestmentSchema(BaseModel):
     liquidation_amount: Decimal | None = Field(None, description='The amount liquidated, after tax')
     country_id: str = Field(..., description='The id of the country')
     country_name: str | None = Field(None, description='The name of the country of the investment')
+
+    observation: str | None = Field(None, description='Observations of the investment')
     objective_id: uuid.UUID | None = Field(None, description='The id of the objective')
 
     gross_amount: Decimal | None = Field(None, description='The gross amount of last period available')
