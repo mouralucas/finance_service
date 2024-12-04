@@ -82,11 +82,14 @@ class InvestmentManager(BaseDataManager):
                 investment_alias.indexer_type_id,
                 investment_alias.country_id,
                 func.coalesce(investment_alias.liquidation_amount, 0).label('liquidation_amount'),
-                func.coalesce(statement_alias.gross_amount, 0.0).label('gross_amount'),
+                case(
+                    (statement_alias.gross_amount == None,
+                    investment_alias.amount),
+                    else_=statement_alias.gross_amount
+                ).label('gross_amount'),
                 case(
                     (statement_alias.gross_amount != None,
-                     ((statement_alias.gross_amount - investment_alias.amount)/investment_alias.amount) * 100
-                     ),
+                     ((statement_alias.gross_amount - investment_alias.amount)/investment_alias.amount) * 100),
                     else_=0
                 ).label('percentage_change'),
                 statement_alias.period
