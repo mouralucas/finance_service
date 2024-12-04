@@ -64,6 +64,7 @@ class InvestmentManager(BaseDataManager):
             select(
                 investment_alias.id,
                 investment_alias.custodian_id,
+                investment_alias.account_id,
                 bank_alias.name.label('custodian_name'),
                 investment_alias.name,
                 investment_alias.transaction_date,

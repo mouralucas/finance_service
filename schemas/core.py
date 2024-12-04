@@ -1,6 +1,5 @@
 import uuid
 
-from fastapi.openapi.models import Schema
 from pydantic import Field, BaseModel, ConfigDict, AliasGenerator
 from pydantic.alias_generators import to_snake, to_camel
 
@@ -18,12 +17,11 @@ class BankSchema(BaseModel):
 
 class CountrySchema(BaseModel):
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
-        validation_alias=to_snake,
         serialization_alias=to_camel,
     ))
 
     id: str = Field(..., serialization_alias='countryId', description='The unique id of the country')
-    name: str = Field(..., description='The name of the country')
+    name: str = Field(..., serialization_alias='countryName', description='The name of the country')
 
 
 class CurrencySchema(BaseModel):
@@ -55,7 +53,7 @@ class IndexerTypeSchema(BaseModel):
     ))
 
     id: uuid.UUID = Field(..., serialization_alias='indexerTypeId', description='The unique id of the index type')
-    name: str = Field(...,serialization_alias='indexerTypeName', description='The name of the index type')
+    name: str = Field(..., serialization_alias='indexerTypeName', description='The name of the index type')
     description: str | None = Field(None, description='The description of the index type')
 
 

@@ -4,11 +4,11 @@ from rolf_common.managers import BaseDataManager
 
 from backend.database import sessionmanager
 from data_mock.account import get_account_type_mock, get_open_account_mock, get_closed_account_mock, get_account_transaction_mock
-from data_mock.core import get_bank_mock, get_currency_mock, get_index_type_mock, get_index_mock, get_category_mock, get_liquidity_mock
+from data_mock.core import get_bank_mock, get_currency_mock, get_index_type_mock, get_index_mock, get_category_mock, get_liquidity_mock, get_country_mock
 from data_mock.credit_card import get_credit_card_mock, get_cancelled_credit_card_mock
 from data_mock.investment import get_investment_type_mock, get_investment_mock, get_investment_statement_mock, get_investment_category_mock
 from models.account import AccountTypeModel, AccountModel, AccountTransactionModel
-from models.core import BankModel, CurrencyModel, IndexerTypeModel, IndexerModel, CategoryModel, LiquidityModel
+from models.core import BankModel, CurrencyModel, IndexerTypeModel, IndexerModel, CategoryModel, LiquidityModel, CountryModel
 from models.credit_card import CreditCardModel
 from models.investment import InvestmentTypeModel, InvestmentModel, InvestmentStatementModel, InvestmentCategoryModel
 
@@ -22,6 +22,7 @@ async def populate():
         await BaseDataManager(session).add_or_ignore_all(IndexerModel, get_index_mock())
         await BaseDataManager(session).add_or_ignore_all(CategoryModel, get_category_mock())
         await BaseDataManager(session).add_or_ignore_all(LiquidityModel, get_liquidity_mock())
+        await BaseDataManager(session).add_or_ignore_all(CountryModel, get_country_mock())
 
         # Account data
         await BaseDataManager(session).add_or_ignore_all(AccountTypeModel, get_account_type_mock())

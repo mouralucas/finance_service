@@ -63,7 +63,7 @@ def get_bank_mock() -> list[dict[str, Any]]:
     return banks
 
 
-def get_country_mocked() -> list[dict[str, Any]]:
+def get_country_mock() -> list[dict[str, Any]]:
     country_list: list[dict[str, Any]] = [
         {
             **default_model_dict,
@@ -90,7 +90,7 @@ def get_country_mocked() -> list[dict[str, Any]]:
 
 
 def get_tax_mocked() -> list[dict[str, Any]]:
-    country_list = get_country_mocked()
+    country_list = get_country_mock()
 
     tax_list: list[dict[str, Any]] = [
         {

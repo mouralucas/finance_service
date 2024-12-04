@@ -1,7 +1,7 @@
 import pytest_asyncio
 from rolf_common.managers import BaseDataManager
 
-from data_mock.core import get_country_mocked, get_tax_mocked, get_currency_mock, get_bank_mock, get_category_mock, get_liquidity_mock
+from data_mock.core import get_country_mock, get_tax_mocked, get_currency_mock, get_bank_mock, get_category_mock, get_liquidity_mock
 from data_mock.core import get_index_mock, get_index_type_mock
 from models.core import BankModel, CurrencyModel, CategoryModel, CountryModel, TaxFeeModel, IndexerTypeModel, IndexerModel, LiquidityModel
 from schemas.core import CurrencySchema, BankSchema, CountrySchema, TaxSchema, CategorySchema, IndexerTypeSchema, IndexerSchema, LiquiditySchema
@@ -49,7 +49,7 @@ async def create_category(test_session) -> list[CategorySchema]:
 
 @pytest_asyncio.fixture
 async def create_country(test_session) -> list[CountrySchema]:
-    data_ = await BaseDataManager(test_session).add_or_ignore_all(CountryModel, get_country_mocked())
+    data_ = await BaseDataManager(test_session).add_or_ignore_all(CountryModel, get_country_mock())
     countries: list[CountrySchema] = [CountrySchema.model_validate(data["CountryModel"]) for data in data_]
 
     return countries

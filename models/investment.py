@@ -75,7 +75,8 @@ class InvestmentModel(SQLModel):
     liquidation_date: Mapped[datetime.date] = mapped_column('liquidation_date', nullable=True)
     liquidation_amount: Mapped[float] = mapped_column('liquidation_amount', DECIMAL(precision=15, scale=5), nullable=True)
 
-    country_id: Mapped[str] = mapped_column('country_id')  # Will tell what kind of tax will be charged
+    country_id: Mapped[str] = mapped_column(ForeignKey('country.id'))
+    country: Mapped['CountryModel'] = relationship(foreign_keys=[country_id], lazy='noload')
 
     objective_id: Mapped[str] = mapped_column(ForeignKey('investment_objective.id'), nullable=True)
     objective: Mapped['InvestmentObjectiveModel'] = relationship('InvestmentObjectiveModel', foreign_keys=[objective_id], lazy='subquery')
