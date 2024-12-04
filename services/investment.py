@@ -63,7 +63,7 @@ class InvestmentService(BaseService):
         fields = investment.model_dump()
         fields['is_liquidated'] = True
 
-        liquidated_investment = await self.investment_manager.update_investment(current_investment, fields)
+        liquidated_investment = await self.investment_manager.update_investment(current_investment.id, fields)
 
         response = LiquidateInvestmentResponse(
             investment=InvestmentSchema.model_validate(liquidated_investment),

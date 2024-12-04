@@ -1,5 +1,4 @@
-import uuid
-from typing import AnyStr, Any
+from typing import Any
 
 from pydantic import Field, BaseModel, ConfigDict, AliasGenerator
 from pydantic.alias_generators import to_camel
@@ -10,6 +9,10 @@ from schemas.investment import InvestmentSchema, InvestmentStatementSchema, Inve
 
 class CreateInvestmentResponse(SuccessResponseBase):
     investment: InvestmentSchema = Field(..., description='The investment created')
+
+
+class UpdateInvestmentResponse(CreateInvestmentResponse):
+    pass
 
 
 class GetInvestmentResponse(SuccessResponseBase):
@@ -56,6 +59,7 @@ class GetObjectiveSummaryResponse(SuccessResponseBase):
     amount_stipulated: float = Field(..., serialization_alias='amountStipulated', description='The amount stipulated when objective was created')
     amount_invested: float = Field(..., serialization_alias='amountInvested', description='The amount invested so far in this objective')
     perc_completed: float = Field(..., serialization_alias='percCompleted', description='The percentage completed of the objective')
+
 
 # Dashboard information
 class GetInvestmentAllocationResponse(SuccessResponseBase):

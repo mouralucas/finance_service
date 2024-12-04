@@ -23,16 +23,19 @@ class InvestmentManager(BaseDataManager):
 
         return investment
 
-    async def update_investment(self, investment: SQLModel, fields: dict[str, Any]) -> SQLModel:
+    async def update_investment(self, investment_id: uuid.UUID, fields: dict[str, Any]) -> InvestmentModel:
         query = (
             update(InvestmentModel)
-            .where(InvestmentModel.id == investment.id)
+            .where(InvestmentModel.id == investment_id)
             .values(**fields)
         )
 
-        updated_item = await self.update_one(sql_statement=query, sql_model=investment)
+        await self.session.execute(query)
+        await self.session.flush()
 
-        return updated_item
+        updated_investment = await self.get_investment_by_id(investment_id=investment_id)
+
+        return cast(InvestmentModel, updated_investment)
 
     async def get_investment_by_id(self, investment_id: uuid.UUID, raise_exception: bool = False) -> InvestmentModel | None:
         investment = await self.get_by_id(InvestmentModel, investment_id)
@@ -84,12 +87,12 @@ class InvestmentManager(BaseDataManager):
                 func.coalesce(investment_alias.liquidation_amount, 0).label('liquidation_amount'),
                 case(
                     (statement_alias.gross_amount == None,
-                    investment_alias.amount),
+                     investment_alias.amount),
                     else_=statement_alias.gross_amount
                 ).label('gross_amount'),
                 case(
                     (statement_alias.gross_amount != None,
-                     ((statement_alias.gross_amount - investment_alias.amount)/investment_alias.amount) * 100),
+                     ((statement_alias.gross_amount - investment_alias.amount) / investment_alias.amount) * 100),
                     else_=0
                 ).label('percentage_change'),
                 statement_alias.period

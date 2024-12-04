@@ -4,7 +4,7 @@ from decimal import Decimal
 
 from fastapi import Query
 from pydantic import BaseModel, Field, model_validator, ConfigDict, AliasGenerator
-from pydantic.alias_generators import to_snake, to_camel
+from pydantic.alias_generators import to_camel
 
 
 class CreateInvestmentRequest(BaseModel):
@@ -44,6 +44,30 @@ class CreateInvestmentRequest(BaseModel):
         return data
 
 
+class UpdateInvestmentRequest(CreateInvestmentRequest):
+    """
+        It is the same as CreateInvestment, but without any required field
+        Only investment id is required
+    """
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
+        alias=to_camel
+    ))
+
+    investment_id: uuid.UUID = Field(..., description='The unique identifier of the investment')
+    name: str | None = Field(None, description='The name of the investment')
+    account_id: uuid.UUID | None = Field(None, description='The id of the account')
+    type_id: uuid.UUID | None = Field(None, description='The id of the investment type')
+    transaction_date: datetime.date | None = Field(None, description='The date of the investment')
+    contracted_rate: str | None = Field(None, description='The rate of the investment')
+
+    currency_id: str | None = Field(None, description='The id of the currency')
+
+    indexer_type_id: uuid.UUID | None = Field(None, description='The type of the index for the investment')
+    indexer_id: uuid.UUID | None = Field(None, description='The id of the investment index')
+    liquidity_id: None = Field(None, description='The id of investment liquidity')
+    country_id: str | None = Field(None, description='The id of the country')
+
+
 class GetInvestmentRequest(BaseModel):
     id: uuid.UUID | None = Field(None, alias='investmentId', description='The id of the investment')
     start_date: datetime.date | None = Field(None, alias='startDate', description='The start date of the filter')
@@ -58,7 +82,7 @@ class LiquidateInvestmentRequest(BaseModel):
 
 
 class TaxFeeRequest(BaseModel):
-    id: uuid.UUID = Field(..., alias='taxFeeId', description='The identification of the tax/fee') # TODO: should be UUID not str
+    id: uuid.UUID = Field(..., alias='taxFeeId', description='The identification of the tax/fee')  # TODO: should be UUID not str
     amount: Decimal = Field(..., description='The amount of the tax/fee')
     currency_id: str = Field('BRL', alias='currencyId', description='The currency of the tax/fee')
 

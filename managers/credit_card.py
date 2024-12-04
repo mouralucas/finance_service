@@ -171,4 +171,4 @@ class CreditCardManager(BaseDataManager):
 
         result = await self.get_all(query)
 
-        return [dict(i.items()) for i in result] if result else None
+        return [dict(i.items()) for i in result] if result else []

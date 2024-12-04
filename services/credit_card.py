@@ -9,7 +9,7 @@ from starlette import status
 
 from managers.credit_card import CreditCardManager
 from models.credit_card import CreditCardModel, CreditCardTransactionModel
-from schemas.credit_card import CreditCardSchema, CreditCardTransactionSchema, CreditCardBillSchema
+from schemas.credit_card import CreditCardSchema, CreditCardTransactionSchema, CreditCardBillSchema, CreditCardBillSchemaByCard
 from schemas.request.credit_card import CreateCreditCardRequest, GetCreditCardRequest, CreateCreditCardTransactionRequest, CancelCreditCardRequest, GetCreditCardBillRequest, GetCreditCardTransactionsRequest
 from schemas.response.credit_card import CreateCreditCardResponse, GetCreditCardResponse, CreateCreditCardTransactionResponse, CancelCreditCardResponse, GetCreditCardTransactionResponse, GetCreditCardBillConsolidatedResponse, GetCreditCardBillByCardResponse
 from services.utils.datetime import get_period, get_period_range
@@ -120,7 +120,7 @@ class CreditCardService(BaseService):
         average = sum(item['total_amount'] for item in bill_consolidated) / len(bill_consolidated) if bill_consolidated else 0
 
         response = GetCreditCardBillConsolidatedResponse(
-            bill=[CreditCardBillSchema.model_validate(bill) for bill in bill_consolidated] if bill_consolidated else None,
+            bill=[CreditCardBillSchema.model_validate(bill) for bill in bill_consolidated] if bill_consolidated else [],
             average=average,
             period_range=get_period_range(201801, 202506),
             goal=2300,
@@ -130,7 +130,7 @@ class CreditCardService(BaseService):
 
     async def get_credit_card_bill_by_card(self, params: GetCreditCardBillRequest) -> GetCreditCardBillByCardResponse:
         bill_by_card = await self.credit_card_manager.get_bill_history_by_card(owner_id=self.user['user_id'], start_period=params.start_period, end_period=params.end_period)
-        distinct_cards = set(d['credit_card'] for d in bill_by_card)
+        distinct_cards = set(d['credit_card'] for d in bill_by_card) if bill_by_card else []
 
         a = {}
         for i in bill_by_card:
@@ -151,7 +151,7 @@ class CreditCardService(BaseService):
         b = list(a.values())
 
         response = GetCreditCardBillByCardResponse(
-            bill=b,
+            bill=[CreditCardBillSchemaByCard.model_validate(i) for i in b],
             cards=list(distinct_cards)
         )
 

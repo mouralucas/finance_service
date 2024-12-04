@@ -17,7 +17,7 @@ router = APIRouter(prefix="/investment", tags=['Investments'])
 
 
 @router.post('', status_code=status.HTTP_201_CREATED,
-             summary='Create an investment', description='Create an new investment for the user', name='Qual é o nome')
+             summary='Create an investment', description='Create an new investment for the user')
 async def create_investment(
         investment: CreateInvestmentRequest,
         session: AsyncSession = Depends(get_session),
@@ -26,6 +26,15 @@ async def create_investment(
     response = await InvestmentService(session=session, user=user).create_investment(investment)
 
     return response
+
+
+@router.patch('', summary='Update an investment')
+async def update_investment(
+        investment: CreateInvestmentRequest,
+        session: AsyncSession = Depends(get_session),
+        user: RequiredUser = Security(get_user)
+) -> None:
+    print(investment.model_dump(exclude_unset=True))
 
 
 @router.get('', summary='Get investments', description='Get investment base on filters')
