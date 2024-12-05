@@ -150,6 +150,7 @@ class CreditCardManager(BaseDataManager):
             select(
                 CreditCardTransactionModel.period,
                 CreditCardModel.nickname.label('credit_card'),
+                CurrencyModel.symbol.label('currency_symbol'),
                 func.round_(
                     func.sum(CreditCardTransactionModel.amount * -1)
                     , 2
@@ -157,6 +158,7 @@ class CreditCardManager(BaseDataManager):
             )
             .select_from(CreditCardTransactionModel)
             .join(CreditCardModel, CreditCardModel.id == CreditCardTransactionModel.credit_card_id)
+            .join(CurrencyModel, CreditCardModel.currency_id == CurrencyModel.id)
             .where(
                 CreditCardTransactionModel.owner_id == owner_id,
                 CreditCardTransactionModel.period >= start_period,
@@ -164,7 +166,8 @@ class CreditCardManager(BaseDataManager):
             )
             .group_by(
                 CreditCardTransactionModel.period,
-                CreditCardModel.nickname
+                CreditCardModel.nickname,
+                CurrencyModel.symbol
             )
             .order_by(CreditCardTransactionModel.period)
         )

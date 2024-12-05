@@ -64,7 +64,7 @@ class CreditCardBillSchema(BaseModel):
                               alias_generator=AliasGenerator(serialization_alias=to_camel))
 
     period: int = Field(..., description='The period of the bill')
-    total_amount: Decimal = Field(..., description='The total amount of the bill')
+    total_amount: float = Field(..., description='The total amount of the bill')
 
 
 class CreditCardBillSchemaByCard(BaseModel):
@@ -75,6 +75,7 @@ class CreditCardBillSchemaByCard(BaseModel):
 
     id: int = Field(..., description='The id of the bill, usually the period')
     period: int = Field(..., description='The period of the bill')
-    total: Decimal = Field(..., description='The total amount of the bill for that card')
+    total: float = Field(..., description='The total amount of the bill for that card')
+    currency_symbol: str = Field(..., description='The currency symbol for the credit card')
     # The total by card is add dynamically, the key is the name of the card.
     # That's the reason the "extra" config is set to 'allow'

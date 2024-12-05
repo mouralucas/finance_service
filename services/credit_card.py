@@ -137,11 +137,13 @@ class CreditCardService(BaseService):
             period = i['period']
             card = i['credit_card']
             total_amount = i['total_amount']
+            currency_symbol = i['currency_symbol']
 
             if period not in a:
                 a[period] = {
                     'id': period,
                     'period': period,
+                    'currency_symbol': currency_symbol,
                     'total': 0
                 }
 
