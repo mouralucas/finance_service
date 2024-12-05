@@ -32,32 +32,31 @@ class CategoryModel(SQLModel):
     parent: Mapped['CategoryModel'] = relationship(foreign_keys=[parent_id], lazy='subquery')
     order: Mapped[int] = mapped_column('order', SmallInteger, nullable=True)
 
-# TODO: Instead of creating a separated model with relation between expense type and category, maybe the
-# category itself is created by the user and have um column named 'expense_type'
 
-# class ExpenseTypeModel(SQLModel):
-#     """
-#     Created by: Lucas Penha de Moura - 29/10/2024
-#         This models stores all kinds of expenses types, like fixed, variable, recurring, etc
-#     """
-#     __tablename__ = 'expense_type'
-#
-#     name: Mapped[str] = mapped_column('name', String(50))
-#     description: Mapped[str] = mapped_column('description', String(250), nullable=True)
-#
-#
-# class CategoryExpenseTypeModel(SQLModel):
-#     """
-#     Created by: Lucas Penha de Moura - 29/10/2024
-#         This model relates the category with an expense type.
-#         The user can decide which expense type to use with any of its categories.
-#         These values are used to build dashboard charts
-#     """
-#     __tablename__ = 'category_group_user'
-#
-#     owner_id: Mapped[uuid.UUID] = mapped_column('owner_id')
-#     category_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('category.id'))
-#     group_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('category_group.id'))
+class ExpenseTypeModel(SQLModel):
+    """
+    Created by: Lucas Penha de Moura - 29/10/2024
+        This models stores all kinds of expenses types, like fixed, variable, recurring, etc
+    """
+    __tablename__ = 'expense_type'
+
+    name: Mapped[str] = mapped_column('name', String(50))
+    description: Mapped[str] = mapped_column('description', String(250), nullable=True)
+
+
+class CategoryExpenseTypeUserModel(SQLModel):
+    # TODO: creating cache for this info, if is available get from cache, update cache when user update this info
+    """
+    Created by: Lucas Penha de Moura - 29/10/2024
+        This model relates the category with an expense type and specific user.
+        The user can decide which expense type to use with any of its categories.
+        These values are used to build dashboard charts
+    """
+    __tablename__ = 'category_expense_user'
+
+    owner_id: Mapped[uuid.UUID] = mapped_column('owner_id')
+    category_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('category.id'))
+    expense_type_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('expense_type.id'))
 
 
 class CountryModel(SQLModel):

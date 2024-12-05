@@ -120,6 +120,7 @@ def get_account_transaction_mock() -> list[dict[str, Any]]:
     for i in range(0, 35):
         transaction_date = get_randon_date(start_date, end_date)
         amount = -random.uniform(0, 100)
+        category = categories[random.randint(0, len(categories) - 1)]['id']
 
         account_transactions.append(
             {
@@ -131,7 +132,7 @@ def get_account_transaction_mock() -> list[dict[str, Any]]:
                 'amount': amount,
                 'transaction_amount': amount,
                 'transaction_date': transaction_date,
-                'category_id': categories[0]['id'],
+                'category_id': category,
                 'description': 'Transaction {number}'.format(number=i),
                 'transaction_currency_id': currencies[0]['id'],
                 'origin': 'TEST',
@@ -142,6 +143,7 @@ def get_account_transaction_mock() -> list[dict[str, Any]]:
     for i in range(0, 5):
         transaction_date = get_randon_date(start_date, end_date)
         amount = random.uniform(0, 100)
+        category = categories[random.randint(0, len(categories) - 1)]['id']
 
         account_transactions.append(
             {
@@ -153,7 +155,7 @@ def get_account_transaction_mock() -> list[dict[str, Any]]:
                 'amount': amount,
                 'transaction_amount': amount,
                 'transaction_date': transaction_date,
-                'category_id': categories[0]['id'],
+                'category_id': category,
                 'description': 'Transaction {number}'.format(number=i),
                 'transaction_currency_id': currencies[0]['id'],
                 'origin': 'TEST',

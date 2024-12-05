@@ -1,8 +1,10 @@
+import uuid
+
 from pydantic import Field, BaseModel, ConfigDict, AliasGenerator
 from pydantic.alias_generators import to_camel
 from rolf_common.schemas import SuccessResponseBase
 
-from schemas.core import CurrencySchema, BankSchema, IndexerTypeSchema, IndexerSchema, LiquiditySchema
+from schemas.core import CurrencySchema, BankSchema, IndexerTypeSchema, IndexerSchema, LiquiditySchema, ExpensesByCategory
 
 
 class GetSummaryResponse(SuccessResponseBase):
@@ -48,3 +50,9 @@ class GetLiquidityResponse(BaseModel):
 
     quantity: int = Field(..., description='How many liquidity options are available in the request')
     liquidity: list[LiquiditySchema] = Field(..., description='The list of liquidity options')
+
+
+class GetExpensesByCategoryResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(serialization_alias=to_camel))
+
+    expenses_by_category: list[ExpensesByCategory] = Field(...)

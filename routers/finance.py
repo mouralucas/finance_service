@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.database import get_session
 from schemas.request.finance import GetSummaryRequest
-from schemas.response.finance import GetCurrencyResponse, GetBankResponse, GetIndexerTypeResponse, GetIndexerResponse, GetLiquidityResponse
+from schemas.response.finance import GetCurrencyResponse, GetBankResponse, GetIndexerTypeResponse, GetIndexerResponse, GetLiquidityResponse, GetExpensesByCategoryResponse
 from services.finance import FinanceService
 
 router = APIRouter(prefix="/finance", tags=['Finance'])
@@ -50,6 +50,7 @@ async def get_liquidity(
     return await FinanceService(session, user).get_liquidity()
 
 
+# Dashboard endpoints
 @router.get('/summary')
 async def get_summary(
         params: GetSummaryRequest = Depends(),
@@ -57,3 +58,11 @@ async def get_summary(
         user: RequiredUser = Security(get_user)
 ):
     return await FinanceService(session=session, user=user).get_summary(params=params)
+
+
+@router.get('/expenses/category')
+async def get_expenses_by_category(
+        session: AsyncSession = Depends(get_session),
+        user: RequiredUser = Security(get_user)
+) -> GetExpensesByCategoryResponse:
+    return await FinanceService(session=session, user=user).get_expenses_by_category()

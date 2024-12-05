@@ -3,10 +3,11 @@ from rolf_common.services import BaseService
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from managers.account import AccountManager
+from managers.credit_card import CreditCardManager
 from managers.finance import FinanceManager
-from schemas.core import CurrencySchema, BankSchema, IndexerTypeSchema, IndexerSchema, LiquiditySchema
+from schemas.core import CurrencySchema, BankSchema, IndexerTypeSchema, IndexerSchema, LiquiditySchema, ExpensesByCategory
 from schemas.request.finance import GetSummaryRequest
-from schemas.response.finance import GetCurrencyResponse, GetBankResponse, GetIndexerTypeResponse, GetIndexerResponse, GetLiquidityResponse
+from schemas.response.finance import GetCurrencyResponse, GetBankResponse, GetIndexerTypeResponse, GetIndexerResponse, GetLiquidityResponse, GetExpensesByCategoryResponse
 
 
 class FinanceService(BaseService):
@@ -66,6 +67,29 @@ class FinanceService(BaseService):
         response = GetLiquidityResponse(
             quantity=len(liquidity) if liquidity else 0,
             liquidity=[LiquiditySchema.model_validate(i) for i in liquidity] if liquidity else []
+        )
+
+        return response
+
+    # Dashboards services
+    async def get_expenses_by_category(self) -> GetExpensesByCategoryResponse:
+        exclude_categories = []
+
+        account_ = await AccountManager(session=self.session).get_account_expenses_by_category()
+        credit_card_ = await CreditCardManager(session=self.session).get_credit_card_expense_by_category()
+
+        transactions_by_category = {}
+        for item in [dict(row) for row in account_ + credit_card_]:
+            category_id = item["category_id"]
+            total = item["total"]
+            if category_id in transactions_by_category:
+                transactions_by_category[category_id]["total"] += total
+            else:
+                transactions_by_category[category_id] = item
+
+
+        response = GetExpensesByCategoryResponse(
+            expenses_by_category=[ExpensesByCategory.model_validate(transaction) for transaction in list(transactions_by_category.values())],
         )
 
         return response

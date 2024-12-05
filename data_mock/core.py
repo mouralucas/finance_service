@@ -114,8 +114,8 @@ def get_tax_mocked() -> list[dict[str, Any]]:
     return tax_list
 
 
-def get_category_mock() -> list[dict[str, Any]]:
-    categories: list[dict[str, Any]] = [
+def get_category_parent_mock() -> list[dict[str, Any]]:
+    categories_parent: list[dict[str, Any]] = [
         {
             **default_model_dict,
             'id': uuid.UUID('43bc5e7a-02c2-4173-b364-0abcb46950b9'),
@@ -127,7 +127,54 @@ def get_category_mock() -> list[dict[str, Any]]:
             'id': uuid.UUID('dd6022bf-ff38-4b2a-8f82-4f645df97a5b'),
             'name': 'Habitação',
             'description': 'Transações referentes a habitação',
-        }
+        },
+    ]
+
+    return categories_parent
+
+
+def get_category_mock() -> list[dict[str, Any]]:
+    parents = get_category_parent_mock()
+
+    categories: list[dict[str, Any]] = [
+        # Transport categories
+        {
+            **default_model_dict,
+            'id': uuid.UUID('8bb4afce-d8eb-4c15-bc24-78ace6c3faac'),
+            'name': 'Estacionamento',
+            'parent_id': parents[0]['id'],
+        },
+        {
+            **default_model_dict,
+            'id': uuid.UUID('f320ee65-6610-4c1b-a6f4-7ca91cff45d0'),
+            'name': 'Financiamento',
+            'parent_id': parents[0]['id']
+        },
+        {
+            **default_model_dict,
+            'id': uuid.UUID('dd805d44-fd7a-4af2-adb4-39173f6f677f'),
+            'name': 'Transporte público',
+            'parent_id': parents[0]['id']
+        },
+        # Home
+        {
+            **default_model_dict,
+            'id': uuid.UUID('013c9461-876f-4660-bec9-f6e7aba51807'),
+            'name': 'Aluguel',
+            'parent_id': parents[1]['id'],
+        },
+        {
+            **default_model_dict,
+            'id': uuid.UUID('d6e660a9-3c00-4fde-b978-4439cfcd1209'),
+            'name': 'Limpeza',
+            'parent_id': parents[1]['id'],
+        },
+        {
+            **default_model_dict,
+            'id': uuid.UUID('e0c5afab-a677-45cc-aa74-97bdd703d74b'),
+            'name': 'Energia',
+            'parent_id': parents[1]['id']
+        },
     ]
 
     return categories
@@ -206,3 +253,28 @@ def get_liquidity_mock() -> list[dict[str, Any]]:
     ]
 
     return liquidity
+
+
+def get_expense_type_mock() -> list[dict[str, Any]]:
+    expense_types: list[dict[str, Any]] = [
+        {
+            **default_model_dict,
+            'id': uuid.UUID('425394a1-35c9-40ad-bcab-ab53bf024517'),
+            'name': 'Fixo',
+            'description': 'Gastos fixos',
+        },
+        {
+            **default_model_dict,
+            'id': uuid.UUID('984a27e9-50e0-44a0-8737-7a87bb5d50a5'),
+            'name': 'Recorrente',
+            'description': 'Gastos recorrentes',
+        },
+        {
+            **default_model_dict,
+            'id': uuid.UUID('196a9d3c-faf5-4dc6-bd5d-d101367a4d2f'),
+            'name': 'Variável',
+            'description': 'Gastos variáveis',
+        }
+    ]
+
+    return expense_types

@@ -87,3 +87,11 @@ class CategorySchema(BaseModel):
     name: str = Field(..., description='The name of the category')
     comment: str | None = Field(None, description='The description of the category')
     order: int | None = Field(None, description='The order of the category')
+
+
+class ExpensesByCategory(BaseModel):
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(serialization_alias=to_camel))
+
+    category_id: uuid.UUID = Field(..., description='The category id')
+    category_name: str = Field(..., description='The category name')
+    total: float = Field(..., description='The total amount by category')

@@ -1,17 +1,19 @@
 import datetime
 import uuid
 from typing import Any, cast
+from unicodedata import category
 
 from fastapi import HTTPException
 from rolf_common.managers import BaseDataManager
 from rolf_common.models import SQLModel
-from sqlalchemy import select, update, func, case, RowMapping, literal_column, union_all
+from sqlalchemy import select, update, func, case, RowMapping, literal_column, union_all, union
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 from starlette import status
 
 from models.account import AccountModel, AccountTransactionModel, AccountBalanceModel
 from models.core import CurrencyModel, CategoryModel
+from models.credit_card import CreditCardTransactionModel
 from services.utils.datetime import get_current_period
 
 
@@ -267,3 +269,27 @@ class AccountManager(BaseDataManager):
         response = await self.get_all(query)
 
         return response
+
+    async def get_account_expenses_by_category(self) -> list[RowMapping] | None:
+        account_transaction_alias = aliased(AccountTransactionModel)
+        category_alias = aliased(CategoryModel)
+        category_parent_alias = aliased(CategoryModel)
+
+        query = (
+            select(
+                func.sum(account_transaction_alias.amount).label('total'),
+                category_parent_alias.id.label('category_id'),
+                category_parent_alias.name.label('category_name'),
+            )
+            .select_from(account_transaction_alias)
+            .join(category_alias, account_transaction_alias.category_id == category_alias.id)
+            .join(category_parent_alias, category_alias.parent_id == category_parent_alias.id)
+            .group_by(
+                category_parent_alias.id,
+                category_parent_alias.name,
+            )
+        )
+
+        result = await self.get_all(query)
+
+        return result

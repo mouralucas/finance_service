@@ -1,7 +1,7 @@
 import pytest_asyncio
 from rolf_common.managers import BaseDataManager
 
-from data_mock.core import get_country_mock, get_tax_mocked, get_currency_mock, get_bank_mock, get_category_mock, get_liquidity_mock
+from data_mock.core import get_country_mock, get_tax_mocked, get_currency_mock, get_bank_mock, get_category_mock, get_liquidity_mock, get_category_parent_mock
 from data_mock.core import get_index_mock, get_index_type_mock
 from models.core import BankModel, CurrencyModel, CategoryModel, CountryModel, TaxFeeModel, IndexerTypeModel, IndexerModel, LiquidityModel
 from schemas.core import CurrencySchema, BankSchema, CountrySchema, TaxSchema, CategorySchema, IndexerTypeSchema, IndexerSchema, LiquiditySchema
@@ -41,6 +41,8 @@ async def create_indexer(test_session) -> list[IndexerSchema]:
 
 @pytest_asyncio.fixture
 async def create_category(test_session) -> list[CategorySchema]:
+    # Insert the base categories (this categories cannot be set to any transaction)
+    await BaseDataManager(test_session).add_or_ignore_all(CategoryModel, get_category_parent_mock())
     data_ = await BaseDataManager(test_session).add_or_ignore_all(CategoryModel, get_category_mock())
     categories = [CategorySchema.model_validate(data["CategoryModel"]) for data in data_]
 

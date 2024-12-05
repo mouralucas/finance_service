@@ -33,3 +33,6 @@ class CoreService(BaseService):
         )
 
         return response
+
+    async def create_category_expense_relation(self, relation):
+        pass
