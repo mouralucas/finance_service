@@ -277,13 +277,14 @@ class AccountManager(BaseDataManager):
 
         query = (
             select(
-                func.sum(account_transaction_alias.amount).label('total'),
+                func.sum(account_transaction_alias.amount * -1).label('total'),
                 category_parent_alias.id.label('category_id'),
                 category_parent_alias.name.label('category_name'),
             )
             .select_from(account_transaction_alias)
             .join(category_alias, account_transaction_alias.category_id == category_alias.id)
             .join(category_parent_alias, category_alias.parent_id == category_parent_alias.id)
+            .where(account_transaction_alias.amount < 0)
             .group_by(
                 category_parent_alias.id,
                 category_parent_alias.name,
@@ -292,4 +293,4 @@ class AccountManager(BaseDataManager):
 
         result = await self.get_all(query)
 
-        return result
+        return result if result else []
