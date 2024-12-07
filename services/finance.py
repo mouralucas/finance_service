@@ -76,8 +76,8 @@ class FinanceService(BaseService):
         # TODO: How to solve the problem with different currencies?
         exclude_categories = []
 
-        account_ = await AccountManager(session=self.session).get_account_expenses_by_category()
-        credit_card_ = await CreditCardManager(session=self.session).get_credit_card_expense_by_category()
+        account_ = await AccountManager(session=self.session).get_account_expenses_by_category(owner_id=self.user['user_id'], period=202411)
+        credit_card_ = await CreditCardManager(session=self.session).get_credit_card_expense_by_category(owner_id=self.user['user_id'], period=202411)
 
         transactions_by_category = {}
         for item in [dict(row) for row in account_ + credit_card_]:

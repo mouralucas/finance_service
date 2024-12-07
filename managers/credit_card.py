@@ -177,7 +177,7 @@ class CreditCardManager(BaseDataManager):
         return [dict(i.items()) for i in result] if result else []
 
     # Dashboard
-    async def get_credit_card_expense_by_category(self) -> list[RowMapping]:
+    async def get_credit_card_expense_by_category(self, owner_id: uuid.UUID, period: int) -> list[RowMapping]:
         credit_card_transaction_alias = aliased(CreditCardTransactionModel)
         category_alias = aliased(CategoryModel)
         category_parent_alias = aliased(CategoryModel)
@@ -191,7 +191,11 @@ class CreditCardManager(BaseDataManager):
             .select_from(credit_card_transaction_alias)
             .join(category_alias, credit_card_transaction_alias.category_id == category_alias.id)
             .join(category_parent_alias, category_alias.parent_id == category_parent_alias.id)
-            .where(credit_card_transaction_alias.amount < 0)
+            .where(
+                credit_card_transaction_alias.owner_id == owner_id,
+                credit_card_transaction_alias.period == period,
+                credit_card_transaction_alias.amount < 0
+            )
             .group_by(
                 category_parent_alias.id,
                 category_parent_alias.name,

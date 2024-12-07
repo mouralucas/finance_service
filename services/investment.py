@@ -13,6 +13,7 @@ from starlette import status
 
 from managers.account import AccountManager
 from managers.core import CoreManager
+from managers.finance import FinanceManager
 from managers.investment import InvestmentManager
 from models.investment import InvestmentModel, InvestmentStatementModel, InvestmentObjectiveModel
 from schemas.investment import InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema, InvestmentTypeSchema, InvestmentAllocationSchema
@@ -20,6 +21,7 @@ from schemas.request.investment import CreateInvestmentRequest, GetInvestmentReq
     GetPerformanceRequest, UpdateInvestmentRequest
 from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, LiquidateInvestmentResponse, CreateStatementResponse, GetStatementResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse, \
     GetInvestmentWithoutObjectives, GetObjectiveSummaryResponse, GetInvestmentAllocationResponse, GetInvestmentPerformanceResponse, UpdateInvestmentResponse
+from services.finance import FinanceService
 from services.utils.datetime import get_period, get_previous_period
 
 
@@ -240,7 +242,7 @@ class InvestmentService(BaseService):
             indexer_id=params.indexer_id
         )
 
-        indexer = await CoreManager(session=self.session).get_indexer_by_id(indexer_id=params.indexer_id, raise_exception=True)
+        indexer = await FinanceManager(session=self.session).get_indexer_by_id(indexer_id=params.indexer_id, raise_exception=True)
 
         accumulated_indexer = 1.0
         accumulated_variation = 1.0

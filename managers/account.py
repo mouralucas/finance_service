@@ -270,7 +270,7 @@ class AccountManager(BaseDataManager):
 
         return response
 
-    async def get_account_expenses_by_category(self) -> list[RowMapping] | None:
+    async def get_account_expenses_by_category(self, owner_id: uuid.UUID, period: int) -> list[RowMapping] | None:
         account_transaction_alias = aliased(AccountTransactionModel)
         category_alias = aliased(CategoryModel)
         category_parent_alias = aliased(CategoryModel)
@@ -284,7 +284,11 @@ class AccountManager(BaseDataManager):
             .select_from(account_transaction_alias)
             .join(category_alias, account_transaction_alias.category_id == category_alias.id)
             .join(category_parent_alias, category_alias.parent_id == category_parent_alias.id)
-            .where(account_transaction_alias.amount < 0)
+            .where(
+                account_transaction_alias.owner_id == owner_id,
+                account_transaction_alias.period == period,
+                account_transaction_alias.amount < 0
+            )
             .group_by(
                 category_parent_alias.id,
                 category_parent_alias.name,
