@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, date
 
 from dateutil.relativedelta import relativedelta
 from fastapi import HTTPException
@@ -9,10 +9,11 @@ from starlette import status
 
 from managers.credit_card import CreditCardManager
 from models.credit_card import CreditCardModel, CreditCardTransactionModel
-from schemas.credit_card import CreditCardSchema, CreditCardTransactionSchema, CreditCardBillSchema, CreditCardBillSchemaByCard
-from schemas.request.credit_card import CreateCreditCardRequest, GetCreditCardRequest, CreateCreditCardTransactionRequest, CancelCreditCardRequest, GetCreditCardBillRequest, GetCreditCardTransactionsRequest
-from schemas.response.credit_card import CreateCreditCardResponse, GetCreditCardResponse, CreateCreditCardTransactionResponse, CancelCreditCardResponse, GetCreditCardTransactionResponse, GetCreditCardBillConsolidatedResponse, GetCreditCardBillByCardResponse
-from services.utils.datetime import get_period, get_period_range
+from schemas.credit_card import CreditCardSchema, CreditCardTransactionSchema, CreditCardBillSchema, CreditCardBillSchemaByCard, InstallmentsDueDates
+from schemas.request.credit_card import CreateCreditCardRequest, GetCreditCardRequest, CreateCreditCardTransactionRequest, CancelCreditCardRequest, GetCreditCardBillRequest, GetCreditCardTransactionsRequest, GetInstallmentsDueDatesRequest
+from schemas.response.credit_card import CreateCreditCardResponse, GetCreditCardResponse, CreateCreditCardTransactionResponse, CancelCreditCardResponse, GetCreditCardTransactionResponse, GetCreditCardBillConsolidatedResponse, \
+    GetCreditCardBillByCardResponse, GetInstallmentsDueDatesResponse
+from services.utils.datetime import get_period, get_period_range, get_installments_due_dates
 
 
 class CreditCardService(BaseService):
@@ -80,10 +81,11 @@ class CreditCardService(BaseService):
             new_bill_entry = CreditCardTransactionModel(**bill_entry.model_dump(exclude={'installment', 'is_international_transaction', 'tax_detail'}))
 
             new_bill_entry.owner_id = owner_id
-            new_bill_entry.amount = i.amount
+            new_bill_entry.amount = i.amount # TODO: check this warning
             new_bill_entry.currency_id = currency_id
             new_bill_entry.current_installment = i.current_installment
             new_bill_entry.installments = i.installments
+            # TODO: use new function util.datetime.get_installments_due_dates
             new_bill_entry.due_date = self.set_due_date(transaction_date, close_day, due_day, i.current_installment)
             new_bill_entry.period = get_period(new_bill_entry.due_date)
             new_bill_entry.is_installment = True if len(bill_entry.installments) > 1 else False
@@ -98,7 +100,7 @@ class CreditCardService(BaseService):
         created_entries = await CreditCardManager(session=self.session).create_credit_card_transaction(entry_list)
 
         response = CreateCreditCardTransactionResponse(
-            transaction=created_entries
+            transaction=[CreditCardTransactionSchema.model_validate(entry) for entry in created_entries]
         )
 
         return response
@@ -159,9 +161,21 @@ class CreditCardService(BaseService):
 
         return response
 
+    async def get_installments_due_date(self, params: GetInstallmentsDueDatesRequest) -> GetInstallmentsDueDatesResponse:
+        credit_card = await CreditCardManager(session=self.session).get_credit_card_by_id(params.credit_card_id)
+
+        installments_due_dates = get_installments_due_dates(transaction_date=params.transaction_date, due_day=credit_card.due_day, close_day=credit_card.close_day,
+                                                            tot_installments=params.tot_installments)
+
+        response = GetInstallmentsDueDatesResponse(
+            due_dates=[InstallmentsDueDates.model_validate(due_date) for due_date in installments_due_dates],
+        )
+
+        return response
+
     @staticmethod
-    def set_due_date(transaction_date: datetime.date, close_day: int, due_day: int,
-                     installment: int = 1, return_str: bool = False) -> datetime.date | str:
+    def set_due_date(transaction_date: date, close_day: int, due_day: int,
+                     installment: int = 1, return_str: bool = False) -> date | str:
         month = transaction_date.month
         year = transaction_date.year
 
@@ -178,7 +192,7 @@ class CreditCardService(BaseService):
                 month = 1
                 year += 1
 
-        due_date = datetime.datetime(year, month, due_day)
+        due_date = datetime(year, month, due_day)
         if installment > 1:
             due_date += relativedelta(months=installment - 1)
 

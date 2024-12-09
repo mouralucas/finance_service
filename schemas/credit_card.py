@@ -1,10 +1,8 @@
 import datetime
 import uuid
-from tkinter.scrolledtext import example
 
 from pydantic import BaseModel, ConfigDict, Field, AliasGenerator
 from pydantic.alias_generators import to_camel
-from decimal import Decimal
 
 from schemas.core import CurrencySchema
 
@@ -79,3 +77,8 @@ class CreditCardBillSchemaByCard(BaseModel):
     currency_symbol: str = Field(..., description='The currency symbol for the credit card')
     # The total by card is add dynamically, the key is the name of the card.
     # That's the reason the "extra" config is set to 'allow'
+
+
+class InstallmentsDueDates(BaseModel):
+    current_installment: int = Field(..., description='The current installment')
+    due_date: datetime.date = Field(..., description='The due date for the installment')

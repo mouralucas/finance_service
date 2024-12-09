@@ -1,10 +1,10 @@
 import datetime
 import uuid
 from decimal import Decimal
-from typing import Any
 
 from fastapi import Query
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, ConfigDict, AliasGenerator
+from pydantic.alias_generators import to_camel
 
 
 class CreateCreditCardRequest(BaseModel):
@@ -56,6 +56,15 @@ class CreateCreditCardTransactionRequest(BaseModel):
     origin: str = Field('SYSTEM', alias='origin', description='The origin of the transaction')
     operation_type: str = Field(None, alias="operationType", description="The type of the transaction")
 
+
+class GetInstallmentsDueDatesRequest(BaseModel):
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
+        alias=to_camel
+    ))
+
+    transaction_date: datetime.date = Field(..., description='The transaction date')
+    credit_card_id: uuid.UUID = Field(..., description='The credit card id')
+    tot_installments: int = Field(..., description='The total installment')
 
 class GetCreditCardTransactionsRequest(BaseModel):
     credit_card_id: uuid.UUID | None = Field(None, alias='creditCardId', description='The id of the credit card')

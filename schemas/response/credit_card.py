@@ -2,7 +2,7 @@ from pydantic import Field, BaseModel, ConfigDict, AliasGenerator
 from pydantic.alias_generators import to_camel
 from rolf_common.schemas import SuccessResponseBase
 
-from schemas.credit_card import CreditCardSchema, CreditCardTransactionSchema, CreditCardBillSchema, CreditCardBillSchemaByCard
+from schemas.credit_card import CreditCardSchema, CreditCardTransactionSchema, CreditCardBillSchema, CreditCardBillSchemaByCard, InstallmentsDueDates
 
 
 class CreateCreditCardResponse(SuccessResponseBase):
@@ -25,6 +25,10 @@ class CreateCreditCardTransactionResponse(SuccessResponseBase):
 class GetCreditCardTransactionResponse(SuccessResponseBase):
     quantity: int = Field(..., serialization_alias='quantity', description='The number of credit cards transactions')
     transactions: list[CreditCardTransactionSchema] = Field(..., serialization_alias='transactions', description='The list of the credit transactions')
+
+
+class GetInstallmentsDueDatesResponse(BaseModel):
+    due_dates: list[InstallmentsDueDates] = Field(..., description='The list of installments and its due dates')
 
 
 class GetCreditCardBillConsolidatedResponse(BaseModel):

@@ -1,19 +1,23 @@
 import calendar
 import datetime
 import random
+from datetime import datetime, date, timedelta, timezone
+from typing import Any
+
+from dateutil.relativedelta import relativedelta
 
 
 def get_current_period():
-    today = datetime.datetime.now(datetime.timezone.utc)
+    today = datetime.now(timezone.utc)
     month = today.month
     year = today.year
 
     return year * 100 + month
 
 
-def get_period(date: datetime.date | datetime.datetime) -> int:
-    year = date.year
-    month = date.month
+def get_period(reference_date: date | datetime) -> int:
+    year = reference_date.year
+    month = reference_date.month
     return year * 100 + month
 
 
@@ -116,6 +120,42 @@ def get_randon_date(start_date: datetime.date, end_date: datetime.date) -> datet
     """
     date_range = end_date - start_date
     random_days = random.randint(0, date_range.days)
-    random_date = start_date + datetime.timedelta(days=random_days)
+    random_date = start_date + timedelta(days=random_days)
 
     return random_date
+
+
+def get_installments_due_dates(transaction_date: datetime.date, close_day: int, due_day: int,
+                               tot_installments: int = 1, return_str: bool = False) -> list[date | Any]:
+    month = transaction_date.month
+    year = transaction_date.year
+
+    if transaction_date.day >= close_day:
+        # If bill is already closed, the charge will be set in next month
+        month += 1
+        if month > 12:
+            month = 1
+            year += 1
+
+    if close_day > due_day:
+        month += 1
+        if month > 12:
+            month = 1
+            year += 1
+
+    installments_due_dates = []
+    for i in range(1, tot_installments + 1):
+        due_date = datetime(year, month, due_day)
+        if i > 1:
+            due_date += relativedelta(months=i - 1)
+        installments_due_dates.append(
+            {
+                'current_installment': i,
+                'due_date': due_date.date()
+            }
+        )
+
+    if return_str:
+        pass
+
+    return installments_due_dates

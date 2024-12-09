@@ -5,8 +5,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from backend.database import get_session
-from schemas.request.credit_card import CreateCreditCardRequest, CreateCreditCardTransactionRequest, GetCreditCardRequest, CancelCreditCardRequest, GetCreditCardBillRequest, GetCreditCardTransactionsRequest
-from schemas.response.credit_card import CreateCreditCardResponse, CreateCreditCardTransactionResponse, GetCreditCardTransactionResponse, GetCreditCardBillConsolidatedResponse, GetCreditCardBillByCardResponse
+from schemas.request.credit_card import CreateCreditCardRequest, CreateCreditCardTransactionRequest, GetCreditCardRequest, CancelCreditCardRequest, GetCreditCardBillRequest, GetCreditCardTransactionsRequest, GetInstallmentsDueDatesRequest
+from schemas.response.credit_card import CreateCreditCardResponse, CreateCreditCardTransactionResponse, GetCreditCardTransactionResponse, GetCreditCardBillConsolidatedResponse, GetCreditCardBillByCardResponse, \
+    GetInstallmentsDueDatesResponse
 from services.credit_card import CreditCardService
 
 router = APIRouter(prefix="/creditcard", tags=['Credit cards'])
@@ -70,6 +71,15 @@ async def get_transactions(
         user: RequiredUser = Security(get_user)
 ) -> GetCreditCardTransactionResponse:
     return await CreditCardService(session=session, user=user).get_transactions(params)
+
+
+@router.get('/transaction/installment/due-date', summary='Get due date', description='Get due date for every installment')
+async def get_installments_due_dates(
+        params: GetInstallmentsDueDatesRequest = Depends(),
+        session: AsyncSession = Depends(get_session),
+        user: RequiredUser = Security(get_user)
+) -> GetInstallmentsDueDatesResponse:
+    return await CreditCardService(session=session, user=user).get_installments_due_date(params=params)
 
 
 @router.get('/bill/consolidated',
