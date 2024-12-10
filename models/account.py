@@ -48,8 +48,8 @@ class AccountTransactionModel(SQLModel):
     currency: Mapped['CurrencyModel'] = relationship(foreign_keys=[currency_id], lazy='subquery')  # Should be always the same as the account currency
     amount: Mapped[float] = mapped_column('amount', DECIMAL(precision=15, scale=5))
     transaction_date: Mapped[datetime.date] = mapped_column('transaction_date')
-    category_id_old: Mapped[str] = mapped_column('category_id_old', nullable=True)
-    category_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('category.id'), nullable=True)  # TODO: Set to null, return to not null after migration
+    # category_id_old: Mapped[str] = mapped_column('category_id_old', nullable=True)
+    category_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('category.id'))
     category: Mapped['CategoryModel'] = relationship(foreign_keys=[category_id], lazy='subquery')
     description: Mapped[str] = mapped_column('description', String(500), nullable=True)
     operation_type: Mapped[str] = mapped_column('operation_type', String(15), nullable=True)  # deprecated, now just input positive or negative values

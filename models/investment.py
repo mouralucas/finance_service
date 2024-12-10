@@ -25,8 +25,6 @@ class InvestmentTypeModel(SQLModel):
     Created by: Lucas Penha de Moura - 11/08/2024
         This model is used to store all kinds of investment types.
         In Brazil, for example, it can be CDB, LCI, LCA, Tesouro Direto, etc
-
-        TODO: maybe create a field to country, to indicate types by country
     """
     __tablename__ = 'investment_type'
 
@@ -34,6 +32,7 @@ class InvestmentTypeModel(SQLModel):
     description: Mapped[str] = mapped_column('description', String(200), nullable=True)
     parent_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('investment_type.id'), nullable=True)
     parent: Mapped['InvestmentTypeModel'] = relationship(foreign_keys=[parent_id], lazy='subquery')
+    country_id: Mapped[str] = mapped_column(ForeignKey('country.id'), nullable=True)
     investment_category_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('investment_category.id'), nullable=True)
     investment_category: Mapped['InvestmentCategoryModel'] = relationship(foreign_keys=[investment_category_id], lazy='subquery')
 
@@ -50,7 +49,7 @@ class InvestmentModel(SQLModel):
     name: Mapped[str] = mapped_column('name', String(200))
     custodian_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('bank.id'))
     custodiam: Mapped['BankModel'] = relationship(foreign_keys=[custodian_id], lazy='subquery')
-    account_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('account.id'), nullable=True) # TODO: change back to not null after migration
+    account_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('account.id'))
     account: Mapped['AccountModel'] = relationship(foreign_keys=[account_id], lazy='subquery')
 
     type_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('investment_type.id'))
@@ -102,9 +101,8 @@ class InvestmentStatementModel(SQLModel):
     net_amount: Mapped[float] = mapped_column('net_amount', DECIMAL(precision=15, scale=5))
     tax_detail: Mapped[dict] = mapped_column('tax_detail', JSON, nullable=True)
     fee_detail: Mapped[dict] = mapped_column('fee_detail', JSON, nullable=True)
-    reference_date: Mapped[datetime.date] = mapped_column('reference_date', nullable=True) # TODO: Add not null after migration
+    reference_date: Mapped[datetime.date] = mapped_column('reference_date')
     at_maturity: Mapped[bool] = mapped_column('at_maturity', default=False)
-    # TODO: decide if persist this data or calculate when needed
     value_change: Mapped[float] = mapped_column('value_change', DECIMAL(precision=15, scale=5), nullable=True)
     percentage_change: Mapped[float] = mapped_column('percentage_change', DECIMAL(precision=9, scale=3), nullable=True)
     index_percent_change: Mapped[float] = mapped_column('index_change', DECIMAL(precision=9, scale=3), nullable=True)  # how much the index changed in the period

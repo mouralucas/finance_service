@@ -94,7 +94,6 @@ class IndexerModel(SQLModel):
         There is a default option in table when a index is not used {name='Índice não definido'}
 
         TODO: maybe add country
-        TODO: create the default data creation for this table after migrate
     """
     __tablename__ = 'indexer'
 
@@ -120,7 +119,6 @@ class LiquidityModel(SQLModel):
     Created by: Lucas Penha de Moura - 11/08/2024
         This model stores liquidity information like if it is "daily", "monthly", etc.
 
-        # TODO: rethink this table, it can be infinite liquidity like D+
     """
     __tablename__ = 'liquidity'
 
