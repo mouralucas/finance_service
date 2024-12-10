@@ -249,8 +249,8 @@ class InvestmentService(BaseService):
 
         new_list = []
         for item in performance_portfolio:
-            indexer_variation_decimal = item['indexer_variation'] / 100
-            variation_decimal = item['variation'] / 100
+            indexer_variation_decimal = float(item['indexer_variation'] / 100) if item['indexer_variation'] else 0
+            variation_decimal = float(item['variation'] / 100)
 
             accumulated_indexer *= (1 + indexer_variation_decimal)
             accumulated_variation *= (1 + variation_decimal)

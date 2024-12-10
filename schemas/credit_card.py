@@ -80,5 +80,9 @@ class CreditCardBillSchemaByCard(BaseModel):
 
 
 class InstallmentsDueDates(BaseModel):
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
+        serialization_alias=to_camel
+    ))
+
     current_installment: int = Field(..., description='The current installment')
     due_date: datetime.date = Field(..., description='The due date for the installment')

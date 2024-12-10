@@ -315,14 +315,12 @@ class InvestmentManager(BaseDataManager):
 
         :return: RowMapping with period and total gross, net and previous amount
         """
-        # TODO: verify if is possible to add a variable indicating if the period have new transactions
-        # I need to subtract the amount invested in the month
         query = (
             select(
                 InvestmentStatementModel.period,
-                # func.sum(InvestmentStatementModel.previous_amount).label('total_previous'),
-                # func.sum(InvestmentStatementModel.gross_amount).label('total_gross'),
-                # func.sum(InvestmentStatementModel.net_amount).label('total_net'),
+                func.sum(InvestmentStatementModel.previous_amount).label('total_previous'),
+                func.sum(InvestmentStatementModel.gross_amount).label('total_gross'),
+                func.sum(InvestmentStatementModel.net_amount).label('total_net'),
                 IndexerSeriesModel.value.label('indexer_variation'),
                 case(
                     (func.sum(InvestmentStatementModel.previous_amount) != 0,

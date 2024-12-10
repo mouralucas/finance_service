@@ -2,7 +2,7 @@ import uuid
 import datetime
 from rolf_common.models import SQLModel
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import String, SmallInteger, ForeignKey
+from sqlalchemy import String, SmallInteger, ForeignKey, DECIMAL
 
 
 class CurrencyModel(SQLModel):
@@ -109,7 +109,7 @@ class IndexerSeriesModel(SQLModel):
     indexer_name: Mapped[str] = mapped_column('indexer_name', String(100))  # Usually the same as Indexer model, just denormalized
     date: Mapped[datetime.date] = mapped_column('date', nullable=True)
     period: Mapped[int] = mapped_column('period', nullable=True)
-    value: Mapped[float] = mapped_column('value', nullable=True)
+    value: Mapped[float] = mapped_column('value', DECIMAL(precision=15, scale=5), nullable=True)
     periodicity_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('periodicity.id'))
     periodicity_name: Mapped[str] = mapped_column('periodicity_name', String(100))
     unit: Mapped[str] = mapped_column('unit', String(10))

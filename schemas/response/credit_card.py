@@ -28,6 +28,9 @@ class GetCreditCardTransactionResponse(SuccessResponseBase):
 
 
 class GetInstallmentsDueDatesResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
+        serialization_alias=to_camel
+    ))
     due_dates: list[InstallmentsDueDates] = Field(..., description='The list of installments and its due dates')
 
 
