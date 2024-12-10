@@ -122,3 +122,14 @@ class InvestmentAllocationSchema(BaseModel):
 
     name: str = Field(..., description='The name of the allocation')
     total: Decimal = Field(..., description='The total amount allocated')
+
+
+# Performance
+class InvestmentPerformanceDataSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
+        serialization_alias=to_camel,
+    ))
+
+    period: int = Field(..., description='The period of the data')
+    variation: float = Field(..., description='The variation of the investment in the period')
+    indexer_variation: float = Field(..., description='The indexer variation of the investment in the period')

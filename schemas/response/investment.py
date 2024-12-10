@@ -4,7 +4,8 @@ from pydantic import Field, BaseModel, ConfigDict, AliasGenerator
 from pydantic.alias_generators import to_camel
 from rolf_common.schemas import SuccessResponseBase
 
-from schemas.investment import InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema, InvestmentTypeSchema, InvestmentAllocationSchema
+from schemas.core import ChartSeriesSchema
+from schemas.investment import InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema, InvestmentTypeSchema, InvestmentAllocationSchema, InvestmentPerformanceDataSchema
 
 
 class CreateInvestmentResponse(SuccessResponseBase):
@@ -68,5 +69,5 @@ class GetInvestmentAllocationResponse(SuccessResponseBase):
 
 
 class GetInvestmentPerformanceResponse(SuccessResponseBase):
-    data: Any
-    series: Any
+    data: list[InvestmentPerformanceDataSchema] = Field(..., description='The investment performance data')
+    series: list[ChartSeriesSchema] = Field(..., description='The performance series')

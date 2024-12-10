@@ -16,7 +16,8 @@ from managers.core import CoreManager
 from managers.finance import FinanceManager
 from managers.investment import InvestmentManager
 from models.investment import InvestmentModel, InvestmentStatementModel, InvestmentObjectiveModel
-from schemas.investment import InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema, InvestmentTypeSchema, InvestmentAllocationSchema
+from schemas.core import ChartSeriesSchema
+from schemas.investment import InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema, InvestmentTypeSchema, InvestmentAllocationSchema, InvestmentPerformanceDataSchema
 from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, LiquidateInvestmentRequest, CreateStatementRequest, GetStatementRequest, CreateObjectiveRequest, GetObjectiveRequest, GetObjectiveSummaryRequest, \
     GetPerformanceRequest, UpdateInvestmentRequest
 from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, LiquidateInvestmentResponse, CreateStatementResponse, GetStatementResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse, \
@@ -234,8 +235,6 @@ class InvestmentService(BaseService):
         return response
 
     async def get_performance(self, params: GetPerformanceRequest) -> GetInvestmentPerformanceResponse:
-        # A ideia é criar um gráfico de linhas com dois eixos, no primeiro eixo, colocar a evolução percentual de cada investimento,
-        # do agrupado de investimento e de algum indexador (como o cdi) para cada período
         performance_portfolio = await self.investment_manager.get_performance_portfolio(
             owner_id=self.user['user_id'],
             period_range=params.period_range,
@@ -247,7 +246,7 @@ class InvestmentService(BaseService):
         accumulated_indexer = 1.0
         accumulated_variation = 1.0
 
-        new_list = []
+        period_performance = []
         for item in performance_portfolio:
             indexer_variation_decimal = float(item['indexer_variation'] / 100) if item['indexer_variation'] else 0
             variation_decimal = float(item['variation'] / 100)
@@ -255,7 +254,7 @@ class InvestmentService(BaseService):
             accumulated_indexer *= (1 + indexer_variation_decimal)
             accumulated_variation *= (1 + variation_decimal)
 
-            new_list.append(
+            period_performance.append(
                 {
                     'period': item['period'],
                     'indexer_variation': (accumulated_indexer - 1) * 100,
@@ -263,18 +262,20 @@ class InvestmentService(BaseService):
                 }
             )
 
+        series = [
+            {
+                'value': 'indexer_variation',
+                'name': indexer.name
+            },
+            {
+                'value': 'variation',
+                'name': 'Carteira'
+            }
+        ]
+
         response = GetInvestmentPerformanceResponse(
-            data=new_list,
-            series=[
-                {
-                    'value': 'indexer_variation',
-                    'name': indexer.name
-                },
-                {
-                    'value': 'variation',
-                    'name': 'Carteira'
-                }
-            ]
+            data=[InvestmentPerformanceDataSchema.model_validate(performance) for performance in period_performance],
+            series=[ChartSeriesSchema.model_validate(serie) for serie in series],
         )
 
         return response

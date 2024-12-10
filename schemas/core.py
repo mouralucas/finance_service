@@ -95,3 +95,13 @@ class ExpensesByCategory(BaseModel):
     category_id: uuid.UUID = Field(..., description='The category id')
     category_name: str = Field(..., description='The category name')
     total: float = Field(..., description='The total amount by category')
+
+
+# Default Series schema for charts:
+class ChartSeriesSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
+        serialization_alias=to_camel,
+    ))
+
+    value: str = Field(..., description='The value of series')
+    name: str = Field(..., description='The name of the series')
