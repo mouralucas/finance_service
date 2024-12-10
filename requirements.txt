@@ -1,6 +1,6 @@
-fastapi==0.115.2
-pydantic==2.9.2
-pydantic-settings==2.6.0
+fastapi==0.115.6
+pydantic==2.10.3
+pydantic-settings==2.6.1
 uvicorn==0.22.0
 sqlalchemy[asyncio]==2.0.36
 starlette==0.40.0
@@ -10,11 +10,12 @@ git+https://github.com/mouralucas/rolf_common.git@main#egg=rolf_common
 
 
 #Database
-asyncpg==0.29.0
+asyncpg==0.30.0
 alembic==1.13.3
 aiosqlite==0.20.0
 
 # tests
-pytest==7.3.1
-pytest-asyncio==0.21.0
+# To run in Pycharm Configuration, change working directory to project root
+pytest==8.3.4
+pytest-asyncio==0.24.0
 
