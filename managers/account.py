@@ -6,7 +6,7 @@ from unicodedata import category
 from fastapi import HTTPException
 from rolf_common.managers import BaseDataManager
 from rolf_common.models import SQLModel
-from sqlalchemy import select, update, func, case, RowMapping, literal_column, union_all, union
+from sqlalchemy import select, update, func, case, RowMapping, literal_column, union_all, union, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 from starlette import status
@@ -159,6 +159,12 @@ class AccountManager(BaseDataManager):
         balance = await self.get_all(query)
 
         return balance
+
+    async def delete_balance(self, account_id: uuid.UUID) -> None:
+        await self.session.execute(delete(AccountBalanceModel).where(AccountBalanceModel.account_id == account_id))
+        await self.session.flush()
+
+        return
 
     async def get_consolidated_transactions_by_period(self, account_id: uuid.UUID, period_range: list[int]) -> list[RowMapping] | None:
         """

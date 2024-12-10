@@ -55,10 +55,6 @@ class AccountService(BaseService):
             }
             await CreditCardManager(session=self.session).update_credit_card(cast(CreditCardModel, credit_card), credit_card_fields)
 
-        # Refresh account object with the cancelled credit cards
-        # TODO: add a function to manager, not use session here
-        await self.session.refresh(closed_account)
-
         response = CloseAccountResponse(
             account=AccountSchema.model_validate(closed_account),
         )
@@ -133,7 +129,6 @@ class AccountService(BaseService):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Account not exists')
 
         # Get balance from the last period with registered transactions until the account is closed or current period
-        # TODO: stmt should not be in service!
         min_period: int = await self.account_manager.get_only_one(select(func.min(AccountTransactionModel.period)).where(AccountTransactionModel.account_id == params.account_id))
         max_period: int = get_period(account.close_date) if account.close_date else get_current_period()
 
@@ -146,11 +141,6 @@ class AccountService(BaseService):
         # The firs balance available always start with 'previous_balance' at zero, even if in actual account have more transactions
         # The user should add the previous amount as a transaction, so the calculation is correct at the end
         previous_balance = 0.0
-
-        # Remove previous balance data for the account
-        # TODO: database operations must be in managers!!
-        await self.session.execute(delete(AccountBalanceModel).where(AccountBalanceModel.account_id == params.account_id))
-        await self.session.flush()
 
         balance_entries = []
         for period_data in transactions_by_period:
@@ -176,6 +166,10 @@ class AccountService(BaseService):
             # Update the previous balance with the current balance
             previous_balance = balance
 
+        # Remove previous balance data for the account
+        await self.account_manager.delete_balance(account_id=params.account_id)
+
+        # Add the calculated balance for the account
         self.session.add_all(balance_entries)
 
         response = CreateBalanceResponse(
