@@ -108,6 +108,11 @@ class AccountManager(BaseDataManager):
                 transaction_alias.effective_rate,
             )
             .select_from(transaction_alias)
+            .where(
+                transaction_alias.owner_id == owner_id,
+                transaction_alias.period >= start_period,
+                transaction_alias.period <= end_period
+            )
             .join(account_alias, transaction_alias.account_id == account_alias.id)
             .join(currency_alias, transaction_alias.currency_id == currency_alias.id)
             .join(transaction_currency_alias, transaction_alias.transaction_currency_id == transaction_currency_alias.id)
