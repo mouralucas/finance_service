@@ -37,7 +37,7 @@ class CreditCardTransactionModel(SQLModel):
     category: Mapped['CategoryModel'] = relationship(foreign_keys=[category_id], lazy='subquery')
     currency_id: Mapped[str] = mapped_column(ForeignKey('currency.id'))
     currency: Mapped['CurrencyModel'] = relationship(foreign_keys=[currency_id], lazy='subquery')  # The currency showed on the bill
-    operation_type: Mapped[str] = mapped_column('operation_type', String(15))  # whether is incoming or outgoing
+
 
     transaction_currency_id: Mapped[str] = mapped_column(ForeignKey('currency.id'))
     transaction_currency: Mapped['CurrencyModel'] = relationship(foreign_keys=[transaction_currency_id], lazy='subquery')  # The currency of transaction
@@ -61,3 +61,5 @@ class CreditCardTransactionModel(SQLModel):
 
     origin: Mapped[str] = mapped_column('origin', String(10))
     is_validated: Mapped[bool] = mapped_column('is_validated', default=True)
+
+    operation_type: Mapped[str] = mapped_column('operation_type', String(15), nullable=True)  # Deprecated, will be removed soon

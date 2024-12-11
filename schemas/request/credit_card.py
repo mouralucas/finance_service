@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, date
 import uuid
 from decimal import Decimal
 
@@ -11,15 +11,15 @@ class CreateCreditCardRequest(BaseModel):
     nickname: str = Field(..., alias="nickname", description='A nickname for the card')
     account_id: uuid.UUID = Field(None, alias="accountId", description='The account id, if any')
     currency_id: str = Field(..., alias="currencyId", description='The currency id')
-    issue_date: datetime.date = Field(None, alias="issueDate", description='The issue date of the card')
-    cancellation_date: datetime.date = Field(None, alias="cancellationDate", description='The cancel date of the card')
+    issue_date: date = Field(None, alias="issueDate", description='The issue date of the card')
+    cancellation_date: date = Field(None, alias="cancellationDate", description='The cancel date of the card')
     due_day: int = Field(..., alias="dueDay", description='The due day of the card')
     close_day: int = Field(..., alias="closeDay", description='The close day of the card')
 
 
 class CancelCreditCardRequest(BaseModel):
     id: uuid.UUID = Field(None, alias="creditCardId", description='The unique identifier of the card')
-    cancellation_date: datetime.date = Field(None, alias="cancellationDate", description='The cancel date of the card')
+    cancellation_date: date = Field(None, alias="cancellationDate", description='The cancel date of the card')
 
 
 class GetCreditCardRequest(BaseModel):
@@ -27,34 +27,42 @@ class GetCreditCardRequest(BaseModel):
 
 
 class BillEntryInstallment(BaseModel):
-    amount: Decimal = Field(..., alias="amount")
-    current_installment: int = Field(..., alias="currentInstallment")
-    installments: int = Field(..., alias="installments")
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
+        alias=to_camel
+    ))
+
+    current_installment: int = Field(..., description="The current installment")
+    amount: Decimal = Field(..., description="The amount of the installment")
+    due_date: date = Field(..., description='The due date of the installments')
 
 
 class CreateCreditCardTransactionRequest(BaseModel):
-    credit_card_id: uuid.UUID = Field(..., alias="creditCardId", description='The credit card id')
-    transaction_date: datetime.date = Field(None, alias="transactionDate", description='The transaction date of the card')
-    total_amount: Decimal = Field(..., alias="totalAmount", description='The total amount of the transaction')
-    installments: list[BillEntryInstallment] = Field(..., alias="installments")
-    category_id: uuid.UUID = Field(..., alias="categoryId", description='The id of the category of transaction')
-    currency_id: str = Field(..., alias="currencyId", description='The if of the bill currency')
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
+        alias=to_camel
+    ))
+
+    credit_card_id: uuid.UUID = Field(..., description='The credit card id')
+    transaction_date: date = Field(None, description='The transaction date of the card')
+    total_amount: Decimal = Field(..., description='The total amount of the transaction')
+    tot_installments: int = Field(..., description='The total number of installments')
+    installments: list[BillEntryInstallment] = Field(...)
+    category_id: uuid.UUID = Field(..., description='The id of the category of transaction')
+    currency_id: str = Field(..., description='The if of the bill currency')
 
     # This fields indicates an international transaction
-    is_international_transaction: bool = Field(..., alias='isInternationalTransaction', description='Whether the transaction is international')
-    transaction_currency_id: str = Field(None, alias="transactionCurrencyId", description='The currency of the transaction')
-    transaction_amount: float = Field(None, alias="transactionAmount", description='The amount of the transaction in international currency')
+    is_international_transaction: bool = Field(..., description='Whether the transaction is international')
+    transaction_currency_id: str = Field(None, description='The currency of the transaction')
+    transaction_amount: float = Field(None, description='The amount of the transaction in international currency')
 
     # This fields represents the values used in the convertion to default card currency
-    dollar_exchange_rate: float = Field(None, alias='dollarExchangeRate', description='The dollar exchange rate with the default card currency')
-    currency_dollar_exchange_rate: float = Field(None, alias='currencyDollarExchangeRate', description='The dollar exchange rate with the transaction currency')
-    total_tax: Decimal = Field(None, alias='totalTax', description='The tax amount of the transaction')
-    tax_detail: dict = Field(None, alias='taxDetail', description='The tax detail of the transaction')
+    dollar_exchange_rate: float = Field(None, description='The dollar exchange rate with the default card currency')
+    currency_dollar_exchange_rate: float = Field(None, description='The dollar exchange rate with the transaction currency')
+    total_tax: Decimal = Field(None, description='The tax amount of the transaction')
+    tax_detail: dict = Field(None, description='The tax detail of the transaction')
 
-    description: str = Field(None, alias='description', description='The description of the transaction')
+    description: str = Field(None, description='The description of the transaction')
 
-    origin: str = Field('SYSTEM', alias='origin', description='The origin of the transaction')
-    operation_type: str = Field(None, alias="operationType", description="The type of the transaction")
+    origin: str = Field('SYSTEM', description='The origin of the transaction')
 
 
 class GetInstallmentsDueDatesRequest(BaseModel):
@@ -62,7 +70,7 @@ class GetInstallmentsDueDatesRequest(BaseModel):
         alias=to_camel
     ))
 
-    transaction_date: datetime.date = Field(..., description='The transaction date')
+    transaction_date: date = Field(..., description='The transaction date')
     credit_card_id: uuid.UUID = Field(..., description='The credit card id')
     tot_installments: int = Field(..., description='The total installment')
 

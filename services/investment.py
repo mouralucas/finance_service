@@ -254,6 +254,7 @@ class InvestmentService(BaseService):
             accumulated_indexer *= (1 + indexer_variation_decimal)
             accumulated_variation *= (1 + variation_decimal)
 
+
             period_performance.append(
                 {
                     'period': item['period'],
@@ -262,9 +263,11 @@ class InvestmentService(BaseService):
                 }
             )
 
+        # TODO: check an better way to send the name without use camel in python code (indexerVariation)
+        # For each key, except 'period', in period_performance, must have a key/value in series list
         series = [
             {
-                'value': 'indexer_variation',
+                'value': 'indexerVariation',
                 'name': indexer.name
             },
             {

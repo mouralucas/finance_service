@@ -65,33 +65,33 @@ class CreditCardService(BaseService):
         return response
 
     # Credit card transactions
-    async def create_transaction(self, bill_entry: CreateCreditCardTransactionRequest) -> CreateCreditCardTransactionResponse:
-        credit_card = await CreditCardManager(session=self.session).get_credit_card_by_id(bill_entry.credit_card_id)
+    async def create_transaction(self, transaction: CreateCreditCardTransactionRequest) -> CreateCreditCardTransactionResponse:
+        credit_card = await CreditCardManager(session=self.session).get_credit_card_by_id(transaction.credit_card_id)
         if not credit_card or not credit_card.active:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Credit card not valid')
 
         due_day: int = credit_card.due_day
         close_day: int = credit_card.close_day
-        transaction_date = bill_entry.transaction_date
+        transaction_date = transaction.transaction_date
         owner_id = self.user['user_id']
         currency_id = credit_card.currency_id
+        tot_installments = transaction.tot_installments
 
         entry_list = []
-        for i in bill_entry.installments:
-            new_bill_entry = CreditCardTransactionModel(**bill_entry.model_dump(exclude={'installment', 'is_international_transaction', 'tax_detail'}))
+        for i in transaction.installments:
+            new_bill_entry = CreditCardTransactionModel(**transaction.model_dump(exclude={'installment', 'is_international_transaction', 'tax_detail', 'tot_installments'}))
 
             new_bill_entry.owner_id = owner_id
             new_bill_entry.amount = i.amount # TODO: check this warning
             new_bill_entry.currency_id = currency_id
             new_bill_entry.current_installment = i.current_installment
-            new_bill_entry.installments = i.installments
-            # TODO: use new function util.datetime.get_installments_due_dates
-            new_bill_entry.due_date = self.set_due_date(transaction_date, close_day, due_day, i.current_installment)
+            new_bill_entry.installments = tot_installments
+            new_bill_entry.due_date = i.due_date
             new_bill_entry.period = get_period(new_bill_entry.due_date)
-            new_bill_entry.is_installment = True if len(bill_entry.installments) > 1 else False
+            new_bill_entry.is_installment = True if len(transaction.installments) > 1 else False
 
             # If it's not an international transaction, currency and amount are the same as the indicated before
-            if not bill_entry.is_international_transaction:
+            if not transaction.is_international_transaction:
                 new_bill_entry.transaction_currency_id = currency_id
                 new_bill_entry.transaction_amount = i.amount
 
