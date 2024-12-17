@@ -78,6 +78,7 @@ class GetInvestmentRequest(BaseModel):
 
 
 class LiquidateInvestmentRequest(BaseModel):
+    # TODO: add tax/fee information, gross/net amounts to create the last statement automatically
     id: uuid.UUID = Field(..., alias='investmentId', description='The unique identifier of the investment')
     liquidation_date: datetime.date = Field(None, alias='liquidationDate', description='The date that the investment was liquidated')
     liquidation_amount: Decimal = Field(None, alias='liquidationAmount', description='The amount liquidated, after tax')

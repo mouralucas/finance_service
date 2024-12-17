@@ -55,7 +55,8 @@ class CreditCardService(BaseService):
         return response
 
     async def get_credit_cards(self, params: GetCreditCardRequest) -> GetCreditCardResponse:
-        credit_cards = await CreditCardManager(session=self.session).get_credit_cards(credit_card_id=params.id, is_active=params.active)
+        credit_cards = await (CreditCardManager(session=self.session)
+                              .get_credit_cards(owner_id=self.user['user_id'], credit_card_id=params.id, is_active=params.active))
 
         response = GetCreditCardResponse(
             quantity=len(credit_cards) if credit_cards else 0,

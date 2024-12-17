@@ -40,8 +40,12 @@ class CreditCardManager(BaseDataManager):
 
         return credit_card
 
-    async def get_credit_cards(self, credit_card_id=None, is_active=None) -> list[CreditCardModel] | None:
-        query = select(CreditCardModel).order_by(CreditCardModel.nickname)
+    async def get_credit_cards(self, owner_id, credit_card_id=None, is_active=None) -> list[CreditCardModel] | None:
+        query = (
+            select(CreditCardModel)
+            .where(CreditCardModel.owner_id == owner_id)
+            .order_by(CreditCardModel.nickname)
+        )
 
         if credit_card_id is not None:
             query = query.where(CreditCardModel.id == credit_card_id)
