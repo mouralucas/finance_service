@@ -23,7 +23,12 @@ class CancelCreditCardRequest(BaseModel):
 
 
 class GetCreditCardRequest(BaseModel):
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
+        alias=to_camel
+    ))
+
     id: uuid.UUID | None = Field(Query(None, alias="creditCardId", description="The id of the credit card"))
+    active: bool = Field(True, description='Whether the credit card is valid or not')
 
 
 class BillEntryInstallment(BaseModel):

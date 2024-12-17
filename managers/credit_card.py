@@ -40,14 +40,16 @@ class CreditCardManager(BaseDataManager):
 
         return credit_card
 
-    async def get_credit_cards(self, params: dict[str, Any]) -> list[CreditCardModel] | None:
-        stmt = select(CreditCardModel).order_by(CreditCardModel.nickname)
+    async def get_credit_cards(self, credit_card_id=None, is_active=None) -> list[CreditCardModel] | None:
+        query = select(CreditCardModel).order_by(CreditCardModel.nickname)
 
-        for key, value in params.items():
-            if value:
-                stmt = stmt.where(getattr(CreditCardModel, key) == value)
+        if credit_card_id is not None:
+            query = query.where(CreditCardModel.id == credit_card_id)
 
-        credit_cards: list[RowMapping] = await self.get_all(stmt, unique_result=True)
+        if is_active is not None:
+            query = query.where(CreditCardModel.active == is_active)
+
+        credit_cards: list[RowMapping] = await self.get_all(query)
 
         return [credit_card['CreditCardModel'] for credit_card in credit_cards] if credit_cards else None
 
