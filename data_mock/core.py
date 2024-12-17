@@ -89,7 +89,7 @@ def get_country_mock() -> list[dict[str, Any]]:
     return country_list
 
 
-def get_tax_mocked() -> list[dict[str, Any]]:
+def get_tax_mock() -> list[dict[str, Any]]:
     country_list = get_country_mock()
 
     tax_list: list[dict[str, Any]] = [
@@ -112,6 +112,21 @@ def get_tax_mocked() -> list[dict[str, Any]]:
     ]
 
     return tax_list
+
+
+def get_fee_mock() -> list[dict[str, Any]]:
+    fees_list: list[dict[str, Any]] = [
+        {
+            **default_model_dict,
+            'id': uuid.UUID('a187d754-73c9-46d3-ac57-7cc78ea01e6f'),
+            'name': 'Taxa de custódia',
+            'description': 'Taxa cobrado pelo agente de custódia',
+            'country_id': 'BR',
+            'type': 'fee'
+        }
+    ]
+
+    return fees_list
 
 
 def get_category_parent_mock() -> list[dict[str, Any]]:

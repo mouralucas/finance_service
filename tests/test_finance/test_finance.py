@@ -52,3 +52,24 @@ async def test_get_indexer_types(client, create_indexer):
 
     assert 'indexers' in data
     assert type(data['indexers']) == list
+
+
+@pytest.mark.asyncio
+async def test_get_tax_fee(client, create_tax, create_fee):
+    payload = {
+        'countryId': 'BR',
+        'type': 'fee'
+    }
+    response = await client.get('/finance/tax-fee', params=payload)
+
+    assert response.status_code == status.HTTP_200_OK
+    data = response.json()
+
+    assert 'taxFee' in data
+    assert type(data['taxFee']) is list
+    for tax_fee in data['taxFee']:
+        assert 'type' in tax_fee
+        assert tax_fee['type'] == 'fee'
+
+        assert 'countryId' in tax_fee
+        assert tax_fee['countryId'] == 'BR'

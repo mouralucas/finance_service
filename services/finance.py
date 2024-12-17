@@ -5,9 +5,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from managers.account import AccountManager
 from managers.credit_card import CreditCardManager
 from managers.finance import FinanceManager
-from schemas.core import CurrencySchema, BankSchema, IndexerTypeSchema, IndexerSchema, LiquiditySchema, ExpensesByCategory
-from schemas.request.finance import GetSummaryRequest
-from schemas.response.finance import GetCurrencyResponse, GetBankResponse, GetIndexerTypeResponse, GetIndexerResponse, GetLiquidityResponse, GetExpensesByCategoryResponse
+from schemas.core import CurrencySchema, BankSchema, IndexerTypeSchema, IndexerSchema, LiquiditySchema, ExpensesByCategory, TaxFeeSchema
+from schemas.request.finance import GetSummaryRequest, GetTaxFeeRequest
+from schemas.response.finance import GetCurrencyResponse, GetBankResponse, GetIndexerTypeResponse, GetIndexerResponse, GetLiquidityResponse, GetExpensesByCategoryResponse, GetTaxFeeResponse
 
 
 class FinanceService(BaseService):
@@ -28,6 +28,15 @@ class FinanceService(BaseService):
 
         response = GetCurrencyResponse(
             currencies=[CurrencySchema.model_validate(currency) for currency in currencies],
+        )
+
+        return response
+
+    async def get_tax_fee(self, params: GetTaxFeeRequest) -> GetTaxFeeResponse:
+        tax_fees = await  self.finance_manager.get_tax_fee(tax_fee_type=params.type)
+
+        response = GetTaxFeeResponse(
+            tax_fee=[TaxFeeSchema.model_validate(tax_fee) for tax_fee in tax_fees] if tax_fees else [],
         )
 
         return response

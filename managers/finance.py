@@ -7,7 +7,7 @@ from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from models.core import CurrencyModel, BankModel, IndexerTypeModel, IndexerModel, LiquidityModel, PeriodicityModel, IndexerSeriesModel
+from models.core import CurrencyModel, BankModel, IndexerTypeModel, IndexerModel, LiquidityModel, PeriodicityModel, IndexerSeriesModel, TaxFeeModel
 
 
 class FinanceManager(BaseDataManager):
@@ -20,6 +20,14 @@ class FinanceManager(BaseDataManager):
         currencies = await self.get_all(query)
 
         return [currency['CurrencyModel'] for currency in currencies] if currencies else None
+
+    async def get_tax_fee(self, tax_fee_type: str) -> list[TaxFeeModel] | None:
+        query = select(TaxFeeModel).where(TaxFeeModel.type == tax_fee_type)
+
+        tax_fees = await self.get_all(query)
+
+        return [tax_fee['TaxFeeModel'] for tax_fee in tax_fees] if tax_fees else None
+
 
     async def get_banks(self) -> list[BankModel] | None:
         query = select(BankModel)

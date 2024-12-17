@@ -5,8 +5,8 @@ from rolf_common.services import get_user
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.database import get_session
-from schemas.request.finance import GetSummaryRequest
-from schemas.response.finance import GetCurrencyResponse, GetBankResponse, GetIndexerTypeResponse, GetIndexerResponse, GetLiquidityResponse, GetExpensesByCategoryResponse
+from schemas.request.finance import GetSummaryRequest, GetTaxFeeRequest
+from schemas.response.finance import GetCurrencyResponse, GetBankResponse, GetIndexerTypeResponse, GetIndexerResponse, GetLiquidityResponse, GetExpensesByCategoryResponse, GetTaxFeeResponse
 from services.finance import FinanceService
 
 router = APIRouter(prefix="/finance", tags=['Finance'])
@@ -49,6 +49,14 @@ async def get_liquidity(
 ) -> GetLiquidityResponse:
     return await FinanceService(session, user).get_liquidity()
 
+
+@router.get('/tax-fee', summary='Get taxes and fees')
+async def get_tax_fee(
+        params: GetTaxFeeRequest = Depends(),
+        session: AsyncSession = Depends(get_session),
+        user: RequiredUser = Security(get_user)
+) -> GetTaxFeeResponse:
+    return await FinanceService(session=session, user=user).get_tax_fee(params=params)
 
 # Dashboard endpoints
 @router.get('/summary')

@@ -1,7 +1,7 @@
 import pytest_asyncio
 from rolf_common.managers import BaseDataManager
 
-from data_mock.core import get_country_mock, get_tax_mocked, get_currency_mock, get_bank_mock, get_category_mock, get_liquidity_mock, get_category_parent_mock
+from data_mock.core import get_country_mock, get_tax_mock, get_currency_mock, get_bank_mock, get_category_mock, get_liquidity_mock, get_category_parent_mock, get_fee_mock
 from data_mock.core import get_index_mock, get_index_type_mock
 from models.core import BankModel, CurrencyModel, CategoryModel, CountryModel, TaxFeeModel, IndexerTypeModel, IndexerModel, LiquidityModel
 from schemas.core import CurrencySchema, BankSchema, CountrySchema, TaxSchema, CategorySchema, IndexerTypeSchema, IndexerSchema, LiquiditySchema
@@ -59,11 +59,18 @@ async def create_country(test_session) -> list[CountrySchema]:
 
 @pytest_asyncio.fixture
 async def create_tax(test_session, create_country) -> list[TaxSchema]:
-    data_ = await BaseDataManager(test_session).add_or_ignore_all(TaxFeeModel, get_tax_mocked())
+    data_ = await BaseDataManager(test_session).add_or_ignore_all(TaxFeeModel, get_tax_mock())
     tax_list = [TaxSchema.model_validate(data["TaxFeeModel"]) for data in data_]
 
     return tax_list
 
+
+@pytest_asyncio.fixture
+async def create_fee(test_session, create_country):
+    data_ = await BaseDataManager(test_session).add_or_ignore_all(TaxFeeModel, get_fee_mock())
+    fee_list = [TaxSchema.model_validate(data["TaxFeeModel"]) for data in data_]
+
+    return fee_list
 
 @pytest_asyncio.fixture
 async def create_liquidity(test_session):

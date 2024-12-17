@@ -89,6 +89,19 @@ class CategorySchema(BaseModel):
     order: int | None = Field(None, description='The order of the category')
 
 
+class TaxFeeSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
+        serialization_alias=to_camel,
+    ))
+
+    id: uuid.UUID = Field(..., description='The unique id of the tax')
+    name: str = Field(..., description='The name of the tax or fee')
+    description: str | None = Field(None, description='The description of the tax of fee')
+    acronyms: str | None = Field(None, description='The acronyms of the tax or fee')
+    country_id: str = Field(..., description='The country of the tax or fee')
+    type: str = Field(..., description='Whether id tax or fee')
+
+
 class ExpensesByCategory(BaseModel):
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(serialization_alias=to_camel))
 
