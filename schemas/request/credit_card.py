@@ -74,10 +74,16 @@ class GetInstallmentsDueDatesRequest(BaseModel):
     credit_card_id: uuid.UUID = Field(..., description='The credit card id')
     tot_installments: int = Field(..., description='The total installment')
 
+
 class GetCreditCardTransactionsRequest(BaseModel):
-    credit_card_id: uuid.UUID | None = Field(None, alias='creditCardId', description='The id of the credit card')
-    start_period: int = Field(None, alias='startPeriod', description='The start period of the transaction')
-    end_period: int = Field(None, alias='endPeriod', description='The end period of the transaction')
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
+        alias=to_camel
+    ))
+
+    credit_card_id: uuid.UUID | None = Field(None, description='The id of the credit card')
+    start_period: int | None = Field(None, description='The start period of the transaction')
+    end_period: int | None = Field(None, description='The end period of the transaction')
+    parent_id: int | None = Field(None, description='The id of the parent transaction')
 
 
 class GetCreditCardBillRequest(BaseModel):

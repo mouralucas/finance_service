@@ -65,14 +65,11 @@ class CreditCardService(BaseService):
         return response
 
     # Credit card transactions
-    async def create_transaction(self, transaction: CreateCreditCardTransactionRequest) -> CreateCreditCardTransactionResponse:
+    async def create_transaction(self, transaction: CreateCreditCardTransactionRequest, entry=None) -> CreateCreditCardTransactionResponse:
         credit_card = await CreditCardManager(session=self.session).get_credit_card_by_id(transaction.credit_card_id)
         if not credit_card or not credit_card.active:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Credit card not valid')
 
-        due_day: int = credit_card.due_day
-        close_day: int = credit_card.close_day
-        transaction_date = transaction.transaction_date
         owner_id = self.user['user_id']
         currency_id = credit_card.currency_id
         tot_installments = transaction.tot_installments
@@ -98,6 +95,8 @@ class CreditCardService(BaseService):
             entry_list.append(new_bill_entry)
 
         created_entries = await CreditCardManager(session=self.session).create_credit_card_transaction(entry_list)
+        if len(transaction.installments) > 1:
+            [setattr(entry, 'parent_id', created_entries[0].id) for entry in created_entries]
 
         response = CreateCreditCardTransactionResponse(
             transaction=[CreditCardTransactionSchema.model_validate(entry) for entry in created_entries]
@@ -108,7 +107,8 @@ class CreditCardService(BaseService):
     async def get_transactions(self, params: GetCreditCardTransactionsRequest) -> GetCreditCardTransactionResponse:
         transactions = await CreditCardManager(session=self.session).get_credit_card_transactions(owner_id=self.user['user_id'],
                                                                                                   start_period=params.start_period,
-                                                                                                  end_period=params.end_period)
+                                                                                                  end_period=params.end_period,
+                                                                                                  parent_id=params.parent_id)
 
         response = GetCreditCardTransactionResponse(
             quantity=len(transactions) if transactions else 0,

@@ -52,14 +52,15 @@ class CreditCardManager(BaseDataManager):
         return [credit_card['CreditCardModel'] for credit_card in credit_cards] if credit_cards else None
 
     # Transactions
-    async def create_credit_card_transaction(self, transactions: list[CreditCardTransactionModel]) -> list[SQLModel]:
+    async def create_credit_card_transaction(self, transactions: list[CreditCardTransactionModel]) -> list[CreditCardTransactionModel]:
         new_bill_entries = await self.add_all(transactions)
         [await self.session.refresh(i) for i in new_bill_entries]
 
-        return new_bill_entries
+        return [cast(CreditCardTransactionModel, transaction) for transaction in new_bill_entries]
 
     async def get_credit_card_transactions(self, owner_id: uuid.UUID,
-                                           start_period: int, end_period: int) -> list[dict[str, Any]]:
+                                           start_period: int = None, end_period: int = None,
+                                           parent_id: int = None) -> list[dict[str, Any]]:
         transaction_alias = aliased(CreditCardTransactionModel)
         category_alias = aliased(CategoryModel)
         card_alias = aliased(CreditCardModel)
@@ -91,9 +92,7 @@ class CreditCardManager(BaseDataManager):
             )
             .select_from(transaction_alias)
             .where(
-                transaction_alias.owner_id == owner_id,
-                transaction_alias.period >= start_period,
-                transaction_alias.period <= end_period,
+                transaction_alias.owner_id == owner_id
             )
             .join(card_alias, transaction_alias.credit_card_id == card_alias.id)
             .join(category_alias, transaction_alias.category_id == category_alias.id)
@@ -101,6 +100,15 @@ class CreditCardManager(BaseDataManager):
             .join(transaction_currency_alias, transaction_alias.transaction_currency_id == transaction_currency_alias.id)
             .order_by(transaction_alias.transaction_date.desc())
         )
+
+        if start_period is not None:
+            query = query.where(transaction_alias.period >= start_period)
+
+        if end_period is not None:
+            query = query.where(transaction_alias.period <= end_period)
+
+        if parent_id is not None:
+            query = query.where(transaction_alias.parent_id == parent_id)
 
         transactions = await self.get_all(query)
 
