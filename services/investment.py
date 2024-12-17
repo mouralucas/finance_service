@@ -74,15 +74,17 @@ class InvestmentService(BaseService):
         return response
 
     async def liquidate_investment(self, investment: LiquidateInvestmentRequest) -> LiquidateInvestmentResponse:
+        # TODO: update liquidation data and amount in investment table
+        #   and add a statement with period from liquidation date
+        #   maybe check if all older statement are present so the date are up to date
         current_investment = await InvestmentManager(self.session).get_investment_by_id(investment.id)
 
-        fields = investment.model_dump()
-        fields['is_liquidated'] = True
-
-        liquidated_investment = await self.investment_manager.update_investment(current_investment.id, fields)
+        current_investment.is_liquidated = True
+        current_investment.liquidation_date = investment.liquidation_date
+        current_investment.liquidation_amount = investment.liquidation_amount
 
         response = LiquidateInvestmentResponse(
-            investment=InvestmentSchema.model_validate(liquidated_investment),
+            investment=InvestmentSchema.model_validate(current_investment),
         )
 
         return response

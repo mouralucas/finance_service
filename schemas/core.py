@@ -94,12 +94,18 @@ class TaxFeeSchema(BaseModel):
         serialization_alias=to_camel,
     ))
 
-    id: uuid.UUID = Field(..., description='The unique id of the tax')
+    id: uuid.UUID = Field(..., serialization_alias='taxFeeId', description='The unique id of the tax')
     name: str = Field(..., description='The name of the tax or fee')
     description: str | None = Field(None, description='The description of the tax of fee')
     acronyms: str | None = Field(None, description='The acronyms of the tax or fee')
     country_id: str = Field(..., description='The country of the tax or fee')
     type: str = Field(..., description='Whether id tax or fee')
+
+
+class TaxFeeDetailSchema(BaseModel):
+    id: str = Field(..., description='The unique id of the tax or fee')
+    currency_id: str = Field(..., description='The currency of the tax or fee')
+    amount: float = Field(..., description='The amount of the tax or fee')
 
 
 class ExpensesByCategory(BaseModel):

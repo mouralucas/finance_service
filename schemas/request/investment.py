@@ -6,6 +6,8 @@ from fastapi import Query
 from pydantic import BaseModel, Field, model_validator, ConfigDict, AliasGenerator
 from pydantic.alias_generators import to_camel
 
+from schemas.core import TaxFeeDetailSchema
+
 
 class CreateInvestmentRequest(BaseModel):
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
@@ -71,17 +73,29 @@ class UpdateInvestmentRequest(CreateInvestmentRequest):
 
 
 class GetInvestmentRequest(BaseModel):
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
+        alias=to_camel
+    ))
+
     id: uuid.UUID | None = Field(None, alias='investmentId', description='The id of the investment')
-    start_date: datetime.date | None = Field(None, alias='startDate', description='The start date of the filter')
-    end_date: datetime.date | None = Field(None, alias='end_date', description='The end date of the filter')
+    start_date: datetime.date | None = Field(None, description='The start date of the filter')
+    end_date: datetime.date | None = Field(None, description='The end date of the filter')
     # other fields...
 
 
 class LiquidateInvestmentRequest(BaseModel):
-    # TODO: add tax/fee information, gross/net amounts to create the last statement automatically
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
+        alias=to_camel
+    ))
+
     id: uuid.UUID = Field(..., alias='investmentId', description='The unique identifier of the investment')
+    gross_amount: Decimal = Field(None, description='The gross amount of the investment at liquidation')
+    net_amount: Decimal = Field(None, description='The net amount of the investment at liquidation')
+    tax_detail: TaxFeeDetailSchema = Field(None, description='The tax detail of the investment')
+    fee_detail: TaxFeeDetailSchema = Field(None, description='The fee detail of the investment')
+
     liquidation_date: datetime.date = Field(None, alias='liquidationDate', description='The date that the investment was liquidated')
-    liquidation_amount: Decimal = Field(None, alias='liquidationAmount', description='The amount liquidated, after tax')
+    liquidation_amount: Decimal = Field(None, alias='liquidationAmount', description='The amount liquidated, after tax and fees, usually the same as net_amount')
 
 
 class TaxFeeRequest(BaseModel):

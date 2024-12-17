@@ -21,13 +21,18 @@ class FinanceManager(BaseDataManager):
 
         return [currency['CurrencyModel'] for currency in currencies] if currencies else None
 
-    async def get_tax_fee(self, tax_fee_type: str) -> list[TaxFeeModel] | None:
-        query = select(TaxFeeModel).where(TaxFeeModel.type == tax_fee_type)
+    async def get_tax_fee(self, country_id: str, tax_fee_type: str) -> list[TaxFeeModel] | None:
+        query = (
+            select(TaxFeeModel)
+            .where(
+                TaxFeeModel.country_id == country_id,
+                TaxFeeModel.type == tax_fee_type
+            )
+        )
 
         tax_fees = await self.get_all(query)
 
         return [tax_fee['TaxFeeModel'] for tax_fee in tax_fees] if tax_fees else None
-
 
     async def get_banks(self) -> list[BankModel] | None:
         query = select(BankModel)

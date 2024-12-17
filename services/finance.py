@@ -33,7 +33,7 @@ class FinanceService(BaseService):
         return response
 
     async def get_tax_fee(self, params: GetTaxFeeRequest) -> GetTaxFeeResponse:
-        tax_fees = await  self.finance_manager.get_tax_fee(tax_fee_type=params.type)
+        tax_fees = await  self.finance_manager.get_tax_fee(country_id=params.country_id, tax_fee_type=params.type)
 
         response = GetTaxFeeResponse(
             tax_fee=[TaxFeeSchema.model_validate(tax_fee) for tax_fee in tax_fees] if tax_fees else [],
