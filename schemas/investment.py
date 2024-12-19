@@ -91,12 +91,12 @@ class InvestmentStatementSchema(BaseModel):
     investment_id: uuid.UUID = Field(..., description='The id of the investment')
     investment: InvestmentSchema = Field(..., description='The object of the investment')
     period: int = Field(..., description='The period of the statement')
-    gross_amount: Decimal = Field(..., description='The gross amount of the investment in the period')
-    total_tax: Decimal = Field(..., description='The total tax amount of the investment in the period')
+    gross_amount: float = Field(..., description='The gross amount of the investment in the period')
+    total_tax: float = Field(..., description='The total tax amount of the investment in the period')
     tax_detail: list[TaxFeeResponse] | None = Field(..., description='The detail of taxes')
-    total_fee: Decimal = Field(..., description='The total fee of the investment in the period')
+    total_fee: float = Field(..., description='The total fee of the investment in the period')
     fee_detail: list[TaxFeeResponse] | None = Field(..., description='The detail of fees')
-    net_amount: Decimal = Field(..., description='The net amount of the investment in the period')
+    net_amount: float = Field(..., description='The net amount of the investment in the period')
 
 
 class InvestmentObjectiveSchema(BaseModel):

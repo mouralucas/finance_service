@@ -109,8 +109,8 @@ class InvestmentService(BaseService):
         investment = await self.investment_manager.get_investment_by_id(statement.investment_id, raise_exception=True)
 
         # Get previous statement
-        previous_statements = await self.investment_manager.get_statement({'investment_id': investment.id})
-        last_statement = previous_statements[-1]['InvestmentStatementModel'] if previous_statements else None
+        previous_statements = await self.investment_manager.get_statement(investment_id=investment.id)
+        last_statement = previous_statements[-1] if previous_statements else None
 
         # If it is the first statement period must be the same as the investment
         if not previous_statements and get_period(investment.transaction_date) != statement.period:
