@@ -155,10 +155,11 @@ class InvestmentService(BaseService):
         return response
 
     async def get_statement(self, params: GetStatementRequest) -> GetStatementResponse:
-        statement = await InvestmentManager(self.session).get_statement(params=params.model_dump())
+        statement = await InvestmentManager(self.session).get_statement(period=params.period)
 
         response = GetStatementResponse(
-            statement=[InvestmentStatementSchema.model_validate(data["InvestmentStatementModel"]) for data in statement]
+            quantity=len(statement) if statement else 0,
+            statement=[InvestmentStatementSchema.model_validate(data) for data in statement] if statement else []
         )
 
         return response

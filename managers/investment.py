@@ -126,11 +126,14 @@ class InvestmentManager(BaseDataManager):
 
         return statement
 
-    async def get_statement(self, investment_id: uuid.UUID) -> list[InvestmentStatementModel] | None:
+    async def get_statement(self, investment_id: uuid.UUID = None, period: int = None) -> list[InvestmentStatementModel] | None:
         query = select(InvestmentStatementModel).order_by(InvestmentStatementModel.period)
 
         if investment_id:
-            query.where(InvestmentStatementModel.id == investment_id)
+            query = query.where(InvestmentStatementModel.id == investment_id)
+
+        if period:
+            query = query.where(InvestmentStatementModel.period == period)
 
         result: list[RowMapping] = await self.get_all(query, unique_result=True)
         statements = [statement['InvestmentStatementModel'] for statement in result] if result else None

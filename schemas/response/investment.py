@@ -40,6 +40,7 @@ class CreateStatementResponse(SuccessResponseBase):
 
 
 class GetStatementResponse(SuccessResponseBase):
+    quantity: int = Field(..., description='The total number of statement returned')
     statement: list[InvestmentStatementSchema] | None = Field(None, description='The investment statement')
 
 
