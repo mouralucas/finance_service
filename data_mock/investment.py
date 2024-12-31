@@ -122,7 +122,7 @@ def get_investment_statement_mock() -> list[dict[str, Any]]:
             'gross_amount': investments[0]['amount'] + investments[0]['amount'] * 0.01,
             'total_tax': 0.25,
             'total_fee': 0,
-            'net_amount': (investments[0]['amount'] + investments[0]['amount'] * 0.001) - 0.25
+            'net_amount': (investments[0]['amount'] + investments[0]['amount'] * 0.01) - 0.25
         }
     ]
 

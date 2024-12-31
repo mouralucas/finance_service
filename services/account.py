@@ -117,7 +117,7 @@ class AccountService(BaseService):
 
         response = GetAccountTransactionResponse(
             quantity=len(transactions) if transactions else 0,
-            transactions=[AccountTransactionSchema(**transaction) for transaction in transactions]
+            transactions=[AccountTransactionSchema(**transaction) for transaction in transactions] if transactions else []
         )
 
         return response

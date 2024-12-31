@@ -110,7 +110,7 @@ class InvestmentManager(BaseDataManager):
                 (statement_alias.period == subquery.c.latest_period)
             )
             .where(
-                investment_alias.owner_id == "adf52a1e-7a19-11ed-a1eb-0242ac120002",
+                investment_alias.owner_id == owner_id,
                 investment_alias.is_liquidated == False
             )
             .order_by(investment_alias.transaction_date)

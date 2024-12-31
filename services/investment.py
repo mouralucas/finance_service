@@ -1,10 +1,7 @@
 import datetime
-import uuid
-from typing import cast
+from decimal import Decimal
 
 from fastapi import HTTPException
-
-from rolf_common.models import SQLModel
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import BaseService
 from sqlalchemy import RowMapping
@@ -12,7 +9,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from managers.account import AccountManager
-from managers.core import CoreManager
 from managers.finance import FinanceManager
 from managers.investment import InvestmentManager
 from models.investment import InvestmentModel, InvestmentStatementModel, InvestmentObjectiveModel
@@ -22,7 +18,6 @@ from schemas.request.investment import CreateInvestmentRequest, GetInvestmentReq
     GetPerformanceRequest, UpdateInvestmentRequest
 from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, LiquidateInvestmentResponse, CreateStatementResponse, GetStatementResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse, \
     GetInvestmentWithoutObjectives, GetObjectiveSummaryResponse, GetInvestmentAllocationResponse, GetInvestmentPerformanceResponse, UpdateInvestmentResponse
-from services.finance import FinanceService
 from services.utils.datetime import get_period, get_previous_period
 
 
@@ -73,15 +68,38 @@ class InvestmentService(BaseService):
 
         return response
 
-    async def liquidate_investment(self, investment: LiquidateInvestmentRequest) -> LiquidateInvestmentResponse:
-        # TODO: update liquidation data and amount in investment table
-        #   and add a statement with period from liquidation date
-        #   maybe check if all older statement are present so the date are up to date
-        current_investment = await InvestmentManager(self.session).get_investment_by_id(investment.id)
+    async def liquidate_investment(self, investment_liquidate: LiquidateInvestmentRequest) -> LiquidateInvestmentResponse:
+        current_investment = await InvestmentManager(self.session).get_investment_by_id(investment_liquidate.id)
+        investment_liquidate = investment_liquidate.model_dump()
+
+        # Get previous statement
+        previous_statements = await self.investment_manager.get_statement(investment_id=investment_liquidate['id'])
+        last_statement = previous_statements[-1] if previous_statements else None
+
+        # Check if the statement from last period exists
+        liquidation_period = get_period(investment_liquidate['liquidation_date'])
+
+        # TODO: check if the liquidation period exists in statement before add
+        # if last_statement and last_statement.period >= liquidation_period:
+        #     raise ValueError
+        # elif last_statement:
+        #     # Only insert final statement if there is other statement (does not make much sense)
+        #     new_statement = InvestmentStatementModel(
+        #         investment_id=investment_liquidate['id'],
+        #         period=liquidation_period,
+        #         previous_amount=last_statement.gross_amount,
+        #         gross_amount=investment_liquidate['gross_amount'],
+        #         tax_detail = [investment_liquidate['tax_detail'] for tax in investment_liquidate['tax_detail']] if investment_liquidate['tax_detail'] else None,
+        #         fee_detail = [investment_liquidate['fee_detail'] for fee in investment_liquidate['fee_detail']] if investment_liquidate['fee_detail'] else None,
+        #         net_amount=investment_liquidate['net_amount'],
+        #         reference_date=investment_liquidate['liquidation_date'],
+        #         at_maturity=True,
+        #     )
+        #     await self.investment_manager.create_statement(new_statement)
 
         current_investment.is_liquidated = True
-        current_investment.liquidation_date = investment.liquidation_date
-        current_investment.liquidation_amount = investment.liquidation_amount
+        current_investment.liquidation_date = investment_liquidate['liquidation_date']
+        current_investment.liquidation_amount = investment_liquidate['liquidation_amount']
 
         response = LiquidateInvestmentResponse(
             investment=InvestmentSchema.model_validate(current_investment),
@@ -112,6 +130,8 @@ class InvestmentService(BaseService):
         previous_statements = await self.investment_manager.get_statement(investment_id=investment.id)
         last_statement = previous_statements[-1] if previous_statements else None
 
+        # TODO: add check to verify if period already exists (if so return the values)
+
         # If it is the first statement period must be the same as the investment
         if not previous_statements and get_period(investment.transaction_date) != statement.period:
             raise HTTPException(status_code=status.HTTP_412_PRECONDITION_FAILED, detail='First statement period must be the sabe as transaction period')
@@ -138,12 +158,12 @@ class InvestmentService(BaseService):
         new_statement.previous_amount = last_statement.gross_amount if last_statement else investment.amount
 
         # Set the tax/fee totals
-        new_statement.total_tax = sum(tax.amount for tax in statement.tax_detail) if statement.tax_detail else 0
-        new_statement.total_fee = sum(fee.amount for fee in statement.fee_detail) if statement.fee_detail else 0
+        new_statement.total_tax = sum(tax.amount for tax in statement.tax_detail) if statement.tax_detail else 0.0
+        new_statement.total_fee = sum(fee.amount for fee in statement.fee_detail) if statement.fee_detail else 0.0
 
         # Set the statistics
         new_statement.value_change = new_statement.gross_amount - new_statement.previous_amount
-        new_statement.percentage_change = new_statement.value_change / new_statement.previous_amount * 100
+        new_statement.percentage_change = new_statement.value_change / new_statement.previous_amount * Decimal('100')
 
         # Persist data in database
         new_statement = await self.investment_manager.create_statement(new_statement)

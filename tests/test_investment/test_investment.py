@@ -108,6 +108,18 @@ async def test_create_liquidated_investment(client, create_open_account, create_
     price = 112.47
     amount = quantity * price
     contracted_rate = '115% do CDI'
+    tax_detail = [{
+        'currencyId': 'BRL',
+        'id': 'a6c45a5a-f75f-475c-afa1-1cf02cd3fd04',
+        'amount': amount * 0.15
+    }]
+    fee_detail = [
+        {
+            'currencyId': 'BRL',
+            'id': 'a187d754-73c9-46d3-ac57-7cc78ea01e6f',
+            'amount': amount * 0.01
+        }
+    ]
     indexer_type_id = create_indexer_type[0].id
     indexer_id = create_indexer[0].id
     liquidity_id = create_liquidity[0].id
@@ -156,12 +168,32 @@ async def test_liquidate_investment(client, create_investment):
 
     investment_id = investments[0].id
     liquidation_date = '2025-08-09'
+    gross_amount = 300.54
+    net_amount = 250.32
     liquidation_amount = 250.32
+    tax_detail = [
+        {
+            'currencyId': 'BRL',
+            'taxFeeId': 'a6c45a5a-f75f-475c-afa1-1cf02cd3fd04',
+            'amount': liquidation_amount * 0.15
+        }
+    ]
+    fee_detail = [
+        {
+            'currencyId': 'BRL',
+            'taxFeeId': 'a187d754-73c9-46d3-ac57-7cc78ea01e6f',
+            'amount': liquidation_amount * 0.01
+        }
+    ]
 
     payload = {
         'investmentId': str(investment_id),
         'liquidationDate': liquidation_date,
-        'liquidationAmount': liquidation_amount
+        'liquidationAmount': liquidation_amount,
+        'grossAmount': gross_amount,
+        'netAmount': net_amount,
+        'taxDetail': tax_detail,
+        'feeDetail': fee_detail
     }
     response = await client.post('/investment/liquidate', json=payload)
 

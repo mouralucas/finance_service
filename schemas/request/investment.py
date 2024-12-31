@@ -8,6 +8,15 @@ from pydantic.alias_generators import to_camel
 
 from schemas.core import TaxFeeDetailSchema
 
+class TaxFeeRequest(BaseModel):
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
+        alias=to_camel
+    ))
+
+    id: uuid.UUID = Field(..., alias='taxFeeId', description='The identification of the tax/fee')
+    amount: Decimal = Field(..., description='The amount of the tax/fee')
+    currency_id: str = Field('BRL', alias='currencyId', description='The currency of the tax/fee')
+
 
 class CreateInvestmentRequest(BaseModel):
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
@@ -17,7 +26,7 @@ class CreateInvestmentRequest(BaseModel):
     name: str = Field(..., description='The name of the investment')
     account_id: uuid.UUID = Field(..., description='The id of the account')
 
-    type_id: uuid.UUID = Field(..., description='The id of the investment type')
+    type_id: uuid.UUID = Field(..., alias='investmentTypeId', description='The id of the investment type')
     transaction_date: datetime.date = Field(..., description='The date of the investment')
     maturity_date: datetime.date = Field(None, description='The date that the investment will be liquidated')
 
@@ -31,8 +40,10 @@ class CreateInvestmentRequest(BaseModel):
     indexer_type_id: uuid.UUID = Field(..., description='The type of the index for the investment')
     indexer_id: uuid.UUID = Field(..., description='The id of the investment index')
     liquidity_id: uuid.UUID = Field(..., description='The id of investment liquidity')
-    liquidation_date: datetime.date = Field(None, description='The date that the investment was liquidated')
-    liquidation_amount: Decimal = Field(None, description='The amount liquidated, after tax')
+    liquidation_date: datetime.date | None = Field(None, description='The date that the investment was liquidated')
+    liquidation_amount: Decimal | None = Field(None, description='The amount liquidated, after tax')
+    # tax_detail: TaxFeeRequest | None = Field(None, description='The tax detail of the investment')
+    # fee_detail: TaxFeeRequest | None= Field(None, description='The fee detail of the investment')
     country_id: str = Field(..., description='The id of the country')
 
     observation: str = Field(None, description='Observations for the investment')
@@ -71,7 +82,6 @@ class UpdateInvestmentRequest(CreateInvestmentRequest):
     liquidity_id: None = Field(None, description='The id of investment liquidity')
     country_id: str | None = Field(None, description='The id of the country')
 
-
 class GetInvestmentRequest(BaseModel):
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
         alias=to_camel
@@ -91,17 +101,11 @@ class LiquidateInvestmentRequest(BaseModel):
     id: uuid.UUID = Field(..., alias='investmentId', description='The unique identifier of the investment')
     gross_amount: Decimal = Field(None, description='The gross amount of the investment at liquidation')
     net_amount: Decimal = Field(None, description='The net amount of the investment at liquidation')
-    tax_detail: TaxFeeDetailSchema = Field(None, description='The tax detail of the investment')
-    fee_detail: TaxFeeDetailSchema = Field(None, description='The fee detail of the investment')
+    tax_detail: list[TaxFeeRequest] = Field(None, description='The tax detail of the investment')
+    fee_detail: list[TaxFeeRequest] = Field(None, description='The fee detail of the investment')
 
     liquidation_date: datetime.date = Field(None, alias='liquidationDate', description='The date that the investment was liquidated')
     liquidation_amount: Decimal = Field(None, alias='liquidationAmount', description='The amount liquidated, after tax and fees, usually the same as net_amount')
-
-
-class TaxFeeRequest(BaseModel):
-    id: uuid.UUID = Field(..., alias='taxFeeId', description='The identification of the tax/fee')
-    amount: Decimal = Field(..., description='The amount of the tax/fee')
-    currency_id: str = Field('BRL', alias='currencyId', description='The currency of the tax/fee')
 
 
 class CreateStatementRequest(BaseModel):
