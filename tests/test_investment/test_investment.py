@@ -31,7 +31,7 @@ async def test_create_investment(client, create_open_account, create_investment_
     payload = {
         'accountId': str(account.id),
         'name': name,
-        'typeId': str(type_id),
+        'investmentTypeId': str(type_id),
         'transactionDate': transaction_date,
         'maturityDate': maturity_date,
         'quantity': quantity,
@@ -132,7 +132,7 @@ async def test_create_liquidated_investment(client, create_open_account, create_
         'custodianId': str(custodian_id),
         'accountId': str(accounts[0].id),
         'name': name,
-        'typeId': str(type_id),
+        'investmentTypeId': str(type_id),
         'transactionDate': transaction_date,
         'maturityDate': maturity_date,
         'quantity': quantity,
