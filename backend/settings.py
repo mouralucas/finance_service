@@ -4,7 +4,8 @@ from rolf_common.backend.settings import Settings
 
 class FinanceSettings(Settings):
     # Project description
-    project_name: str = "Finance Service"
+    project_name: str = "finance"
+    project_title: str = "Finance Service"
     project_description: str = "Microservice for financial management"
     project_version: str = "0.0.1"
 

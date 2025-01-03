@@ -26,12 +26,13 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title=settings.project_name,
+    title=settings.project_title,
     description=settings.project_description,
     version=settings.project_version,
     lifespan=lifespan,
     swagger_ui_parameters={"defaultModelsExpandDepth": -1},
     docs_url="/",
+    root_path='/api/finance/' + settings.project_name,
     redoc_url="/redoc",
 )
 
@@ -39,6 +40,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",
+        "http://localhost:80",
+        "http://localhost",
     ],
     allow_credentials=True,
     allow_methods=["*"],
