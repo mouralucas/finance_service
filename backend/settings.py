@@ -21,4 +21,7 @@ class FinanceSettings(Settings):
     log_collection_name: str = 'finance_logs'
     log_database_url: str = 'mongodb://dev-user-logs:password@localhost:27017/finance_dev_log?authSource=admin'
 
+    # Allowed origins CORS
+    allowed_origins: str = "http://localhost:3000,http://localhost:80,http://localhost"
+
 settings = FinanceSettings()
