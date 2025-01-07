@@ -1,5 +1,4 @@
 import calendar
-import datetime
 import random
 from datetime import datetime, date, timedelta, timezone
 from typing import Any
@@ -69,7 +68,7 @@ def get_period_range(start_period: int, end_period: int = None) -> list[int]:
     :return: A list with all periods between start_period and end_period.
     """
     if not end_period:
-        today = datetime.datetime.now(datetime.timezone.utc)
+        today = datetime.now(timezone.utc)
         end_period = today.year * 100 + today.month
 
     start_month = start_period % 100
@@ -92,7 +91,7 @@ def get_period_range(start_period: int, end_period: int = None) -> list[int]:
     return period_list
 
 
-def get_period_dates(period: int) -> tuple[datetime.date, datetime.date]:
+def get_period_dates(period: int) -> tuple[date, date]:
     """
     Created by: Lucas Penha de Moura - 20/10/2024
 
@@ -102,13 +101,13 @@ def get_period_dates(period: int) -> tuple[datetime.date, datetime.date]:
     year = period // 100
     month = period % 100
 
-    first_day = datetime.datetime(year, month, 1)
-    last_day = datetime.datetime(year, month, calendar.monthrange(year, month)[1])
+    first_day = datetime(year, month, 1)
+    last_day = datetime(year, month, calendar.monthrange(year, month)[1])
 
     return first_day, last_day
 
 
-def get_randon_date(start_date: datetime.date, end_date: datetime.date) -> datetime.date:
+def get_randon_date(start_date: date, end_date: date) -> date:
     """
     Created by: Lucas Penha de Moura - 06/10/2024
         Creates randon date between two specified dates.
@@ -125,7 +124,7 @@ def get_randon_date(start_date: datetime.date, end_date: datetime.date) -> datet
     return random_date
 
 
-def get_installments_due_dates(transaction_date: datetime.date, close_day: int, due_day: int,
+def get_installments_due_dates(transaction_date: date, close_day: int, due_day: int,
                                tot_installments: int = 1, return_str: bool = False) -> list[date | Any]:
     month = transaction_date.month
     year = transaction_date.year
