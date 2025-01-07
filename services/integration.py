@@ -6,6 +6,7 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from managers.core import CoreManager
+from managers.finance import FinanceManager
 from managers.investment import InvestmentManager
 from models.core import IndexerSeriesModel
 from schemas.request.integration import CreateIndexerSeriesRequest
@@ -17,14 +18,15 @@ class BcbIntegrationService:
         self.session: AsyncSession = session
         self.url_bcb = 'https://api.bcb.gov.br/dados/serie/bcdata.sgs.{resource_code}/dados?{params}'
 
-        self.investment_manager = CoreManager(self.session)
+        self.core_manager = CoreManager(self.session)
+        self.finance_manager = FinanceManager(self.session)
 
     async def get_indexer(self, params: CreateIndexerSeriesRequest):
 
-        indexer = await self.investment_manager.get_indexer_by_id(indexer_id=params.indexer_id, raise_exception=True)
-        periodicity = await self.investment_manager.get_periodicity_by_id(periodicity_id=params.periodicity_id, raise_exception=True)
+        indexer = await self.finance_manager.get_indexer_by_id(indexer_id=params.indexer_id, raise_exception=True)
+        periodicity = await self.finance_manager.get_periodicity_by_id(periodicity_id=params.periodicity_id, raise_exception=True)
 
-        latest_period = await self.investment_manager.get_latest_finance_series_period(indexer_id=params.indexer_id, periodicity_id=params.periodicity_id)
+        latest_period = await self.finance_manager.get_latest_finance_series_period(indexer_id=params.indexer_id, periodicity_id=params.periodicity_id)
 
         if latest_period:
             last_date_available = get_period_dates(latest_period) if latest_period else None
