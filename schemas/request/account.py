@@ -76,10 +76,15 @@ class UpdateAccountTransactionRequest(BaseModel):
     is_validated: bool | None = Field(None, description="Whether the transaction is validated by the user")
 
 
-class GetAccountTransactionRequest(DefaultModel):
+class GetAccountTransactionRequest(BaseModel):
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
+        alias=to_camel
+    ))
+
     account_id: uuid.UUID = Field(None, description="The id of the account")
-    startPeriod: int = Field(None, description="The start period of the transaction")
-    endPeriod: int = Field(None, description="The end period of the transaction")
+    start_period: int = Field(None, description="The start period of the transaction")
+    end_period: int = Field(None, description="The end period of the transaction")
+
 
 class CreateBalanceRequest(DefaultModel):
     account_id: uuid.UUID = Field(None, description='The id of the account')

@@ -11,7 +11,7 @@ from starlette import status
 
 from backend.database import get_session
 from schemas.request.account import CreateAccountRequest, GetAccountRequest, CreateAccountTransactionRequest, \
-    CloseAccountRequest, CreateBalanceRequest, GetBalanceRequest, UpdateAccountTransactionRequest
+    CloseAccountRequest, CreateBalanceRequest, GetBalanceRequest, UpdateAccountTransactionRequest, GetAccountTransactionRequest
 from schemas.response.account import CreateAccountResponse, GetAccountResponse, CloseAccountResponse, \
     GetAccountTransactionResponse, CreateAccountTransactionResponse
 from services.account import AccountService
@@ -70,6 +70,7 @@ async def update_transaction(
 
 @router.get('/transaction',  summary='Get account transactions')
 async def get_transactions(
+        params: GetAccountTransactionRequest = Depends(),
         session: AsyncSession = Depends(get_session),
         user: RequiredUser = Security(get_user)
 ) -> GetAccountTransactionResponse:
