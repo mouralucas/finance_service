@@ -6,6 +6,8 @@ from fastapi import Query
 from pydantic import BaseModel, Field, ConfigDict, AliasGenerator
 from pydantic.alias_generators import to_camel
 
+from schemas.request.finance import TaxFeeRequest
+
 
 class CreateCreditCardRequest(BaseModel):
     nickname: str = Field(..., alias="nickname", description='A nickname for the card')
@@ -63,7 +65,7 @@ class CreateCreditCardTransactionRequest(BaseModel):
     dollar_exchange_rate: float = Field(None, description='The dollar exchange rate with the default card currency')
     currency_dollar_exchange_rate: float = Field(None, description='The dollar exchange rate with the transaction currency')
     total_tax: Decimal = Field(None, description='The tax amount of the transaction')
-    tax_detail: dict = Field(None, description='The tax detail of the transaction')
+    tax_detail: TaxFeeRequest = Field(None, description='The tax detail of the transaction')
 
     description: str = Field(None, description='The description of the transaction')
 

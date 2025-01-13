@@ -81,9 +81,9 @@ class GetAccountTransactionRequest(BaseModel):
         alias=to_camel
     ))
 
-    account_id: uuid.UUID = Field(None, description="The id of the account")
-    start_period: int = Field(None, description="The start period of the transaction")
-    end_period: int = Field(None, description="The end period of the transaction")
+    account_id: uuid.UUID | None = Field(None, description="The id of the account")
+    start_period: int | None = Field(None, description="The start period of the transaction")
+    end_period: int | None = Field(None, description="The end period of the transaction")
 
 
 class CreateBalanceRequest(DefaultModel):

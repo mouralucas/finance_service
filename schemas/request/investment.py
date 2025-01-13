@@ -7,15 +7,7 @@ from pydantic import BaseModel, Field, model_validator, ConfigDict, AliasGenerat
 from pydantic.alias_generators import to_camel
 
 from schemas.core import TaxFeeDetailSchema
-
-class TaxFeeRequest(BaseModel):
-    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
-        alias=to_camel
-    ))
-
-    id: uuid.UUID = Field(..., alias='taxFeeId', description='The identification of the tax/fee')
-    amount: Decimal = Field(..., description='The amount of the tax/fee')
-    currency_id: str = Field('BRL', alias='currencyId', description='The currency of the tax/fee')
+from schemas.request.finance import TaxFeeRequest
 
 
 class CreateInvestmentRequest(BaseModel):

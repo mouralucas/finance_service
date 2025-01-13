@@ -74,7 +74,7 @@ async def get_transactions(
         session: AsyncSession = Depends(get_session),
         user: RequiredUser = Security(get_user)
 ) -> GetAccountTransactionResponse:
-    return await AccountService(session=session, user=user).get_transactions()
+    return await AccountService(session=session, user=user).get_transactions(params=params)
 
 
 
