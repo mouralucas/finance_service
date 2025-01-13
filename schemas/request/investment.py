@@ -118,7 +118,13 @@ class CreateBatchStatementRequest(BaseModel):
 
 
 class GetStatementRequest(BaseModel):
-    period: int = Field(Query(..., alias='period'), description='The period of the statement')
+    # TODO: add rules:
+    #   If period, start/end periods must be null and if start OR end, period must be null
+    #   Start and end periods are independent, but if both exists end must be greater than start
+    id: uuid.UUID = Field(..., description='The id of the statement')
+    start_period: int | None = Field(None, description='The start period of the statement')
+    end_period: int | None = Field(None, description='The end period of the statement')
+    period: int | None = Field(None, description='The period of the statement')
 
 
 class CreateObjectiveRequest(BaseModel):

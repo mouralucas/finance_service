@@ -77,15 +77,6 @@ async def create_statement(
     return await InvestmentService(session=session, user=user).create_statement(statement=statement)
 
 
-@router.post('/statement/batch', status_code=status.HTTP_201_CREATED)
-async def creat_batch_statement(
-        statements: CreateBatchStatementRequest,
-        session: AsyncSession = Depends(get_session),
-        user: RequiredUser = Security(get_user)
-):
-    print(statements)
-
-
 @router.get('/statement', summary='Get statement for an investment', description='Get statement base on filters')
 async def get_statement(
         params: GetStatementRequest = Depends(),

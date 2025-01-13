@@ -120,6 +120,12 @@ class AccountManager(BaseDataManager):
             .order_by(transaction_alias.transaction_date.desc(), transaction_alias.created_at.desc())
         )
 
+        if start_period:
+            query = query.where(transaction_alias.period >= start_period)
+
+        if end_period:
+            query = query.where(transaction_alias.period <= end_period)
+
         transactions: list[RowMapping] = await self.get_all(query)
 
         return [dict(transaction.items()) for transaction in transactions] if transactions else None

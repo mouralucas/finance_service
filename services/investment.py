@@ -175,7 +175,8 @@ class InvestmentService(BaseService):
         return response
 
     async def get_statement(self, params: GetStatementRequest) -> GetStatementResponse:
-        statement = await InvestmentManager(self.session).get_statement(period=params.period)
+        statement = await InvestmentManager(self.session).get_statement(investment_id=params.id, period=params.period,
+                                                                        start_period=params.start_period, end_period=params.end_period)
 
         response = GetStatementResponse(
             quantity=len(statement) if statement else 0,
