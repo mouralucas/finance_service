@@ -8,6 +8,7 @@ default_model_dict = {
 }
 
 
+# TODO: create periodicity mock and add to populate_database
 def get_currency_mock() -> list[dict[str, Any]]:
     currencies = [
         {

@@ -314,11 +314,13 @@ class InvestmentManager(BaseDataManager):
 
         return result
 
-    async def get_performance_portfolio(self, owner_id: uuid.UUID, indexer_id: uuid.UUID, period_range: int) -> list[dict]:
+    async def get_performance_portfolio(self, owner_id: uuid.UUID,
+                                        investment_id: uuid.UUID, indexer_id: uuid.UUID, period_range: int) -> list[dict]:
         """
         Created by: Lucas Penha de Moura - 17/10/2024
             Fetches the sum of gross, net and previous amount for the period range
-        :param indexer_id:
+        :param investment_id: the identification of the investment
+        :param indexer_id: the identification of the indexer
         :param owner_id: the identification of the owner of the investment
         :param period_range: The number of past periods to fetch, if 0 return all available periods
 
@@ -355,6 +357,9 @@ class InvestmentManager(BaseDataManager):
         if period_range > 0:
             start_period = get_previous_period(offset=period_range)
             query = query.where(InvestmentStatementModel.period >= start_period)
+
+        if investment_id:
+            query = query.where(InvestmentStatementModel.investment_id == investment_id)
 
         result = await self.get_all(query)
 

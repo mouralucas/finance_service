@@ -147,5 +147,10 @@ class GetObjectiveSummaryRequest(BaseModel):
 
 
 class GetPerformanceRequest(BaseModel):
-    indexer_id: uuid.UUID = Field('2a2b100f-17d9-4c61-b3b4-f06662113953', alias='indexerId', description='The unique identifier of the indexer - Default is CDI')
-    period_range: int = Field(12, alias='periodRange', description='The period range of the objective, how many months will be displayed')
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
+        alias=to_camel
+    ))
+
+    investment_id: uuid.UUID | None = Field(None, description='The id of the investment')
+    indexer_id: uuid.UUID = Field('2a2b100f-17d9-4c61-b3b4-f06662113953', description='The unique identifier of the indexer - Default is CDI')
+    period_range: int = Field(12, description='The period range of the objective, how many months will be displayed')

@@ -261,9 +261,12 @@ class InvestmentService(BaseService):
     async def get_performance(self, params: GetPerformanceRequest) -> GetInvestmentPerformanceResponse:
         performance_portfolio = await self.investment_manager.get_performance_portfolio(
             owner_id=self.user['user_id'],
+            investment_id=params.investment_id,
             period_range=params.period_range,
             indexer_id=params.indexer_id
         )
+
+        # TODO: handle if performance is None
 
         indexer = await FinanceManager(session=self.session).get_indexer_by_id(indexer_id=params.indexer_id, raise_exception=True)
 
