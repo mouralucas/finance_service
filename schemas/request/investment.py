@@ -121,7 +121,11 @@ class GetStatementRequest(BaseModel):
     # TODO: add rules:
     #   If period, start/end periods must be null and if start OR end, period must be null
     #   Start and end periods are independent, but if both exists end must be greater than start
-    id: uuid.UUID = Field(..., description='The id of the statement')
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
+        alias=to_camel
+    ))
+
+    investment_id: uuid.UUID = Field(..., description='The id of the statement')
     start_period: int | None = Field(None, description='The start period of the statement')
     end_period: int | None = Field(None, description='The end period of the statement')
     period: int | None = Field(None, description='The period of the statement')

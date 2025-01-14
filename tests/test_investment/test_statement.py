@@ -35,12 +35,13 @@ async def test_create_first_investment_statement(client, create_investment, crea
     investment_id = str(investments[0].id)
     period = get_period(investments[0].transaction_date)
     gross_amount = 35.10
-    tax_detail = [{
+    tax_details = [{
+        'currencyId': 'BRL',
         'taxFeeId': str(create_tax[0].id),
         'amount': 0.21
     }]
 
-    net_amount = gross_amount - sum(tax['amount'] for tax in tax_detail)
+    net_amount = gross_amount - sum(tax['amount'] for tax in tax_details)
 
     payload = {
         'investmentId': investment_id,
@@ -48,7 +49,7 @@ async def test_create_first_investment_statement(client, create_investment, crea
         'referenceDate': investments[0].transaction_date.strftime('%Y-%m-%d'),
         'grossAmount': gross_amount,
         'netAmount': net_amount,
-        'taxDetail': tax_detail,
+        'taxDetails': tax_details,
     }
 
     response = await client.post('/investment/statement', json=payload)
@@ -64,7 +65,7 @@ async def test_create_first_investment_statement(client, create_investment, crea
     assert 'grossAmount' in data['investmentStatement']
     assert float(data['investmentStatement']['grossAmount']) == gross_amount
     assert 'totalTax' in data['investmentStatement']
-    assert float( data['investmentStatement']['totalTax']) == sum(tax['amount'] for tax in tax_detail)
+    assert float( data['investmentStatement']['totalTax']) == sum(tax['amount'] for tax in tax_details)
     assert 'totalFee' in data['investmentStatement']
     assert float(data['investmentStatement']['totalFee']) == 0
     assert 'netAmount' in data['investmentStatement']
@@ -85,6 +86,7 @@ async def test_get_statement(client, create_investment_statement):
     period = get_period(investment.transaction_date)
 
     payload = {
+        'investmentId': investment.id,
         'period': period
     }
     response = await client.get('/investment/statement', params=payload)
