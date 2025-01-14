@@ -145,11 +145,11 @@ class InvestmentService(BaseService):
             raise HTTPException(status_code=status.HTTP_412_PRECONDITION_FAILED, detail='Statement must be the following period of the last statement')
 
         # Set the model with the new statement
-        new_statement = InvestmentStatementModel(**statement.model_dump())
+        new_statement = InvestmentStatementModel(**statement.model_dump(exclude={'tax_details', 'fee_details'}))
 
         # Serialize the tax/fee information
-        new_statement.tax_detail = [tax.model_dump(mode='json') for tax in statement.tax_detail] if statement.tax_detail else None
-        new_statement.fee_detail = [fee.model_dump(mode='json') for fee in statement.fee_detail] if statement.fee_detail else None
+        new_statement.tax_detail = [tax.model_dump(mode='json') for tax in statement.tax_details] if statement.tax_details else None
+        new_statement.fee_detail = [fee.model_dump(mode='json') for fee in statement.fee_details] if statement.fee_details else None
 
         # Link the statement with the user
         new_statement.owner_id = self.user['user_id']
@@ -158,8 +158,8 @@ class InvestmentService(BaseService):
         new_statement.previous_amount = last_statement.gross_amount if last_statement else investment.amount
 
         # Set the tax/fee totals
-        new_statement.total_tax = sum(tax.amount for tax in statement.tax_detail) if statement.tax_detail else 0.0
-        new_statement.total_fee = sum(fee.amount for fee in statement.fee_detail) if statement.fee_detail else 0.0
+        new_statement.total_tax = sum(tax.amount for tax in statement.tax_details) if statement.tax_details else 0.0
+        new_statement.total_fee = sum(fee.amount for fee in statement.fee_details) if statement.fee_details else 0.0
 
         # Set the statistics
         new_statement.value_change = new_statement.gross_amount - new_statement.previous_amount

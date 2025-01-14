@@ -131,7 +131,7 @@ class InvestmentManager(BaseDataManager):
         query = select(InvestmentStatementModel).order_by(InvestmentStatementModel.period)
 
         if investment_id:
-            query = query.where(InvestmentStatementModel.id == investment_id)
+            query = query.where(InvestmentStatementModel.investment_id == investment_id)
 
         if period:
             query = query.where(InvestmentStatementModel.period == period)

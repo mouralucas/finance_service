@@ -109,8 +109,8 @@ class CreateStatementRequest(BaseModel):
     reference_date: datetime.date = Field(..., description='The date when the statement was calculated, usually the last business of the month')
     gross_amount: Decimal = Field(..., description='The gross amount of the period')
     net_amount: Decimal = Field(..., description='The net amount of the period')
-    tax_detail: list[TaxFeeRequest] | None = Field(None, description='The tax details of the investment tax')
-    fee_detail: list[TaxFeeRequest] | None = Field(None, description='The fee details of the investment fee')
+    tax_details: list[TaxFeeRequest] | None = Field(None, description='The tax details of the investment tax')
+    fee_details: list[TaxFeeRequest] | None = Field(None, description='The fee details of the investment fee')
 
 
 class CreateBatchStatementRequest(BaseModel):
