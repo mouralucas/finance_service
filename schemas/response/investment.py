@@ -64,9 +64,14 @@ class GetObjectiveSummaryResponse(SuccessResponseBase):
 
 
 # Dashboard information
-class GetInvestmentAllocationResponse(SuccessResponseBase):
-    type_allocation: list[InvestmentAllocationSchema] | list = Field(..., serialization_alias='typeAllocation', description='The list of investment allocated by type')
-    category_allocation: list[InvestmentAllocationSchema] | list = Field(..., serialization_alias='categoryAllocation', description='The list of investment allocated by category')
+class GetInvestmentAllocationResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
+        serialization_alias=to_camel
+    ))
+
+    type_allocation: list[InvestmentAllocationSchema] | list = Field(..., description='The list of investment allocated by type')
+    category_allocation: list[InvestmentAllocationSchema] | list = Field(..., description='The list of investment allocated by category')
+    custodian_allocation: list[InvestmentAllocationSchema] | list = Field(..., description='The list of investment allocated by category')
 
 
 class GetInvestmentPerformanceResponse(SuccessResponseBase):

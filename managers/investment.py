@@ -314,6 +314,40 @@ class InvestmentManager(BaseDataManager):
 
         return result
 
+    async def get_allocation_by_custodian(self, owner_id: uuid.UUID) -> list[RowMapping]:
+        subquery_latest_period = (
+            select(
+                InvestmentStatementModel.investment_id,
+                func.max(InvestmentStatementModel.period).label('latest_period')
+            )
+            .group_by(InvestmentStatementModel.investment_id)
+            .subquery()
+        )
+
+        query = (
+            select(
+                BankModel.name.label('name'),
+                func.sum(InvestmentStatementModel.gross_amount).label('total')
+            )
+            .select_from(InvestmentStatementModel)
+            .join(InvestmentModel, InvestmentModel.id == InvestmentStatementModel.investment_id)
+            .join(BankModel, InvestmentModel.custodian_id == BankModel.id)
+            .join(
+                subquery_latest_period,
+                (InvestmentStatementModel.investment_id == subquery_latest_period.c.investment_id) &
+                (InvestmentStatementModel.period == subquery_latest_period.c.latest_period)
+            )
+            .where(
+                InvestmentModel.is_liquidated == False,
+                InvestmentModel.owner_id == owner_id,
+            )
+            .group_by(BankModel.name)
+        )
+
+        result = await self.get_all(query)
+
+        return result
+
     async def get_performance_portfolio(self, owner_id: uuid.UUID,
                                         investment_id: uuid.UUID, indexer_id: uuid.UUID, period_range: int) -> list[dict]:
         """

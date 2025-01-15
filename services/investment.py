@@ -248,13 +248,14 @@ class InvestmentService(BaseService):
 
     # Dashboard information
     async def get_investment_allocation(self) -> GetInvestmentAllocationResponse:
-        allocation_by_type = await self.investment_manager.get_allocation_by_investment_type(owner_id=self.user['user_id'])
-
-        allocation_by_category = await self.investment_manager.get_allocation_by_category(owner_id=self.user['user_id'])
+        type_allocation = await self.investment_manager.get_allocation_by_investment_type(owner_id=self.user['user_id'])
+        category_allocation = await self.investment_manager.get_allocation_by_category(owner_id=self.user['user_id'])
+        custodian_allocation = await self.investment_manager.get_allocation_by_custodian(owner_id=self.user['user_id'])
 
         response = GetInvestmentAllocationResponse(
-            type_allocation=[InvestmentAllocationSchema.model_validate(allocation) for allocation in allocation_by_type] if allocation_by_type else [],
-            category_allocation=[InvestmentAllocationSchema.model_validate(allocation) for allocation in allocation_by_category] if allocation_by_category else [],
+            type_allocation=[InvestmentAllocationSchema.model_validate(allocation) for allocation in type_allocation] if type_allocation else [],
+            category_allocation=[InvestmentAllocationSchema.model_validate(allocation) for allocation in category_allocation] if category_allocation else [],
+            custodian_allocation=[InvestmentAllocationSchema.model_validate(allocation) for allocation in custodian_allocation] if custodian_allocation else []
         )
 
         return response
