@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, date
 import uuid
 from decimal import Decimal
 
@@ -43,8 +43,8 @@ class InvestmentSchema(BaseModel):
     name: str = Field(..., description='The name of the investment')
 
     type_id: uuid.UUID = Field(..., serialization_alias='investmentTypeId', description='The id of the investment type')
-    transaction_date: datetime.date = Field(..., description='The date of the investment')
-    maturity_date: datetime.date | None = Field(None, serialization_alias='maturityDate', description='The date that the investment will be liquidated')
+    transaction_date: date = Field(..., description='The date of the investment')
+    maturity_date: date | None = Field(None, serialization_alias='maturityDate', description='The date that the investment will be liquidated')
     quantity: float = Field(..., description='The quantity of the investment bought')
     price: float = Field(..., description='The unit price for the investment')
     amount: float = Field(..., description='The total bought. Quantity * price')
@@ -58,7 +58,7 @@ class InvestmentSchema(BaseModel):
     liquidity_id: uuid.UUID = Field(..., description='The id of investment liquidity')
     liquidity_name: str | None = Field(None, description='The name of the investment liquidity')
     is_liquidated: bool = Field(False, description='Whether the investment is liquidated')
-    liquidation_date: datetime.date | None = Field(None, description='The date that the investment was liquidated')
+    liquidation_date: date | None = Field(None, description='The date that the investment was liquidated')
     liquidation_amount: Decimal | None = Field(None, description='The amount liquidated, after tax')
     country_id: str = Field(..., description='The id of the country')
     country_name: str | None = Field(None, description='The name of the country of the investment')
@@ -89,7 +89,7 @@ class InvestmentStatementSchema(BaseModel):
 
     id: uuid.UUID = Field(..., serialization_alias='investmentStatementId', description='The id of the statement')
     investment_id: uuid.UUID = Field(..., description='The id of the investment')
-    investment: InvestmentSchema = Field(..., description='The object of the investment')
+    referenceDate: date = Field(..., description='The date of the investment')
     period: int = Field(..., description='The period of the statement')
     gross_amount: float = Field(..., description='The gross amount of the investment in the period')
     total_tax: float = Field(..., description='The total tax amount of the investment in the period')
@@ -110,7 +110,7 @@ class InvestmentObjectiveSchema(BaseModel):
     title: str = Field(..., description='The title of the objective')
     description: str | None = Field(None, description='The description of the objective')
     amount: Decimal = Field(..., description='The amount of the objective')
-    estimated_deadline: datetime.date | None = Field(None, description='The date that are expected to reach the objective')
+    estimated_deadline: date | None = Field(None, description='The date that are expected to reach the objective')
 
 
 # Allocation

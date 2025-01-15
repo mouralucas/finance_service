@@ -118,9 +118,6 @@ class CreateBatchStatementRequest(BaseModel):
 
 
 class GetStatementRequest(BaseModel):
-    # TODO: add rules:
-    #   If period, start/end periods must be null and if start OR end, period must be null
-    #   Start and end periods are independent, but if both exists end must be greater than start
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
         alias=to_camel
     ))
@@ -129,6 +126,16 @@ class GetStatementRequest(BaseModel):
     start_period: int | None = Field(None, description='The start period of the statement')
     end_period: int | None = Field(None, description='The end period of the statement')
     period: int | None = Field(None, description='The period of the statement')
+
+    @model_validator(mode='before')
+    def check_periods(cls, data: dict) -> dict:
+        if data.get('period') and (data.get('startPeriod') or data.get('endPeriod')):
+            raise ValueError('only specific period or a range is allowed')
+
+        if data.get('startPeriod') and data.get('endPeriod') and (data.get('endPeriod') < data.get('startPeriod')):
+            raise ValueError('start period must be before end period')
+
+        return data
 
 
 class CreateObjectiveRequest(BaseModel):
@@ -139,7 +146,7 @@ class CreateObjectiveRequest(BaseModel):
 
 
 class GetObjectiveRequest(BaseModel):
-    id: uuid.UUID | None = Field(Query(None, serialization_alias='objectiveId', description='The unique identifier of the investment objective'))
+    id: uuid.UUID | None = Field(Query(None, alias='objectiveId', description='The unique identifier of the investment objective'))
 
 
 class GetObjectiveSummaryRequest(BaseModel):

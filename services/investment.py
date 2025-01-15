@@ -2,6 +2,7 @@ import datetime
 from decimal import Decimal
 
 from fastapi import HTTPException
+from fastapi.dependencies.utils import request_params_to_args
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import BaseService
 from sqlalchemy import RowMapping
@@ -266,7 +267,11 @@ class InvestmentService(BaseService):
             indexer_id=params.indexer_id
         )
 
-        # TODO: handle if performance is None
+        if not performance_portfolio:
+            return GetInvestmentPerformanceResponse(
+                data=[],
+                series=[],
+            )
 
         indexer = await FinanceManager(session=self.session).get_indexer_by_id(indexer_id=params.indexer_id, raise_exception=True)
 
@@ -280,7 +285,6 @@ class InvestmentService(BaseService):
 
             accumulated_indexer *= (1 + indexer_variation_decimal)
             accumulated_variation *= (1 + variation_decimal)
-
 
             period_performance.append(
                 {
