@@ -128,7 +128,7 @@ class InvestmentManager(BaseDataManager):
 
     async def get_statement(self, investment_id: uuid.UUID = None, period: int = None, start_period: int = None, end_period: int = None) -> list[InvestmentStatementModel] | None:
         # TODO: get also cdi or the selected indexer with the statement for each period
-        query = select(InvestmentStatementModel).order_by(InvestmentStatementModel.period)
+        query = select(InvestmentStatementModel).order_by(InvestmentStatementModel.period.desc())
 
         if investment_id:
             query = query.where(InvestmentStatementModel.investment_id == investment_id)

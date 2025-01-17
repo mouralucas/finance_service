@@ -73,31 +73,6 @@ class InvestmentService(BaseService):
         current_investment = await InvestmentManager(self.session).get_investment_by_id(investment_liquidate.id)
         investment_liquidate = investment_liquidate.model_dump()
 
-        # Get previous statement
-        previous_statements = await self.investment_manager.get_statement(investment_id=investment_liquidate['id'])
-        last_statement = previous_statements[-1] if previous_statements else None
-
-        # Check if the statement from last period exists
-        liquidation_period = get_period(investment_liquidate['liquidation_date'])
-
-        # TODO: check if the liquidation period exists in statement before add
-        # if last_statement and last_statement.period >= liquidation_period:
-        #     raise ValueError
-        # elif last_statement:
-        #     # Only insert final statement if there is other statement (does not make much sense)
-        #     new_statement = InvestmentStatementModel(
-        #         investment_id=investment_liquidate['id'],
-        #         period=liquidation_period,
-        #         previous_amount=last_statement.gross_amount,
-        #         gross_amount=investment_liquidate['gross_amount'],
-        #         tax_detail = [investment_liquidate['tax_detail'] for tax in investment_liquidate['tax_detail']] if investment_liquidate['tax_detail'] else None,
-        #         fee_detail = [investment_liquidate['fee_detail'] for fee in investment_liquidate['fee_detail']] if investment_liquidate['fee_detail'] else None,
-        #         net_amount=investment_liquidate['net_amount'],
-        #         reference_date=investment_liquidate['liquidation_date'],
-        #         at_maturity=True,
-        #     )
-        #     await self.investment_manager.create_statement(new_statement)
-
         current_investment.is_liquidated = True
         current_investment.liquidation_date = investment_liquidate['liquidation_date']
         current_investment.liquidation_amount = investment_liquidate['liquidation_amount']
@@ -270,11 +245,15 @@ class InvestmentService(BaseService):
 
         if not performance_portfolio:
             return GetInvestmentPerformanceResponse(
+                indexer_name='',
                 data=[],
                 series=[],
             )
 
         indexer = await FinanceManager(session=self.session).get_indexer_by_id(indexer_id=params.indexer_id, raise_exception=True)
+        investment = None
+        if params.investment_id:
+            investment = await self.investment_manager.get_investment_by_id(investment_id=params.investment_id)
 
         accumulated_indexer = 1.0
         accumulated_variation = 1.0
@@ -304,11 +283,12 @@ class InvestmentService(BaseService):
             },
             {
                 'value': 'variation',
-                'name': 'Carteira'
+                'name': investment.name if investment else 'Carteira'
             }
         ]
 
         response = GetInvestmentPerformanceResponse(
+            indexer_name=indexer.name,
             data=[InvestmentPerformanceDataSchema.model_validate(performance) for performance in period_performance],
             series=[ChartSeriesSchema.model_validate(serie) for serie in series],
         )

@@ -74,6 +74,11 @@ class GetInvestmentAllocationResponse(BaseModel):
     custodian_allocation: list[InvestmentAllocationSchema] | list = Field(..., description='The list of investment allocated by category')
 
 
-class GetInvestmentPerformanceResponse(SuccessResponseBase):
+class GetInvestmentPerformanceResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
+        serialization_alias=to_camel
+    ))
+
+    indexer_name: str = Field(..., description='The name of the indexer')
     data: list[InvestmentPerformanceDataSchema] = Field(..., description='The investment performance data')
     series: list[ChartSeriesSchema] = Field(..., description='The performance series')

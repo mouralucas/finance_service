@@ -13,6 +13,35 @@ orbs:
 
 
 jobs:
+  deploy:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - run:
+          name: Configurar chave SSH
+          command: |
+            mkdir -p ~/.ssh
+            echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+            chmod 600 ~/.ssh/id_rsa
+            ssh-keyscan -H $DEPLOY_SERVER_HOST >> ~/.ssh/known_hosts
+      - run:
+          name: Desbloquear chave com senha
+          command: |
+            eval "$(ssh-agent -s)"
+            echo "$SSH_PASSPHRASE" | ssh-add ~/.ssh/id_rsa
+      - run:
+          name: Deploy para o servidor
+          command: |
+            ssh $DEPLOY_USER@$DEPLOY_SERVER_HOST <<EOF
+              cd /var/www/service/finance
+              # Aqui você pode rodar os comandos para o deploy
+              echo "Fazendo deploy..."
+              docker-compose down
+              git pull origin main
+              # Qualquer outro comando necessário
+            EOF
+
   test-service:
     executor: python-executor
     steps:
