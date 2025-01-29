@@ -95,7 +95,8 @@ class InvestmentManager(BaseDataManager):
                      ((statement_alias.gross_amount - investment_alias.amount) / investment_alias.amount) * 100),
                     else_=0
                 ).label('percentage_change'),
-                statement_alias.period
+                statement_alias.period,
+                investment_alias.objective_id
             )
             .join(currency_alias, investment_alias.currency_id == currency_alias.id)
             .join(type_alias, investment_alias.type_id == type_alias.id)
