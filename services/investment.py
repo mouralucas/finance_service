@@ -30,6 +30,13 @@ class InvestmentService(BaseService):
 
     # Investments
     async def create_investment(self, investment: CreateInvestmentRequest) -> CreateInvestmentResponse:
+        """
+        Created by: Lucas Penha de Moura - 12/08/2024
+
+            Create a new investment
+        :param investment: The object of CreateInvestmentRequest
+        :return:
+        """
         account = await AccountManager(session=self.session).get_account_by_id(account_id=investment.account_id)
         custodian_id = account.bank_id
 
@@ -49,6 +56,13 @@ class InvestmentService(BaseService):
         return response
 
     async def update_investment(self, investment: UpdateInvestmentRequest) -> UpdateInvestmentResponse:
+        """
+        Created by: Lucas Penha de Moura - 04/12/2024
+
+            Update the information about an investment
+        :param investment: The object of UpdateInvestmentRequest
+        :return:
+        """
         fields = investment.model_dump(exclude_unset=True)
 
         updated_investment: InvestmentModel = await self.investment_manager.update_investment(investment_id=fields['id'], fields=fields)
@@ -60,6 +74,13 @@ class InvestmentService(BaseService):
         return response
 
     async def get_investments(self, params: GetInvestmentRequest) -> GetInvestmentResponse:
+        """
+        Created by: Lucas Penha de Moura - 12/08/2024
+
+            Get investment based on available filters
+        :param params: The object of GetInvestmentRequest with available params
+        :return:
+        """
         investments = await InvestmentManager(self.session).get_investments(owner_id=self.user['user_id'])
 
         response = GetInvestmentResponse(
@@ -70,6 +91,13 @@ class InvestmentService(BaseService):
         return response
 
     async def liquidate_investment(self, investment_liquidate: LiquidateInvestmentRequest) -> LiquidateInvestmentResponse:
+        """
+        Created by: Lucas Penha de Moura - 14/08/2024
+
+            Update an investment with the values of a liquidation (date, amount and taxes)
+        :param investment_liquidate: The object of LiquidateInvestmentRequest
+        :return:
+        """
         current_investment = await InvestmentManager(self.session).get_investment_by_id(investment_liquidate.id)
         investment_liquidate = investment_liquidate.model_dump()
 
@@ -88,6 +116,12 @@ class InvestmentService(BaseService):
         pass
 
     async def get_investment_types(self) -> GetInvestmentTypeResponse:
+        """
+        Created by: Lucas Penha de Moura - 21/09/2024
+
+            Get investments types
+        :return: The list of investment types
+        """
         investment_types: list[RowMapping] = await self.investment_manager.get_investment_type()
 
         response = GetInvestmentTypeResponse(
@@ -99,6 +133,13 @@ class InvestmentService(BaseService):
 
     # Statements
     async def create_statement(self, statement: CreateStatementRequest) -> CreateStatementResponse:
+        """
+        Created by: Lucas Penha de Moura - 23/09/2024
+
+            Create an investment statement
+        :param statement: The object of CreateStatementRequest
+        :return: The statement created
+        """
         # Get the investment
         investment = await self.investment_manager.get_investment_by_id(statement.investment_id, raise_exception=True)
 
@@ -151,6 +192,13 @@ class InvestmentService(BaseService):
         return response
 
     async def get_statement(self, params: GetStatementRequest) -> GetStatementResponse:
+        """
+        Created by: Lucas Penha de Moura - 28/08/2024
+
+            Get investments statements based available params
+        :param params: The object of GetStatementRequest with available parameters
+        :return:
+        """
         statement = await InvestmentManager(self.session).get_statement(investment_id=params.investment_id, period=params.period,
                                                                         start_period=params.start_period, end_period=params.end_period)
 
@@ -163,6 +211,13 @@ class InvestmentService(BaseService):
 
     # Objectives
     async def create_objective(self, objective: CreateObjectiveRequest) -> CreateObjectiveResponse:
+        """
+        Created by: Lucas Penha de Moura - 02/09/2024
+
+            Create a new investment objective
+        :param objective: The object of CreateObjectiveRequest
+        :return: The objective created
+        """
         new_objective_ = InvestmentObjectiveModel(**objective.model_dump())
         new_objective_.owner_id = self.user['user_id']
 
@@ -175,6 +230,13 @@ class InvestmentService(BaseService):
         return response
 
     async def get_objectives(self, params: GetObjectiveRequest):
+        """
+        Created by: Lucas Penha de Moura - 02/09/2024
+
+            Get investment objectives
+        :param params: The object of GetObjectiveRequest with available parameters
+        :return:
+        """
         objectives = await InvestmentManager(self.session).get_objectives(params=params.model_dump())
 
         response = GetObjectiveResponse(
@@ -185,6 +247,12 @@ class InvestmentService(BaseService):
         return response
 
     async def get_investment_without_objective(self) -> GetInvestmentWithoutObjectives:
+        """
+        Created by: Lucas Penha de Moura - 21/09/2024
+
+            Get all investment without objectives related to it
+        :return: The list of investment without objectives
+        """
         investments: list[InvestmentModel] = await self.investment_manager.get_objective_investments(with_objective=False)
 
         response = GetInvestmentWithoutObjectives(
@@ -194,6 +262,13 @@ class InvestmentService(BaseService):
         return response
 
     async def get_objective_summary(self, params: GetObjectiveSummaryRequest) -> GetObjectiveSummaryResponse:
+        """
+        Created by: Lucas Penha de Moura - 06/10/2024
+
+            Get the summary of the objectives
+        :param params: The object of GetObjectiveSummaryRequest
+        :return: The summary of the objectives
+        """
         # The summary contais:
         #   1 - All data available from the objective (title, description,amount and estimated deadline)
         #   2 - If amount is present, check with the latest statement for the investment the gross amount. if not statement get the amount invested.
@@ -224,6 +299,12 @@ class InvestmentService(BaseService):
 
     # Dashboard information
     async def get_investment_allocation(self) -> GetInvestmentAllocationResponse:
+        """
+        Created by: Lucas Penha de Moura - 16/10/2024
+
+            Get the allocations of the investments
+        :return: The allocations of the investments
+        """
         type_allocation = await self.investment_manager.get_allocation_by_investment_type(owner_id=self.user['user_id'])
         category_allocation = await self.investment_manager.get_allocation_by_category(owner_id=self.user['user_id'])
         custodian_allocation = await self.investment_manager.get_allocation_by_custodian(owner_id=self.user['user_id'])
@@ -239,6 +320,13 @@ class InvestmentService(BaseService):
         return response
 
     async def get_performance(self, params: GetPerformanceRequest) -> GetInvestmentPerformanceResponse:
+        """
+        Created by: Lucas Penha de Moura - 04/12/2024
+
+            Get investments performance.
+        :param params: The object of PerformanceRequest with available parameters
+        :return: The performance of the investments
+        """
         performance_portfolio = await self.investment_manager.get_performance_portfolio(
             owner_id=self.user['user_id'],
             investment_id=params.investment_id,

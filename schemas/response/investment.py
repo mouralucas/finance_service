@@ -8,7 +8,7 @@ from schemas.core import ChartSeriesSchema
 from schemas.investment import InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema, InvestmentTypeSchema, InvestmentAllocationSchema, InvestmentPerformanceDataSchema
 
 
-class CreateInvestmentResponse(SuccessResponseBase):
+class CreateInvestmentResponse(BaseModel):
     investment: InvestmentSchema = Field(..., description='The investment created')
 
 
@@ -16,7 +16,7 @@ class UpdateInvestmentResponse(CreateInvestmentResponse):
     pass
 
 
-class GetInvestmentResponse(SuccessResponseBase):
+class GetInvestmentResponse(BaseModel):
     quantity: int = Field(..., description='The total number of investment returned')
     investments: list[InvestmentSchema] = Field(..., description='The list of investments')
 
@@ -35,16 +35,20 @@ class LiquidateInvestmentResponse(CreateInvestmentResponse):
     pass
 
 
-class CreateStatementResponse(SuccessResponseBase):
-    investment_statement: InvestmentStatementSchema = Field(..., serialization_alias='investmentStatement', description='The investment statement')
+class CreateStatementResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
+        serialization_alias=to_camel
+    ))
+
+    investment_statement: InvestmentStatementSchema = Field(..., description='The investment statement')
 
 
-class GetStatementResponse(SuccessResponseBase):
+class GetStatementResponse(BaseModel):
     quantity: int = Field(..., description='The total number of statement returned')
     statement: list[InvestmentStatementSchema] | None = Field(None, description='The investment statement')
 
 
-class CreateObjectiveResponse(SuccessResponseBase):
+class CreateObjectiveResponse(BaseModel):
     objective: InvestmentObjectiveSchema = Field(..., description='The investment objective')
 
 
@@ -57,11 +61,15 @@ class GetInvestmentWithoutObjectives(GetInvestmentResponse):
     pass
 
 
-class GetObjectiveSummaryResponse(SuccessResponseBase):
-    objective_title: str = Field(..., serialization_alias='objectiveTitle', description='The title of the objective')
-    amount_stipulated: float = Field(..., serialization_alias='amountStipulated', description='The amount stipulated when objective was created')
-    amount_invested: float = Field(..., serialization_alias='amountInvested', description='The amount invested so far in this objective')
-    perc_completed: float = Field(..., serialization_alias='percCompleted', description='The percentage completed of the objective')
+class GetObjectiveSummaryResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
+        serialization_alias=to_camel
+    ))
+
+    objective_title: str = Field(..., description='The title of the objective')
+    amount_stipulated: float = Field(..., description='The amount stipulated when objective was created')
+    amount_invested: float = Field(..., description='The amount invested so far in this objective')
+    perc_completed: float = Field(..., description='The percentage completed of the objective')
 
 
 # Dashboard information
