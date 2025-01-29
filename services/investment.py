@@ -178,7 +178,8 @@ class InvestmentService(BaseService):
         objectives = await InvestmentManager(self.session).get_objectives(params=params.model_dump())
 
         response = GetObjectiveResponse(
-            objectives=[InvestmentObjectiveSchema.model_validate(data['InvestmentObjectiveModel']) for data in objectives]
+            quantity=len(objectives) if objectives else 0,
+            objectives=[InvestmentObjectiveSchema.model_validate(data['InvestmentObjectiveModel']) for data in objectives] if objectives else []
         )
 
         return response
@@ -226,11 +227,13 @@ class InvestmentService(BaseService):
         type_allocation = await self.investment_manager.get_allocation_by_investment_type(owner_id=self.user['user_id'])
         category_allocation = await self.investment_manager.get_allocation_by_category(owner_id=self.user['user_id'])
         custodian_allocation = await self.investment_manager.get_allocation_by_custodian(owner_id=self.user['user_id'])
+        objectives_allocation = await self.investment_manager.get_allocation_by_objectives(owner_id=self.user['user_id'])
 
         response = GetInvestmentAllocationResponse(
             type_allocation=[InvestmentAllocationSchema.model_validate(allocation) for allocation in type_allocation] if type_allocation else [],
             category_allocation=[InvestmentAllocationSchema.model_validate(allocation) for allocation in category_allocation] if category_allocation else [],
-            custodian_allocation=[InvestmentAllocationSchema.model_validate(allocation) for allocation in custodian_allocation] if custodian_allocation else []
+            custodian_allocation=[InvestmentAllocationSchema.model_validate(allocation) for allocation in custodian_allocation] if custodian_allocation else [],
+            objective_allocation=[InvestmentAllocationSchema.model_validate(allocation) for allocation in objectives_allocation] if objectives_allocation else []
         )
 
         return response

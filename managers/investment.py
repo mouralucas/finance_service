@@ -4,7 +4,7 @@ from typing import Any, cast
 from fastapi import HTTPException
 from rolf_common.managers import BaseDataManager
 from rolf_common.models import SQLModel
-from sqlalchemy import select, update, Executable, RowMapping, func, case
+from sqlalchemy import select, update, Executable, RowMapping, func, case, literal
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 from starlette import status
@@ -342,6 +342,43 @@ class InvestmentManager(BaseDataManager):
                 InvestmentModel.owner_id == owner_id,
             )
             .group_by(BankModel.name)
+        )
+
+        result = await self.get_all(query)
+
+        return result
+
+    async def get_allocation_by_objectives(self, owner_id: uuid.UUID) -> list[RowMapping]:
+        subquery_latest_period = (
+            select(
+                InvestmentStatementModel.investment_id,
+                func.max(InvestmentStatementModel.period).label('latest_period')
+            )
+            .group_by(InvestmentStatementModel.investment_id)
+            .subquery()
+        )
+
+        query = (
+            select(
+                case(
+                    (InvestmentObjectiveModel.title == None, literal('Não alocado')),
+                    else_=InvestmentObjectiveModel.title
+                ).label('name'),
+                func.sum(InvestmentStatementModel.gross_amount).label('total')
+            )
+            .select_from(InvestmentStatementModel)
+            .join(InvestmentModel, InvestmentModel.id == InvestmentStatementModel.investment_id)
+            .outerjoin(InvestmentObjectiveModel, InvestmentModel.objective_id == InvestmentObjectiveModel.id)
+            .join(
+                subquery_latest_period,
+                (InvestmentStatementModel.investment_id == subquery_latest_period.c.investment_id) &
+                (InvestmentStatementModel.period == subquery_latest_period.c.latest_period)
+            )
+            .where(
+                InvestmentModel.is_liquidated == False,
+                InvestmentModel.owner_id == owner_id,
+            )
+            .group_by(InvestmentObjectiveModel.title)
         )
 
         result = await self.get_all(query)

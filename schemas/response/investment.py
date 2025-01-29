@@ -48,7 +48,8 @@ class CreateObjectiveResponse(SuccessResponseBase):
     objective: InvestmentObjectiveSchema = Field(..., description='The investment objective')
 
 
-class GetObjectiveResponse(SuccessResponseBase):
+class GetObjectiveResponse(BaseModel):
+    quantity: int = Field(..., description='The total number of objectives returned')
     objectives: list[InvestmentObjectiveSchema] = Field(..., description='The list of investment objectives')
 
 
@@ -72,6 +73,7 @@ class GetInvestmentAllocationResponse(BaseModel):
     type_allocation: list[InvestmentAllocationSchema] | list = Field(..., description='The list of investment allocated by type')
     category_allocation: list[InvestmentAllocationSchema] | list = Field(..., description='The list of investment allocated by category')
     custodian_allocation: list[InvestmentAllocationSchema] | list = Field(..., description='The list of investment allocated by category')
+    objective_allocation: list[InvestmentAllocationSchema] | list = Field(..., description='The list of investment allocated by objective')
 
 
 class GetInvestmentPerformanceResponse(BaseModel):
