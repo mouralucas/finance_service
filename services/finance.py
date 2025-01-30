@@ -27,7 +27,8 @@ class FinanceService(BaseService):
         currencies = await self.finance_manager.get_currencies()
 
         response = GetCurrencyResponse(
-            currencies=[CurrencySchema.model_validate(currency) for currency in currencies],
+            quantity=len(currencies) if currencies else 0,
+            currencies=[CurrencySchema.model_validate(currency) for currency in currencies] if currencies else [],
         )
 
         return response
@@ -45,7 +46,8 @@ class FinanceService(BaseService):
         banks = await self.finance_manager.get_banks()
 
         response = GetBankResponse(
-            banks=[BankSchema.model_validate(bank) for bank in banks]
+            quantity=len(banks) if banks else 0,
+            banks=[BankSchema.model_validate(bank) for bank in banks] if banks else []
         )
 
         return response

@@ -8,21 +8,27 @@ from schemas.core import CurrencySchema, BankSchema, IndexerTypeSchema, IndexerS
 
 
 class GetSummaryResponse(SuccessResponseBase):
-    total_invested: float = Field(..., serialization_alias='totalInvested', description='The total amount invested in the period')
-    total_credit_card: float = Field(..., serialization_alias='totalCreditCard', description='The total amount spent in credit card in the period')
-    incoming: float = Field(..., serialization_alias='incoming', description='The total amount incoming in the period')
-    outgoing: float = Field(..., serialization_alias='outgoing', description='The total amount outgoing in the period')
-    balance: float = Field(..., serialization_alias='balance', description='The total amount in the period')
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
+        serialization_alias=to_camel,
+    ))
+
+    total_invested: float = Field(..., description='The total amount invested in the period')
+    total_credit_card: float = Field(..., description='The total amount spent in credit card in the period')
+    incoming: float = Field(..., description='The total amount incoming in the period')
+    outgoing: float = Field(..., description='The total amount outgoing in the period')
+    balance: float = Field(..., description='The total amount in the period')
 
 
-class GetCurrencyResponse(SuccessResponseBase):
-    currencies: list[CurrencySchema]
+class GetCurrencyResponse(BaseModel):
+    quantity: int = Field(..., description='The total of currencies available')
+    currencies: list[CurrencySchema] = Field(..., description='The list of currencies available')
 
 
 class GetBankResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    banks: list[BankSchema]
+    quantity: int = Field(..., description='The total of banks available')
+    banks: list[BankSchema] = Field(..., description='The list of banks available')
 
 
 class GetIndexerTypeResponse(BaseModel):
