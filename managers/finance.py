@@ -35,7 +35,7 @@ class FinanceManager(BaseDataManager):
         return [tax_fee['TaxFeeModel'] for tax_fee in tax_fees] if tax_fees else None
 
     async def get_banks(self) -> list[BankModel] | None:
-        query = select(BankModel)
+        query = select(BankModel).order_by(BankModel.name)
 
         banks = await self.get_all(query)
 
