@@ -195,12 +195,11 @@ class InvestmentManager(BaseDataManager):
 
         return new_objective
 
-    async def get_objectives(self, params: dict[str, Any]) -> list[RowMapping] | None:
-        query = select(InvestmentObjectiveModel)
+    async def get_objectives(self, owner_id: str, objective_id: uuid = None) -> list[RowMapping] | None:
+        query = select(InvestmentObjectiveModel).where(InvestmentObjectiveModel.owner_id == owner_id)
 
-        for key, value in params.items():
-            if value:
-                query = query.where(getattr(InvestmentObjectiveModel, key) == value)
+        if objective_id:
+            query = query.where(InvestmentObjectiveModel.id == objective_id)
 
         investment_objectives: list[RowMapping] = await self.get_all(query, unique_result=True)
 

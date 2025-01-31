@@ -145,7 +145,7 @@ class InvestmentService(BaseService):
 
         # Get previous statement
         previous_statements = await self.investment_manager.get_statement(investment_id=investment.id)
-        last_statement = previous_statements[-1] if previous_statements else None
+        last_statement = previous_statements[0] if previous_statements else None
 
         # TODO: add check to verify if period already exists (if so return the values)
 
@@ -237,7 +237,7 @@ class InvestmentService(BaseService):
         :param params: The object of GetObjectiveRequest with available parameters
         :return:
         """
-        objectives = await InvestmentManager(self.session).get_objectives(params=params.model_dump())
+        objectives = await InvestmentManager(self.session).get_objectives(owner_id=self.user['user_id'], objective_id=params.id)
 
         response = GetObjectiveResponse(
             quantity=len(objectives) if objectives else 0,

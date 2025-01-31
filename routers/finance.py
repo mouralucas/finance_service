@@ -1,15 +1,14 @@
-from alembic.util import status
 from fastapi import APIRouter
 from fastapi import Depends, Security
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import get_user
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette import status
 
 from backend.database import get_session
-from schemas.request.finance import GetSummaryRequest, GetTaxFeeRequest, GetBankRequest
+from schemas.request.finance import GetSummaryRequest, GetTaxFeeRequest
 from schemas.response.finance import GetCurrencyResponse, GetBankResponse, GetIndexerTypeResponse, GetIndexerResponse, GetLiquidityResponse, GetExpensesByCategoryResponse, GetTaxFeeResponse
 from services.finance import FinanceService
-from starlette import status
 
 router = APIRouter(prefix="/finance", tags=['Finance'])
 
