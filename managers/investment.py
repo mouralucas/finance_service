@@ -84,6 +84,7 @@ class InvestmentManager(BaseDataManager):
                 investment_alias.indexer_id,
                 investment_alias.indexer_type_id,
                 investment_alias.country_id,
+                investment_alias.liquidation_date,
                 func.coalesce(investment_alias.liquidation_amount, 0).label('liquidation_amount'),
                 case(
                     (statement_alias.gross_amount == None,
