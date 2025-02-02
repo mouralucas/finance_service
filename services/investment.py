@@ -81,7 +81,7 @@ class InvestmentService(BaseService):
         :param params: The object of GetInvestmentRequest with available params
         :return:
         """
-        investments = await InvestmentManager(self.session).get_investments(owner_id=self.user['user_id'])
+        investments = await InvestmentManager(self.session).get_investments(owner_id=self.user['user_id'], is_liquidated=params.is_liquidated)
 
         response = GetInvestmentResponse(
             quantity=len(investments) if investments else 0,

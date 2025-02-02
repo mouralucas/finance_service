@@ -82,7 +82,7 @@ class GetInvestmentRequest(BaseModel):
     id: uuid.UUID | None = Field(None, alias='investmentId', description='The id of the investment')
     start_date: datetime.date | None = Field(None, description='The start date of the filter')
     end_date: datetime.date | None = Field(None, description='The end date of the filter')
-    # other fields...
+    is_liquidated: bool | None = Field(None, description='Whether the investment is liquidated')
 
 
 class LiquidateInvestmentRequest(BaseModel):

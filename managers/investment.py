@@ -47,7 +47,7 @@ class InvestmentManager(BaseDataManager):
 
         return investment
 
-    async def get_investments(self, owner_id: uuid.UUID, is_liquidated: bool = False) -> list[dict[str, Any]]:
+    async def get_investments(self, owner_id: uuid.UUID, is_liquidated: bool) -> list[dict[str, Any]]:
         investment_alias = aliased(InvestmentModel)
         currency_alias = aliased(CurrencyModel)
         type_alias = aliased(InvestmentTypeModel)
@@ -112,10 +112,15 @@ class InvestmentManager(BaseDataManager):
             )
             .where(
                 investment_alias.owner_id == owner_id,
-                investment_alias.is_liquidated == False
             )
             .order_by(investment_alias.transaction_date)
         )
+
+        if is_liquidated is not None and is_liquidated:
+            query = query.where(investment_alias.is_liquidated == True)
+
+        if is_liquidated is not None and not is_liquidated:
+            query = query.where(investment_alias.is_liquidated == False)
 
         investments: list[RowMapping] = await self.get_all(query)
 
