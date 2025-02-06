@@ -104,7 +104,7 @@ class CreditCardManager(BaseDataManager):
             .join(category_alias, transaction_alias.category_id == category_alias.id)
             .join(currency_alias, transaction_alias.currency_id == currency_alias.id)
             .join(transaction_currency_alias, transaction_alias.transaction_currency_id == transaction_currency_alias.id)
-            .order_by(transaction_alias.transaction_date.desc())
+            .order_by(transaction_alias.transaction_date.desc(), transaction_alias.created_at.desc())
         )
 
         if start_period is not None:

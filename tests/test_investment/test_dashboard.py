@@ -11,11 +11,12 @@ async def test_get_investment_allocation(client):
 
 
 @pytest.mark.asyncio
-async def test_get_investment_performance(client, create_investment):
-    # TODO: create test body
-    payload = {
-        'indexerId': ''
-    }
-    response = await client.get("/investment/performance")
+async def test_get_investment_performance(client, create_investment, create_indexer):
+    indexers = create_indexer
 
-    assert True
+    payload = {
+        'indexerId': indexers[0].id,
+    }
+    response = await client.get("/investment/performance", params=payload)
+
+    assert response.status_code == status.HTTP_200_OK
