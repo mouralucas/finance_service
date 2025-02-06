@@ -106,3 +106,13 @@ Finally, apply the changes into the database using:
 ```bash
 python3 -m alembic.config upgrade head
 ```
+
+## Used APIs
+For finances many APIs are used, but primarily it is used the [Portal de Dados Abertos do Banco Central do Brasil](https://dadosabertos.bcb.gov.br/).
+
+The API uses values from [SGS - Sistema Gerenciador de Séries Temporais](https://www3.bcb.gov.br/sgspub/localizarseries/localizarSeries.do?method=prepararTelaLocalizarSeries) as references to params.
+
+
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)
