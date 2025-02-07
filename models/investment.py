@@ -121,3 +121,44 @@ class InvestmentObjectiveModel(SQLModel):
 
     # Investment reverse relation
     investments: Mapped[list['InvestmentModel']] = relationship(back_populates='objective', lazy='subquery')
+
+
+### New Investment Models ###
+class InvestmentBase(SQLModel):
+    __abstract__ = True
+
+    owner_id: Mapped[uuid.UUID] = mapped_column('owner_id')
+    name: Mapped[str] = mapped_column('name', String(200))
+
+    custodian_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('bank.id'))
+    custodiam: Mapped['BankModel'] = relationship(foreign_keys=[custodian_id], lazy='subquery')
+    account_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('account.id'))
+    account: Mapped['AccountModel'] = relationship(foreign_keys=[account_id], lazy='subquery')
+
+    indexer_type_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('indexer_type.id'))
+    indexer_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('indexer.id'))
+
+    currency_id: Mapped[str] = mapped_column(ForeignKey('currency.id'))
+    currency: Mapped['CurrencyModel'] = relationship(foreign_keys=[currency_id], lazy='subquery')
+
+    country_id: Mapped[str] = mapped_column(ForeignKey('country.id'))
+    country: Mapped['CountryModel'] = relationship(foreign_keys=[country_id], lazy='noload')
+
+    objective_id: Mapped[str] = mapped_column(ForeignKey('investment_objective.id'), nullable=True)
+    objective: Mapped['InvestmentObjectiveModel'] = relationship('InvestmentObjectiveModel', foreign_keys=[objective_id], lazy='subquery')
+
+    is_liquidated: Mapped[bool] = mapped_column('is_liquidated', default=False)
+
+
+class FixedIncomeInvestment(InvestmentBase):
+    __tablename__ = 'fixed_income_investment'
+
+    pass
+
+
+class FundsInvestment(InvestmentBase):
+    __tablename__ = 'funds_investment'
+
+
+class TreasuryInvestment(InvestmentBase):
+    __tablename__ = 'treasury_investment'
