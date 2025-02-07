@@ -5,6 +5,12 @@ from pydantic import BaseModel, Field, ConfigDict, AliasGenerator
 from pydantic.alias_generators import to_camel
 
 
+class GetCurrencyCostAverage(BaseModel):
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
+        alias=to_camel
+    ))
+
+
 class GetSummaryRequest(BaseModel):
     period: int | None = Field(None, description='The period of the summary')
 

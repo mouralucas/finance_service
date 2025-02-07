@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from backend.database import get_session
-from schemas.request.finance import GetSummaryRequest, GetTaxFeeRequest
+from schemas.request.finance import GetSummaryRequest, GetTaxFeeRequest, GetCurrencyCostAverage
 from schemas.response.finance import GetCurrencyResponse, GetBankResponse, GetIndexerTypeResponse, GetIndexerResponse, GetLiquidityResponse, GetExpensesByCategoryResponse, GetTaxFeeResponse
 from services.finance import FinanceService
 
@@ -20,6 +20,14 @@ async def get_currencies(
 ) -> GetCurrencyResponse:
     return await FinanceService(session=session, user=user).get_currencies()
 
+
+@router.get('/currency/cost-average')
+async def get_currency_cost_average(
+        params: GetCurrencyCostAverage = Depends(),
+        session: AsyncSession = Depends(get_session),
+        user: RequiredUser = Security(get_user)
+):
+    pass
 
 @router.post('/bank', summary='Create a new bank', status_code=status.HTTP_501_NOT_IMPLEMENTED)
 async def create_bank(
