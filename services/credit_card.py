@@ -80,7 +80,7 @@ class CreditCardService(BaseService):
             new_bill_entry = CreditCardTransactionModel(**transaction.model_dump(exclude={'installment', 'is_international_transaction', 'tax_detail', 'tot_installments'}))
 
             new_bill_entry.owner_id = owner_id
-            new_bill_entry.amount = i.amount # TODO: check this warning
+            new_bill_entry.amount = i.amount  # TODO: check this warning
             new_bill_entry.currency_id = currency_id
             new_bill_entry.current_installment = i.current_installment
             new_bill_entry.installments = tot_installments
@@ -146,21 +146,27 @@ class CreditCardService(BaseService):
                 a[period] = {
                     'id': period,
                     'period': period,
-                    'total_amount': total_amount,
-                    'currency_symbol': currency_symbol,
-                    'cards': [
-                        {
-                            'nickname': card,
-                            'total': total_amount,
-                        }
-                    ],
+                    'total_amount': [],
+                    'credit_cards': [],
                 }
+
+
+            # a[period]['total_amount'] += total_amount
+            for dic in a[period]['total_amount']:
+                if dic['currency_symbol'] == currency_symbol:
+                    dic['total'] += total_amount
+                    break
+                else:
+                    a[period]['total_amount'].append({'currency_symbol': currency_symbol, 'total': total_amount})
             else:
-                a[period]['total_amount'] += total_amount
-                a[period]['cards'].append({
-                    'nickname': card,
-                    'total': total_amount,
-                })
+                a[period]['total_amount'].append({'currency_symbol': currency_symbol, 'total': total_amount})
+
+
+            a[period]['credit_cards'].append({
+                'nickname': card,
+                'currency_symbol': currency_symbol,
+                'total': total_amount,
+            })
 
         b = list(a.values())
 

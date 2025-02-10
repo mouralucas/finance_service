@@ -64,9 +64,16 @@ class CreditCardBillSchema(BaseModel):
     period: int = Field(..., description='The period of the bill')
     total_amount: float = Field(..., description='The total amount of the bill')
 
-class CreditCardsBillByCardSchema(BaseModel):
+
+class CreditCardsTotalBillByCardSchema(BaseModel):
     nickname: str = Field(..., description='The nickname of the credit card')
+    currency_symbol: str = Field(..., description='The currency symbol for the credit card')
     total: float = Field(..., description='The total for the credit card')
+
+
+class CreditCardTotalBillByCurrencySchema(BaseModel):
+    currency_symbol: str = Field(..., description='The currency symbol for the credit card')
+    total: float = Field(..., description='The total amount for the currency')
 
 
 class CreditCardBillHistorySchema(BaseModel):
@@ -77,9 +84,8 @@ class CreditCardBillHistorySchema(BaseModel):
 
     id: int = Field(..., description='The id of the bill, usually the period')
     period: int = Field(..., description='The period of the bill')
-    total_amount: float = Field(..., description='The total spent in all credit cards in the period')
-    currency_symbol: str = Field(..., description='The currency symbol for the credit card')
-    cards: list[CreditCardsBillByCardSchema] = Field(..., description='The list of credit cards')
+    total_amount: list[CreditCardTotalBillByCurrencySchema] = Field(..., description='The total spent in the period by currency')
+    credit_cards: list[CreditCardsTotalBillByCardSchema] = Field(..., description='The list of credit cards')
 
 class InstallmentsDueDates(BaseModel):
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(

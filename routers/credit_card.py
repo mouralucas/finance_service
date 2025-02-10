@@ -93,8 +93,8 @@ async def get_bill(
     return await CreditCardService(session, user).get_credit_card_bill_consolidated(params=params)
 
 
-@router.get('/bill/card', summary='Get credit card bill', description='Get credit card bill for all cards available for the period range')
-async def get_bill(
+@router.get('/bill/history', summary='Get credit card bill', description='Get credit card bill for all cards available for the period range')
+async def get_bill_history(
         params: GetCreditCardBillRequest = Depends(),
         session: AsyncSession = Depends(get_session),
         user: RequiredUser = Security(get_user)
