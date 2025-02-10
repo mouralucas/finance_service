@@ -9,10 +9,10 @@ from starlette import status
 
 from managers.credit_card import CreditCardManager
 from models.credit_card import CreditCardModel, CreditCardTransactionModel
-from schemas.credit_card import CreditCardSchema, CreditCardTransactionSchema, CreditCardBillSchema, CreditCardBillSchemaByCard, InstallmentsDueDates
+from schemas.credit_card import CreditCardSchema, CreditCardTransactionSchema, CreditCardBillSchema, CreditCardBillHistorySchema, InstallmentsDueDates
 from schemas.request.credit_card import CreateCreditCardRequest, GetCreditCardRequest, CreateCreditCardTransactionRequest, CancelCreditCardRequest, GetCreditCardBillRequest, GetCreditCardTransactionsRequest, GetInstallmentsDueDatesRequest
 from schemas.response.credit_card import CreateCreditCardResponse, GetCreditCardResponse, CreateCreditCardTransactionResponse, CancelCreditCardResponse, GetCreditCardTransactionResponse, GetCreditCardBillConsolidatedResponse, \
-    GetCreditCardBillByCardResponse, GetInstallmentsDueDatesResponse
+    GetCreditCardBillHistoryResponse, GetInstallmentsDueDatesResponse
 from services.utils.datetime import get_period, get_period_range, get_installments_due_dates
 
 
@@ -131,7 +131,7 @@ class CreditCardService(BaseService):
 
         return response
 
-    async def get_credit_card_bill_by_card(self, params: GetCreditCardBillRequest) -> GetCreditCardBillByCardResponse:
+    async def get_credit_card_bill_by_card(self, params: GetCreditCardBillRequest) -> GetCreditCardBillHistoryResponse:
         bill_by_card = await self.credit_card_manager.get_bill_history_by_card(owner_id=self.user['user_id'], start_period=params.start_period, end_period=params.end_period)
         distinct_cards = set(d['credit_card'] for d in bill_by_card) if bill_by_card else []
 
@@ -146,18 +146,26 @@ class CreditCardService(BaseService):
                 a[period] = {
                     'id': period,
                     'period': period,
+                    'total_amount': total_amount,
                     'currency_symbol': currency_symbol,
-                    'total': 0
+                    'cards': [
+                        {
+                            'nickname': card,
+                            'total': total_amount,
+                        }
+                    ],
                 }
-
-            a[period][card] = total_amount
-            a[period]['total'] += total_amount
+            else:
+                a[period]['total_amount'] += total_amount
+                a[period]['cards'].append({
+                    'nickname': card,
+                    'total': total_amount,
+                })
 
         b = list(a.values())
 
-        response = GetCreditCardBillByCardResponse(
-            bill=[CreditCardBillSchemaByCard.model_validate(i) for i in b],
-            cards=list(distinct_cards)
+        response = GetCreditCardBillHistoryResponse(
+            credit_card_bill_history=[CreditCardBillHistorySchema.model_validate(i) for i in b],
         )
 
         return response

@@ -64,8 +64,12 @@ class CreditCardBillSchema(BaseModel):
     period: int = Field(..., description='The period of the bill')
     total_amount: float = Field(..., description='The total amount of the bill')
 
+class CreditCardsBillByCardSchema(BaseModel):
+    nickname: str = Field(..., description='The nickname of the credit card')
+    total: float = Field(..., description='The total for the credit card')
 
-class CreditCardBillSchemaByCard(BaseModel):
+
+class CreditCardBillHistorySchema(BaseModel):
     model_config = ConfigDict(from_attributes=True,
                               alias_generator=AliasGenerator(serialization_alias=to_camel),
                               extra="allow",
@@ -73,11 +77,9 @@ class CreditCardBillSchemaByCard(BaseModel):
 
     id: int = Field(..., description='The id of the bill, usually the period')
     period: int = Field(..., description='The period of the bill')
-    total: float = Field(..., description='The total amount of the bill for that card')
+    total_amount: float = Field(..., description='The total spent in all credit cards in the period')
     currency_symbol: str = Field(..., description='The currency symbol for the credit card')
-    # The total by card is add dynamically, the key is the name of the card.
-    # That's the reason the "extra" config is set to 'allow'
-
+    cards: list[CreditCardsBillByCardSchema] = Field(..., description='The list of credit cards')
 
 class InstallmentsDueDates(BaseModel):
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
