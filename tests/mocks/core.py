@@ -2,7 +2,7 @@ import pytest_asyncio
 from rolf_common.managers import BaseDataManager
 
 from data_mock.core import get_country_mock, get_tax_mock, get_currency_mock, get_bank_mock, get_category_mock, get_liquidity_mock, get_category_parent_mock, get_fee_mock
-from data_mock.core import get_index_mock, get_index_type_mock
+from data_mock.core import get_indexer_mock, get_index_type_mock
 from models.core import BankModel, CurrencyModel, CategoryModel, CountryModel, TaxFeeModel, IndexerTypeModel, IndexerModel, LiquidityModel
 from schemas.core import CurrencySchema, BankSchema, CountrySchema, TaxSchema, CategorySchema, IndexerTypeSchema, IndexerSchema, LiquiditySchema
 
@@ -33,7 +33,7 @@ async def create_indexer_type(test_session) -> list[IndexerTypeSchema]:
 
 @pytest_asyncio.fixture
 async def create_indexer(test_session) -> list[IndexerSchema]:
-    data_ = await BaseDataManager(test_session).add_or_ignore_all(IndexerModel, get_index_mock())
+    data_ = await BaseDataManager(test_session).add_or_ignore_all(IndexerModel, get_indexer_mock())
     index = [IndexerSchema.model_validate(data["IndexerModel"]) for data in data_]
 
     return index

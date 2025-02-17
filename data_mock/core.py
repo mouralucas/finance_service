@@ -221,25 +221,31 @@ def get_index_type_mock() -> list[dict[str, Any]]:
     return index_types
 
 
-def get_index_mock() -> list[dict[str, Any]]:
+def get_indexer_mock() -> list[dict[str, Any]]:
     index_list: list[dict[str, Any]] = [
         {
             **default_model_dict,
-            'id': uuid.UUID('4448e544-54bb-418f-b8d3-4d58513c0b58'),
+            'id': uuid.UUID('3aa9be51-c139-42bd-a796-d7ac815ca607'),
             'name': 'Não especificado',
             'description': 'Sem índice especificado',
         },
         {
             **default_model_dict,
-            'id': uuid.UUID('373c2e30-321c-4590-9187-3e816e40c224'),
+            'id': uuid.UUID('b7e5c4a0-3b65-4b1f-86d8-3797ef1a91a0'),
             'name': 'SELIC',
             'description': 'Taxa de juros SELIC'
         },
         {
             **default_model_dict,
-            'id': uuid.UUID('bfcfb9d4-b4d4-4fc9-993b-7516c44f47e4'),
+            'id': uuid.UUID('2a2b100f-17d9-4c61-b3b4-f06662113953'),
             'name': 'CDI',
             'description': 'Certificado de depósito interbancário'
+        },
+        {
+            **default_model_dict,
+            'id': 'ef07cbb0-9b29-43c6-a060-bef73f1cc000',
+            'name': 'IPC-A',
+            'description': 'Índice de preços ao consumidor amplo'
         }
     ]
 
