@@ -243,7 +243,7 @@ def get_indexer_mock() -> list[dict[str, Any]]:
         },
         {
             **default_model_dict,
-            'id': 'ef07cbb0-9b29-43c6-a060-bef73f1cc000',
+            'id': uuid.UUID('ef07cbb0-9b29-43c6-a060-bef73f1cc000'),
             'name': 'IPC-A',
             'description': 'Índice de preços ao consumidor amplo'
         }
