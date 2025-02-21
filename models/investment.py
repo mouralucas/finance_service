@@ -3,7 +3,7 @@ import datetime
 from decimal import Decimal
 
 from rolf_common.models import SQLModel
-from sqlalchemy import String, ForeignKey, JSON, Numeric
+from sqlalchemy import String, ForeignKey, JSON, Numeric, Text
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 
@@ -79,7 +79,7 @@ class InvestmentModel(SQLModel):
     country_id: Mapped[str] = mapped_column(ForeignKey('country.id'))
     country: Mapped['CountryModel'] = relationship(foreign_keys=[country_id], lazy='noload')
 
-    observation: Mapped[str] = mapped_column('observation', String(200), nullable=True)
+    observation: Mapped[str] = mapped_column('observation', Text, nullable=True)
 
     objective_id: Mapped[str] = mapped_column(ForeignKey('investment_objective.id'), nullable=True)
     objective: Mapped['InvestmentObjectiveModel'] = relationship('InvestmentObjectiveModel', foreign_keys=[objective_id], lazy='subquery')

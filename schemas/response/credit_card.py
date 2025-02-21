@@ -2,7 +2,7 @@ from pydantic import Field, BaseModel, ConfigDict, AliasGenerator
 from pydantic.alias_generators import to_camel
 from rolf_common.schemas import SuccessResponseBase
 
-from schemas.credit_card import CreditCardSchema, CreditCardTransactionSchema, CreditCardBillSchema, CreditCardBillSchemaByCard, InstallmentsDueDates
+from schemas.credit_card import CreditCardSchema, CreditCardTransactionSchema, CreditCardBillSchema, CreditCardBillHistorySchema, InstallmentsDueDates
 
 
 class CreateCreditCardResponse(SuccessResponseBase):
@@ -44,9 +44,8 @@ class GetCreditCardBillConsolidatedResponse(BaseModel):
     bill: list[CreditCardBillSchema] = Field(..., description='The list bill by period')
 
 
-class GetCreditCardBillByCardResponse(BaseModel):
+class GetCreditCardBillHistoryResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True,
                               alias_generator=AliasGenerator(serialization_alias=to_camel))
 
-    cards: list[str] | None = Field(None, description='The list of available cards')
-    bill: list[CreditCardBillSchemaByCard] = Field(..., description='The list bill by period')
+    credit_card_bill_history: list[CreditCardBillHistorySchema] = Field(..., description='The list bill by period')

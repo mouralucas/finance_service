@@ -5,7 +5,7 @@ from typing import Any
 from dateutil.relativedelta import relativedelta
 
 from data_mock.account import get_open_account_mock
-from data_mock.core import get_currency_mock, get_index_type_mock, get_index_mock, get_liquidity_mock, get_country_mock
+from data_mock.core import get_currency_mock, get_index_type_mock, get_indexer_mock, get_liquidity_mock, get_country_mock
 from models.core import LiquidityModel
 from models.investment import InvestmentModel
 from services.utils.datetime import get_period
@@ -59,7 +59,7 @@ def get_investment_mock() -> list[dict[str, Any]]:
     investment_types = get_investment_type_mock()
     currencies = get_currency_mock()
     index_types = get_index_type_mock()
-    indexer = get_index_mock()
+    indexer = get_indexer_mock()
     liquidity = get_liquidity_mock()
     countries = get_country_mock()
 

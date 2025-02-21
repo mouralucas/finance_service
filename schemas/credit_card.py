@@ -65,7 +65,18 @@ class CreditCardBillSchema(BaseModel):
     total_amount: float = Field(..., description='The total amount of the bill')
 
 
-class CreditCardBillSchemaByCard(BaseModel):
+class CreditCardsTotalBillByCardSchema(BaseModel):
+    nickname: str = Field(..., description='The nickname of the credit card')
+    currency_symbol: str = Field(..., description='The currency symbol for the credit card')
+    total: float = Field(..., description='The total for the credit card')
+
+
+class CreditCardTotalBillByCurrencySchema(BaseModel):
+    currency_symbol: str = Field(..., description='The currency symbol for the credit card')
+    total: float = Field(..., description='The total amount for the currency')
+
+
+class CreditCardBillHistorySchema(BaseModel):
     model_config = ConfigDict(from_attributes=True,
                               alias_generator=AliasGenerator(serialization_alias=to_camel),
                               extra="allow",
@@ -73,11 +84,8 @@ class CreditCardBillSchemaByCard(BaseModel):
 
     id: int = Field(..., description='The id of the bill, usually the period')
     period: int = Field(..., description='The period of the bill')
-    total: float = Field(..., description='The total amount of the bill for that card')
-    currency_symbol: str = Field(..., description='The currency symbol for the credit card')
-    # The total by card is add dynamically, the key is the name of the card.
-    # That's the reason the "extra" config is set to 'allow'
-
+    total_amount: list[CreditCardTotalBillByCurrencySchema] = Field(..., description='The total spent in the period by currency')
+    credit_cards: list[CreditCardsTotalBillByCardSchema] = Field(..., description='The list of credit cards')
 
 class InstallmentsDueDates(BaseModel):
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(

@@ -6,7 +6,7 @@ from starlette import status
 
 from backend.database import get_session
 from schemas.request.credit_card import CreateCreditCardRequest, CreateCreditCardTransactionRequest, GetCreditCardRequest, CancelCreditCardRequest, GetCreditCardBillRequest, GetCreditCardTransactionsRequest, GetInstallmentsDueDatesRequest
-from schemas.response.credit_card import CreateCreditCardResponse, CreateCreditCardTransactionResponse, GetCreditCardTransactionResponse, GetCreditCardBillConsolidatedResponse, GetCreditCardBillByCardResponse, \
+from schemas.response.credit_card import CreateCreditCardResponse, CreateCreditCardTransactionResponse, GetCreditCardTransactionResponse, GetCreditCardBillConsolidatedResponse, GetCreditCardBillHistoryResponse, \
     GetInstallmentsDueDatesResponse
 from services.credit_card import CreditCardService
 
@@ -93,10 +93,10 @@ async def get_bill(
     return await CreditCardService(session, user).get_credit_card_bill_consolidated(params=params)
 
 
-@router.get('/bill/card', )
-async def get_bill(
+@router.get('/bill/history', summary='Get credit card bill', description='Get credit card bill for all cards available for the period range')
+async def get_bill_history(
         params: GetCreditCardBillRequest = Depends(),
         session: AsyncSession = Depends(get_session),
         user: RequiredUser = Security(get_user)
-) -> GetCreditCardBillByCardResponse:
+) -> GetCreditCardBillHistoryResponse:
     return await CreditCardService(session, user).get_credit_card_bill_by_card(params=params)

@@ -9,10 +9,10 @@ from starlette import status
 
 from managers.credit_card import CreditCardManager
 from models.credit_card import CreditCardModel, CreditCardTransactionModel
-from schemas.credit_card import CreditCardSchema, CreditCardTransactionSchema, CreditCardBillSchema, CreditCardBillSchemaByCard, InstallmentsDueDates
+from schemas.credit_card import CreditCardSchema, CreditCardTransactionSchema, CreditCardBillSchema, CreditCardBillHistorySchema, InstallmentsDueDates
 from schemas.request.credit_card import CreateCreditCardRequest, GetCreditCardRequest, CreateCreditCardTransactionRequest, CancelCreditCardRequest, GetCreditCardBillRequest, GetCreditCardTransactionsRequest, GetInstallmentsDueDatesRequest
 from schemas.response.credit_card import CreateCreditCardResponse, GetCreditCardResponse, CreateCreditCardTransactionResponse, CancelCreditCardResponse, GetCreditCardTransactionResponse, GetCreditCardBillConsolidatedResponse, \
-    GetCreditCardBillByCardResponse, GetInstallmentsDueDatesResponse
+    GetCreditCardBillHistoryResponse, GetInstallmentsDueDatesResponse
 from services.utils.datetime import get_period, get_period_range, get_installments_due_dates
 
 
@@ -80,7 +80,7 @@ class CreditCardService(BaseService):
             new_bill_entry = CreditCardTransactionModel(**transaction.model_dump(exclude={'installment', 'is_international_transaction', 'tax_detail', 'tot_installments'}))
 
             new_bill_entry.owner_id = owner_id
-            new_bill_entry.amount = i.amount # TODO: check this warning
+            new_bill_entry.amount = i.amount  # TODO: check this warning
             new_bill_entry.currency_id = currency_id
             new_bill_entry.current_installment = i.current_installment
             new_bill_entry.installments = tot_installments
@@ -131,7 +131,7 @@ class CreditCardService(BaseService):
 
         return response
 
-    async def get_credit_card_bill_by_card(self, params: GetCreditCardBillRequest) -> GetCreditCardBillByCardResponse:
+    async def get_credit_card_bill_by_card(self, params: GetCreditCardBillRequest) -> GetCreditCardBillHistoryResponse:
         bill_by_card = await self.credit_card_manager.get_bill_history_by_card(owner_id=self.user['user_id'], start_period=params.start_period, end_period=params.end_period)
         distinct_cards = set(d['credit_card'] for d in bill_by_card) if bill_by_card else []
 
@@ -146,18 +146,32 @@ class CreditCardService(BaseService):
                 a[period] = {
                     'id': period,
                     'period': period,
-                    'currency_symbol': currency_symbol,
-                    'total': 0
+                    'total_amount': [],
+                    'credit_cards': [],
                 }
 
-            a[period][card] = total_amount
-            a[period]['total'] += total_amount
+
+            # a[period]['total_amount'] += total_amount
+            for dic in a[period]['total_amount']:
+                if dic['currency_symbol'] == currency_symbol:
+                    dic['total'] += total_amount
+                    break
+                else:
+                    a[period]['total_amount'].append({'currency_symbol': currency_symbol, 'total': total_amount})
+            else:
+                a[period]['total_amount'].append({'currency_symbol': currency_symbol, 'total': total_amount})
+
+
+            a[period]['credit_cards'].append({
+                'nickname': card,
+                'currency_symbol': currency_symbol,
+                'total': total_amount,
+            })
 
         b = list(a.values())
 
-        response = GetCreditCardBillByCardResponse(
-            bill=[CreditCardBillSchemaByCard.model_validate(i) for i in b],
-            cards=list(distinct_cards)
+        response = GetCreditCardBillHistoryResponse(
+            credit_card_bill_history=[CreditCardBillHistorySchema.model_validate(i) for i in b],
         )
 
         return response
