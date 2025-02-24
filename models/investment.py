@@ -135,6 +135,10 @@ class InvestmentBase(SQLModel):
     account_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('account.id'))
     account: Mapped['AccountModel'] = relationship(foreign_keys=[account_id], lazy='noload')
 
+    price: Mapped[float] = mapped_column('share_price', Numeric(precision=18, scale=8), doc='Price per unit/share of an investment')
+    quantity: Mapped[float] = mapped_column('quantity', Numeric(precision=18, scale=8), doc='Quantity acquired')
+    amount: Mapped[float] = mapped_column('amount', Numeric(precision=18, scale=8))
+
     type_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('investment_type.id'))
     type: Mapped[InvestmentTypeModel] = relationship(foreign_keys=[type_id], lazy='noload')
 
@@ -167,10 +171,6 @@ class FixedIncomeInvestmentBrazil(InvestmentBase):
     grace_period_date: Mapped[datetime.date] = mapped_column('grace_period_date')
     contracted_rate: Mapped[str] = mapped_column('contracted_rate', String(50))
 
-    price: Mapped[float] = mapped_column('price', Numeric(precision=18, scale=8))
-    quantity: Mapped[float] = mapped_column('quantity', Numeric(precision=15, scale=8))
-    amount: Mapped[float] = mapped_column('amount', Numeric(precision=18, scale=8))
-
     registered_at: Mapped[str] = mapped_column('registered_at') # Where the money actually stays, like B3. Maybe create e FK?
 
     indexer_type_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('indexer_type.id'))
@@ -181,15 +181,10 @@ class FundsInvestmentBrazil(InvestmentBase):
     __tablename__ = 'investment_funds_br'
 
     quotation_date: Mapped[datetime.date] = mapped_column('quotation_date')
-    share_price: Mapped[float] = mapped_column('share_price', Numeric(precision=18, scale=8))
     liquidation_date: Mapped[datetime.date] = mapped_column('liquidation_date')
-    amount: Mapped[float] = mapped_column('amount', Numeric(precision=18, scale=8))
-    quantity: Mapped[float] = mapped_column('quantity', Numeric(precision=18, scale=8))
 
 
 class TreasuryInvestmentBrazil(InvestmentBase):
     __tablename__ = 'investment_treasury_br'
 
-    price: Mapped[float] = mapped_column('price', Numeric(precision=18, scale=8))
-    quantity: Mapped[float] = mapped_column('quantity', Numeric(precision=15, scale=8))
-    amount: Mapped[float] = mapped_column('amount', Numeric(precision=18, scale=8))
+    pass
