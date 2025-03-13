@@ -4,7 +4,7 @@ from decimal import Decimal
 
 from rolf_common.models import SQLModel
 from sqlalchemy import String, ForeignKey, JSON, Numeric, Text, Integer
-from sqlalchemy.orm import mapped_column, Mapped, relationship
+from sqlalchemy.orm import mapped_column, Mapped, relationship, declared_attr
 
 
 class InvestmentCategoryModel(SQLModel):
@@ -131,60 +131,69 @@ class InvestmentBase(SQLModel):
     name: Mapped[str] = mapped_column('name', String(200))
 
     custodian_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('bank.id'))
-    custodiam: Mapped['BankModel'] = relationship(foreign_keys=[custodian_id], lazy='noload')
     account_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('account.id'))
-    account: Mapped['AccountModel'] = relationship(foreign_keys=[account_id], lazy='noload')
 
-    price: Mapped[float] = mapped_column('share_price', Numeric(precision=18, scale=8), doc='Price per unit/share of an investment')
+    price: Mapped[float] = mapped_column('price', Numeric(precision=18, scale=8), doc='Price per unit/share of an investment')
     quantity: Mapped[float] = mapped_column('quantity', Numeric(precision=18, scale=8), doc='Quantity acquired')
     amount: Mapped[float] = mapped_column('amount', Numeric(precision=18, scale=8))
 
     type_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('investment_type.id'))
-    type: Mapped[InvestmentTypeModel] = relationship(foreign_keys=[type_id], lazy='noload')
-
     currency_id: Mapped[str] = mapped_column(ForeignKey('currency.id'))
-    currency: Mapped['CurrencyModel'] = relationship(foreign_keys=[currency_id], lazy='noload')
-
     country_id: Mapped[str] = mapped_column(ForeignKey('country.id'))
-    country: Mapped['CountryModel'] = relationship(foreign_keys=[country_id], lazy='noload')
-
     objective_id: Mapped[str] = mapped_column(ForeignKey('investment_objective.id'), nullable=True)
-    objective: Mapped['InvestmentObjectiveModel'] = relationship('InvestmentObjectiveModel', foreign_keys=[objective_id], lazy='subquery')
-
     is_liquidated: Mapped[bool] = mapped_column('is_liquidated', default=False)
 
+    tax: Mapped[list[dict]] = mapped_column('tax', type_=JSON, nullable=True, doc='Tax information. What taxes are levied on investments and its rates')
+    fee: Mapped[list[dict]] = mapped_column('fee', type_=JSON, nullable=True, doc='Fee information. What fees are levied on investments and its rates')
 
-class InvestmentStatementBase(SQLModel):
-    __abstract__ = True
-
-    period: Mapped[int] = mapped_column('period', Integer)
-    start_amount: Mapped[float] = mapped_column('start_amount', Numeric(precision=18, scale=8))
-    monthly_contribution: Mapped[float] = mapped_column('monthly_contribution', Numeric(precision=18, scale=8))
+    observation: Mapped[str] = mapped_column('observation', Text, nullable=True)
 
 
-class FixedIncomeInvestmentBrazil(InvestmentBase):
-    __tablename__ = 'investment_fixed_income_br'
+# class InvestmentStatementBase(SQLModel):
+#     __abstract__ = True
+#
+#     period: Mapped[int] = mapped_column('period', Integer)
+#     start_amount: Mapped[float] = mapped_column('start_amount', Numeric(precision=18, scale=8))
+#     monthly_contribution: Mapped[float] = mapped_column('monthly_contribution', Numeric(precision=18, scale=8))
+#
+#
+# class InvestmentFixedIncomeBrazilModel(InvestmentBase):
+#     __tablename__ = 'investment_fixed_income_br'
+#
+#     issue_date: Mapped[datetime.date] = mapped_column('issue_date')
+#     transaction_date: Mapped[datetime.date] = mapped_column('transaction_date')
+#     maturity_date: Mapped[datetime.date] = mapped_column('maturity_date')
+#     grace_period_date: Mapped[datetime.date] = mapped_column('grace_period_date', nullable=True)
+#     contracted_rate: Mapped[str] = mapped_column('contracted_rate', String(50))
+#
+#     registered_at: Mapped[str] = mapped_column('registered_at', nullable=True, doc='Actual custodian, like B3')
+#
+#     indexer_type_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('indexer_type.id'))
+#     indexer_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('indexer.id'))
+#
+#     ticker: Mapped[str] = mapped_column('ticker', nullable=True)
 
-    issue_date: Mapped[datetime.date] = mapped_column('issue_date')
-    transaction_date: Mapped[datetime.date] = mapped_column('transaction_date')
-    maturity_date: Mapped[datetime.date] = mapped_column('maturity_date')
-    grace_period_date: Mapped[datetime.date] = mapped_column('grace_period_date')
-    contracted_rate: Mapped[str] = mapped_column('contracted_rate', String(50))
+# class FundsBr(SQLModel):
+#     name: Mapped[str] = mapped_column('name', String(200))
+    
 
-    registered_at: Mapped[str] = mapped_column('registered_at') # Where the money actually stays, like B3. Maybe create e FK?
-
-    indexer_type_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('indexer_type.id'))
-    indexer_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('indexer.id'))
-
-
-class FundsInvestmentBrazil(InvestmentBase):
+class InvestmentFundsBrazilModel(InvestmentBase):
     __tablename__ = 'investment_funds_br'
 
-    quotation_date: Mapped[datetime.date] = mapped_column('quotation_date')
-    liquidation_date: Mapped[datetime.date] = mapped_column('liquidation_date')
+    investment_quotation_date: Mapped[datetime.date] = mapped_column('investment_quotation_date', doc='The day the investment was quoted')
+    investment_settlement_date: Mapped[datetime.date] = mapped_column('liquidation_settlement_date', doc='The date the investment is liquidated in the fund') # TODO: check this name
+    redemption_quotation_range: Mapped[str] = mapped_column('redemption_quotation_range', doc='How many days for the settlement be quoted')
+    redemption_quotation_date: Mapped[datetime.date] = mapped_column('redemption_quotation_date', nullable=True)
+    redemption_settlement_range: Mapped[str] = mapped_column('redemption_settlement_range', doc='How many days for the amount be available after the quotation date')
+    redemption_settlement_date: Mapped[datetime.date] = mapped_column('redemption_settlement_date', nullable=True)
 
+    minimum_balance: Mapped[float] = mapped_column('minimum_balance', Numeric(precision=18, scale=8), doc='The minimum amount to be in the fund')
+    minimum_transaction: Mapped[float] = mapped_column('minimum_transaction', Numeric(precision=18, scale=8), doc='The minimum amount for every transaction in the fund')
+    initial_investment: Mapped[float] = mapped_column('initial_investment', Numeric(precision=18, scale=8), doc='The initial amount to be in the fund')
 
-class TreasuryInvestmentBrazil(InvestmentBase):
-    __tablename__ = 'investment_treasury_br'
+    benchmark: Mapped[str] = mapped_column('benchmark', String(50), nullable=True)
 
-    pass
+# class TreasuryInvestmentBrazil(InvestmentBase):
+#     __tablename__ = 'investment_treasury_br'
+#
+#     pass

@@ -5,58 +5,15 @@ from typing import Any
 from dateutil.relativedelta import relativedelta
 
 from data_mock.account import get_open_account_mock
+from data_mock.common import default_model_dict
 from data_mock.core import get_currency_mock, get_index_type_mock, get_indexer_mock, get_liquidity_mock, get_country_mock
-from models.core import LiquidityModel
-from models.investment import InvestmentModel
+from data_mock.investment.base import get_investment_category_mock, get_fixed_income_br_investment_type_mock
 from services.utils.datetime import get_period
-
-default_model_dict = {
-    'created_at': datetime.datetime.now(datetime.timezone.utc),
-    'active': True
-}
-
-
-def get_investment_category_mock() -> list[dict[str, Any]]:
-    index_types: list[dict[str, Any]] = [
-        {
-            **default_model_dict,
-            'id': uuid.UUID('f001458a-251f-4f82-9846-a14834e82c68'),
-            'name': 'Renda Fixa',
-        },
-        {
-            **default_model_dict,
-            'id': uuid.UUID('954d50fc-3e0b-458f-92b5-fe00f163b3d2'),
-            'name': 'Renda variável'
-        },
-        {
-            **default_model_dict,
-            'id': uuid.UUID('bc94b55d-0041-42cf-9b03-2b9e1faabdab'),
-            'name': 'Multimercado'
-        }
-    ]
-
-    return index_types
-
-
-def get_investment_type_mock() -> list[dict[str, Any]]:
-    investment_category = get_investment_category_mock()
-
-    investment_types: list[dict[str, Any]] = [
-        {
-            **default_model_dict,
-            'id': uuid.UUID('b9df5e2c-874b-4e7b-a68d-adfdb84dcbe6'),
-            'name': 'CDB',
-            'description': 'Certificado de Depósito Bancário',
-            'investment_category_id': investment_category[0]['id']
-        }
-    ]
-
-    return investment_types
 
 
 def get_investment_mock() -> list[dict[str, Any]]:
     accounts = get_open_account_mock()
-    investment_types = get_investment_type_mock()
+    investment_types = get_fixed_income_br_investment_type_mock()
     currencies = get_currency_mock()
     index_types = get_index_type_mock()
     indexer = get_indexer_mock()
@@ -129,26 +86,4 @@ def get_investment_statement_mock() -> list[dict[str, Any]]:
     return statements
 
 
-def get_open_investment_objective_mocked() -> list[dict[str, Any]]:
-    open_objectives: list[dict[str, Any]] = [
-        {
-            **default_model_dict,
-            'id': uuid.UUID('97502c10-1dec-48b8-b0d7-0d5a3eef7020'),
-            'owner_id': uuid.UUID("adf52a1e-7a19-11ed-a1eb-0242ac120002"),
-            'title': 'Meu objetivo futuro',
-            'description': 'Comprar casa na praia',
-            'amount': 75500,
-            'estimated_deadline': datetime.date.today() + relativedelta(years=4),
-        },
-        {
-            **default_model_dict,
-            'id': uuid.UUID('26c28396-4d6f-454f-bc00-3bb2933a6238'),
-            'owner_id': uuid.UUID("adf52a1e-7a19-11ed-a1eb-0242ac120002"),
-            'title': 'Compra um carro novo',
-            'description': 'Comprar um carro melhor que meu carro atual',
-            'amount': 25000,
-            'estimated_deadline': datetime.date.today() + relativedelta(years=1, months=6),
-        }
-    ]
 
-    return open_objectives

@@ -3,11 +3,11 @@ from starlette import status
 
 
 @pytest.mark.asyncio
-async def test_create_investment(client, create_open_account, create_investment_type, create_indexer_type,
+async def test_create_investment(client, create_open_account, create_fixed_income_br_investment_type, create_indexer_type,
                                  create_indexer, create_liquidity, create_country):
     accounts = create_open_account
     account = accounts[0]
-    investment_types = create_investment_type
+    investment_types = create_fixed_income_br_investment_type
     indexer_types = create_indexer_type
     indexers = create_indexer
     liquidity = create_liquidity
@@ -95,13 +95,13 @@ async def test_create_investment(client, create_open_account, create_investment_
 
 
 @pytest.mark.asyncio
-async def test_create_liquidated_investment(client, create_open_account, create_investment_type, create_indexer_type,
+async def test_create_liquidated_investment(client, create_open_account, create_fixed_income_br_investment_type, create_indexer_type,
                                             create_indexer, create_liquidity, create_currency, create_country):
     accounts = create_open_account
 
     custodian_id = accounts[0].bank_id
     name = 'Investment already liquidated'
-    type_id = create_investment_type[0].id
+    type_id = create_fixed_income_br_investment_type[0].id
     transaction_date = '2022-07-04'
     maturity_date = '2024-08-01'
     quantity = 1

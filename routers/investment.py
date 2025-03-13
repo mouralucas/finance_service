@@ -1,3 +1,4 @@
+from ipaddress import summarize_address_range
 from uuid import uuid4
 
 from fastapi import APIRouter, Depends, Security
@@ -6,12 +7,13 @@ from rolf_common.services import get_user
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.util import await_only
 from starlette import status
+from typing_extensions import deprecated
 
 from backend.database import get_session
 from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, CreateStatementRequest, GetStatementRequest, LiquidateInvestmentRequest, GetObjectiveRequest, CreateObjectiveRequest, GetObjectiveSummaryRequest, \
-    GetPerformanceRequest, CreateBatchStatementRequest, UpdateInvestmentRequest
+    GetPerformanceRequest, CreateBatchStatementRequest, UpdateInvestmentRequest, CreateFixedIncomeInvestmentBrazilRequest, CreateFundInvestmentBrazilRequest
 from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, CreateStatementResponse, GetStatementResponse, LiquidateInvestmentResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse, \
-    GetInvestmentWithoutObjectives, GetObjectiveSummaryResponse, GetInvestmentAllocationResponse, GetInvestmentPerformanceResponse, UpdateInvestmentResponse
+    GetInvestmentWithoutObjectives, GetObjectiveSummaryResponse, GetInvestmentAllocationResponse, GetInvestmentPerformanceResponse, UpdateInvestmentResponse, CreateInvestmentFundsBrSchema
 from services.integration import BcbIntegrationService
 from services.investment import InvestmentService
 
@@ -19,7 +21,8 @@ router = APIRouter(prefix="/investment", tags=['Investments'])
 
 
 @router.post('', status_code=status.HTTP_201_CREATED,
-             summary='Create an investment', description='Create an new investment for the user')
+             summary='Create an investment', description='Create an new investment for the user',
+             deprecated=True)
 async def create_investment(
         investment: CreateInvestmentRequest,
         session: AsyncSession = Depends(get_session),
@@ -29,6 +32,29 @@ async def create_investment(
 
     return response
 
+
+@router.post('/fixed-income/br',
+             summary='Create a brazilian fixed income investment', description='Create a brazilian fixed income investment such as CDB, LCA, etc',
+             status_code=status.HTTP_201_CREATED
+             )
+async def create_fixed_income_br_investment(
+        investment: CreateFixedIncomeInvestmentBrazilRequest,
+        session: AsyncSession = Depends(get_session),
+        user: RequiredUser = Security(get_user)
+):
+    return await InvestmentService(session=session, user=user).create_fixed_incoming_br_investment(investment=investment)
+
+
+@router.post('/funds/br',
+             summary='Create a brazilian funds investment',
+             status_code=status.HTTP_201_CREATED
+             )
+async def create_funds_br_investment(
+        investment: CreateFundInvestmentBrazilRequest,
+        session: AsyncSession = Depends(get_session),
+        user: RequiredUser = Security(get_user)
+) -> CreateInvestmentFundsBrSchema:
+    return await InvestmentService(session=session, user=user).create_fund_br_investment(investment=investment)
 
 @router.patch('', summary='Update an investment')
 async def update_investment(

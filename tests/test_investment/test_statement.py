@@ -7,7 +7,7 @@ from services.utils.datetime import get_period
 
 
 @pytest.mark.asyncio
-async def test_get_investment_type(client, create_investment_type):
+async def test_get_investment_type(client, create_fixed_income_br_investment_type):
     response = await client.get('/investment/type')
 
     assert response.status_code == status.HTTP_200_OK

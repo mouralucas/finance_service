@@ -12,13 +12,13 @@ from starlette import status
 from managers.account import AccountManager
 from managers.finance import FinanceManager
 from managers.investment import InvestmentManager
-from models.investment import InvestmentModel, InvestmentStatementModel, InvestmentObjectiveModel
+from models.investment import InvestmentModel, InvestmentStatementModel, InvestmentObjectiveModel, InvestmentFundsBrazilModel
 from schemas.core import ChartSeriesSchema
-from schemas.investment import InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema, InvestmentTypeSchema, InvestmentAllocationSchema, InvestmentPerformanceDataSchema
+from schemas.investment import InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema, InvestmentTypeSchema, InvestmentAllocationSchema, InvestmentPerformanceDataSchema, InvestmentFundBrSchema
 from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, LiquidateInvestmentRequest, CreateStatementRequest, GetStatementRequest, CreateObjectiveRequest, GetObjectiveRequest, GetObjectiveSummaryRequest, \
-    GetPerformanceRequest, UpdateInvestmentRequest
+    GetPerformanceRequest, UpdateInvestmentRequest, CreateFixedIncomeInvestmentBrazilRequest, CreateFundInvestmentBrazilRequest
 from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, LiquidateInvestmentResponse, CreateStatementResponse, GetStatementResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse, \
-    GetInvestmentWithoutObjectives, GetObjectiveSummaryResponse, GetInvestmentAllocationResponse, GetInvestmentPerformanceResponse, UpdateInvestmentResponse
+    GetInvestmentWithoutObjectives, GetObjectiveSummaryResponse, GetInvestmentAllocationResponse, GetInvestmentPerformanceResponse, UpdateInvestmentResponse, CreateInvestmentFundsBrSchema
 from services.utils.datetime import get_period, get_previous_period
 
 
@@ -51,6 +51,25 @@ class InvestmentService(BaseService):
 
         response = CreateInvestmentResponse(
             investment=InvestmentSchema.model_validate(new_investment),
+        )
+
+        return response
+
+    async def create_fixed_incoming_br_investment(self, investment: CreateFixedIncomeInvestmentBrazilRequest):
+        pass
+
+    async def create_fund_br_investment(self, investment: CreateFundInvestmentBrazilRequest) -> CreateInvestmentFundsBrSchema:
+        account = await AccountManager(session=self.session).get_account_by_id(account_id=investment.account_id)
+        custodian_id = account.bank_id
+
+        new_fund = InvestmentFundsBrazilModel(**investment.model_dump())
+        new_fund.owner_id = self.user['user_id']
+        new_fund.custodian_id = custodian_id
+
+        new_fund = await self.investment_manager.create_investment(new_fund)
+
+        response = CreateInvestmentFundsBrSchema(
+            fund=InvestmentFundBrSchema.model_validate(new_fund)
         )
 
         return response

@@ -183,7 +183,7 @@ class CreditCardManager(BaseDataManager):
                 CreditCardModel.nickname,
                 CurrencyModel.symbol
             )
-            .order_by(CreditCardTransactionModel.period)
+            .order_by(CreditCardTransactionModel.period.desc())
         )
 
         result = await self.get_all(query)

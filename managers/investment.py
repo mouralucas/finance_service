@@ -18,7 +18,7 @@ class InvestmentManager(BaseDataManager):
     def __init__(self, session: AsyncSession):
         super().__init__(session)
 
-    async def create_investment(self, investment: InvestmentModel) -> SQLModel:
+    async def create_investment(self, investment: Any) -> SQLModel:
         await self.add_one(investment)
 
         return investment

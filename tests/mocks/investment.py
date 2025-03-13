@@ -1,7 +1,8 @@
 import pytest_asyncio
 from rolf_common.managers import BaseDataManager
 
-from data_mock.investment import get_investment_type_mock, get_investment_mock, get_investment_statement_mock, get_open_investment_objective_mocked, get_investment_category_mock
+from data_mock.investment.base import get_open_investment_objective_mock, get_funds_br_investment_type_mock
+from data_mock.investment.investment import get_fixed_income_br_investment_type_mock, get_investment_mock, get_investment_statement_mock, get_investment_category_mock
 from models.investment import InvestmentTypeModel, InvestmentModel, InvestmentStatementModel, InvestmentObjectiveModel, InvestmentCategoryModel
 from schemas.investment import InvestmentTypeSchema, InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema, InvestmentCategorySchema
 
@@ -13,18 +14,26 @@ async def create_investment_category(test_session) -> list[InvestmentCategorySch
 
     return investment_categories
 
+
 @pytest_asyncio.fixture
-async def create_investment_type(test_session, create_investment_category) -> list[InvestmentTypeSchema]:
-    data_ = await BaseDataManager(test_session).add_or_ignore_all(InvestmentTypeModel, get_investment_type_mock())
+async def create_fixed_income_br_investment_type(test_session, create_investment_category) -> list[InvestmentTypeSchema]:
+    data_ = await BaseDataManager(test_session).add_or_ignore_all(InvestmentTypeModel, get_fixed_income_br_investment_type_mock())
     investment_types: list[InvestmentTypeSchema] = [InvestmentTypeSchema.model_validate(data["InvestmentTypeModel"]) for data in data_]
 
     return investment_types
 
 
 @pytest_asyncio.fixture
-async def create_investment(test_session, create_open_account, create_investment_type, create_currency,
-                            create_indexer_type, create_indexer, create_liquidity, create_country) -> list[InvestmentSchema]:
+async def create_funds_br_investment_type(test_session, create_investment_category) -> list[InvestmentStatementSchema]:
+    data_ = await BaseDataManager(test_session).add_or_ignore_all(InvestmentTypeModel, get_funds_br_investment_type_mock())
+    investment_types: list[InvestmentTypeSchema] = [InvestmentTypeSchema.model_validate(data["InvestmentTypeModel"]) for data in data_]
 
+    return investment_types
+
+
+@pytest_asyncio.fixture
+async def create_investment(test_session, create_open_account, create_fixed_income_br_investment_type, create_currency,
+                            create_indexer_type, create_indexer, create_liquidity, create_country) -> list[InvestmentSchema]:
     data_ = await BaseDataManager(test_session).add_or_ignore_all(InvestmentModel, get_investment_mock())
     investments = [InvestmentSchema.model_validate(data["InvestmentModel"]) for data in data_]
 
@@ -38,9 +47,10 @@ async def create_investment_statement(test_session, create_investment) -> list[I
 
     return statements
 
+
 @pytest_asyncio.fixture
 async def create_open_investment_objectives(test_session) -> list[InvestmentObjectiveSchema]:
-    data_ = await BaseDataManager(test_session).add_or_ignore_all(InvestmentObjectiveModel, get_open_investment_objective_mocked())
+    data_ = await BaseDataManager(test_session).add_or_ignore_all(InvestmentObjectiveModel, get_open_investment_objective_mock())
     open_objectives = [InvestmentObjectiveSchema.model_validate(data["InvestmentObjectiveModel"]) for data in data_]
 
     return open_objectives

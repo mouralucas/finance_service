@@ -70,6 +70,44 @@ class InvestmentSchema(BaseModel):
     percentage_change: Decimal | None = Field(None, description='The percentage change from start to last period available')
 
 
+class InvestmentBaseSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(serialization_alias=to_camel))
+
+    owner_id: uuid.UUID = Field(..., description='The id of the owner')
+    custodian_id: uuid.UUID = Field(..., description='The id of the custodian bank')
+    account_id: uuid.UUID | None = Field(None, description='The id of the account')
+    name: str = Field(..., description='The name of the investment')
+
+    price: float = Field(..., description='The unit price for the investment')
+    quantity: float = Field(..., description='The quantity of the investment bought')
+    amount: float = Field(..., description='The total bought. Quantity * price')
+
+    type_id: uuid.UUID = Field(..., serialization_alias='investmentTypeId', description='The id of the investment type')
+    country_id: str = Field(..., description='The id of the country')
+    country_name: str | None = Field(None, description='The name of the country of the investment')
+    currency_id: str = Field(..., description='The id of the currency')
+    currency_symbol: str | None = Field(None, description='The currency symbol')
+
+    objective_id: uuid.UUID | None = Field(None, description='The id of the objective')
+    objective_name: str | None = Field(None, description='The name of the objective')
+
+    is_liquidated: bool = Field(False, description='Whether the investment is liquidated')
+
+    observation: str | None = Field(None, description='Observations of the investment')
+
+
+class InvestmentFundBrSchema(InvestmentBaseSchema):
+    investment_quotation_date: date = Field(..., description='The date the investment was quoted')
+    investment_settlement_date: date = Field(..., description='The date the investment is liquidated in the fund')
+    redemption_quotation_range: str = Field(..., description='How many days for the settlement be quoted')
+    redemption_quotation_date: date | None = Field(None, description='')
+    redemption_settlement_range: str = Field(..., description='How many days for the amount be available after the quotation date')
+    redemption_settlement_date: date | None = Field(None, description='')
+
+    minimum_balance: float = Field(..., description='The minimum amount to be in the fund')
+    minimum_transaction: float = Field(..., description='The minimum amount for every transaction in the fund')
+    initial_investment: float = Field(..., description='The initial amount to be in the fund')
+
 class TaxFeeResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
         validation_alias=to_snake,

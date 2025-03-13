@@ -38,6 +38,19 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data:cached
 
+  pg_finance_service_temporary:
+    container_name: 'pg_finance_service_temporary'
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: dev-user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: finance_dev_db_temporary
+    ports:
+      - "5438:5432"
+    volumes:
+      - db-data-temporary:/var/lib/postgresql/data:cached
+
   mongo_finance_logs:
     container_name: 'mongo_finance_logs'
     image: mongo
@@ -53,4 +66,5 @@ services:
 
 volumes:
   db-data:
+  db-data-temporary:
   mongodb-data:
