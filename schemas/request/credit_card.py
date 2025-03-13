@@ -94,5 +94,6 @@ class GetCreditCardTransactionsRequest(BaseModel):
 
 
 class GetCreditCardBillRequest(BaseModel):
+    investment_id: uuid.UUID | None = Field(None, description='The id of the investment')
     start_period: int = Field(None, alias="startPeriod", description='The start period of the bill')
     end_period: int = Field(None, alias="endPeriod", description='The end period of the bill')

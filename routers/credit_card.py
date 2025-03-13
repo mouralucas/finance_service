@@ -82,9 +82,9 @@ async def get_installments_due_dates(
     return await CreditCardService(session=session, user=user).get_installments_due_date(params=params)
 
 
-@router.get('/bill/consolidated',
-            summary='Get credit card bill consolidated',
-            description='Get creditcard bill consolidated by period. All credit cards used in the period.')
+@router.get('/bill/evolution',
+            summary='Get credit card bill evolution',
+            description='Get creditcard bill evolution in the period range.')
 async def get_bill(
         params: GetCreditCardBillRequest = Depends(),
         session: AsyncSession = Depends(get_session),
