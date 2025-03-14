@@ -40,7 +40,6 @@ class GetCreditCardBillConsolidatedResponse(BaseModel):
 
     average: float | None = Field(None, description='The average credit card bill')
     goal: float | None = Field(None, description='The goal credit card bill')
-    period_range: list[int] | None = Field(None, description='The range of available bill periods')
     bill: list[CreditCardBillSchema] = Field(..., description='The list bill by period')
 
 

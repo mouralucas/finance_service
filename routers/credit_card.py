@@ -90,7 +90,7 @@ async def get_bill(
         session: AsyncSession = Depends(get_session),
         user: RequiredUser = Security(get_user)
 ) -> GetCreditCardBillConsolidatedResponse:
-    return await CreditCardService(session, user).get_credit_card_bill_consolidated(params=params)
+    return await CreditCardService(session, user).get_credit_card_bill_evolution(params=params)
 
 
 @router.get('/bill/history', summary='Get credit card bill', description='Get credit card bill for all cards available for the period range')

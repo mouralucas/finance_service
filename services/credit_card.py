@@ -118,14 +118,13 @@ class CreditCardService(BaseService):
 
         return response
 
-    async def get_credit_card_bill_consolidated(self, params: GetCreditCardBillRequest) -> GetCreditCardBillConsolidatedResponse:
+    async def get_credit_card_bill_evolution(self, params: GetCreditCardBillRequest) -> GetCreditCardBillConsolidatedResponse:
         bill_consolidated = await self.credit_card_manager.get_bill_history_aggregated(owner_id=self.user['user_id'], start_period=params.start_period, end_period=params.end_period)
         average = sum(item['total_amount'] for item in bill_consolidated) / len(bill_consolidated) if bill_consolidated else 0
 
         response = GetCreditCardBillConsolidatedResponse(
             bill=[CreditCardBillSchema.model_validate(bill) for bill in bill_consolidated] if bill_consolidated else [],
             average=average,
-            period_range=get_period_range(201801, 202506),
             goal=2300,
         )
 
