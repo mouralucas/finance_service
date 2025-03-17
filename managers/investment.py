@@ -238,6 +238,22 @@ class InvestmentManager(BaseDataManager):
         return [investment['InvestmentModel'] for investment in investments]
 
     # Dashboard
+    async def get_total_invested(self, investment_id: uuid.UUID = None) -> float:
+        query = (
+            select(
+                func.sum(InvestmentModel.amount)
+            )
+            .where(InvestmentModel.is_liquidated == False)
+        )
+
+        if investment_id:
+            query = query.where(InvestmentModel.id == investment_id)
+
+        total_invested = await self.session.execute(query)
+        total_invested = total_invested.scalar() or 0.0
+
+        return total_invested
+
     async def get_allocation_by_investment_type(self, owner_id: uuid.UUID) -> list[RowMapping] | None:
         # Get the latest statement per investment
         subquery_latest_period = (

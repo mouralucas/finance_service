@@ -397,10 +397,13 @@ class InvestmentService(BaseService):
             }
         ]
 
+        total_invested = await self.investment_manager.get_total_invested()
+
         response = GetInvestmentPerformanceResponse(
             indexer_name=indexer.name,
             data=[InvestmentPerformanceDataSchema.model_validate(performance) for performance in period_performance],
             series=[ChartSeriesSchema.model_validate(serie) for serie in series],
+            total_invested=total_invested,
         )
 
         return response

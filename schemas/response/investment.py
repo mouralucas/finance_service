@@ -95,3 +95,4 @@ class GetInvestmentPerformanceResponse(BaseModel):
     indexer_name: str = Field(..., description='The name of the indexer')
     data: list[InvestmentPerformanceDataSchema] = Field(..., description='The investment performance data')
     series: list[ChartSeriesSchema] = Field(..., description='The performance series')
+    total_invested: float = Field(..., description='The total invested')
