@@ -112,6 +112,9 @@ For finances many APIs are used, but primarily it is used the [Portal de Dados A
 
 The API uses values from [SGS - Sistema Gerenciador de Séries Temporais](https://www3.bcb.gov.br/sgspub/localizarseries/localizarSeries.do?method=prepararTelaLocalizarSeries) as references to params.
 
+For Brazilian Funds the following website is used to get official information about the fund.
+
+[Comissão de Valores Mobiliários](https://cvmweb.cvm.gov.br/swb/default.asp?sg_sistema=fundosreg)
 
 ## License
 

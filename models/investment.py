@@ -1,10 +1,10 @@
 import uuid
-import datetime
+from datetime import date
 from decimal import Decimal
 
 from rolf_common.models import SQLModel
-from sqlalchemy import String, ForeignKey, JSON, Numeric, Text, Integer
-from sqlalchemy.orm import mapped_column, Mapped, relationship, declared_attr
+from sqlalchemy import String, ForeignKey, JSON, Numeric, Text
+from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 
 class InvestmentCategoryModel(SQLModel):
@@ -56,8 +56,8 @@ class InvestmentModel(SQLModel):
 
     type_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('investment_type.id'))
     type: Mapped[InvestmentTypeModel] = relationship(foreign_keys=[type_id], lazy='subquery')
-    transaction_date: Mapped[datetime.date] = mapped_column('transaction_date')
-    maturity_date: Mapped[datetime.date] = mapped_column('maturity_date', nullable=True)
+    transaction_date: Mapped[date] = mapped_column('transaction_date')
+    maturity_date: Mapped[date] = mapped_column('maturity_date', nullable=True)
 
     quantity: Mapped[Decimal] = mapped_column('quantity', Numeric(precision=9, scale=3), nullable=True)
     price: Mapped[Decimal] = mapped_column('price', Numeric(precision=15, scale=5), nullable=True)
@@ -73,7 +73,7 @@ class InvestmentModel(SQLModel):
     liquidity_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('liquidity.id'))
     liquidity: Mapped['LiquidityModel'] = relationship(foreign_keys=[liquidity_id], lazy='subquery')
     is_liquidated: Mapped[bool] = mapped_column('is_liquidated', default=False)
-    liquidation_date: Mapped[datetime.date] = mapped_column('liquidation_date', nullable=True)
+    liquidation_date: Mapped[date] = mapped_column('liquidation_date', nullable=True)
     liquidation_amount: Mapped[Decimal] = mapped_column('liquidation_amount', Numeric(precision=15, scale=5), nullable=True)
 
     country_id: Mapped[str] = mapped_column(ForeignKey('country.id'))
@@ -103,7 +103,7 @@ class InvestmentStatementModel(SQLModel):
     net_amount: Mapped[Decimal] = mapped_column('net_amount', Numeric(precision=15, scale=5))
     tax_detail: Mapped[list[dict]] = mapped_column('tax_detail', JSON, nullable=True)
     fee_detail: Mapped[list[dict]] = mapped_column('fee_detail', JSON, nullable=True)
-    reference_date: Mapped[datetime.date] = mapped_column('reference_date')
+    reference_date: Mapped[date] = mapped_column('reference_date')
     at_maturity: Mapped[bool] = mapped_column('at_maturity', default=False)
     value_change: Mapped[Decimal] = mapped_column('value_change', Numeric(precision=15, scale=5), nullable=True)
     percentage_change: Mapped[Decimal] = mapped_column('percentage_change', Numeric(precision=9, scale=3), nullable=True)
@@ -117,7 +117,7 @@ class InvestmentObjectiveModel(SQLModel):
     title: Mapped[str] = mapped_column('title', String(100))
     description: Mapped[str] = mapped_column('description', String(500), nullable=True)
     amount: Mapped[float] = mapped_column('amount', Numeric(precision=15, scale=5))
-    estimated_deadline: Mapped[datetime.date] = mapped_column('estimated_deadline', nullable=True)
+    estimated_deadline: Mapped[date] = mapped_column('estimated_deadline', nullable=True)
 
     # Investment reverse relation
     investments: Mapped[list['InvestmentModel']] = relationship(back_populates='objective', lazy='subquery')
@@ -149,51 +149,43 @@ class InvestmentBase(SQLModel):
     observation: Mapped[str] = mapped_column('observation', Text, nullable=True)
 
 
-# class InvestmentStatementBase(SQLModel):
-#     __abstract__ = True
-#
-#     period: Mapped[int] = mapped_column('period', Integer)
-#     start_amount: Mapped[float] = mapped_column('start_amount', Numeric(precision=18, scale=8))
-#     monthly_contribution: Mapped[float] = mapped_column('monthly_contribution', Numeric(precision=18, scale=8))
-#
-#
-# class InvestmentFixedIncomeBrazilModel(InvestmentBase):
-#     __tablename__ = 'investment_fixed_income_br'
-#
-#     issue_date: Mapped[datetime.date] = mapped_column('issue_date')
-#     transaction_date: Mapped[datetime.date] = mapped_column('transaction_date')
-#     maturity_date: Mapped[datetime.date] = mapped_column('maturity_date')
-#     grace_period_date: Mapped[datetime.date] = mapped_column('grace_period_date', nullable=True)
-#     contracted_rate: Mapped[str] = mapped_column('contracted_rate', String(50))
-#
-#     registered_at: Mapped[str] = mapped_column('registered_at', nullable=True, doc='Actual custodian, like B3')
-#
-#     indexer_type_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('indexer_type.id'))
-#     indexer_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('indexer.id'))
-#
-#     ticker: Mapped[str] = mapped_column('ticker', nullable=True)
+class FundsBr(SQLModel):
+    __tablename__ = 'funds_br'
 
-# class FundsBr(SQLModel):
-#     name: Mapped[str] = mapped_column('name', String(200))
-    
+    name: Mapped[str] = mapped_column('name', String(200))
+    fund_cnpj: Mapped[str] = mapped_column('fund_cnpj', String(18))
+    administrator: Mapped[str] = mapped_column('administrator', String(250))
+    administrator_cnpj: Mapped[str] = mapped_column('administrator_cnpj', String(18))
+    status: Mapped[str] = mapped_column('status', String(150), nullable=True)
+    start_date: Mapped[date] = mapped_column('start_date', doc='The day that the fund start')
+
+    minimum_balance: Mapped[float] = mapped_column('minimum_balance', Numeric(precision=18, scale=8), doc='The minimum amount to be in the fund')
+    minimum_investment: Mapped[float] = mapped_column('minimum_investment', Numeric(precision=18, scale=8), doc='The minimum amount for every transaction in the fund')
+    minimum_withdraw: Mapped[float] = mapped_column('minimum_withdraw', Numeric(precision=18, scale=8), doc='The minimum amount for every transaction in the fund')
+    initial_investment: Mapped[float] = mapped_column('initial_investment', Numeric(precision=18, scale=8), doc='The initial amount to be in the fund')
+
+    investment_quotation: Mapped[str] = mapped_column('investment_quotation', String(10), doc='The number of days until the quotation after the investment')
+    redemption_quotation: Mapped[str] = mapped_column('redemption_quotation', String(10), doc='The number of days until the quotation after the redemption')
+    redemption_settlement: Mapped[str] = mapped_column('redemption_settlement', String(10), doc='The number of days until the redemption is settled to the investor')
+
+    fees: Mapped[dict] = mapped_column('fees', JSON, doc='The list of fees that apply to the investment')
+
+    benchmark: Mapped[str] = mapped_column('benchmark', String(50), nullable=True)
+
+
+"""
+Criar a tabela FundsBr que conterá as informações básica do fundo (ver canal oficial para essas informações)
+Ao adicionar um extrato, verificar na tabela InvestmentFundsBr se houve um investimento naquele mes, se sim, incluir no "aporte do mes" na tabela
+    do extrato, assim ao calcular a evolução essa valor é somado ao valor inicial do mês e não distorce o cálculo da performance 
+"""
+
 
 class InvestmentFundsBrazilModel(InvestmentBase):
     __tablename__ = 'investment_funds_br'
 
-    investment_quotation_date: Mapped[datetime.date] = mapped_column('investment_quotation_date', doc='The day the investment was quoted')
-    investment_settlement_date: Mapped[datetime.date] = mapped_column('liquidation_settlement_date', doc='The date the investment is liquidated in the fund') # TODO: check this name
-    redemption_quotation_range: Mapped[str] = mapped_column('redemption_quotation_range', doc='How many days for the settlement be quoted')
-    redemption_quotation_date: Mapped[datetime.date] = mapped_column('redemption_quotation_date', nullable=True)
-    redemption_settlement_range: Mapped[str] = mapped_column('redemption_settlement_range', doc='How many days for the amount be available after the quotation date')
-    redemption_settlement_date: Mapped[datetime.date] = mapped_column('redemption_settlement_date', nullable=True)
-
-    minimum_balance: Mapped[float] = mapped_column('minimum_balance', Numeric(precision=18, scale=8), doc='The minimum amount to be in the fund')
-    minimum_transaction: Mapped[float] = mapped_column('minimum_transaction', Numeric(precision=18, scale=8), doc='The minimum amount for every transaction in the fund')
-    initial_investment: Mapped[float] = mapped_column('initial_investment', Numeric(precision=18, scale=8), doc='The initial amount to be in the fund')
-
-    benchmark: Mapped[str] = mapped_column('benchmark', String(50), nullable=True)
-
-# class TreasuryInvestmentBrazil(InvestmentBase):
-#     __tablename__ = 'investment_treasury_br'
-#
-#     pass
+    fund_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('funds_br.id'))
+    transaction_date: Mapped[date] = mapped_column('transaction_date', nullable=True)
+    investment_quotation_date: Mapped[date] = mapped_column('investment_quotation_date', doc='The day the investment was quoted')
+    investment_settlement_date: Mapped[date] = mapped_column('liquidation_settlement_date', doc='The date the investment is liquidated in the fund')  # TODO: check this name
+    redemption_quotation_date: Mapped[date] = mapped_column('redemption_quotation_date', nullable=True)
+    redemption_settlement_date: Mapped[date] = mapped_column('redemption_settlement_date', nullable=True)

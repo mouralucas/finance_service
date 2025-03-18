@@ -10,8 +10,7 @@ class FinanceSettings(Settings):
     project_version: str = "0.0.1"
 
     # Database and test settings
-    # finance_database_url: str = 'postgresql+asyncpg://dev-user:password@localhost:5434/finance_dev_db'
-    finance_database_url: str = 'postgresql+asyncpg://dev-user:password@localhost:5438/finance_dev_db_temporary'
+    finance_database_url: str = 'postgresql+asyncpg://dev-user:password@localhost:5434/finance_dev_db'
     test_database_url: str = 'sqlite+aiosqlite:///:memory:'
     echo_sql: bool = False
     echo_test_sql: bool = True
