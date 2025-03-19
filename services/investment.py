@@ -356,6 +356,7 @@ class InvestmentService(BaseService):
         if not performance_portfolio:
             return GetInvestmentPerformanceResponse(
                 indexer_name='',
+                total_invested=0,
                 data=[],
                 series=[],
             )
