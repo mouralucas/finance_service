@@ -56,6 +56,7 @@ async def create_funds_br_investment(
 ) -> CreateInvestmentFundsBrSchema:
     return await InvestmentService(session=session, user=user).create_fund_br_investment(investment=investment)
 
+
 @router.patch('', summary='Update an investment')
 async def update_investment(
         investment: UpdateInvestmentRequest,

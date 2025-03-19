@@ -5,6 +5,7 @@ from pydantic.alias_generators import to_camel
 from rolf_common.schemas import SuccessResponseBase
 
 from schemas.core import CurrencySchema, BankSchema, IndexerTypeSchema, IndexerSchema, LiquiditySchema, ExpensesByCategory, TaxFeeSchema
+from schemas.finance import FundsBrSchema
 
 
 class GetSummaryResponse(SuccessResponseBase):
@@ -68,3 +69,10 @@ class GetTaxFeeResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(serialization_alias=to_camel))
 
     tax_fee: list[TaxFeeSchema] = Field(..., description='The tax or fee list')
+
+class CreateBrazilianFundResponse(BaseModel):
+    fund: FundsBrSchema = Field(..., description='The created fund')
+
+class GetBrazilianFundResponse(BaseModel):
+    quantity: int = Field(..., description='The quantity of funds available')
+    funds: FundsBrSchema = Field(..., description='The available funds')

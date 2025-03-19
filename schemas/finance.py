@@ -1,54 +1,17 @@
 import uuid
 from datetime import date
-from decimal import Decimal
 
 from pydantic import BaseModel, Field, ConfigDict, AliasGenerator
 from pydantic.alias_generators import to_camel
 
+from schemas.request.finance import TaxFeeQuote
 
-class GetCurrencyCostAverage(BaseModel):
+
+class FundsBrSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
-        alias=to_camel
-    ))
+        serialization_alias=to_camel))
 
-
-class GetSummaryRequest(BaseModel):
-    period: int | None = Field(None, description='The period of the summary')
-
-
-class GetTaxFeeRequest(BaseModel):
-    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
-        alias=to_camel
-    ))
-
-    country_id: str = Field('BR', description='The id of the country for the tax or fee')
-    type: str = Field(..., description='Whether is tax or fee to fetch')
-
-
-class TaxFeeRequest(BaseModel):
-    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
-        alias=to_camel
-    ))
-
-    id: uuid.UUID = Field(..., alias='taxFeeId', description='The identification of the tax/fee')
-    amount: Decimal = Field(..., description='The amount of the tax/fee')
-    currency_id: str = Field('BRL', alias='currencyId', description='The currency of the tax/fee')
-
-
-class TaxFeeQuote(BaseModel):
-    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
-        alias=to_camel
-    ))
-
-    id: uuid.UUID = Field(..., alias='taxFeeId', description='The identification of the tax/fee')
-    percentage: Decimal = Field(..., description='The percentage of the tax/fee')
-
-
-class CreateBrazilianFundRequest(BaseModel):
-    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
-        alias=to_camel
-    ))
-
+    id: uuid.UUID = Field(..., serialization_alias='fundId', description='The unique identification for the fund')
     name: str = Field(..., description='The name of the fund')
     fund_cnpj: str = Field(..., min_length=14, max_length=18, description='The cnpj of the fund')
     administrator: str = Field(..., description='The administrator of the fund')
@@ -65,6 +28,7 @@ class CreateBrazilianFundRequest(BaseModel):
     redemption_quotation: str = Field(..., description='The number of days until the quotation after the redemption')
     redemption_settlement: str = Field(..., description='The number of days until the redemption is settled to the investor')
 
+    # TODO: maybe change the TaxFeeQuote for one schema not in request folder
     fees: list[TaxFeeQuote] | None = Field(None, description='The fee details of the fund fees')
 
     benchmark: str | None = Field(None, description='The benchmark of the fund')

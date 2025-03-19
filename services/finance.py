@@ -5,9 +5,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from managers.account import AccountManager
 from managers.credit_card import CreditCardManager
 from managers.finance import FinanceManager
+from models.investment import FundsBrModel
 from schemas.core import CurrencySchema, BankSchema, IndexerTypeSchema, IndexerSchema, LiquiditySchema, ExpensesByCategory, TaxFeeSchema
-from schemas.request.finance import GetSummaryRequest, GetTaxFeeRequest
-from schemas.response.finance import GetCurrencyResponse, GetBankResponse, GetIndexerTypeResponse, GetIndexerResponse, GetLiquidityResponse, GetExpensesByCategoryResponse, GetTaxFeeResponse
+from schemas.finance import FundsBrSchema
+from schemas.request.finance import GetSummaryRequest, GetTaxFeeRequest, CreateBrazilianFundRequest
+from schemas.response.finance import GetCurrencyResponse, GetBankResponse, GetIndexerTypeResponse, GetIndexerResponse, GetLiquidityResponse, GetExpensesByCategoryResponse, GetTaxFeeResponse, CreateBrazilianFundResponse
 
 
 class FinanceService(BaseService):
@@ -99,9 +101,21 @@ class FinanceService(BaseService):
             else:
                 transactions_by_category[category_id] = item
 
-
         response = GetExpensesByCategoryResponse(
             expenses_by_category=[ExpensesByCategory.model_validate(transaction) for transaction in list(transactions_by_category.values())],
+        )
+
+        return response
+
+    # Funds service
+    async def create_br_fund(self, fund: CreateBrazilianFundRequest):
+        fund_model = FundsBrModel(**fund.model_dump())
+        fund_model.owner_id = self.user['user_id']
+
+        new_fund = await self.finance_manager.create_fund(fund_model)
+
+        response = CreateBrazilianFundResponse(
+            fund=FundsBrSchema.model_validate(new_fund),
         )
 
         return response

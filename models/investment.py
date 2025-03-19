@@ -149,7 +149,7 @@ class InvestmentBase(SQLModel):
     observation: Mapped[str] = mapped_column('observation', Text, nullable=True)
 
 
-class FundsBr(SQLModel):
+class FundsBrModel(SQLModel):
     __tablename__ = 'funds_br'
 
     name: Mapped[str] = mapped_column('name', String(200))

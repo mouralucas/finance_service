@@ -1,4 +1,5 @@
 import datetime
+from datetime import date
 import uuid
 from decimal import Decimal
 
@@ -6,7 +7,7 @@ from fastapi import Query
 from pydantic import BaseModel, Field, model_validator, ConfigDict, AliasGenerator
 from pydantic.alias_generators import to_camel
 
-from schemas.request.finance import TaxFeeRequest
+from schemas.request.finance import TaxFeeRequest, TaxFeeQuote
 
 
 class CreateInvestmentBaseRequest(BaseModel):
@@ -46,14 +47,8 @@ class CreateFundInvestmentBrazilRequest(CreateInvestmentBaseRequest):
 
     investment_quotation_date: datetime.date = Field(..., description='The day that the investment is quoted')
     investment_settlement_date: datetime.date = Field(..., description='The date the investment is liquidated in the fund')
-    redemption_quotation_range: str = Field(..., description='How many days for the settlement be quoted')
     redemption_quotation_date: datetime.date = Field(None, description='')
-    redemption_settlement_range: str = Field(..., description='How many days for the amount be available after the quotation date')
     redemption_settlement_date: datetime.date = Field(None, description='')
-
-    minimum_balance: float = Field(..., description='The minimum amount of the investment')
-    minimum_transaction: float = Field(..., description='The minimum amount for every transaction in the fund')
-    initial_investment: float = Field(..., description='The initial amount to be in the fund')
 
 class CreateInvestmentRequest(BaseModel):
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(

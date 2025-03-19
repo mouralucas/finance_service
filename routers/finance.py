@@ -6,8 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from backend.database import get_session
-from schemas.request.finance import GetSummaryRequest, GetTaxFeeRequest, GetCurrencyCostAverage
-from schemas.response.finance import GetCurrencyResponse, GetBankResponse, GetIndexerTypeResponse, GetIndexerResponse, GetLiquidityResponse, GetExpensesByCategoryResponse, GetTaxFeeResponse
+from schemas.request.finance import GetSummaryRequest, GetTaxFeeRequest, GetCurrencyCostAverage, CreateBrazilianFundRequest
+from schemas.response.finance import GetCurrencyResponse, GetBankResponse, GetIndexerTypeResponse, GetIndexerResponse, GetLiquidityResponse, GetExpensesByCategoryResponse, GetTaxFeeResponse, CreateBrazilianFundResponse
 from services.finance import FinanceService
 
 router = APIRouter(prefix="/finance", tags=['Finance'])
@@ -93,3 +93,13 @@ async def get_expenses_by_category(
         user: RequiredUser = Security(get_user)
 ) -> GetExpensesByCategoryResponse:
     return await FinanceService(session=session, user=user).get_expenses_by_category()
+
+
+@router.post('/funds/br', summary='Create a new Brazilian Fund',
+             status_code=status.HTTP_201_CREATED)
+async def create_brazilian_fund(
+        fund: CreateBrazilianFundRequest,
+        session: AsyncSession = Depends(get_session),
+        user: RequiredUser = Security(get_user)
+) -> CreateBrazilianFundResponse:
+    return await FinanceService(session=session, user=user).create_br_fund(fund=fund)

@@ -3,16 +3,23 @@ from typing import cast
 
 from fastapi import HTTPException
 from rolf_common.managers import BaseDataManager
+from rolf_common.models import SQLModel
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from models.core import CurrencyModel, BankModel, IndexerTypeModel, IndexerModel, LiquidityModel, PeriodicityModel, IndexerSeriesModel, TaxFeeModel
+from models.investment import FundsBrModel
 
 
 class FinanceManager(BaseDataManager):
     def __init__(self, session: AsyncSession):
         super().__init__(session)
+
+    async def create_fund(self, fund: FundsBrModel) -> SQLModel:
+        await self.add_one(fund)
+
+        return fund
 
     async def get_currencies(self) -> list[CurrencyModel] | None:
         query = select(CurrencyModel)
