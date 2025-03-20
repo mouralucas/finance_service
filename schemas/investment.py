@@ -108,10 +108,11 @@ class InvestmentFundBrSchema(InvestmentBaseSchema):
     minimum_transaction: float = Field(..., description='The minimum amount for every transaction in the fund')
     initial_investment: float = Field(..., description='The initial amount to be in the fund')
 
-class TaxFeeResponse(BaseModel):
+
+
+class TaxFeeSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
         validation_alias=to_snake,
-        serialization_alias=to_camel,
     ))
 
     id: uuid.UUID = Field(..., serialization_alias='taxFeeId', description='The identification of the tax/fee')
@@ -132,9 +133,9 @@ class InvestmentStatementSchema(BaseModel):
     period: int = Field(..., description='The period of the statement')
     gross_amount: float = Field(..., description='The gross amount of the investment in the period')
     total_tax: float = Field(..., description='The total tax amount of the investment in the period')
-    tax_detail: list[TaxFeeResponse] | None = Field(..., description='The detail of taxes')
+    tax_detail: list[TaxFeeSchema] | None = Field(..., description='The detail of taxes')
     total_fee: float = Field(..., description='The total fee of the investment in the period')
-    fee_detail: list[TaxFeeResponse] | None = Field(..., description='The detail of fees')
+    fee_detail: list[TaxFeeSchema] | None = Field(..., description='The detail of fees')
     net_amount: float = Field(..., description='The net amount of the investment in the period')
 
 

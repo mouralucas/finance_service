@@ -119,9 +119,17 @@ def get_fee_mock() -> list[dict[str, Any]]:
     fees_list: list[dict[str, Any]] = [
         {
             **default_model_dict,
-            'id': uuid.UUID('a187d754-73c9-46d3-ac57-7cc78ea01e6f'),
+            'id': uuid.UUID('b932a5b8-6fc6-4396-bd70-b830cb892c7d'),
             'name': 'Taxa de custódia',
             'description': 'Taxa cobrado pelo agente de custódia',
+            'country_id': 'BR',
+            'type': 'fee'
+        },
+        {
+            **default_model_dict,
+            'id': uuid.UUID('d3ddb367-6159-42db-a9d3-103efe18e0e9'),
+            'name': 'Taxa de performance',
+            'description': 'Taxa sobre a performance do investimento',
             'country_id': 'BR',
             'type': 'fee'
         }

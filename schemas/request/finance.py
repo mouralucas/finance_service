@@ -35,7 +35,7 @@ class TaxFeeRequest(BaseModel):
     currency_id: str = Field('BRL', alias='currencyId', description='The currency of the tax/fee')
 
 
-class TaxFeeQuote(BaseModel):
+class TaxFeeQuotationRequest(BaseModel):
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
         alias=to_camel
     ))
@@ -65,6 +65,6 @@ class CreateBrazilianFundRequest(BaseModel):
     redemption_quotation: str = Field(..., description='The number of days until the quotation after the redemption')
     redemption_settlement: str = Field(..., description='The number of days until the redemption is settled to the investor')
 
-    fees: list[TaxFeeQuote] | None = Field(None, description='The fee details of the fund fees')
+    fees: list[TaxFeeQuotationRequest] | None = Field(None, description='The fee details of the fund fees')
 
     benchmark: str | None = Field(None, description='The benchmark of the fund')

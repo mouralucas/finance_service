@@ -78,7 +78,9 @@ async def test_get_tax_fee(client, create_tax, create_fee):
 
 
 @pytest.mark.asyncio
-async def test_create_brazilian_fund(client):
+async def test_create_brazilian_fund(client, create_country, create_fee):
+    fees = create_fee
+
     name = 'Novo Fundo de Investimento FIM'
     fund_cnpj = '25.487.141/0001-01'
     admin = 'Banco Adm'
@@ -92,6 +94,12 @@ async def test_create_brazilian_fund(client):
     investment_quotation = 'D+1'
     redemption_quotation = 'D+3'
     redemption_settlement = 'D+4 (dias úteis)'
+    fees = [
+        {
+            'taxFeeId': str(fees[0].id),
+            'percentage': 0.6
+        }
+    ]
 
     payload = {
         'name': name,
@@ -107,6 +115,7 @@ async def test_create_brazilian_fund(client):
         'investmentQuotation': investment_quotation,
         'redemptionQuotation': redemption_quotation,
         'redemptionSettlement': redemption_settlement,
+        'fees': fees
     }
     response = await client.post('/finance/funds/br', json=payload)
     assert response.status_code == status.HTTP_201_CREATED
@@ -116,4 +125,31 @@ async def test_create_brazilian_fund(client):
     assert type(data['fund']) is dict
 
     assert 'fundId' in data['fund']
-
+    assert 'name' in data['fund']
+    assert data['fund']['name'] == name
+    assert 'fundCnpj' in data['fund']
+    assert data['fund']['fundCnpj'] == fund_cnpj
+    assert 'administrator' in data['fund']
+    assert data['fund']['administrator'] == admin
+    assert 'administratorCnpj' in data['fund']
+    assert data['fund']['administratorCnpj'] == admin_cnpj
+    assert 'status' in data['fund']
+    assert data['fund']['status'] == fund_status
+    assert 'startDate' in data['fund']
+    assert data['fund']['startDate'] == start_date
+    assert 'minimumBalance' in data['fund']
+    assert data['fund']['minimumBalance'] == minimum_balance
+    assert 'minimumInvestment' in data['fund']
+    assert data['fund']['minimumInvestment'] == minimum_investment
+    assert 'minimumWithdraw' in data['fund']
+    assert data['fund']['minimumWithdraw'] == minimum_withdraw
+    assert 'initialInvestment' in data['fund']
+    assert data['fund']['initialInvestment'] == initial_investment
+    assert 'investmentQuotation' in data['fund']
+    assert data['fund']['investmentQuotation'] == investment_quotation
+    assert 'redemptionQuotation' in data['fund']
+    assert data['fund']['redemptionQuotation'] == redemption_quotation
+    assert 'redemptionSettlement' in data['fund']
+    assert data['fund']['redemptionSettlement'] == redemption_settlement
+    assert 'fees' in data['fund']
+    assert type(data['fund']['fees']) is list

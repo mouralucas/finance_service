@@ -168,7 +168,7 @@ class FundsBrModel(SQLModel):
     redemption_quotation: Mapped[str] = mapped_column('redemption_quotation', String(10), doc='The number of days until the quotation after the redemption')
     redemption_settlement: Mapped[str] = mapped_column('redemption_settlement', String(10), doc='The number of days until the redemption is settled to the investor')
 
-    fees: Mapped[dict] = mapped_column('fees', JSON, doc='The list of fees that apply to the investment')
+    fees: Mapped[list[dict]] = mapped_column('fees', JSON, doc='The list of fees that apply to the investment')
 
     benchmark: Mapped[str] = mapped_column('benchmark', String(50), nullable=True)
 

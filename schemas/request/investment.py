@@ -7,7 +7,7 @@ from fastapi import Query
 from pydantic import BaseModel, Field, model_validator, ConfigDict, AliasGenerator
 from pydantic.alias_generators import to_camel
 
-from schemas.request.finance import TaxFeeRequest, TaxFeeQuote
+from schemas.request.finance import TaxFeeRequest
 
 
 class CreateInvestmentBaseRequest(BaseModel):

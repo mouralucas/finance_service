@@ -2,9 +2,16 @@ import uuid
 from datetime import date
 
 from pydantic import BaseModel, Field, ConfigDict, AliasGenerator
-from pydantic.alias_generators import to_camel
+from pydantic.alias_generators import to_camel, to_snake
 
-from schemas.request.finance import TaxFeeQuote
+
+class TaxFeeQuotationSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
+        validation_alias=to_snake,
+    ))
+
+    id: uuid.UUID = Field(..., serialization_alias='taxFeeId', description='The identification of the tax/fee')
+    percentage: float = Field(..., description='The percentage of the tax/fee')
 
 
 class FundsBrSchema(BaseModel):
@@ -29,6 +36,6 @@ class FundsBrSchema(BaseModel):
     redemption_settlement: str = Field(..., description='The number of days until the redemption is settled to the investor')
 
     # TODO: maybe change the TaxFeeQuote for one schema not in request folder
-    fees: list[TaxFeeQuote] | None = Field(None, description='The fee details of the fund fees')
+    fees: list[TaxFeeQuotationSchema] | None = Field(None, description='The fee details of the fund fees')
 
     benchmark: str | None = Field(None, description='The benchmark of the fund')

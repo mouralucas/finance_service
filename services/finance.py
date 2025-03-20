@@ -111,6 +111,7 @@ class FinanceService(BaseService):
     async def create_br_fund(self, fund: CreateBrazilianFundRequest):
         fund_model = FundsBrModel(**fund.model_dump())
         fund_model.owner_id = self.user['user_id']
+        fund_model.fees = [fee.model_dump(mode='json') for fee in fund.fees] if fund.fees else None
 
         new_fund = await self.finance_manager.create_fund(fund_model)
 

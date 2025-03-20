@@ -1,8 +1,8 @@
 """Create new funds models
 
-Revision ID: f9edebed4248
+Revision ID: 907f829c206b
 Revises: 2eb9b44bbe17
-Create Date: 2025-03-18 10:55:19.463170
+Create Date: 2025-03-20 09:50:01.423414
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'f9edebed4248'
+revision: str = '907f829c206b'
 down_revision: Union[str, None] = '2eb9b44bbe17'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
