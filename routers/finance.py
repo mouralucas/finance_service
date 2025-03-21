@@ -3,6 +3,7 @@ from fastapi import Depends, Security
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import get_user
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.util import await_only
 from starlette import status
 
 from backend.database import get_session
@@ -103,3 +104,10 @@ async def create_brazilian_fund(
         user: RequiredUser = Security(get_user)
 ) -> CreateBrazilianFundResponse:
     return await FinanceService(session=session, user=user).create_br_fund(fund=fund)
+
+@router.get('/funds/br', summary='Get all available brazilian funds')
+async def get_brazilian_funds(
+        session: AsyncSession = Depends(get_session),
+        user: RequiredUser = Security(get_user)
+):
+    return await FinanceService(session=session, user=user).get_brazilian_funds()

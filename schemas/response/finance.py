@@ -73,6 +73,6 @@ class GetTaxFeeResponse(BaseModel):
 class CreateBrazilianFundResponse(BaseModel):
     fund: FundsBrSchema = Field(..., description='The created fund')
 
-class GetBrazilianFundResponse(BaseModel):
+class GetBrazilianFundsResponse(BaseModel):
     quantity: int = Field(..., description='The quantity of funds available')
-    funds: FundsBrSchema = Field(..., description='The available funds')
+    funds: list[FundsBrSchema] = Field(..., description='The available funds')

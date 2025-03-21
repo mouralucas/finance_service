@@ -21,6 +21,13 @@ class FinanceManager(BaseDataManager):
 
         return fund
 
+    async def get_brazilian_funds(self) -> list[FundsBrModel]:
+        query = select(FundsBrModel)
+
+        funds = await self.get_all(query)
+
+        return [fund['FundsBrModel'] for fund in funds] if funds else None
+
     async def get_currencies(self) -> list[CurrencyModel] | None:
         query = select(CurrencyModel)
 

@@ -9,7 +9,8 @@ from models.investment import FundsBrModel
 from schemas.core import CurrencySchema, BankSchema, IndexerTypeSchema, IndexerSchema, LiquiditySchema, ExpensesByCategory, TaxFeeSchema
 from schemas.finance import FundsBrSchema
 from schemas.request.finance import GetSummaryRequest, GetTaxFeeRequest, CreateBrazilianFundRequest
-from schemas.response.finance import GetCurrencyResponse, GetBankResponse, GetIndexerTypeResponse, GetIndexerResponse, GetLiquidityResponse, GetExpensesByCategoryResponse, GetTaxFeeResponse, CreateBrazilianFundResponse
+from schemas.response.finance import GetCurrencyResponse, GetBankResponse, GetIndexerTypeResponse, GetIndexerResponse, GetLiquidityResponse, GetExpensesByCategoryResponse, GetTaxFeeResponse, CreateBrazilianFundResponse, \
+    GetBrazilianFundsResponse
 
 
 class FinanceService(BaseService):
@@ -108,7 +109,7 @@ class FinanceService(BaseService):
         return response
 
     # Funds service
-    async def create_br_fund(self, fund: CreateBrazilianFundRequest):
+    async def create_br_fund(self, fund: CreateBrazilianFundRequest) -> CreateBrazilianFundResponse:
         fund_model = FundsBrModel(**fund.model_dump())
         fund_model.owner_id = self.user['user_id']
         fund_model.fees = [fee.model_dump(mode='json') for fee in fund.fees] if fund.fees else None
@@ -117,6 +118,16 @@ class FinanceService(BaseService):
 
         response = CreateBrazilianFundResponse(
             fund=FundsBrSchema.model_validate(new_fund),
+        )
+
+        return response
+
+    async def get_brazilian_funds(self) -> GetBrazilianFundsResponse:
+        funds = await self.finance_manager.get_brazilian_funds()
+
+        response = GetBrazilianFundsResponse(
+            quantity=len(funds) if funds else 0,
+            funds=[FundsBrSchema.model_validate(fund) for fund in funds] if funds else []
         )
 
         return response
