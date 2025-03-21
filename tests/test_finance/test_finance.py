@@ -97,7 +97,7 @@ async def test_create_brazilian_fund(client, create_country, create_fee):
     fees = [
         {
             'taxFeeId': str(fees[0].id),
-            'percentage': 0.6
+            'percentage': 'De 0.6% a 0.8% ao ano'
         }
     ]
 

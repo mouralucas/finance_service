@@ -11,7 +11,7 @@ class TaxFeeQuotationSchema(BaseModel):
     ))
 
     id: uuid.UUID = Field(..., serialization_alias='taxFeeId', description='The identification of the tax/fee')
-    percentage: float = Field(..., description='The percentage of the tax/fee')
+    percentage: str = Field(..., description='The percentage of the tax/fee')
 
 
 class FundsBrSchema(BaseModel):

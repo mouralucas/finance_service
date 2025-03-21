@@ -41,7 +41,7 @@ class TaxFeeQuotationRequest(BaseModel):
     ))
 
     id: uuid.UUID = Field(..., alias='taxFeeId', description='The identification of the tax/fee')
-    percentage: Decimal = Field(..., description='The percentage of the tax/fee')
+    percentage: str = Field(..., description='The percentage of the tax/fee')
 
 
 class CreateBrazilianFundRequest(BaseModel):

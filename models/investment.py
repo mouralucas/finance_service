@@ -164,9 +164,9 @@ class FundsBrModel(SQLModel):
     minimum_withdraw: Mapped[float] = mapped_column('minimum_withdraw', Numeric(precision=18, scale=8), doc='The minimum amount for every transaction in the fund')
     initial_investment: Mapped[float] = mapped_column('initial_investment', Numeric(precision=18, scale=8), doc='The initial amount to be in the fund')
 
-    investment_quotation: Mapped[str] = mapped_column('investment_quotation', String(10), doc='The number of days until the quotation after the investment')
-    redemption_quotation: Mapped[str] = mapped_column('redemption_quotation', String(10), doc='The number of days until the quotation after the redemption')
-    redemption_settlement: Mapped[str] = mapped_column('redemption_settlement', String(10), doc='The number of days until the redemption is settled to the investor')
+    investment_quotation: Mapped[str] = mapped_column('investment_quotation', String(25), doc='The number of days until the quotation after the investment')
+    redemption_quotation: Mapped[str] = mapped_column('redemption_quotation', String(25), doc='The number of days until the quotation after the redemption')
+    redemption_settlement: Mapped[str] = mapped_column('redemption_settlement', String(25), doc='The number of days until the redemption is settled to the investor')
 
     fees: Mapped[list[dict]] = mapped_column('fees', JSON, doc='The list of fees that apply to the investment')
 
