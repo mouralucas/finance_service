@@ -238,12 +238,15 @@ class InvestmentManager(BaseDataManager):
         return [investment['InvestmentModel'] for investment in investments]
 
     # Dashboard
-    async def get_total_invested(self, investment_id: uuid.UUID = None) -> float:
+    async def get_total_invested(self, owner_id: uuid.UUID, investment_id: uuid.UUID = None) -> float:
         query = (
             select(
                 func.sum(InvestmentModel.amount)
             )
-            .where(InvestmentModel.is_liquidated == False)
+            .where(
+                InvestmentModel.owner_id == owner_id,
+                InvestmentModel.is_liquidated == False
+            )
         )
 
         if investment_id:

@@ -398,7 +398,7 @@ class InvestmentService(BaseService):
             }
         ]
 
-        total_invested = await self.investment_manager.get_total_invested()
+        total_invested = await self.investment_manager.get_total_invested(owner_id=self.user['user_id'])
 
         response = GetInvestmentPerformanceResponse(
             indexer_name=indexer.name,
