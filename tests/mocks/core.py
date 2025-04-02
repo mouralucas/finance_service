@@ -1,10 +1,12 @@
 import pytest_asyncio
 from rolf_common.managers import BaseDataManager
 
-from data_mock.core import get_country_mock, get_tax_mock, get_currency_mock, get_bank_mock, get_category_mock, get_liquidity_mock, get_category_parent_mock, get_fee_mock
+from data_mock.core import get_country_mock, get_tax_mock, get_currency_mock, get_bank_mock, get_category_mock, get_liquidity_mock, get_category_parent_mock, get_fee_mock, get_brazilian_fund_mock
 from data_mock.core import get_indexer_mock, get_index_type_mock
 from models.core import BankModel, CurrencyModel, CategoryModel, CountryModel, TaxFeeModel, IndexerTypeModel, IndexerModel, LiquidityModel
+from models.investment import FundsBrModel
 from schemas.core import CurrencySchema, BankSchema, CountrySchema, TaxSchema, CategorySchema, IndexerTypeSchema, IndexerSchema, LiquiditySchema
+from schemas.finance import FundsBrSchema
 
 
 @pytest_asyncio.fixture
@@ -78,3 +80,11 @@ async def create_liquidity(test_session):
     liquidity = [LiquiditySchema.model_validate(data["LiquidityModel"]) for data in data_]
 
     return liquidity
+
+
+@pytest_asyncio.fixture
+async def create_brazilian_funds(test_session):
+    data_ = await BaseDataManager(test_session).add_or_ignore_all(FundsBrModel, get_brazilian_fund_mock())
+    brazilian_funds = [FundsBrSchema.model_validate(data["FundsBrModel"]) for data in data_]
+
+    return brazilian_funds

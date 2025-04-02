@@ -73,7 +73,7 @@ def get_open_investment_objective_mock() -> list[dict[str, Any]]:
             **default_model_dict,
             'id': uuid.UUID('26c28396-4d6f-454f-bc00-3bb2933a6238'),
             'owner_id': uuid.UUID("adf52a1e-7a19-11ed-a1eb-0242ac120002"),
-            'title': 'Compra um carro novo',
+            'title': 'Comprar um carro novo',
             'description': 'Comprar um carro melhor que meu carro atual',
             'amount': 25000,
             'estimated_deadline': date.today() + relativedelta(years=1, months=6),

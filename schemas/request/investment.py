@@ -22,6 +22,8 @@ class CreateInvestmentBaseRequest(BaseModel):
     quantity: Decimal = Field(None, description='The quantity of the investment bought')
     amount: Decimal = Field(None, description='The total bought. Quantity * price')
 
+    transaction_date: date = Field(..., description='The date')
+
     type_id: uuid.UUID = Field(..., alias='investmentTypeId', description='The id of the investment type')
     currency_id: str = Field(..., description='The id of the currency')
     country_id: str = Field('BR', description='The id of the country')
@@ -45,10 +47,12 @@ class CreateFundInvestmentBrazilRequest(CreateInvestmentBaseRequest):
         alias=to_camel
     ))
 
-    investment_quotation_date: datetime.date = Field(..., description='The day that the investment is quoted')
-    investment_settlement_date: datetime.date = Field(..., description='The date the investment is liquidated in the fund')
-    redemption_quotation_date: datetime.date = Field(None, description='')
-    redemption_settlement_date: datetime.date = Field(None, description='')
+    fund_id: uuid.UUID = Field(..., description='The identification of the fund')
+
+    investment_quotation_date: datetime.date = Field(..., description='The day that the investment was quoted')
+    investment_settlement_date: datetime.date = Field(..., description='The date the investment was liquidated in the fund')
+    redemption_quotation_date: datetime.date | None = Field(None, description='The day that the redemption was quoted')
+    redemption_settlement_date: datetime.date | None = Field(None, description='The day that the amount was settled')
 
 class CreateInvestmentRequest(BaseModel):
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(

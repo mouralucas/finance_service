@@ -1,20 +1,14 @@
-from ipaddress import summarize_address_range
-from uuid import uuid4
-
 from fastapi import APIRouter, Depends, Security
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import get_user
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.util import await_only
 from starlette import status
-from typing_extensions import deprecated
 
 from backend.database import get_session
 from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, CreateStatementRequest, GetStatementRequest, LiquidateInvestmentRequest, GetObjectiveRequest, CreateObjectiveRequest, GetObjectiveSummaryRequest, \
-    GetPerformanceRequest, CreateBatchStatementRequest, UpdateInvestmentRequest, CreateFixedIncomeInvestmentBrazilRequest, CreateFundInvestmentBrazilRequest
+    GetPerformanceRequest, UpdateInvestmentRequest, CreateFixedIncomeInvestmentBrazilRequest, CreateFundInvestmentBrazilRequest
 from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, CreateStatementResponse, GetStatementResponse, LiquidateInvestmentResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse, \
     GetInvestmentWithoutObjectives, GetObjectiveSummaryResponse, GetInvestmentAllocationResponse, GetInvestmentPerformanceResponse, UpdateInvestmentResponse, CreateInvestmentFundsBrSchema
-from services.integration import BcbIntegrationService
 from services.investment import InvestmentService
 
 router = APIRouter(prefix="/investment", tags=['Investments'])

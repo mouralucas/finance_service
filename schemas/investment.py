@@ -73,6 +73,8 @@ class InvestmentSchema(BaseModel):
 class InvestmentBaseSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(serialization_alias=to_camel))
 
+    id: uuid.UUID = Field(..., serialization_alias='investmentId', description='The unique identification of the investment')
+
     owner_id: uuid.UUID = Field(..., description='The id of the owner')
     custodian_id: uuid.UUID = Field(..., description='The id of the custodian bank')
     account_id: uuid.UUID | None = Field(None, description='The id of the account')
@@ -97,16 +99,12 @@ class InvestmentBaseSchema(BaseModel):
 
 
 class InvestmentFundBrSchema(InvestmentBaseSchema):
+    fund_id: uuid.UUID = Field(..., description='The identification of the fund')
+
     investment_quotation_date: date = Field(..., description='The date the investment was quoted')
     investment_settlement_date: date = Field(..., description='The date the investment is liquidated in the fund')
-    redemption_quotation_range: str = Field(..., description='How many days for the settlement be quoted')
     redemption_quotation_date: date | None = Field(None, description='')
-    redemption_settlement_range: str = Field(..., description='How many days for the amount be available after the quotation date')
     redemption_settlement_date: date | None = Field(None, description='')
-
-    minimum_balance: float = Field(..., description='The minimum amount to be in the fund')
-    minimum_transaction: float = Field(..., description='The minimum amount for every transaction in the fund')
-    initial_investment: float = Field(..., description='The initial amount to be in the fund')
 
 
 

@@ -115,6 +115,7 @@ The API uses values from [SGS - Sistema Gerenciador de Séries Temporais](https:
 For Brazilian Funds the following website is used to get official information about the fund.
 
 [Comissão de Valores Mobiliários](https://cvmweb.cvm.gov.br/swb/default.asp?sg_sistema=fundosreg)
+[Outro](https://conteudo.cvm.gov.br/menu/regulados/fundos/consultas/fundos.html)
 
 ## License
 
