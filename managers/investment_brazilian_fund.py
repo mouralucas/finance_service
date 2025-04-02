@@ -4,7 +4,7 @@ from rolf_common.models import SQLModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from managers.investment import InvestmentManager
-from models.investment import InvestmentFundsBrazilModel
+from models.investment_brazilian_fund import InvestmentFundsBrazilModel
 
 
 class InvestmentBrazilianFundManager(InvestmentManager):

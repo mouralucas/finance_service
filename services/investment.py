@@ -2,7 +2,6 @@ import datetime
 from decimal import Decimal
 
 from fastapi import HTTPException
-from fastapi.dependencies.utils import request_params_to_args
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import BaseService
 from sqlalchemy import RowMapping
@@ -12,13 +11,13 @@ from starlette import status
 from managers.account import AccountManager
 from managers.finance import FinanceManager
 from managers.investment import InvestmentManager
-from models.investment import InvestmentModel, InvestmentStatementModel, InvestmentObjectiveModel, InvestmentFundsBrazilModel
+from models.investment import InvestmentModel, InvestmentStatementModel, InvestmentObjectiveModel
 from schemas.core import ChartSeriesSchema
-from schemas.investment import InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema, InvestmentTypeSchema, InvestmentAllocationSchema, InvestmentPerformanceDataSchema, InvestmentFundBrSchema
+from schemas.investment import InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema, InvestmentTypeSchema, InvestmentAllocationSchema, InvestmentPerformanceDataSchema
 from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, LiquidateInvestmentRequest, CreateStatementRequest, GetStatementRequest, CreateObjectiveRequest, GetObjectiveRequest, GetObjectiveSummaryRequest, \
-    GetPerformanceRequest, UpdateInvestmentRequest, CreateFixedIncomeInvestmentBrazilRequest, CreateFundInvestmentBrazilRequest
+    GetPerformanceRequest, UpdateInvestmentRequest, CreateFixedIncomeInvestmentBrazilRequest
 from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, LiquidateInvestmentResponse, CreateStatementResponse, GetStatementResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse, \
-    GetInvestmentWithoutObjectives, GetObjectiveSummaryResponse, GetInvestmentAllocationResponse, GetInvestmentPerformanceResponse, UpdateInvestmentResponse, CreateInvestmentFundsBrSchema
+    GetInvestmentWithoutObjectives, GetObjectiveSummaryResponse, GetInvestmentAllocationResponse, GetInvestmentPerformanceResponse, UpdateInvestmentResponse
 from services.utils.datetime import get_period, get_previous_period
 
 

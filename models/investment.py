@@ -123,6 +123,30 @@ class InvestmentObjectiveModel(SQLModel):
     investments: Mapped[list['InvestmentModel']] = relationship(back_populates='objective', lazy='subquery')
 
 
+class FundsBrModel(SQLModel):
+    __tablename__ = 'funds_br'
+
+    name: Mapped[str] = mapped_column('name', String(200))
+    fund_cnpj: Mapped[str] = mapped_column('fund_cnpj', String(18))
+    administrator: Mapped[str] = mapped_column('administrator', String(250))
+    administrator_cnpj: Mapped[str] = mapped_column('administrator_cnpj', String(18))
+    status: Mapped[str] = mapped_column('status', String(150), nullable=True)
+    start_date: Mapped[date] = mapped_column('start_date', doc='The day that the fund start')
+
+    minimum_balance: Mapped[float] = mapped_column('minimum_balance', Numeric(precision=18, scale=8), doc='The minimum amount to be in the fund')
+    minimum_investment: Mapped[float] = mapped_column('minimum_investment', Numeric(precision=18, scale=8), doc='The minimum amount for every transaction in the fund')
+    minimum_withdraw: Mapped[float] = mapped_column('minimum_withdraw', Numeric(precision=18, scale=8), doc='The minimum amount for every transaction in the fund')
+    initial_investment: Mapped[float] = mapped_column('initial_investment', Numeric(precision=18, scale=8), doc='The initial amount to be in the fund')
+
+    investment_quotation: Mapped[str] = mapped_column('investment_quotation', String(25), doc='The number of days until the quotation after the investment')
+    redemption_quotation: Mapped[str] = mapped_column('redemption_quotation', String(25), doc='The number of days until the quotation after the redemption')
+    redemption_settlement: Mapped[str] = mapped_column('redemption_settlement', String(25), doc='The number of days until the redemption is settled to the investor')
+
+    fees: Mapped[list[dict]] = mapped_column('fees', JSON, doc='The list of fees that apply to the investment')
+
+    benchmark: Mapped[str] = mapped_column('benchmark', String(50), nullable=True)
+
+
 ### New Investment Models ###
 class InvestmentBase(SQLModel):
     __abstract__ = True
@@ -149,28 +173,18 @@ class InvestmentBase(SQLModel):
     observation: Mapped[str] = mapped_column('observation', Text, nullable=True)
 
 
-class FundsBrModel(SQLModel):
-    __tablename__ = 'funds_br'
+class InvestmentStatementBaseModel(SQLModel):
+    __abstract__ = True
 
-    name: Mapped[str] = mapped_column('name', String(200))
-    fund_cnpj: Mapped[str] = mapped_column('fund_cnpj', String(18))
-    administrator: Mapped[str] = mapped_column('administrator', String(250))
-    administrator_cnpj: Mapped[str] = mapped_column('administrator_cnpj', String(18))
-    status: Mapped[str] = mapped_column('status', String(150), nullable=True)
-    start_date: Mapped[date] = mapped_column('start_date', doc='The day that the fund start')
-
-    minimum_balance: Mapped[float] = mapped_column('minimum_balance', Numeric(precision=18, scale=8), doc='The minimum amount to be in the fund')
-    minimum_investment: Mapped[float] = mapped_column('minimum_investment', Numeric(precision=18, scale=8), doc='The minimum amount for every transaction in the fund')
-    minimum_withdraw: Mapped[float] = mapped_column('minimum_withdraw', Numeric(precision=18, scale=8), doc='The minimum amount for every transaction in the fund')
-    initial_investment: Mapped[float] = mapped_column('initial_investment', Numeric(precision=18, scale=8), doc='The initial amount to be in the fund')
-
-    investment_quotation: Mapped[str] = mapped_column('investment_quotation', String(25), doc='The number of days until the quotation after the investment')
-    redemption_quotation: Mapped[str] = mapped_column('redemption_quotation', String(25), doc='The number of days until the quotation after the redemption')
-    redemption_settlement: Mapped[str] = mapped_column('redemption_settlement', String(25), doc='The number of days until the redemption is settled to the investor')
-
-    fees: Mapped[list[dict]] = mapped_column('fees', JSON, doc='The list of fees that apply to the investment')
-
-    benchmark: Mapped[str] = mapped_column('benchmark', String(50), nullable=True)
+    period: Mapped[int] = mapped_column('period')
+    previous_amount: Mapped[Decimal] = mapped_column('start_amount', Numeric(precision=15, scale=5), default=0)
+    gross_amount: Mapped[Decimal] = mapped_column('gross_amount', Numeric(precision=15, scale=5))
+    total_tax: Mapped[Decimal] = mapped_column('total_tax', Numeric(precision=15, scale=5), default=0)
+    total_fee: Mapped[Decimal] = mapped_column('total_fee', Numeric(precision=15, scale=5), default=0)
+    net_amount: Mapped[Decimal] = mapped_column('net_amount', Numeric(precision=15, scale=5))
+    tax_detail: Mapped[list[dict]] = mapped_column('tax_detail', JSON, nullable=True)
+    fee_detail: Mapped[list[dict]] = mapped_column('fee_detail', JSON, nullable=True)
+    reference_date: Mapped[date] = mapped_column('reference_date')
 
 
 """
@@ -178,15 +192,3 @@ Criar a tabela FundsBr que conterá as informações básica do fundo (ver canal
 Ao adicionar um extrato, verificar na tabela InvestmentFundsBr se houve um investimento naquele mes, se sim, incluir no "aporte do mes" na tabela
     do extrato, assim ao calcular a evolução essa valor é somado ao valor inicial do mês e não distorce o cálculo da performance 
 """
-
-
-class InvestmentFundsBrazilModel(InvestmentBase):
-    __tablename__ = 'investment_funds_br'
-
-    fund_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('funds_br.id'))
-    fund: Mapped[FundsBrModel] = relationship(foreign_keys=[fund_id], lazy='subquery')
-    transaction_date: Mapped[date] = mapped_column('transaction_date', nullable=True)
-    investment_quotation_date: Mapped[date] = mapped_column('investment_quotation_date', doc='The day the investment was quoted')
-    investment_settlement_date: Mapped[date] = mapped_column('liquidation_settlement_date', doc='The date the investment is liquidated in the fund')  # TODO: check this name
-    redemption_quotation_date: Mapped[date] = mapped_column('redemption_quotation_date', nullable=True)
-    redemption_settlement_date: Mapped[date] = mapped_column('redemption_settlement_date', nullable=True)

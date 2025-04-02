@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from managers.account import AccountManager
 from managers.investment_brazilian_fund import InvestmentBrazilianFundManager
-from models.investment import InvestmentFundsBrazilModel
+from models.investment_brazilian_fund import InvestmentFundsBrazilModel
 from schemas.investment import InvestmentFundBrSchema
 from schemas.request.investment import CreateFundInvestmentBrazilRequest
 from schemas.response.investment import CreateInvestmentFundsBrSchema
