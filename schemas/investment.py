@@ -5,6 +5,8 @@ from decimal import Decimal
 from pydantic import BaseModel, Field, ConfigDict, AliasGenerator
 from pydantic.alias_generators import to_camel, to_snake
 
+from schemas.finance import FundsBrSchema
+
 
 class InvestmentCategorySchema(BaseModel):
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
@@ -84,6 +86,8 @@ class InvestmentBaseSchema(BaseModel):
     quantity: float = Field(..., description='The quantity of the investment bought')
     amount: float = Field(..., description='The total bought. Quantity * price')
 
+    transaction_date: date = Field(..., description='The date of the transaction')
+
     type_id: uuid.UUID = Field(..., serialization_alias='investmentTypeId', description='The id of the investment type')
     country_id: str = Field(..., description='The id of the country')
     country_name: str | None = Field(None, description='The name of the country of the investment')
@@ -100,12 +104,18 @@ class InvestmentBaseSchema(BaseModel):
 
 class InvestmentFundBrSchema(InvestmentBaseSchema):
     fund_id: uuid.UUID = Field(..., description='The identification of the fund')
+    fund: FundsBrSchema = Field(..., exclude=True)
+    fund_name: str | None = Field(None, description='The name of the fund')
 
     investment_quotation_date: date = Field(..., description='The date the investment was quoted')
-    investment_settlement_date: date = Field(..., description='The date the investment is liquidated in the fund')
-    redemption_quotation_date: date | None = Field(None, description='')
-    redemption_settlement_date: date | None = Field(None, description='')
+    investment_settlement_date: date = Field(..., description='The date the investment was liquidated in the fund')
+    redemption_quotation_date: date | None = Field(None, description='The date that the redemption was quoted')
+    redemption_settlement_date: date | None = Field(None, description='The date that the redemption was settled')
 
+    def transform(self):
+        self.fund_name = self.fund.name
+
+        return self
 
 
 class TaxFeeSchema(BaseModel):

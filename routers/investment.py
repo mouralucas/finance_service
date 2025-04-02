@@ -10,6 +10,7 @@ from schemas.request.investment import CreateInvestmentRequest, GetInvestmentReq
 from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, CreateStatementResponse, GetStatementResponse, LiquidateInvestmentResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse, \
     GetInvestmentWithoutObjectives, GetObjectiveSummaryResponse, GetInvestmentAllocationResponse, GetInvestmentPerformanceResponse, UpdateInvestmentResponse, CreateInvestmentFundsBrSchema
 from services.investment import InvestmentService
+from services.investment_brazilian_fund import InvestmentBrazilianFundService
 
 router = APIRouter(prefix="/investment", tags=['Investments'])
 
@@ -48,7 +49,7 @@ async def create_funds_br_investment(
         session: AsyncSession = Depends(get_session),
         user: RequiredUser = Security(get_user)
 ) -> CreateInvestmentFundsBrSchema:
-    return await InvestmentService(session=session, user=user).create_fund_br_investment(investment=investment)
+    return await InvestmentBrazilianFundService(session=session, user=user).create_fund_br_investment(investment=investment)
 
 
 @router.patch('', summary='Update an investment')

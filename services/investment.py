@@ -58,22 +58,6 @@ class InvestmentService(BaseService):
     async def create_fixed_incoming_br_investment(self, investment: CreateFixedIncomeInvestmentBrazilRequest):
         pass
 
-    async def create_fund_br_investment(self, investment: CreateFundInvestmentBrazilRequest) -> CreateInvestmentFundsBrSchema:
-        account = await AccountManager(session=self.session).get_account_by_id(account_id=investment.account_id)
-        custodian_id = account.bank_id
-
-        new_fund = InvestmentFundsBrazilModel(**investment.model_dump())
-        new_fund.owner_id = self.user['user_id']
-        new_fund.custodian_id = custodian_id
-
-        new_fund = await self.investment_manager.create_investment(new_fund)
-
-        response = CreateInvestmentFundsBrSchema(
-            fund=InvestmentFundBrSchema.model_validate(new_fund)
-        )
-
-        return response
-
     async def update_investment(self, investment: UpdateInvestmentRequest) -> UpdateInvestmentResponse:
         """
         Created by: Lucas Penha de Moura - 04/12/2024

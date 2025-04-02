@@ -184,6 +184,7 @@ class InvestmentFundsBrazilModel(InvestmentBase):
     __tablename__ = 'investment_funds_br'
 
     fund_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('funds_br.id'))
+    fund: Mapped[FundsBrModel] = relationship(foreign_keys=[fund_id], lazy='subquery')
     transaction_date: Mapped[date] = mapped_column('transaction_date', nullable=True)
     investment_quotation_date: Mapped[date] = mapped_column('investment_quotation_date', doc='The day the investment was quoted')
     investment_settlement_date: Mapped[date] = mapped_column('liquidation_settlement_date', doc='The date the investment is liquidated in the fund')  # TODO: check this name
