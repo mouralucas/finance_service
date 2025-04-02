@@ -102,7 +102,7 @@ class InvestmentBaseSchema(BaseModel):
     observation: str | None = Field(None, description='Observations of the investment')
 
 
-class InvestmentFundBrSchema(InvestmentBaseSchema):
+class InvestmentFundBrazilSchema(InvestmentBaseSchema):
     fund_id: uuid.UUID = Field(..., description='The identification of the fund')
     fund: FundsBrSchema = Field(..., exclude=True)
     fund_name: str | None = Field(None, description='The name of the fund')

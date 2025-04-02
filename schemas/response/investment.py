@@ -5,7 +5,7 @@ from pydantic.alias_generators import to_camel
 from rolf_common.schemas import SuccessResponseBase
 
 from schemas.core import ChartSeriesSchema
-from schemas.investment import InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema, InvestmentTypeSchema, InvestmentAllocationSchema, InvestmentPerformanceDataSchema, InvestmentFundBrSchema
+from schemas.investment import InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema, InvestmentTypeSchema, InvestmentAllocationSchema, InvestmentPerformanceDataSchema, InvestmentFundBrazilSchema
 
 
 class CreateInvestmentResponse(BaseModel):
@@ -13,7 +13,7 @@ class CreateInvestmentResponse(BaseModel):
 
 
 class CreateInvestmentFundsBrSchema(BaseModel):
-    fund: InvestmentFundBrSchema = Field(..., description='The investment fund br created')
+    fund: InvestmentFundBrazilSchema = Field(..., description='The investment fund br created')
 
 class UpdateInvestmentResponse(CreateInvestmentResponse):
     pass

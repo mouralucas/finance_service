@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from managers.account import AccountManager
 from managers.investment_brazilian_fund import InvestmentBrazilianFundManager
 from models.investment_brazilian_fund import InvestmentFundsBrazilModel
-from schemas.investment import InvestmentFundBrSchema
+from schemas.investment import InvestmentFundBrazilSchema
 from schemas.request.investment import CreateFundInvestmentBrazilRequest
 from schemas.response.investment import CreateInvestmentFundsBrSchema
 from services.investment import InvestmentService
@@ -27,7 +27,7 @@ class InvestmentBrazilianFundService(InvestmentService):
         new_fund = await self.investment_brazilian_fund_manager.create_brazilian_fund(investment=new_fund)
 
         response = CreateInvestmentFundsBrSchema(
-            fund=InvestmentFundBrSchema.model_validate(new_fund).transform()
+            fund=InvestmentFundBrazilSchema.model_validate(new_fund).transform()
         )
 
         return response

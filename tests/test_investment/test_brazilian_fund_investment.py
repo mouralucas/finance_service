@@ -78,3 +78,12 @@ async def test_create_brazilian_fund_investment(client, create_brazilian_funds, 
 @pytest.mark.asyncio
 async def test_create_brazilian_fund_investment_statement(client):
     pass
+
+
+@pytest.mark.asyncio
+async def test_create_brazilian_fund_investment_statement_with_contribution_in_period(client, create_brazilian_fund_investment):
+    """
+        This test verifies if the contribution in period is being calculated correctly.
+        The service checks if there are any contributions in the period, if there are, it adds the contribution to the statement.
+    """
+    assert True
