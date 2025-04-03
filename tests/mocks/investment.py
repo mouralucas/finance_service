@@ -6,7 +6,8 @@ from data_mock.investment.brazilian_funds import get_brazilian_fund_investment_m
 from data_mock.investment.investment import get_fixed_income_br_investment_type_mock, get_investment_mock, get_investment_statement_mock, get_investment_category_mock
 from models.investment import InvestmentTypeModel, InvestmentModel, InvestmentStatementModel, InvestmentObjectiveModel, InvestmentCategoryModel
 from models.investment_brazilian_fund import InvestmentFundsBrazilModel
-from schemas.investment import InvestmentTypeSchema, InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema, InvestmentCategorySchema, InvestmentFundBrazilSchema
+from schemas.investment import InvestmentTypeSchema, InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema, InvestmentCategorySchema
+from schemas.investment_brazilian_fund import InvestmentBrazilianFundSchema
 
 
 @pytest_asyncio.fixture
@@ -47,7 +48,7 @@ async def create_brazilian_fund_investment(test_session,
                                            create_open_account, create_brazilian_funds,
                                            create_funds_br_investment_type, create_currency,  create_country) -> list[InvestmentSchema]:
     data_ = await BaseDataManager(test_session).add_or_ignore_all(InvestmentFundsBrazilModel, get_brazilian_fund_investment_mock())
-    br_funds_investment = [InvestmentFundBrazilSchema.model_validate(data["InvestmentFundsBrazilModel"]) for data in data_]
+    br_funds_investment = [InvestmentBrazilianFundSchema.model_validate(data["InvestmentFundsBrazilModel"]) for data in data_]
 
     return br_funds_investment
 

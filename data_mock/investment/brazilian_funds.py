@@ -25,7 +25,6 @@ def get_brazilian_fund_investment_mock():
             'quantity': 1.02,
             'amount': 1.02 * 150.65,
             'type_id': investment_types[0]['id'],
-
             'currency_id': currencies[0]['id'],
             'country_id': countries[0]['id'],
             'fund_id': brazilian_funds[0]['id'],

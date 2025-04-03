@@ -27,10 +27,11 @@ class InvestmentFundsBrazilStatementModel(InvestmentStatementBaseModel):
     Created by: Lucas Penha de Moura - 02/04/2025
         This model is used to store the statement of funds investments in Brazil.
         It inherits from the InvestmentStatementBaseModel and adds specific fields for funds investments.
+        The statement refers to the fund and not to a specific investment.
     """
     __tablename__ = 'investment_funds_br_statement'
 
-    investment_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('investment_funds_br.id'))
+    fund_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('investment_funds_br.id'))
     contribution: Mapped[float] = mapped_column('contribution', Numeric(precision=18, scale=8), default=0.0, doc='The amount of money contributed to the fund in the period')
     price: Mapped[float] = mapped_column('price', Numeric(precision=18, scale=8), doc='The price of the fund in the reference day')
     penalty: Mapped[float] = mapped_column('penalty', Numeric(precision=18, scale=8), default=0.0, doc='The penalty applied to the investment in the period')

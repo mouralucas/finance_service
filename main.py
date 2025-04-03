@@ -8,7 +8,8 @@ from starlette.middleware.cors import CORSMiddleware
 from backend.settings import settings
 from lifespan import start_log_service, shutdown_log_service
 from routers import (account, credit_card, core,
-                     investment, integration, finance)
+                     investment, investment_brazilian_funds,
+                     integration, finance)
 
 
 @asynccontextmanager
@@ -50,6 +51,7 @@ app.add_middleware(LogsMiddleware)
 app.include_router(account.router)
 app.include_router(credit_card.router)
 app.include_router(investment.router)
+app.include_router(investment_brazilian_funds.router)
 app.include_router(integration.router)
 app.include_router(finance.router)
 app.include_router(core.router)

@@ -15,7 +15,8 @@ from models.investment import InvestmentModel, InvestmentStatementModel, Investm
 from schemas.core import ChartSeriesSchema
 from schemas.investment import InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema, InvestmentTypeSchema, InvestmentAllocationSchema, InvestmentPerformanceDataSchema
 from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, LiquidateInvestmentRequest, CreateStatementRequest, GetStatementRequest, CreateObjectiveRequest, GetObjectiveRequest, GetObjectiveSummaryRequest, \
-    GetPerformanceRequest, UpdateInvestmentRequest, CreateFixedIncomeInvestmentBrazilRequest
+    GetPerformanceRequest, UpdateInvestmentRequest
+from schemas.request.investment_brazilian_fixed_income import CreateFixedIncomeInvestmentBrazilRequest
 from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, LiquidateInvestmentResponse, CreateStatementResponse, GetStatementResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse, \
     GetInvestmentWithoutObjectives, GetObjectiveSummaryResponse, GetInvestmentAllocationResponse, GetInvestmentPerformanceResponse, UpdateInvestmentResponse
 from services.utils.datetime import get_period, get_previous_period

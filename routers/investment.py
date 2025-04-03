@@ -6,11 +6,11 @@ from starlette import status
 
 from backend.database import get_session
 from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, CreateStatementRequest, GetStatementRequest, LiquidateInvestmentRequest, GetObjectiveRequest, CreateObjectiveRequest, GetObjectiveSummaryRequest, \
-    GetPerformanceRequest, UpdateInvestmentRequest, CreateFixedIncomeInvestmentBrazilRequest, CreateFundInvestmentBrazilRequest
+    GetPerformanceRequest, UpdateInvestmentRequest
+from schemas.request.investment_brazilian_fixed_income import CreateFixedIncomeInvestmentBrazilRequest
 from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, CreateStatementResponse, GetStatementResponse, LiquidateInvestmentResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse, \
-    GetInvestmentWithoutObjectives, GetObjectiveSummaryResponse, GetInvestmentAllocationResponse, GetInvestmentPerformanceResponse, UpdateInvestmentResponse, CreateInvestmentFundsBrSchema
+    GetInvestmentWithoutObjectives, GetObjectiveSummaryResponse, GetInvestmentAllocationResponse, GetInvestmentPerformanceResponse, UpdateInvestmentResponse
 from services.investment import InvestmentService
-from services.investment_brazilian_fund import InvestmentBrazilianFundService
 
 router = APIRouter(prefix="/investment", tags=['Investments'])
 
@@ -38,19 +38,6 @@ async def create_fixed_income_br_investment(
         user: RequiredUser = Security(get_user)
 ):
     return await InvestmentService(session=session, user=user).create_fixed_incoming_br_investment(investment=investment)
-
-
-@router.post('/funds/br',
-             summary='Create a brazilian funds investment',
-             status_code=status.HTTP_201_CREATED
-             )
-async def create_funds_br_investment(
-        investment: CreateFundInvestmentBrazilRequest,
-        session: AsyncSession = Depends(get_session),
-        user: RequiredUser = Security(get_user)
-) -> CreateInvestmentFundsBrSchema:
-    return await InvestmentBrazilianFundService(session=session, user=user).create_fund_br_investment(investment=investment)
-
 
 @router.patch('', summary='Update an investment')
 async def update_investment(

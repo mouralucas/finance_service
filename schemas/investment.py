@@ -102,25 +102,9 @@ class InvestmentBaseSchema(BaseModel):
     observation: str | None = Field(None, description='Observations of the investment')
 
 
-class InvestmentFundBrazilSchema(InvestmentBaseSchema):
-    fund_id: uuid.UUID = Field(..., description='The identification of the fund')
-    fund: FundsBrSchema = Field(..., exclude=True)
-    fund_name: str | None = Field(None, description='The name of the fund')
-
-    investment_quotation_date: date = Field(..., description='The date the investment was quoted')
-    investment_settlement_date: date = Field(..., description='The date the investment was liquidated in the fund')
-    redemption_quotation_date: date | None = Field(None, description='The date that the redemption was quoted')
-    redemption_settlement_date: date | None = Field(None, description='The date that the redemption was settled')
-
-    def transform(self):
-        self.fund_name = self.fund.name
-
-        return self
-
-
 class TaxFeeSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
-        validation_alias=to_snake,
+        serialization_alias=to_snake,
     ))
 
     id: uuid.UUID = Field(..., serialization_alias='taxFeeId', description='The identification of the tax/fee')
@@ -130,7 +114,6 @@ class TaxFeeSchema(BaseModel):
 
 class InvestmentStatementSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
-        validation_alias=to_snake,
         serialization_alias=to_camel,
     ))
 
@@ -146,6 +129,17 @@ class InvestmentStatementSchema(BaseModel):
     fee_detail: list[TaxFeeSchema] | None = Field(..., description='The detail of fees')
     net_amount: float = Field(..., description='The net amount of the investment in the period')
 
+
+class InvestmentStatementBase(BaseModel):
+    id: uuid.UUID = Field(..., serialization_alias='investmentStatementId', description='The id of the statement')
+    referenceDate: date = Field(..., description='The date of the investment')
+    period: int = Field(..., description='The period of the statement')
+    gross_amount: float = Field(..., description='The gross amount of the investment in the period')
+    total_tax: float = Field(..., description='The total tax amount of the investment in the period')
+    tax_detail: list[TaxFeeSchema] | None = Field(..., description='The detail of taxes')
+    total_fee: float = Field(..., description='The total fee of the investment in the period')
+    fee_detail: list[TaxFeeSchema] | None = Field(..., description='The detail of fees')
+    net_amount: float = Field(..., description='The net amount of the investment in the period')
 
 class InvestmentObjectiveSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(

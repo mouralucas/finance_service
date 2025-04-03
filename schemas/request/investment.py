@@ -32,27 +32,17 @@ class CreateInvestmentBaseRequest(BaseModel):
     observation: str = Field(None, description='Observations for the investment')
 
 
-class CreateFixedIncomeInvestmentBrazilRequest(CreateInvestmentBaseRequest):
-    issue_date: datetime.date = Field(..., description='The date the investment was issued')
-    transaction_date: datetime.date = Field(..., description='The date the investment was transmitted')
-    maturity_date: datetime.date = Field(..., description='The date the investment will due')
-    grace_period_date: datetime.date = Field(..., description='The date the investment can be liquidated')
-    contracted_rate: str = Field(..., description='The rate of the investment')
-    indexer_type_id: uuid.UUID = Field(..., description='The type of the index for the investment')
-    indexer_id: uuid.UUID = Field(..., description='The id of the investment index')
+class CreateInvestmentStatementBaseRequest(BaseModel):
+    model_config = ConfigDict(from_attributes=True,
+                              alias_generator=AliasGenerator(alias=to_camel))
 
+    period: int = Field(..., alias='period', description='The period of the statement', examples=['202408'])
+    reference_date: datetime.date = Field(..., description='The date when the statement was calculated, usually the last business of the month')
+    gross_amount: Decimal = Field(..., description='The gross amount of the period')
+    net_amount: Decimal = Field(..., description='The net amount of the period')
+    tax_details: list[TaxFeeRequest] | None = Field(None, description='The tax details of the investment tax')
+    fee_details: list[TaxFeeRequest] | None = Field(None, description='The fee details of the investment fee')
 
-class CreateFundInvestmentBrazilRequest(CreateInvestmentBaseRequest):
-    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
-        alias=to_camel
-    ))
-
-    fund_id: uuid.UUID = Field(..., description='The identification of the fund')
-
-    investment_quotation_date: datetime.date = Field(..., description='The day that the investment was quoted')
-    investment_settlement_date: datetime.date = Field(..., description='The date the investment was liquidated in the fund')
-    redemption_quotation_date: datetime.date | None = Field(None, description='The day that the redemption was quoted')
-    redemption_settlement_date: datetime.date | None = Field(None, description='The day that the amount was settled')
 
 class CreateInvestmentRequest(BaseModel):
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(

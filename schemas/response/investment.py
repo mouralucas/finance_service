@@ -1,19 +1,16 @@
-from typing import Any
-
 from pydantic import Field, BaseModel, ConfigDict, AliasGenerator
 from pydantic.alias_generators import to_camel
-from rolf_common.schemas import SuccessResponseBase
 
 from schemas.core import ChartSeriesSchema
-from schemas.investment import InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema, InvestmentTypeSchema, InvestmentAllocationSchema, InvestmentPerformanceDataSchema, InvestmentFundBrazilSchema
+from schemas.investment import (InvestmentSchema, InvestmentStatementSchema,
+                                InvestmentObjectiveSchema, InvestmentTypeSchema,
+                                InvestmentAllocationSchema, InvestmentPerformanceDataSchema)
+from schemas.investment_brazilian_fund import InvestmentBrazilianFundSchema
 
 
 class CreateInvestmentResponse(BaseModel):
     investment: InvestmentSchema = Field(..., description='The investment created')
 
-
-class CreateInvestmentFundsBrSchema(BaseModel):
-    fund: InvestmentFundBrazilSchema = Field(..., description='The investment fund br created')
 
 class UpdateInvestmentResponse(CreateInvestmentResponse):
     pass
