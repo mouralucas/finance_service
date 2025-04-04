@@ -5,8 +5,8 @@ from managers.account import AccountManager
 from managers.investment_brazilian_fund import InvestmentBrazilianFundManager
 from models.investment_brazilian_fund import InvestmentBrazilianFundsModel, InvestmentBrazilianFundsStatementModel
 from schemas.investment_brazilian_fund import InvestmentBrazilianFundSchema, InvestmentBrazilianFundStatementSchema
-from schemas.request.investment_brazilian_funds import CreateBrazilianFundInvestmentStatementRequest, CreateBrazilianFundInvestmentRequest
-from schemas.response.investment_brazilian_funds import CreateBrazilianFundInvestmentResponse, CreateBrazilianFundInvestmentStatementResponse
+from schemas.request.investment_brazilian_funds import CreateBrazilianFundInvestmentStatementRequest, CreateBrazilianFundInvestmentRequest, GetBrazilianFundInvestmentStatementRequest
+from schemas.response.investment_brazilian_funds import CreateBrazilianFundInvestmentResponse, CreateBrazilianFundInvestmentStatementResponse, GetBrazilianFundInvestmentStatementResponse
 from services.investment import InvestmentService
 from services.utils.datetime import get_period
 
@@ -78,5 +78,14 @@ class InvestmentBrazilianFundService(InvestmentService):
 
         return response
 
-    async def get_brazilian_fund_statements(self):
-        pass
+    async def get_brazilian_fund_statements(self, params: GetBrazilianFundInvestmentStatementRequest) -> GetBrazilianFundInvestmentStatementResponse:
+        statements = await self.investment_brazilian_fund_manager.get_statement(
+            fund_id=params.fund_id, period=params.period, start_period=params.start_period, end_period=params.end_period
+        )
+
+        response = GetBrazilianFundInvestmentStatementResponse(
+            quantity=len(statements) if statements else 0,
+            statements=[InvestmentBrazilianFundStatementSchema.model_validate(statement) for statement in statements]
+        )
+
+        return response

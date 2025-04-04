@@ -9,3 +9,8 @@ class CreateBrazilianFundInvestmentResponse(BaseModel):
 
 class CreateBrazilianFundInvestmentStatementResponse(BaseModel):
     statement: InvestmentBrazilianFundStatementSchema = Field(..., description='The fund investment statement')
+
+
+class GetBrazilianFundInvestmentStatementResponse(BaseModel):
+    quantity: int = Field(..., description='The quantity of the fund investment statements')
+    statements: list[InvestmentBrazilianFundStatementSchema] = Field(..., description='The list of statement')
