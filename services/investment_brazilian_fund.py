@@ -61,7 +61,7 @@ class InvestmentBrazilianFundService(InvestmentService):
         if not last_statement:
             new_statement.contribution = sum(investment.amount for investment in fund_investments)
 
-        # If there is at least one statement, the previos amount for current statement is the gross amount from the last one
+        # If there is at least one statement, the previous amount for current statement is the gross amount from the last one
         if last_statement:
             new_statement.previous_amount = last_statement.gross_amount
 
@@ -77,3 +77,6 @@ class InvestmentBrazilianFundService(InvestmentService):
         )
 
         return response
+
+    async def get_brazilian_fund_statements(self):
+        pass

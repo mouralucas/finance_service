@@ -133,12 +133,13 @@ class InvestmentManager(BaseDataManager):
 
         return statement
 
-    async def get_statement(self, investment_id: uuid.UUID = None, period: int = None, start_period: int = None, end_period: int = None) -> list[InvestmentStatementModel] | None:
+    async def get_statement(self, investment_id: uuid.UUID, period: int = None, start_period: int = None, end_period: int = None) -> list[InvestmentStatementModel] | None:
         # TODO: get also cdi or the selected indexer with the statement for each period
-        query = select(InvestmentStatementModel).order_by(InvestmentStatementModel.period.desc())
-
-        if investment_id:
-            query = query.where(InvestmentStatementModel.investment_id == investment_id)
+        query = (
+            select(InvestmentStatementModel)
+            .where(InvestmentStatementModel.investment_id == investment_id)
+            .order_by(InvestmentStatementModel.period.desc())
+        )
 
         if period:
             query = query.where(InvestmentStatementModel.period == period)

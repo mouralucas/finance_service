@@ -43,16 +43,14 @@ class InvestmentBrazilianFundManager(InvestmentManager):
 
         return cast(InvestmentBrazilianFundsStatementModel, new_statement)
 
-    async def get_statement(self, fund_id: uuid.UUID = None, period: int = None,
+    async def get_statement(self, fund_id: uuid.UUID, period: int = None,
                             start_period: int = None, end_period: int = None):
         query = (
             select(InvestmentBrazilianFundsStatementModel)
+            .where(InvestmentBrazilianFundsStatementModel.fund_id == fund_id)
             .order_by(InvestmentBrazilianFundsStatementModel.period.desc())
         )
 
-        if fund_id:
-            query = query.where(InvestmentBrazilianFundsStatementModel.fund_id == fund_id)
-        
         result: list[RowMapping] = await self.get_all(query, unique_result=True)
         
         return [statement['InvestmentBrazilianFundsModel'] for statement in result] if result else None
