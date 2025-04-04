@@ -5,8 +5,6 @@ from decimal import Decimal
 from pydantic import BaseModel, Field, ConfigDict, AliasGenerator
 from pydantic.alias_generators import to_camel, to_snake
 
-from schemas.finance import FundsBrSchema
-
 
 class InvestmentCategorySchema(BaseModel):
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
@@ -130,9 +128,13 @@ class InvestmentStatementSchema(BaseModel):
     net_amount: float = Field(..., description='The net amount of the investment in the period')
 
 
-class InvestmentStatementBase(BaseModel):
+class   InvestmentStatementBase(BaseModel):
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
+        serialization_alias=to_camel,
+    ))
+
     id: uuid.UUID = Field(..., serialization_alias='investmentStatementId', description='The id of the statement')
-    referenceDate: date = Field(..., description='The date of the investment')
+    reference_date: date = Field(..., description='The date of the investment')
     period: int = Field(..., description='The period of the statement')
     gross_amount: float = Field(..., description='The gross amount of the investment in the period')
     total_tax: float = Field(..., description='The total tax amount of the investment in the period')
@@ -143,7 +145,6 @@ class InvestmentStatementBase(BaseModel):
 
 class InvestmentObjectiveSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
-        validation_alias=to_snake,
         serialization_alias=to_camel,
     ))
 

@@ -84,6 +84,3 @@ def get_investment_statement_mock() -> list[dict[str, Any]]:
     ]
 
     return statements
-
-
-

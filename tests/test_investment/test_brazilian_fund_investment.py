@@ -76,14 +76,67 @@ async def test_create_brazilian_fund_investment(client, create_brazilian_funds, 
 
 
 @pytest.mark.asyncio
-async def test_create_brazilian_fund_investment_statement(client):
-    pass
+async def test_create_brazilian_fund_investment_statement(client, create_tax, create_currency, create_country, create_bank, create_open_account, create_funds_br_investment_type,
+                                                          create_brazilian_fund_investment):
+    """
+            This test verifies if the contribution in period is being calculated correctly.
+            The service checks if there are any contributions in the period, if there are, it adds the contribution to the statement.
+        """
+    fund_investments = create_brazilian_fund_investment
+    taxes = create_tax
+
+    fund_id = fund_investments[0].fund_id
+    total_invested = sum(investment.amount for investment in fund_investments if investment.fund_id == fund_id)
+    period = 202503
+    reference_date = '2025-03-31'
+    gross_amount = total_invested * 1.01
+    tax_details = [{
+        'taxFeeId': str(taxes[0].id),
+        'amount': total_invested * 1.01,
+        'currencyId': 'BRL',
+    }]
+    total_tax = sum(tax['amount'] for tax in tax_details)
+    net_amount = gross_amount - tax_details[0]['amount']
+    price = fund_investments[0].price * 1.1
+
+    payload = {
+        'period': period,
+        'referenceDate': reference_date,
+        'grossAmount': gross_amount,
+        'netAmount': net_amount,
+        'taxDetail': tax_details,
+        'price': price,
+        'fundId': str(fund_id),
+    }
+    response = await client.post('/investment/funds/br/statement', json=payload)
+    assert response.status_code == status.HTTP_201_CREATED
+
+    data = response.json()
+    assert 'statement' in data
+    assert 'investmentStatementId' in data['statement']
+    assert 'referenceDate' in data['statement']
+    assert data['statement']['referenceDate'] == reference_date
+    assert 'period' in data['statement']
+    assert data['statement']['period'] == period
+    assert 'grossAmount' in data['statement']
+    assert data['statement']['grossAmount'] == gross_amount
+    assert 'totalTax' in data['statement']
+    assert data['statement']['totalTax'] == round(total_tax, 5)
+    assert 'netAmount' in data['statement']
+    assert data['statement']['netAmount'] == net_amount
+    assert 'fundId' in data['statement']
+    assert data['statement']['fundId'] == str(fund_id)
+    assert 'contribution' in data['statement']
+    # For first statement the contribution is the total invested
+    assert data['statement']['contribution'] == total_invested
+    assert 'price' in data['statement']
+    assert data['statement']['price'] == round(price, 5)
+    assert 'penalty' in data['statement']
+    # If not provided, the penalty is 0
+    assert data['statement']['penalty'] == 0
 
 
 @pytest.mark.asyncio
-async def test_create_brazilian_fund_investment_statement_with_contribution_in_period(client, create_brazilian_fund_investment):
-    """
-        This test verifies if the contribution in period is being calculated correctly.
-        The service checks if there are any contributions in the period, if there are, it adds the contribution to the statement.
-    """
-    assert True
+async def test_create_brazilian_fund_investment_statement_with_contribution_in_period(client, create_tax, create_currency,
+                                                                                      create_brazilian_fund_investment):
+    pass

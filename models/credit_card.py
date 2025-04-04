@@ -1,8 +1,9 @@
 import datetime
 import uuid
+from decimal import Decimal
 
 from rolf_common.models import SQLModel
-from sqlalchemy import String, ForeignKey, SmallInteger, Integer, JSON, DECIMAL
+from sqlalchemy import String, ForeignKey, SmallInteger, Integer, JSON, Numeric
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
@@ -31,29 +32,29 @@ class CreditCardTransactionModel(SQLModel):
     period: Mapped[int] = mapped_column('period', Integer)
     due_date: Mapped[datetime.date] = mapped_column('due_date')
     transaction_date: Mapped[datetime.date] = mapped_column('transaction_date')
-    amount: Mapped[float] = mapped_column('amount', DECIMAL(precision=15, scale=5))  # The amount show on the credit card bill
+    amount: Mapped[Decimal] = mapped_column('amount', Numeric(precision=15, scale=5))  # The amount show on the credit card bill
     # category_id_old: Mapped[str] = mapped_column('category_id_old', nullable=True)
     category_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('category.id'))
-    category: Mapped['CategoryModel'] = relationship(foreign_keys=[category_id], lazy='subquery')
+    category: Mapped["CategoryModel"] = relationship(foreign_keys=[category_id], lazy='subquery')
     currency_id: Mapped[str] = mapped_column(ForeignKey('currency.id'))
     currency: Mapped['CurrencyModel'] = relationship(foreign_keys=[currency_id], lazy='subquery')  # The currency showed on the bill
 
 
     transaction_currency_id: Mapped[str] = mapped_column(ForeignKey('currency.id'))
     transaction_currency: Mapped['CurrencyModel'] = relationship(foreign_keys=[transaction_currency_id], lazy='subquery')  # The currency of transaction
-    transaction_amount: Mapped[float] = mapped_column('transaction_amount', DECIMAL(precision=15, scale=5))
+    transaction_amount: Mapped[Decimal] = mapped_column('transaction_amount', Numeric(precision=15, scale=5))
 
     # This fields only required when transaction currency is different from the bill currency
     # In the front-end put a check-box "compra internacional" then open a box with this info
-    dollar_exchange_rate: Mapped[float] = mapped_column('dollar_exchange_rate', DECIMAL(precision=15, scale=5), nullable=True)  # the dollar rate with the currency on the bill
-    currency_dollar_exchange_rate: Mapped[float] = mapped_column('currency_dollar_ex_rate', DECIMAL(precision=15, scale=5), nullable=True)  # The rate between transaction currency and dollar
-    total_tax: Mapped[float] = mapped_column('total_tax', DECIMAL(precision=15, scale=5), nullable=True)
+    dollar_exchange_rate: Mapped[Decimal] = mapped_column('dollar_exchange_rate', Numeric(precision=15, scale=5), nullable=True)  # the dollar rate with the currency on the bill
+    currency_dollar_exchange_rate: Mapped[Decimal] = mapped_column('currency_dollar_ex_rate', Numeric(precision=15, scale=5), nullable=True)  # The rate between transaction currency and dollar
+    total_tax: Mapped[Decimal] = mapped_column('total_tax', Numeric(precision=15, scale=5), nullable=True)
     tax_details: Mapped[dict] = mapped_column('tax_details', JSON, nullable=True)
 
     is_installment: Mapped[bool] = mapped_column('is_installment', default=False)
     current_installment: Mapped[int] = mapped_column('current_installment', SmallInteger, default=1)
     installments: Mapped[int] = mapped_column('installments', SmallInteger, default=1)
-    total_amount: Mapped[float] = mapped_column('total_amount', DECIMAL(precision=15, scale=5))  # The total amount of transaction
+    total_amount: Mapped[Decimal] = mapped_column('total_amount', Numeric(precision=15, scale=5))  # The total amount of transaction
     parent_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('credit_card_transaction.id'), nullable=True)
     parent: Mapped['CreditCardTransactionModel'] = relationship(foreign_keys=[parent_id], lazy='subquery')
 

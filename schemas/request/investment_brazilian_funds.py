@@ -1,5 +1,6 @@
 import uuid
 from datetime import date
+from decimal import Decimal
 
 from pydantic import Field
 
@@ -17,6 +18,6 @@ class CreateBrazilianFundInvestmentRequest(CreateInvestmentBaseRequest):
 
 class CreateBrazilianFundInvestmentStatementRequest(CreateInvestmentStatementBaseRequest):
     fund_id: uuid.UUID = Field(..., description='The unique identification of the fund')
-    contribution: float = Field(..., description='The amount of money contributed to the fund in the period')
-    price: float = Field(..., description='The price of the fund in the reference day')
-    penalty: float = Field(..., description='The penalty applied to the investment in the period')
+    # contribution: float = Field(..., description='The amount of money contributed to the fund in the period')
+    price: Decimal = Field(..., description='The price of the fund in the reference day')
+    penalty: Decimal | None = Field(Decimal('0'), description='The penalty applied to the investment in the period')

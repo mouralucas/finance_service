@@ -28,6 +28,7 @@ def get_investment_category_mock() -> list[dict[str, Any]]:
 
     return index_types
 
+
 def get_fixed_income_br_investment_type_mock() -> list[dict[str, Any]]:
     investment_category = get_investment_category_mock()
 
@@ -43,6 +44,7 @@ def get_fixed_income_br_investment_type_mock() -> list[dict[str, Any]]:
 
     return investment_types
 
+
 def get_funds_br_investment_type_mock() -> list[dict[str, Any]]:
     investment_category = get_investment_category_mock()
 
@@ -57,6 +59,7 @@ def get_funds_br_investment_type_mock() -> list[dict[str, Any]]:
     ]
 
     return funds_types
+
 
 def get_open_investment_objective_mock() -> list[dict[str, Any]]:
     open_objectives: list[dict[str, Any]] = [

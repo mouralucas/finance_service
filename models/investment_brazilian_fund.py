@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from sqlalchemy import ForeignKey, Numeric
 from sqlalchemy.orm import Mapped, relationship, mapped_column
 import uuid
@@ -5,7 +7,7 @@ from datetime import date
 from models.investment import InvestmentBase, FundsBrModel, InvestmentStatementModel, InvestmentStatementBaseModel
 
 
-class InvestmentFundsBrazilModel(InvestmentBase):
+class InvestmentBrazilianFundsModel(InvestmentBase):
     """
     Created by: Lucas Penha de Moura - 02/04/2025
         This model is used to store the funds investments in Brazil.
@@ -22,7 +24,7 @@ class InvestmentFundsBrazilModel(InvestmentBase):
     redemption_settlement_date: Mapped[date] = mapped_column('redemption_settlement_date', nullable=True)
 
 
-class InvestmentFundsBrazilStatementModel(InvestmentStatementBaseModel):
+class InvestmentBrazilianFundsStatementModel(InvestmentStatementBaseModel):
     """
     Created by: Lucas Penha de Moura - 02/04/2025
         This model is used to store the statement of funds investments in Brazil.
@@ -31,7 +33,7 @@ class InvestmentFundsBrazilStatementModel(InvestmentStatementBaseModel):
     """
     __tablename__ = 'investment_funds_br_statement'
 
-    fund_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('investment_funds_br.id'))
-    contribution: Mapped[float] = mapped_column('contribution', Numeric(precision=18, scale=8), default=0.0, doc='The amount of money contributed to the fund in the period')
-    price: Mapped[float] = mapped_column('price', Numeric(precision=18, scale=8), doc='The price of the fund in the reference day')
-    penalty: Mapped[float] = mapped_column('penalty', Numeric(precision=18, scale=8), default=0.0, doc='The penalty applied to the investment in the period')
+    fund_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('funds_br.id'))
+    contribution: Mapped[Decimal] = mapped_column('contribution', Numeric(precision=18, scale=8), default=0.0, doc='The amount of money contributed to the fund in the period')
+    price: Mapped[Decimal] = mapped_column('price', Numeric(precision=18, scale=8), doc='The price of the fund in the reference day')
+    penalty: Mapped[Decimal] = mapped_column('penalty', Numeric(precision=18, scale=8), default=0.0, doc='The penalty applied to the investment in the period')

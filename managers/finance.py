@@ -28,6 +28,14 @@ class FinanceManager(BaseDataManager):
 
         return [fund['FundsBrModel'] for fund in funds] if funds else None
 
+    async def get_brazilian_fund_by_id(self, fund_id: uuid.UUID) -> FundsBrModel:
+        fund = await self.get_by_id(FundsBrModel, fund_id)
+
+        if not fund:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Fund not found")
+
+        return cast(FundsBrModel, fund)
+
     async def get_currencies(self) -> list[CurrencyModel] | None:
         query = select(CurrencyModel)
 

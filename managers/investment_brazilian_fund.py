@@ -3,31 +3,56 @@ from typing import Any, cast
 
 from fastapi import HTTPException
 from rolf_common.models import SQLModel
+from sqlalchemy import select, RowMapping
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from managers.investment import InvestmentManager
-from models.investment_brazilian_fund import InvestmentFundsBrazilModel
+from models.investment_brazilian_fund import InvestmentBrazilianFundsModel, InvestmentBrazilianFundsStatementModel
 
 
 class InvestmentBrazilianFundManager(InvestmentManager):
     def __init__(self, session: AsyncSession):
         super().__init__(session)
 
-
-    async def create_brazilian_fund(self, investment: InvestmentFundsBrazilModel) -> SQLModel:
+    async def create_brazilian_fund(self, investment: InvestmentBrazilianFundsModel) -> SQLModel:
         new_investment_fund = await self.add_one(investment)
 
         return new_investment_fund
-
 
     async def get_investment_funds(self):
         # In this case, if one fund have more than one investment it will be aggregated in only one register and the total is added
         pass
 
-    async def get_investment_fund_by_id(self, investment_id: uuid.UUID) -> InvestmentFundsBrazilModel:
-        investment = await self.get_by_id(InvestmentFundsBrazilModel, investment_id)
-        if not investment:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Investment not found")
+    async def get_investments_by_fund_id(self, fund_id: uuid.UUID) -> list[InvestmentBrazilianFundsModel]:
+        query = (
+            select(
+                InvestmentBrazilianFundsModel
+            )
+            .where(
+                InvestmentBrazilianFundsModel.fund_id == fund_id
+            )
+            .order_by(InvestmentBrazilianFundsModel.transaction_date)
+        )
+        investments = await self.get_all(query)
 
-        return cast(InvestmentFundsBrazilModel, investment)
+        return [investment['InvestmentBrazilianFundsModel'] for investment in investments] if investments else None
+
+    async def create_investment_statement(self, statement: InvestmentBrazilianFundsStatementModel) -> InvestmentBrazilianFundsStatementModel:
+        new_statement = await self.add_one(statement)
+
+        return cast(InvestmentBrazilianFundsStatementModel, new_statement)
+
+    async def get_statement(self, fund_id: uuid.UUID = None, period: int = None,
+                            start_period: int = None, end_period: int = None):
+        query = (
+            select(InvestmentBrazilianFundsStatementModel)
+            .order_by(InvestmentBrazilianFundsStatementModel.period.desc())
+        )
+
+        if fund_id:
+            query = query.where(InvestmentBrazilianFundsStatementModel.fund_id == fund_id)
+        
+        result: list[RowMapping] = await self.get_all(query, unique_result=True)
+        
+        return [statement['InvestmentBrazilianFundsModel'] for statement in result] if result else None

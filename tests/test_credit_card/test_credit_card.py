@@ -1,10 +1,5 @@
-from decimal import Decimal
-
 import pytest
 from starlette import status
-import datetime
-from services.credit_card import CreditCardService
-from services.utils.datetime import get_period
 
 
 @pytest.mark.asyncio

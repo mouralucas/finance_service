@@ -1,5 +1,6 @@
 import datetime
 import uuid
+from decimal import Decimal
 
 from rolf_common.models import SQLModel
 from sqlalchemy import ForeignKey, String, Integer, Numeric
@@ -46,7 +47,7 @@ class AccountTransactionModel(SQLModel):
     period: Mapped[int] = mapped_column('period', Integer)
     currency_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('currency.id'))
     currency: Mapped['CurrencyModel'] = relationship(foreign_keys=[currency_id], lazy='subquery')  # Should be always the same as the account currency
-    amount: Mapped[float] = mapped_column('amount', Numeric(precision=15, scale=5))
+    amount: Mapped[Decimal] = mapped_column('amount', Numeric(precision=15, scale=5))
     transaction_date: Mapped[datetime.date] = mapped_column('transaction_date')
     # category_id_old: Mapped[str] = mapped_column('category_id_old', nullable=True)
     category_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('category.id'))
@@ -57,15 +58,15 @@ class AccountTransactionModel(SQLModel):
     # Fields for international transactions, like exchange money or by in a currency different from the account
     transaction_currency_id: Mapped[str] = mapped_column(ForeignKey('currency.id'))
     transaction_currency: Mapped['CurrencyModel'] = relationship(foreign_keys=[transaction_currency_id], lazy='subquery')  # The currency of transaction
-    transaction_amount: Mapped[float] = mapped_column('transaction_amount', Numeric(precision=15, scale=5))
+    transaction_amount: Mapped[Decimal] = mapped_column('transaction_amount', Numeric(precision=15, scale=5))
 
     # Fields for exchange rates and applicable tax and fees
-    exchange_rate: Mapped[float] = mapped_column('exchange_rate', Numeric(precision=15, scale=5), nullable=True)  # the rate between default currency and transaction currency
-    tax_perc: Mapped[float] = mapped_column('perc_tax', Numeric(precision=10, scale=4), nullable=True)  # the total tax percentage
-    tax: Mapped[float] = mapped_column('tax', Numeric(precision=15, scale=5), nullable=True)  # the exchange_rate * tax_perc
-    spread_perc: Mapped[float] = mapped_column('spread_perc', Numeric(precision=15, scale=5), nullable=True)  # the percentage of spread applied
-    spread: Mapped[float] = mapped_column('spread', Numeric(precision=15, scale=5), nullable=True)  # the exchange_rate * spread_perc
-    effective_rate: Mapped[float] = mapped_column('effective_rate', Numeric(precision=15, scale=5), nullable=True)  # the final exchange rate, with tax and fees
+    exchange_rate: Mapped[Decimal] = mapped_column('exchange_rate', Numeric(precision=15, scale=5), nullable=True)  # the rate between default currency and transaction currency
+    tax_perc: Mapped[Decimal] = mapped_column('perc_tax', Numeric(precision=10, scale=4), nullable=True)  # the total tax percentage
+    tax: Mapped[Decimal] = mapped_column('tax', Numeric(precision=15, scale=5), nullable=True)  # the exchange_rate * tax_perc
+    spread_perc: Mapped[Decimal] = mapped_column('spread_perc', Numeric(precision=15, scale=5), nullable=True)  # the percentage of spread applied
+    spread: Mapped[Decimal] = mapped_column('spread', Numeric(precision=15, scale=5), nullable=True)  # the exchange_rate * spread_perc
+    effective_rate: Mapped[Decimal] = mapped_column('effective_rate', Numeric(precision=15, scale=5), nullable=True)  # the final exchange rate, with tax and fees
 
     origin: Mapped[str] = mapped_column('origin', String(10))
     is_validated: Mapped[bool] = mapped_column('is_validated', default=True)
@@ -76,9 +77,9 @@ class AccountBalanceModel(SQLModel):
 
     account_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('account.id'))
     period: Mapped[int] = mapped_column('period', Integer)
-    previous_balance: Mapped[float] = mapped_column('previous_balance', Numeric(precision=10, scale=2))
-    incoming: Mapped[float] = mapped_column('incoming', Numeric(precision=10, scale=2))
-    outgoing: Mapped[float] = mapped_column('outgoing', Numeric(precision=10, scale=2))
-    transactions: Mapped[float] = mapped_column('transactions', Numeric(precision=10, scale=2))  # incoming - outgoing
-    earnings: Mapped[float] = mapped_column('earnings', Numeric(precision=10, scale=2), default=0)
-    balance: Mapped[float] = mapped_column('balance', Numeric(precision=10, scale=2))
+    previous_balance: Mapped[Decimal] = mapped_column('previous_balance', Numeric(precision=10, scale=2))
+    incoming: Mapped[Decimal] = mapped_column('incoming', Numeric(precision=10, scale=2))
+    outgoing: Mapped[Decimal] = mapped_column('outgoing', Numeric(precision=10, scale=2))
+    transactions: Mapped[Decimal] = mapped_column('transactions', Numeric(precision=10, scale=2))  # incoming - outgoing
+    earnings: Mapped[Decimal] = mapped_column('earnings', Numeric(precision=10, scale=2), default=0)
+    balance: Mapped[Decimal] = mapped_column('balance', Numeric(precision=10, scale=2))

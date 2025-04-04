@@ -116,7 +116,7 @@ class InvestmentObjectiveModel(SQLModel):
     owner_id: Mapped[uuid.UUID] = mapped_column('owner_id')
     title: Mapped[str] = mapped_column('title', String(100))
     description: Mapped[str] = mapped_column('description', String(500), nullable=True)
-    amount: Mapped[float] = mapped_column('amount', Numeric(precision=15, scale=5))
+    amount: Mapped[Decimal] = mapped_column('amount', Numeric(precision=15, scale=5))
     estimated_deadline: Mapped[date] = mapped_column('estimated_deadline', nullable=True)
 
     # Investment reverse relation
@@ -133,10 +133,10 @@ class FundsBrModel(SQLModel):
     status: Mapped[str] = mapped_column('status', String(150), nullable=True)
     start_date: Mapped[date] = mapped_column('start_date', doc='The day that the fund start')
 
-    minimum_balance: Mapped[float] = mapped_column('minimum_balance', Numeric(precision=18, scale=8), doc='The minimum amount to be in the fund')
-    minimum_investment: Mapped[float] = mapped_column('minimum_investment', Numeric(precision=18, scale=8), doc='The minimum amount for every transaction in the fund')
-    minimum_withdraw: Mapped[float] = mapped_column('minimum_withdraw', Numeric(precision=18, scale=8), doc='The minimum amount for every transaction in the fund')
-    initial_investment: Mapped[float] = mapped_column('initial_investment', Numeric(precision=18, scale=8), doc='The initial amount to be in the fund')
+    minimum_balance: Mapped[Decimal] = mapped_column('minimum_balance', Numeric(precision=18, scale=8), doc='The minimum amount to be in the fund')
+    minimum_investment: Mapped[Decimal] = mapped_column('minimum_investment', Numeric(precision=18, scale=8), doc='The minimum amount for every transaction in the fund')
+    minimum_withdraw: Mapped[Decimal] = mapped_column('minimum_withdraw', Numeric(precision=18, scale=8), doc='The minimum amount for every transaction in the fund')
+    initial_investment: Mapped[Decimal] = mapped_column('initial_investment', Numeric(precision=18, scale=8), doc='The initial amount to be in the fund')
 
     investment_quotation: Mapped[str] = mapped_column('investment_quotation', String(25), doc='The number of days until the quotation after the investment')
     redemption_quotation: Mapped[str] = mapped_column('redemption_quotation', String(25), doc='The number of days until the quotation after the redemption')
@@ -157,9 +157,9 @@ class InvestmentBase(SQLModel):
     custodian_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('bank.id'))
     account_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('account.id'))
 
-    price: Mapped[float] = mapped_column('price', Numeric(precision=18, scale=8), doc='Price per unit/share of an investment')
-    quantity: Mapped[float] = mapped_column('quantity', Numeric(precision=18, scale=8), doc='Quantity acquired')
-    amount: Mapped[float] = mapped_column('amount', Numeric(precision=18, scale=8))
+    price: Mapped[Decimal] = mapped_column('price', Numeric(precision=18, scale=8), doc='Price per unit/share of an investment')
+    quantity: Mapped[Decimal] = mapped_column('quantity', Numeric(precision=18, scale=8), doc='Quantity acquired')
+    amount: Mapped[Decimal] = mapped_column('amount', Numeric(precision=18, scale=8))
 
     type_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('investment_type.id'))
     currency_id: Mapped[str] = mapped_column(ForeignKey('currency.id'))

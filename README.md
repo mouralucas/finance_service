@@ -92,6 +92,18 @@ app = FastAPI(
 )
 ```
 
+## Models Types
+
+For decimal values use Decimal from decimal in Mapped[] and 
+Numeric(precision: 18, scale=8) in type_from mapped_column.
+
+```aiignore
+from decimal import Decimal
+from sqlalchemy import Numeric
+
+example: Mapped[Decimal] = mapped_column('example', type_=Numeric(precision: 18, scale=8)
+```
+
 ## Migrations
 
 To run migrations, first create the file with the database changes:
