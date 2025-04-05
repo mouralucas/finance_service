@@ -35,17 +35,14 @@ def get_period(reference_date: date | datetime) -> int:
 #     return previous_period
 
 
-def get_previous_period(period: int = None, offset: int = 1) -> int:
+def get_previous_period(period: int = get_current_period(), offset: int = 1) -> int:
     """
     Created by: Lucas Penha de Moura - 25/10/2024
         Returns the previous period based in the offset
     :param period: the base period
-    :param offset: how many periods back is the period wanted
+    :param offset: how many periods back is the wanted period
     :return:
     """
-    if not period:
-        period = get_current_period()
-
     month = period % 100
     year = period // 100
     for i in range(offset):

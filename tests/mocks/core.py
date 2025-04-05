@@ -1,8 +1,9 @@
 import pytest_asyncio
 from rolf_common.managers import BaseDataManager
 
-from data_mock.core import get_country_mock, get_tax_mock, get_currency_mock, get_bank_mock, get_category_mock, get_liquidity_mock, get_category_parent_mock, get_fee_mock, get_brazilian_fund_mock
+from data_mock.core import get_country_mock, get_tax_mock, get_currency_mock, get_bank_mock, get_category_mock, get_liquidity_mock, get_category_parent_mock, get_fee_mock
 from data_mock.core import get_indexer_mock, get_index_type_mock
+from data_mock.investment.base import get_brazilian_fund_mock
 from models.core import BankModel, CurrencyModel, CategoryModel, CountryModel, TaxFeeModel, IndexerTypeModel, IndexerModel, LiquidityModel
 from models.investment import FundsBrModel
 from schemas.core import CurrencySchema, BankSchema, CountrySchema, TaxSchema, CategorySchema, IndexerTypeSchema, IndexerSchema, LiquiditySchema

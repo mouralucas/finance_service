@@ -5,6 +5,7 @@ from typing import Any
 from dateutil.relativedelta import relativedelta
 
 from data_mock.common import default_model_dict
+from data_mock.core import get_fee_mock
 
 
 def get_investment_category_mock() -> list[dict[str, Any]]:
@@ -84,3 +85,36 @@ def get_open_investment_objective_mock() -> list[dict[str, Any]]:
     ]
 
     return open_objectives
+
+
+def get_brazilian_fund_mock() -> list[dict[str, Any]]:
+    fees = get_fee_mock()
+
+    brazilian_funds: list[dict[str, Any]] = [
+        {
+            **default_model_dict,
+            'id': uuid.UUID('7737aca8-3db0-4fbd-bcbd-32c732faba8b'),
+            "name": "Fundo de Teste FIM",
+            "fund_cnpj": "36.436.439/0001-09",
+            "administrator": "Adm do Fundo de Teste",
+            "administrator_cnpj": "10.309.888/0001-00",
+            "status": "ATIVO",
+            "start_date": date(year=2010, month=4, day=5),
+            "minimum_balance": 150,
+            "minimum_investment": 100,
+            "minimum_withdraw": 100,
+            "initial_investment": 200,
+            "investment_quotation": "D+1",
+            "redemption_quotation": "D+3",
+            "redemption_settlement": "D+4 (dias úteis)",
+            "fees": [
+                {
+                    "id": str(fees[0]['id']),
+                    "percentage": "0,6% a.a"
+                }
+            ],
+            "benchmark": "CDI"
+        }
+    ]
+
+    return brazilian_funds

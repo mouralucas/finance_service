@@ -2,12 +2,13 @@ import pytest_asyncio
 from rolf_common.managers import BaseDataManager
 
 from data_mock.investment.base import get_open_investment_objective_mock, get_funds_br_investment_type_mock
-from data_mock.investment.brazilian_funds import get_brazilian_fund_investment_mock
+from data_mock.investment.brazilian_funds import get_brazilian_fund_investment_mock, get_brazilian_fund_investment_statement_mock
 from data_mock.investment.investment import get_fixed_income_br_investment_type_mock, get_investment_mock, get_investment_statement_mock, get_investment_category_mock
 from models.investment import InvestmentTypeModel, InvestmentModel, InvestmentStatementModel, InvestmentObjectiveModel, InvestmentCategoryModel
-from models.investment_brazilian_fund import InvestmentBrazilianFundsModel
+from models.investment_brazilian_fund import InvestmentBrazilianFundsModel, InvestmentBrazilianFundsStatementModel
+from routers.account import create_account
 from schemas.investment import InvestmentTypeSchema, InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema, InvestmentCategorySchema
-from schemas.investment_brazilian_fund import InvestmentBrazilianFundSchema
+from schemas.investment_brazilian_fund import InvestmentBrazilianFundSchema, InvestmentBrazilianFundStatementSchema
 
 
 @pytest_asyncio.fixture
@@ -44,13 +45,29 @@ async def create_investment(test_session, create_open_account, create_fixed_inco
 
 
 @pytest_asyncio.fixture
-async def create_brazilian_fund_investment(test_session,
-                                           create_open_account, create_brazilian_funds,
-                                           create_funds_br_investment_type, create_currency,  create_country) -> list[InvestmentSchema]:
+async def create_brazilian_fund_investment(
+        test_session,
+        create_open_account, create_brazilian_funds,
+        create_funds_br_investment_type, create_currency, create_country
+) -> list[InvestmentBrazilianFundSchema]:
     data_ = await BaseDataManager(test_session).add_or_ignore_all(InvestmentBrazilianFundsModel, get_brazilian_fund_investment_mock())
     br_funds_investment = [InvestmentBrazilianFundSchema.model_validate(data["InvestmentBrazilianFundsModel"]) for data in data_]
 
     return br_funds_investment
+
+
+@pytest_asyncio.fixture
+async def create_brazilian_fund_investment_statement(
+        test_session,
+        create_open_account, create_brazilian_funds,
+        create_funds_br_investment_type, create_currency, create_country,
+        create_brazilian_fund_investment
+) -> list[InvestmentBrazilianFundStatementSchema]:
+    data_ = await BaseDataManager(test_session).add_or_ignore_all(InvestmentBrazilianFundsStatementModel, get_brazilian_fund_investment_statement_mock())
+    br_funds_investment_statement = [InvestmentBrazilianFundStatementSchema.model_validate(data['InvestmentBrazilianFundsStatementModel']) for data in data_]
+
+    return br_funds_investment_statement
+
 
 @pytest_asyncio.fixture
 async def create_investment_statement(test_session, create_investment) -> list[InvestmentStatementSchema]:
