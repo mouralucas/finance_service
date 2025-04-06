@@ -53,4 +53,4 @@ class InvestmentBrazilianFundManager(InvestmentManager):
 
         result: list[RowMapping] = await self.get_all(query, unique_result=True)
         
-        return [statement['InvestmentBrazilianFundsModel'] for statement in result] if result else None
+        return [statement['InvestmentBrazilianFundsStatementModel'] for statement in result] if result else None

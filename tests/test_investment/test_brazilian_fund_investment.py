@@ -139,5 +139,28 @@ async def test_create_brazilian_fund_investment_statement(client, create_tax, cr
 @pytest.mark.asyncio
 async def test_get_brazilian_fund_investment_statement(client, create_brazilian_fund_investment_statement):
     statements = create_brazilian_fund_investment_statement
+    fund_id = statements[0].fund_id
 
-    assert True
+    payload = {
+        'fund_id': str(fund_id)
+    }
+    response = await client.get('/investment/funds/br/statement', params=payload)
+    assert response.status_code == status.HTTP_200_OK
+
+    data = response.json()
+    assert 'quantity' in data
+    assert data['quantity'] >= 1
+
+    assert 'statements' in data
+    for statement in data['statements']:
+        assert 'investmentStatementId' in statement
+        assert 'referenceDate' in statement
+        assert 'period' in statement
+        assert 'grossAmount' in statement
+        assert 'totalTax' in statement
+        assert 'netAmount' in statement
+        assert 'fundId' in statement
+        assert 'contribution' in statement
+        assert 'price' in statement
+        assert 'penalty' in statement
+
