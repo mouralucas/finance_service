@@ -132,18 +132,25 @@ class CreditCardManager(BaseDataManager):
         """
         query = (
             select(
+                CreditCardModel.nickname,
                 CreditCardTransactionModel.period,
                 func.sum(
                     CreditCardTransactionModel.amount * -1
                 ).label('total_amount')
             )
             .select_from(CreditCardTransactionModel)
+            .outerjoin(
+                CreditCardModel, CreditCardModel.id == CreditCardTransactionModel.credit_card_id
+            )
             .where(
                 CreditCardTransactionModel.owner_id == owner_id,
                 CreditCardTransactionModel.period >= start_period,
                 CreditCardTransactionModel.period <= end_period
             )
-            .group_by(CreditCardTransactionModel.period)
+            .group_by(
+                CreditCardModel.nickname,
+                CreditCardTransactionModel.period
+            )
             .order_by(CreditCardTransactionModel.period)
         )
 
@@ -154,6 +161,8 @@ class CreditCardManager(BaseDataManager):
     async def get_bill_history_by_card(self, owner_id: uuid.UUID, start_period: int, end_period: int) -> list[dict[str, Any]] | None:
         """
         Created by: Lucas Penha de Moura - 30/10/2024
+
+            This query fetches the total amount spent by card/period for the owner in the period range
 
         :param owner_id: The id og the owner of the transactions
         :param start_period: the start period of the transactions

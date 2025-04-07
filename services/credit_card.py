@@ -130,47 +130,47 @@ class CreditCardService(BaseService):
 
         return response
 
-    async def get_credit_card_bill_by_card(self, params: GetCreditCardBillRequest) -> GetCreditCardBillHistoryResponse:
+    async def get_credit_card_bill_history(self, params: GetCreditCardBillRequest) -> GetCreditCardBillHistoryResponse:
         bill_by_card = await self.credit_card_manager.get_bill_history_by_card(owner_id=self.user['user_id'], start_period=params.start_period, end_period=params.end_period)
-        distinct_cards = set(d['credit_card'] for d in bill_by_card) if bill_by_card else []
 
-        a = {}
+        bill_periods = {}
         for i in bill_by_card:
+            # The bill_by_card response return the values for cards in same period in different rows, so we need to group them by period
             period = i['period']
             card = i['credit_card']
             total_amount = i['total_amount']
             currency_symbol = i['currency_symbol']
 
-            if period not in a:
-                a[period] = {
+            if period not in bill_periods:
+                bill_periods[period] = {
                     'id': period,
                     'period': period,
                     'total_amount': [],
                     'credit_cards': [],
                 }
 
-
-            # a[period]['total_amount'] += total_amount
-            for dic in a[period]['total_amount']:
+            # The totals are segregated by currency symbol, so we need to check if the currency symbol is already in the list
+            # If the currency symbol is already in the list, we just need to update the total amount
+            for dic in bill_periods[period]['total_amount']:
                 if dic['currency_symbol'] == currency_symbol:
                     dic['total'] += total_amount
                     break
                 else:
-                    a[period]['total_amount'].append({'currency_symbol': currency_symbol, 'total': total_amount})
+                    bill_periods[period]['total_amount'].append({'currency_symbol': currency_symbol, 'total': total_amount})
             else:
-                a[period]['total_amount'].append({'currency_symbol': currency_symbol, 'total': total_amount})
+                bill_periods[period]['total_amount'].append({'currency_symbol': currency_symbol, 'total': total_amount})
 
-
-            a[period]['credit_cards'].append({
+            bill_periods[period]['credit_cards'].append({
                 'nickname': card,
                 'currency_symbol': currency_symbol,
                 'total': total_amount,
             })
 
-        b = list(a.values())
+        # The bill history only uses the values for each period
+        bill_history = list(bill_periods.values())
 
         response = GetCreditCardBillHistoryResponse(
-            credit_card_bill_history=[CreditCardBillHistorySchema.model_validate(i) for i in b],
+            credit_card_bill_history=[CreditCardBillHistorySchema.model_validate(i) for i in bill_history],
         )
 
         return response

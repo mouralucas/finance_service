@@ -61,6 +61,7 @@ class CreditCardBillSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True,
                               alias_generator=AliasGenerator(serialization_alias=to_camel))
 
+    nickname: str = Field(..., description='The nickname of the credit card')
     period: int = Field(..., description='The period of the bill')
     total_amount: float = Field(..., description='The total amount of the bill')
 

@@ -99,4 +99,4 @@ async def get_bill_history(
         session: AsyncSession = Depends(get_session),
         user: RequiredUser = Security(get_user)
 ) -> GetCreditCardBillHistoryResponse:
-    return await CreditCardService(session, user).get_credit_card_bill_by_card(params=params)
+    return await CreditCardService(session, user).get_credit_card_bill_history(params=params)
