@@ -444,7 +444,6 @@ class InvestmentManager(BaseDataManager):
                        (IndexerSeriesModel.indexer_id == indexer_id)
                        )
             .where(
-                InvestmentModel.is_liquidated == False,
                 InvestmentModel.owner_id == owner_id
             )
             .group_by(InvestmentStatementModel.period, IndexerSeriesModel.value)
