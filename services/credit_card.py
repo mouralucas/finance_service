@@ -122,10 +122,25 @@ class CreditCardService(BaseService):
         bill_consolidated = await self.credit_card_manager.get_bill_history_aggregated(owner_id=self.user['user_id'], start_period=params.start_period, end_period=params.end_period)
         average = sum(item['total_amount'] for item in bill_consolidated) / len(bill_consolidated) if bill_consolidated else 0
 
+        caralhos = {}
+        for i in bill_consolidated:
+            period = i['period']
+            credit_card = i['nickname']
+            amount = i['total_amount']
+
+            if period not in caralhos:
+                caralhos[period] = {
+                    'period': period,
+                    credit_card: amount,
+                }
+
+            caralhos[period][credit_card] = amount
+
         response = GetCreditCardBillConsolidatedResponse(
             bill=[CreditCardBillSchema.model_validate(bill) for bill in bill_consolidated] if bill_consolidated else [],
             average=average,
             goal=2300,
+            outro=caralhos,
         )
 
         return response

@@ -1,4 +1,4 @@
-from pydantic import Field, BaseModel, ConfigDict, AliasGenerator
+from pydantic import Field, BaseModel, ConfigDict, AliasGenerator, Extra
 from pydantic.alias_generators import to_camel
 from rolf_common.schemas import SuccessResponseBase
 
@@ -35,13 +35,15 @@ class GetInstallmentsDueDatesResponse(BaseModel):
 
 
 class GetCreditCardBillConsolidatedResponse(BaseModel):
+    # add configuration to allow extra fields not mapped to the model
     model_config = ConfigDict(from_attributes=True,
-                              alias_generator=AliasGenerator(serialization_alias=to_camel))
+                              alias_generator=AliasGenerator(serialization_alias=to_camel),
+                              extra='allow')
 
     average: float | None = Field(None, description='The average credit card bill')
     goal: float | None = Field(None, description='The goal credit card bill')
-    bill: list[CreditCardBillSchema] = Field(..., description='The list bill by period')
-
+    bill: list[CreditCardBillSchema] | None = Field(..., description='The list bill by period')
+    
 
 class GetCreditCardBillHistoryResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True,
