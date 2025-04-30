@@ -122,25 +122,27 @@ class CreditCardService(BaseService):
         bill_consolidated = await self.credit_card_manager.get_bill_history_aggregated(owner_id=self.user['user_id'], start_period=params.start_period, end_period=params.end_period)
         average = sum(item['total_amount'] for item in bill_consolidated) / len(bill_consolidated) if bill_consolidated else 0
 
-        caralhos = {}
+        stacked_bill = {}
+        series = set()
         for i in bill_consolidated:
             period = i['period']
             credit_card = i['nickname']
             amount = i['total_amount']
 
-            if period not in caralhos:
-                caralhos[period] = {
+            if period not in stacked_bill:
+                stacked_bill[period] = {
                     'period': period,
                     credit_card: amount,
                 }
-
-            caralhos[period][credit_card] = amount
+            series.add(credit_card)
+            stacked_bill[period][credit_card] = amount
 
         response = GetCreditCardBillConsolidatedResponse(
             bill=[CreditCardBillSchema.model_validate(bill) for bill in bill_consolidated] if bill_consolidated else [],
             average=average,
             goal=2300,
-            outro=caralhos,
+            billStacked=list(stacked_bill.values()),
+            series=list(series),
         )
 
         return response
@@ -150,7 +152,7 @@ class CreditCardService(BaseService):
 
         bill_periods = {}
         for i in bill_by_card:
-            # The bill_by_card response return the values for cards in same period in different rows, so we need to group them by period
+            # The bill_by_card response returns the values for cards in the same period in different rows, so we need to group them by period
             period = i['period']
             card = i['credit_card']
             total_amount = i['total_amount']

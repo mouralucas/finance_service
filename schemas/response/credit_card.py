@@ -1,4 +1,6 @@
-from pydantic import Field, BaseModel, ConfigDict, AliasGenerator, Extra
+from typing import Any
+
+from pydantic import Field, BaseModel, ConfigDict, AliasGenerator
 from pydantic.alias_generators import to_camel
 from rolf_common.schemas import SuccessResponseBase
 
@@ -42,7 +44,9 @@ class GetCreditCardBillConsolidatedResponse(BaseModel):
 
     average: float | None = Field(None, description='The average credit card bill')
     goal: float | None = Field(None, description='The goal credit card bill')
-    bill: list[CreditCardBillSchema] | None = Field(..., description='The list bill by period')
+    bill: list[CreditCardBillSchema] | None = Field(..., description='The list of consolidated bill by period')
+    billStacked: list[dict[str, Any]] = Field(..., description='The list of bill stacked by card/period')
+    series: list[str] = Field(..., description='The list of available series for the bill stacked')
     
 
 class GetCreditCardBillHistoryResponse(BaseModel):
