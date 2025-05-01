@@ -2,6 +2,7 @@ import pytest
 from dateutil.relativedelta import relativedelta
 from starlette import status
 
+from services.utils.datetime import get_period
 from tests.utils import random_date
 
 
@@ -79,15 +80,15 @@ async def test_create_brazilian_fund_investment(client, create_brazilian_funds, 
 async def test_create_brazilian_fund_investment_statement(client, create_tax, create_currency, create_country, create_bank, create_open_account, create_funds_br_investment_type,
                                                           create_brazilian_fund_investment):
     """
-            This test verifies if the contribution in period is being calculated correctly.
-            The service checks if there are any contributions in the period, if there are, it adds the contribution to the statement.
-        """
+        This test verifies if the contribution in period is being calculated correctly.
+        The service checks if there are any contributions in the period, if there are, it adds the contribution to the statement.
+    """
     fund_investments = create_brazilian_fund_investment
     taxes = create_tax
 
     fund_id = fund_investments[0].fund_id
     total_invested = sum(investment.amount for investment in fund_investments if investment.fund_id == fund_id)
-    period = 202503
+    period = get_period(fund_investments[0].transaction_date)
     reference_date = '2025-03-31'
     gross_amount = total_invested * 1.01
     tax_details = [{
@@ -127,7 +128,7 @@ async def test_create_brazilian_fund_investment_statement(client, create_tax, cr
     assert 'fundId' in data['statement']
     assert data['statement']['fundId'] == str(fund_id)
     assert 'contribution' in data['statement']
-    # For first statement the contribution is the total invested
+    # For the first statement the contribution is the total invested
     assert round(data['statement']['contribution'], 2) == round(total_invested, 2)
     assert 'price' in data['statement']
     assert round(data['statement']['price'], 2) == round(price, 2)

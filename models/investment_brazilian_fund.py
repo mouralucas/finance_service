@@ -28,7 +28,7 @@ class InvestmentBrazilianFundsStatementModel(InvestmentStatementBaseModel):
     """
     Created by: Lucas Penha de Moura - 02/04/2025
         This model is used to store the statement of funds investments in Brazil.
-        It inherits from the InvestmentStatementBaseModel and adds specific fields for funds investments.
+        It inherits from the InvestmentStatementBaseModel and adds specific fields for fund investments.
         The statement refers to the fund and not to a specific investment.
     """
     __tablename__ = 'investment_funds_br_statement'

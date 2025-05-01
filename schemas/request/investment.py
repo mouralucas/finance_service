@@ -25,11 +25,11 @@ class CreateInvestmentBaseRequest(BaseModel):
     transaction_date: date = Field(..., description='The date')
 
     type_id: uuid.UUID = Field(..., alias='investmentTypeId', description='The id of the investment type')
-    currency_id: str = Field(..., description='The id of the currency')
+    currency_id: str = Field('BRL', description='The id of the currency')
     country_id: str = Field('BR', description='The id of the country')
 
     objective_id: uuid.UUID | None = Field(None, description='The id of the objective')
-    observation: str = Field(None, description='Observations for the investment')
+    observation: str | None = Field(None, description='Observations for the investment')
 
 
 class CreateInvestmentStatementBaseRequest(BaseModel):

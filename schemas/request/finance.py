@@ -36,6 +36,11 @@ class TaxFeeRequest(BaseModel):
 
 
 class TaxFeeQuotationRequest(BaseModel):
+    """
+    Created by: Lucas Penha de Moura - 19/03/2025
+        This model define the request for the tax/fee quotation details for the investment.
+        Which tax/fee are applied to the investment and the percentage of each one.
+    """
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
         alias=to_camel
     ))

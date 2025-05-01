@@ -40,6 +40,13 @@ def get_fixed_income_br_investment_type_mock() -> list[dict[str, Any]]:
             'name': 'CDB',
             'description': 'Certificado de Depósito Bancário',
             'investment_category_id': investment_category[0]['id']
+        },
+        {
+            **default_model_dict,
+            'id': uuid.UUID('fd47a9a3-cc13-497f-bc55-ef55648af816'),
+            'name': 'Fundo de investimento multimercado',
+            'description': 'Fundo de investimento multimercado',
+            'investment_category_id': investment_category[2]['id']
         }
     ]
 

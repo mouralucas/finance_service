@@ -1,5 +1,7 @@
+from fastapi import HTTPException
 from rolf_common.schemas.auth import RequiredUser
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette import status
 
 from managers.account import AccountManager
 from managers.investment_brazilian_fund import InvestmentBrazilianFundManager
@@ -38,38 +40,43 @@ class InvestmentBrazilianFundService(InvestmentService):
     async def create_brazilian_fund_investment_statement(self, statement: CreateBrazilianFundInvestmentStatementRequest):
         # fund: FundsBrModel = await FinanceManager(self.session).get_brazilian_fund_by_id(statement.fund_id)
         fund_investments = await self.investment_brazilian_fund_manager.get_investments_by_fund_id(fund_id=statement.fund_id)
+        if not fund_investments:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='No investment found for this fund')
 
-        previous_statements = await self.investment_brazilian_fund_manager.get_statement(fund_id=fund_investments[-1].id)
+        previous_statements = await self.investment_brazilian_fund_manager.get_statement(fund_id=fund_investments[0].fund_id)
         last_statement = previous_statements[0] if previous_statements else None
 
         # If it is the first statement period must be the same as the investment
+        if not last_statement and statement.period != get_period(fund_investments[0].transaction_date):
+            raise HTTPException(status_code=status.HTTP_412_PRECONDITION_FAILED, detail='The period for the first statement must be the same as the investment')
 
+        # Add the statement information to a new statement object
         new_statement = InvestmentBrazilianFundsStatementModel(**statement.model_dump(exclude={'tax_details', 'fee_details'}))
 
-        # Serialize the tax/fee information
+        # Serialize the tax/fee information and add to the new statement
         new_statement.tax_detail = [tax.model_dump(mode='json') for tax in statement.tax_detail] if statement.tax_detail else None
         new_statement.fee_detail = [fee.model_dump(mode='json') for fee in statement.fee_detail] if statement.fee_detail else None
 
-        # Set the tax/fee totals
+        # Set the tax/fee totals and add to the new statement
         new_statement.total_tax = sum(tax.amount for tax in statement.tax_detail) if statement.tax_detail else 0.0
         new_statement.total_fee = sum(fee.amount for fee in statement.fee_detail) if statement.fee_detail else 0.0
 
-        # Link the statement with the user
+        # Link the new statement with the user
         new_statement.owner_id = self.user['user_id']
 
-        # If it is the first statement for the fund, there is no previous amount, just the first contribution
-        if not last_statement:
-            new_statement.contribution = sum(investment.amount for investment in fund_investments)
-
-        # If there is at least one statement, the previous amount for current statement is the gross amount from the last one
+        # If there is at least one statement, the previous amount for the current statement is the gross amount from the last one
         if last_statement:
             new_statement.previous_amount = last_statement.gross_amount
 
-        # If there is at least one statement, but the period for the current statement is the same from the last contribution
-        #   than this contribution should appear in the statement
-        if last_statement and statement.period == get_period(fund_investments[-1].transaction_date):
-            new_statement.contribution = fund_investments[-1].amount
+        # Check if in the statement period there are any contributions
+        period_contribution = [
+            tx.amount for tx in fund_investments
+            if get_period(tx.transaction_date) == statement.period
+        ]
+        total_period_contribution = sum(a for a in period_contribution) if period_contribution else 0.0
+        new_statement.contribution = total_period_contribution
 
+        # Create the entry in the database
         new_statement = await self.investment_brazilian_fund_manager.create_investment_statement(statement=new_statement)
 
         response = CreateBrazilianFundInvestmentStatementResponse(
