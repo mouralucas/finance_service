@@ -10,7 +10,6 @@ from starlette import status
 from managers.investment import InvestmentManager
 from models.investment_brazilian_fund import InvestmentBrazilianFundsModel, InvestmentBrazilianFundsStatementModel
 
-
 class InvestmentBrazilianFundManager(InvestmentManager):
     def __init__(self, session: AsyncSession):
         super().__init__(session)
@@ -20,8 +19,20 @@ class InvestmentBrazilianFundManager(InvestmentManager):
 
         return new_investment_fund
 
-    async def get_investment_funds(self):
-        # In this case, if one fund have more than one investment it will be aggregated in only one register and the total is added
+    async def get_brazilian_fund_investment(self, investment_id: uuid.UUID, is_settled: bool) -> list[InvestmentBrazilianFundsModel]:
+        query = select(InvestmentBrazilianFundsModel)
+
+        if investment_id:
+            query = query.where(InvestmentBrazilianFundsModel.id == investment_id)
+
+        if is_settled:
+            query = query.where(InvestmentBrazilianFundsModel.is_liquidated == True)
+
+        result = await self.get_all(query)
+
+        return [investment['InvestmentBrazilianFundsModel'] for investment in result]
+
+    async def get_brazilian_fund_investment_consolidated(self, fund_id: uuid.UUID):
         pass
 
     async def get_investments_by_fund_id(self, fund_id: uuid.UUID) -> list[InvestmentBrazilianFundsModel]:
@@ -52,5 +63,5 @@ class InvestmentBrazilianFundManager(InvestmentManager):
         )
 
         result: list[RowMapping] = await self.get_all(query, unique_result=True)
-        
+
         return [statement['InvestmentBrazilianFundsStatementModel'] for statement in result] if result else None

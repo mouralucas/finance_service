@@ -6,10 +6,10 @@ from starlette import status
 from uvicorn.config import resolve_reload_patterns
 
 from backend.database import get_session
-from schemas.request.investment import GetInvestmentRequest
+from schemas.request.investment import GetInvestmentRequest, GetBrazilianFundInvestmentsRequest
 from schemas.request.investment_brazilian_funds import CreateBrazilianFundInvestmentStatementRequest, CreateBrazilianFundInvestmentRequest, GetBrazilianFundInvestmentStatementRequest
 from schemas.response.investment import GetInvestmentResponse
-from schemas.response.investment_brazilian_funds import CreateBrazilianFundInvestmentResponse, CreateBrazilianFundInvestmentStatementResponse, GetBrazilianFundInvestmentStatementResponse
+from schemas.response.investment_brazilian_funds import CreateBrazilianFundInvestmentResponse, CreateBrazilianFundInvestmentStatementResponse, GetBrazilianFundInvestmentStatementResponse, GetBrazilianFundInvestmentsResponse
 from services.investment_brazilian_fund import InvestmentBrazilianFundService
 
 router = APIRouter(prefix="/investment/funds/br", tags=['Investments'])
@@ -29,12 +29,11 @@ async def create_funds_br_investment(
 
 @router.get('')
 async def get_funds_br_investments(
-        # TODO: adjust schemas
-        params: GetInvestmentRequest = Depends(),
+        params: GetBrazilianFundInvestmentsRequest = Depends(),
         session: AsyncSession = Depends(get_session),
         user: RequiredUser = Security(get_user)
-) -> GetInvestmentResponse:
-    return await InvestmentBrazilianFundService(session=session, user=user).get_brazilian_fund_investments()
+) -> GetBrazilianFundInvestmentsResponse:
+    return await InvestmentBrazilianFundService(session=session, user=user).get_brazilian_fund_investments(params=params)
 
 
 @router.post('/statement',

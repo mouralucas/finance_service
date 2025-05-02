@@ -10,6 +10,7 @@ from pydantic.alias_generators import to_camel
 from schemas.request.finance import TaxFeeRequest
 
 
+# The base schemas for investment
 class CreateInvestmentBaseRequest(BaseModel):
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
         alias=to_camel
@@ -109,6 +110,16 @@ class UpdateInvestmentRequest(CreateInvestmentRequest):
     country_id: str | None = Field(None, description='The id of the country')
 
 
+class GetBrazilianFundInvestmentsRequest(BaseModel):
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
+        alias=to_camel
+    ))
+
+    id: uuid.UUID | None = Field(None, alias='investmentId', description='The id of the investment')
+    is_settled: bool = Field(False, alias='isSettled', description='Whether the investment is settled')
+
+
+# Old schemas
 class GetInvestmentRequest(BaseModel):
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
         alias=to_camel

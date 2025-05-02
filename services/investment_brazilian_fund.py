@@ -7,8 +7,9 @@ from managers.account import AccountManager
 from managers.investment_brazilian_fund import InvestmentBrazilianFundManager
 from models.investment_brazilian_fund import InvestmentBrazilianFundsModel, InvestmentBrazilianFundsStatementModel
 from schemas.investment_brazilian_fund import InvestmentBrazilianFundSchema, InvestmentBrazilianFundStatementSchema
+from schemas.request.investment import GetBrazilianFundInvestmentsRequest
 from schemas.request.investment_brazilian_funds import CreateBrazilianFundInvestmentStatementRequest, CreateBrazilianFundInvestmentRequest, GetBrazilianFundInvestmentStatementRequest
-from schemas.response.investment_brazilian_funds import CreateBrazilianFundInvestmentResponse, CreateBrazilianFundInvestmentStatementResponse, GetBrazilianFundInvestmentStatementResponse
+from schemas.response.investment_brazilian_funds import CreateBrazilianFundInvestmentResponse, CreateBrazilianFundInvestmentStatementResponse, GetBrazilianFundInvestmentStatementResponse, GetBrazilianFundInvestmentsResponse
 from services.investment import InvestmentService
 from services.utils.datetime import get_period
 
@@ -34,8 +35,16 @@ class InvestmentBrazilianFundService(InvestmentService):
 
         return response
 
-    async def get_brazilian_fund_investments(self):
-        pass
+    async def get_brazilian_fund_investments(self, params: GetBrazilianFundInvestmentsRequest) -> GetBrazilianFundInvestmentsResponse:
+        statements = await self.investment_brazilian_fund_manager.get_brazilian_fund_investment(investment_id=params.id,
+                                                                                                is_settled=params.is_settled)
+
+        response = GetBrazilianFundInvestmentsResponse(
+            quantity=len(statements) if statements else 0,
+            investments=[InvestmentBrazilianFundSchema.model_validate(statement) for statement in statements] if statements else [],
+        )
+
+        return response
 
     async def create_brazilian_fund_investment_statement(self, statement: CreateBrazilianFundInvestmentStatementRequest):
         # fund: FundsBrModel = await FinanceManager(self.session).get_brazilian_fund_by_id(statement.fund_id)
