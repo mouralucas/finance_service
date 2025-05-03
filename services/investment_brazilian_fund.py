@@ -41,7 +41,7 @@ class InvestmentBrazilianFundService(InvestmentService):
 
         response = GetBrazilianFundInvestmentsResponse(
             quantity=len(statements) if statements else 0,
-            investments=[InvestmentBrazilianFundSchema.model_validate(statement) for statement in statements] if statements else [],
+            investments=[InvestmentBrazilianFundSchema.model_validate(statement).transform() for statement in statements] if statements else [],
         )
 
         return response
