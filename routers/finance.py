@@ -8,7 +8,8 @@ from starlette import status
 
 from backend.database import get_session
 from schemas.request.finance import GetSummaryRequest, GetTaxFeeRequest, GetCurrencyCostAverage, CreateBrazilianFundRequest
-from schemas.response.finance import GetCurrencyResponse, GetBankResponse, GetIndexerTypeResponse, GetIndexerResponse, GetLiquidityResponse, GetExpensesByCategoryResponse, GetTaxFeeResponse, CreateBrazilianFundResponse
+from schemas.response.finance import GetCurrencyResponse, GetBankResponse, GetIndexerTypeResponse, GetIndexerResponse, GetLiquidityResponse, GetExpensesByCategoryResponse, GetTaxFeeResponse, CreateBrazilianFundResponse, \
+    GetBrazilianFundsResponse
 from services.finance import FinanceService
 
 router = APIRouter(prefix="/finance", tags=['Finance'])
@@ -109,5 +110,5 @@ async def create_brazilian_fund(
 async def get_brazilian_funds(
         session: AsyncSession = Depends(get_session),
         user: RequiredUser = Security(get_user)
-):
+) -> GetBrazilianFundsResponse:
     return await FinanceService(session=session, user=user).get_brazilian_funds()

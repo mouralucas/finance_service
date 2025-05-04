@@ -3,7 +3,7 @@ from typing import cast
 from fastapi import HTTPException
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import BaseService
-from sqlalchemy import select, func, delete, RowMapping
+from sqlalchemy import select, func, delete, RowMapping, case, literal, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
@@ -16,7 +16,7 @@ from schemas.request.account import CreateAccountRequest, GetAccountRequest, Cre
 from schemas.response.account import CreateAccountResponse, GetAccountResponse, CloseAccountResponse, CreateBalanceResponse, GetBalanceResponse, GetAccountTransactionResponse, UpdateTransactionResponse
 from schemas.response.account import CreateAccountTransactionResponse
 from services.utils.datetime import get_period, get_current_period, get_period_range
-
+import uuid
 
 class AccountService(BaseService):
     def __init__(self, session: AsyncSession, user: RequiredUser):
@@ -132,13 +132,17 @@ class AccountService(BaseService):
         min_period: int = await self.account_manager.get_only_one(select(func.min(AccountTransactionModel.period)).where(AccountTransactionModel.account_id == params.account_id))
         max_period: int = get_period(account.close_date) if account.close_date else get_current_period()
 
-        # Get all periods between min and max periods so even without transactions all periods in this range have its own balance
+        # TODO: create better validation
+        if not min_period:
+            raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, detail='Provavelmente não existem transações nessa conta')
+
+        # Get all periods between min and max periods, so even without transactions, all periods in this range have its own balance
         period_range: list[int] = get_period_range(min_period, max_period)
 
         # Fetch all transactions grouped by period
         transactions_by_period = await self.account_manager.get_consolidated_transactions_by_period(account_id=params.account_id, period_range=period_range)
 
-        # The firs balance available always start with 'previous_balance' at zero, even if in actual account have more transactions
+        # The first balance available always starts with 'previous_balance' at zero, even if in actual account have more transactions
         # The user should add the previous amount as a transaction, so the calculation is correct at the end
         previous_balance = 0.0
 
@@ -180,13 +184,16 @@ class AccountService(BaseService):
         return response
 
     async def get_balance(self, params: GetBalanceRequest) -> GetBalanceResponse:
-        account: AccountModel = await self.account_manager.get_account_by_id(account_id=params.account_id, raise_exception=True)
-        balance = await self.account_manager.get_balance(params.account_id, params.start_period, params.end_period)
+        balance = await self.account_manager.get_balance_beta(account_id=params.account_id, period=202407)
+        # balance = await self.account_manager.get_monthly_account_report(account_id=params.account_id)
+        # account: AccountModel = await self.account_manager.get_account_by_id(account_id=params.account_id, raise_exception=True)
+        # balance = await self.account_manager.get_balance(params.account_id, params.start_period, params.end_period)
+        #
+        # response = GetBalanceResponse(
+        #     account_name=account.nickname,
+        #     quantity=len(balance) if balance else 0,
+        #     balance=[BalanceSchema.model_validate(data["AccountBalanceModel"]) for data in balance] if balance else []
+        # )
+        #
+        # return response
 
-        response = GetBalanceResponse(
-            account_name=account.nickname,
-            quantity=len(balance) if balance else 0,
-            balance=[BalanceSchema.model_validate(data["AccountBalanceModel"]) for data in balance] if balance else []
-        )
-
-        return response

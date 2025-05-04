@@ -6,7 +6,7 @@ from unicodedata import category
 from fastapi import HTTPException
 from rolf_common.managers import BaseDataManager
 from rolf_common.models import SQLModel
-from sqlalchemy import select, update, func, case, RowMapping, literal_column, union_all, union, delete
+from sqlalchemy import select, update, func, case, RowMapping, literal_column, union_all, union, delete, literal, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 from starlette import status
@@ -142,6 +142,7 @@ class AccountManager(BaseDataManager):
 
         :return: 
         """
+        # TODO: this balance will need to separate the currencies available
         query = (
             select(
                 AccountBalanceModel.period,
@@ -168,6 +169,126 @@ class AccountManager(BaseDataManager):
         balance = await self.get_all(query)
 
         return balance
+
+    async def get_balance_beta(self, account_id: uuid.UUID, period: int):
+        t = AccountTransactionModel  # sua tabela de transações
+
+        stmt = select(
+            literal(period).label("period"),
+
+            # Valor inicial: saldo antes do período
+            func.coalesce(
+                func.sum(
+                    case(
+                        (t.period < period, t.amount),
+                        else_=0
+                    )
+                ), 0
+            ).label("initial_value"),
+
+            # Entradas: positivas, excluindo earnings
+            func.coalesce(
+                func.sum(
+                    case(
+                        (and_(t.period == period, t.amount > 0, t.category_id != uuid.UUID('dcef92cb-9664-4dc4-9adb-afe556016fe2')), t.amount),
+                        else_=0
+                    )
+                ), 0
+            ).label("inflow"),
+
+            # Rendimentos: qualquer valor com categoria 'earnings'
+            func.coalesce(
+                func.sum(
+                    case(
+                        (and_(t.period == period, t.category_id == uuid.UUID('dcef92cb-9664-4dc4-9adb-afe556016fe2')), t.amount),
+                        else_=0
+                    )
+                ), 0
+            ).label("earnings"),
+
+            # Saídas: negativas, excluindo earnings
+            func.coalesce(
+                func.sum(
+                    case(
+                        (and_(t.period == period, t.amount < 0, t.category_id != uuid.UUID('dcef92cb-9664-4dc4-9adb-afe556016fe2')), t.amount),
+                        else_=0
+                    )
+                ), 0
+            ).label("outflow"),
+
+            # Saldo no período (balance = inflow + earnings + outflow)
+            func.coalesce(
+                func.sum(
+                    case(
+                        (t.period == period, t.amount),
+                        else_=0
+                    )
+                ), 0
+            ).label("balance"),
+
+            # Saldo final acumulado até o fim do período
+            func.coalesce(
+                func.sum(
+                    case(
+                        (t.period <= period, t.amount),
+                        else_=0
+                    )
+                ), 0
+            ).label("final_balance"),
+        ).where(
+            t.account_id == account_id
+        )
+
+        balance = await self.get_all(stmt)
+        balance = balance[0]
+        print('')
+
+    async def get_monthly_account_report(self, account_id: uuid.UUID):
+        t = AccountTransactionModel
+
+        # Base para todos os cálculos do mês
+        base_stmt = select(
+            t.period,
+            func.sum(
+                case(
+                    (and_(t.amount > 0, t.category_id != 'earnings'), t.amount),
+                    else_=0
+                )
+            ).label("inflow"),
+            func.sum(
+                case(
+                    (and_(t.amount < 0, t.category_id != 'earnings'), t.amount),
+                    else_=0
+                )
+            ).label("outflow"),
+            func.sum(
+                case(
+                    (t.category_id == 'earnings', t.amount),
+                    else_=0
+                )
+            ).label("earnings"),
+            func.sum(t.amount).label("balance"),
+            func.sum(t.amount).over(
+                partition_by=t.account_id,
+                order_by=t.period,
+                rows=(None, 0)
+            ).label("final_balance"),
+            func.sum(t.amount).over(
+                partition_by=t.account_id,
+                order_by=t.period,
+                rows=(None, -1)
+            ).label("initial_value"),
+        ).where(
+            t.account_id == account_id
+        ).group_by(
+            t.period
+        ).order_by(
+            t.period
+        )
+
+        result = await self.get_all(base_stmt)
+
+        return result
 
     async def delete_balance(self, account_id: uuid.UUID) -> None:
         await self.session.execute(delete(AccountBalanceModel).where(AccountBalanceModel.account_id == account_id))
