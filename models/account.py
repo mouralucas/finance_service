@@ -6,7 +6,6 @@ from rolf_common.models import SQLModel
 from sqlalchemy import ForeignKey, String, Integer, Numeric
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from models.core import BankModel
 
 
 class AccountTypeModel(SQLModel):
@@ -21,7 +20,7 @@ class AccountModel(SQLModel):
 
     owner_id: Mapped[uuid.UUID] = mapped_column('owner_id')
     bank_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('bank.id'))
-    bank: Mapped[BankModel] = relationship(foreign_keys=[bank_id], lazy='subquery')
+    bank: Mapped['BankModel'] = relationship(foreign_keys=[bank_id], lazy='subquery')
     nickname: Mapped[str] = mapped_column('nickname', String(50))
     description: Mapped[str] = mapped_column('description', String(500), nullable=True)
     branch: Mapped[str] = mapped_column('branch', String(30), nullable=True)
