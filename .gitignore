@@ -27,6 +27,9 @@
 .idea/**/uiDesigner.xml
 .idea/**/dbnavigator.xml
 
+# Remove launch from git
+.vscode
+
 # Gradle
 .idea/**/gradle.xml
 .idea/**/libraries

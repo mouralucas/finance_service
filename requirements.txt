@@ -8,6 +8,8 @@ httpx==0.24.1
 python-dateutil~=2.9.0.post0
 git+https://github.com/mouralucas/rolf_common.git@main#egg=rolf_common
 
+# GraphQL support
+ariadne==0.26.2
 
 #Database
 asyncpg==0.30.0

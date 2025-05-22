@@ -37,6 +37,54 @@ To complete the configuration, install all requirements:
 pip3 install -r requirements
 ```
 
+## Run and debug in VSCode
+
+If not exist, create a .vscode folder and a launch.json file with the following content:
+
+```json
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Develop",
+        "type": "debugpy",
+        "request": "launch",
+        "module": "uvicorn",
+        "args": [
+          "main:app",
+          "--host", "127.0.0.1",
+          "--port", "8000"
+        ],
+        "env": {
+          "auth_service_base_url": "<auth_service_url>",
+        },
+        "jinja": true,
+        "justMyCode": true,
+        "console": "integratedTerminal"
+      },
+      {
+        "name": "Production",
+        "type": "debugpy",
+        "request": "launch",
+        "module": "uvicorn",
+        "args": [
+          "main:app",
+          "--host", "127.0.0.1",
+          "--port", "8000"
+        ],
+        "env": {
+          "auth_service_base_url": "<auth_service_url>",
+          "library_database_url": "<prod_database_connection>"
+        },
+        "jinja": true,
+        "justMyCode": true,
+        "console": "integratedTerminal"
+      }
+    ]
+  }
+```
+
+The env `auth_service_base_url` is only needed when not running the user_server locally.
 ....
 
 ## Logging
@@ -128,6 +176,20 @@ For Brazilian Funds the following website is used to get official information ab
 
 [Comissão de Valores Mobiliários](https://cvmweb.cvm.gov.br/swb/default.asp?sg_sistema=fundosreg)
 [Outro](https://conteudo.cvm.gov.br/menu/regulados/fundos/consultas/fundos.html)
+
+## Conda Environments
+
+To list all available Conda Environments:
+
+```bash
+conda env list
+```
+
+To remove an environment from the system
+
+```bash
+conda remove -n <env_name> --all
+```
 
 ## License
 
