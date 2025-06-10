@@ -10,6 +10,7 @@ from lifespan import start_log_service, shutdown_log_service
 from routers import (account, credit_card, core,
                      investment, investment_brazilian_funds,
                      integration, finance)
+from routers_graphql import main
 
 
 @asynccontextmanager
@@ -55,3 +56,5 @@ app.include_router(investment_brazilian_funds.router)
 app.include_router(integration.router)
 app.include_router(finance.router)
 app.include_router(core.router)
+
+app.include_router(main.router)
