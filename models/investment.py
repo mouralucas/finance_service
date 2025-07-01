@@ -165,7 +165,7 @@ class InvestmentBase(SQLModel):
     currency_id: Mapped[str] = mapped_column(ForeignKey('currency.id'))
     country_id: Mapped[str] = mapped_column(ForeignKey('country.id'))
     objective_id: Mapped[str] = mapped_column(ForeignKey('investment_objective.id'), nullable=True)
-    is_liquidated: Mapped[bool] = mapped_column('is_liquidated', default=False)
+    is_settled: Mapped[bool] = mapped_column('is_settled', default=False)
 
     tax: Mapped[list[dict]] = mapped_column('tax', type_=JSON, nullable=True, doc='Tax information. What taxes are levied on investments and its rates')
     fee: Mapped[list[dict]] = mapped_column('fee', type_=JSON, nullable=True, doc='Fee information. What fees are levied on investments and its rates')

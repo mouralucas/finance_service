@@ -10,7 +10,7 @@ from models.investment import InvestmentBase, FundsBrModel, InvestmentStatementM
 class InvestmentBrazilianFundsModel(InvestmentBase):
     """
     Created by: Lucas Penha de Moura - 02/04/2025
-        This model is used to store the funds investments in Brazil.
+        This model is used to store the fund investments in Brazil.
         It inherits from the InvestmentBase and adds specific fields for funds investments.
     """
     __tablename__ = 'investment_funds_br'
@@ -22,7 +22,7 @@ class InvestmentBrazilianFundsModel(InvestmentBase):
     investment_settlement_date: Mapped[date] = mapped_column('liquidation_settlement_date', doc='The date the investment is liquidated in the fund')  # TODO: check this name
     redemption_quotation_date: Mapped[date] = mapped_column('redemption_quotation_date', nullable=True)
     redemption_settlement_date: Mapped[date] = mapped_column('redemption_settlement_date', nullable=True)
-
+    settlement_amount: Mapped[Decimal] = mapped_column('settlement_amount', Numeric(precision=18, scale=8), default=0)
 
 class InvestmentBrazilianFundsStatementModel(InvestmentStatementBaseModel):
     """
