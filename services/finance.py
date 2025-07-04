@@ -6,11 +6,20 @@ from managers.account import AccountManager
 from managers.credit_card import CreditCardManager
 from managers.finance import FinanceManager
 from models.investment import FundsBrModel
-from schemas.core import CurrencySchema, BankSchema, IndexerTypeSchema, IndexerSchema, LiquiditySchema, ExpensesByCategory, TaxFeeSchema
+from schemas.core import BankSchema, CurrencySchema, ExpensesByCategory, IndexerSchema, IndexerTypeSchema, LiquiditySchema, TaxFeeSchema
 from schemas.finance import FundsBrSchema
-from schemas.request.finance import GetSummaryRequest, GetTaxFeeRequest, CreateBrazilianFundRequest
-from schemas.response.finance import GetCurrencyResponse, GetBankResponse, GetIndexerTypeResponse, GetIndexerResponse, GetLiquidityResponse, GetExpensesByCategoryResponse, GetTaxFeeResponse, CreateBrazilianFundResponse, \
-    GetBrazilianFundsResponse
+from schemas.request.finance import CreateBrazilianFundRequest, GetSummaryRequest, GetTaxFeeRequest
+from schemas.response.finance import (
+    CreateBrazilianFundResponse,
+    GetBankResponse,
+    GetBrazilianFundsResponse,
+    GetCurrencyResponse,
+    GetExpensesByCategoryResponse,
+    GetIndexerResponse,
+    GetIndexerTypeResponse,
+    GetLiquidityResponse,
+    GetTaxFeeResponse,
+)
 
 
 class FinanceService(BaseService):

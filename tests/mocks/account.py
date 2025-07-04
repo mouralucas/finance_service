@@ -1,9 +1,9 @@
 import pytest_asyncio
 from rolf_common.managers import BaseDataManager
 
-from data_mock.account import get_open_account_mock, get_account_type_mock, get_closed_account_mock, get_account_transaction_mock
-from models.account import AccountTypeModel, AccountModel, AccountTransactionModel
-from schemas.account import AccountSchema, AccountTypeSchema, AccountTransactionSchema
+from data_mock.account import get_account_transaction_mock, get_account_type_mock, get_closed_account_mock, get_open_account_mock
+from models.account import AccountModel, AccountTransactionModel, AccountTypeModel
+from schemas.account import AccountSchema, AccountTransactionSchema, AccountTypeSchema
 
 
 @pytest_asyncio.fixture

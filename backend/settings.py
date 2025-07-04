@@ -1,4 +1,3 @@
-from pydantic_settings import BaseSettings
 from rolf_common.backend.settings import Settings
 
 

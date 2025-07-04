@@ -1,5 +1,4 @@
 import datetime
-import uuid
 
 from dateutil.relativedelta import relativedelta
 from httpx import AsyncClient
@@ -7,7 +6,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from managers.core import CoreManager
 from managers.finance import FinanceManager
-from managers.investment import InvestmentManager
 from models.core import IndexerSeriesModel
 from schemas.request.integration import CreateIndexerSeriesRequest
 from services.utils.datetime import get_period, get_period_dates

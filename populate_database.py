@@ -3,20 +3,42 @@ import asyncio
 from rolf_common.managers import BaseDataManager
 
 from backend.database import sessionmanager
-from data_mock.account import get_account_type_mock, get_open_account_mock, get_closed_account_mock, get_account_transaction_mock
-from data_mock.core import (get_bank_mock, get_currency_mock, get_index_type_mock, get_indexer_mock,
-                            get_category_mock, get_liquidity_mock, get_country_mock, get_expense_type_mock,
-                            get_category_parent_mock, get_tax_mock, get_fee_mock)
-from data_mock.credit_card import get_credit_card_mock, get_cancelled_credit_card_mock
+from data_mock.account import get_account_transaction_mock, get_account_type_mock, get_closed_account_mock, get_open_account_mock
+from data_mock.core import (
+    get_bank_mock,
+    get_category_mock,
+    get_category_parent_mock,
+    get_country_mock,
+    get_currency_mock,
+    get_expense_type_mock,
+    get_fee_mock,
+    get_index_type_mock,
+    get_indexer_mock,
+    get_liquidity_mock,
+    get_tax_mock,
+)
+from data_mock.credit_card import get_cancelled_credit_card_mock, get_credit_card_mock
 from data_mock.investment.base import get_brazilian_fund_mock
-from data_mock.investment.investment import get_fixed_income_br_investment_type_mock, get_investment_mock, get_investment_statement_mock, get_investment_category_mock
-from data_mock.investment.brazilian_funds import get_brazilian_fund_investment_mock
-from models.account import AccountTypeModel, AccountModel, AccountTransactionModel
-from models.core import BankModel, CurrencyModel, IndexerTypeModel, IndexerModel, CategoryModel, LiquidityModel, CountryModel, ExpenseTypeModel, TaxFeeModel
+from data_mock.investment.investment import (
+    get_fixed_income_br_investment_type_mock,
+    get_investment_category_mock,
+    get_investment_mock,
+    get_investment_statement_mock,
+)
+from models.account import AccountModel, AccountTransactionModel, AccountTypeModel
+from models.core import (
+    BankModel,
+    CategoryModel,
+    CountryModel,
+    CurrencyModel,
+    ExpenseTypeModel,
+    IndexerModel,
+    IndexerTypeModel,
+    LiquidityModel,
+    TaxFeeModel,
+)
 from models.credit_card import CreditCardModel
-from models.investment import InvestmentTypeModel, InvestmentModel, InvestmentStatementModel, InvestmentCategoryModel, FundsBrModel
-from models.investment_brazilian_fund import InvestmentBrazilianFundsModel
-from routers.finance import get_brazilian_funds
+from models.investment import FundsBrModel, InvestmentCategoryModel, InvestmentModel, InvestmentStatementModel, InvestmentTypeModel
 
 
 async def populate():

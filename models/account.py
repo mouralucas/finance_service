@@ -3,9 +3,8 @@ import uuid
 from decimal import Decimal
 
 from rolf_common.models import SQLModel
-from sqlalchemy import ForeignKey, String, Integer, Numeric
+from sqlalchemy import ForeignKey, Integer, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
 
 
 class AccountTypeModel(SQLModel):

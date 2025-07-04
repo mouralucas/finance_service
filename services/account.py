@@ -3,20 +3,37 @@ from typing import cast
 from fastapi import HTTPException
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import BaseService
-from sqlalchemy import select, func, delete, RowMapping, case, literal, and_
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from managers.account import AccountManager
 from managers.credit_card import CreditCardManager
-from models.account import AccountModel, AccountTransactionModel, AccountBalanceModel
+from models.account import AccountBalanceModel, AccountModel, AccountTransactionModel
 from models.credit_card import CreditCardModel
-from schemas.account import AccountSchema, AccountTransactionSchema, BalanceSchema
-from schemas.request.account import CreateAccountRequest, GetAccountRequest, CreateAccountTransactionRequest, CloseAccountRequest, CreateBalanceRequest, GetBalanceRequest, UpdateAccountTransactionRequest, GetAccountTransactionRequest
-from schemas.response.account import CreateAccountResponse, GetAccountResponse, CloseAccountResponse, CreateBalanceResponse, GetBalanceResponse, GetAccountTransactionResponse, UpdateTransactionResponse
-from schemas.response.account import CreateAccountTransactionResponse
-from services.utils.datetime import get_period, get_current_period, get_period_range
-import uuid
+from schemas.account import AccountSchema, AccountTransactionSchema
+from schemas.request.account import (
+    CloseAccountRequest,
+    CreateAccountRequest,
+    CreateAccountTransactionRequest,
+    CreateBalanceRequest,
+    GetAccountRequest,
+    GetAccountTransactionRequest,
+    GetBalanceRequest,
+    UpdateAccountTransactionRequest,
+)
+from schemas.response.account import (
+    CloseAccountResponse,
+    CreateAccountResponse,
+    CreateAccountTransactionResponse,
+    CreateBalanceResponse,
+    GetAccountResponse,
+    GetAccountTransactionResponse,
+    GetBalanceResponse,
+    UpdateTransactionResponse,
+)
+from services.utils.datetime import get_current_period, get_period, get_period_range
+
 
 class AccountService(BaseService):
     def __init__(self, session: AsyncSession, user: RequiredUser):

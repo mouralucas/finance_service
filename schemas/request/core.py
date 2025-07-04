@@ -1,6 +1,8 @@
-from pydantic import BaseModel, ConfigDict, AliasGenerator, Field
-from pydantic.alias_generators import to_snake
 import uuid
+
+from pydantic import AliasGenerator, BaseModel, ConfigDict, Field
+from pydantic.alias_generators import to_snake
+
 
 class CreateCategoryExpenseRelationRequest(BaseModel):
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(

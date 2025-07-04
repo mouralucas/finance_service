@@ -1,10 +1,11 @@
+import uuid
+from datetime import date
 from decimal import Decimal
 
 from sqlalchemy import ForeignKey, Numeric
-from sqlalchemy.orm import Mapped, relationship, mapped_column
-import uuid
-from datetime import date
-from models.investment import InvestmentBase, FundsBrModel, InvestmentStatementModel, InvestmentStatementBaseModel
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from models.investment import FundsBrModel, InvestmentBase, InvestmentStatementBaseModel
 
 
 class InvestmentBrazilianFundsModel(InvestmentBase):

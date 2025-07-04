@@ -1,10 +1,10 @@
 from typing import Any
 
-from pydantic import Field, BaseModel, ConfigDict, AliasGenerator
+from pydantic import AliasGenerator, BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
 from rolf_common.schemas import SuccessResponseBase
 
-from schemas.credit_card import CreditCardSchema, CreditCardTransactionSchema, CreditCardBillSchema, CreditCardBillHistorySchema, InstallmentsDueDates
+from schemas.credit_card import CreditCardBillHistorySchema, CreditCardBillSchema, CreditCardSchema, CreditCardTransactionSchema, InstallmentsDueDates
 
 
 class CreateCreditCardResponse(SuccessResponseBase):
@@ -47,7 +47,7 @@ class GetCreditCardBillConsolidatedResponse(BaseModel):
     bill: list[CreditCardBillSchema] | None = Field(..., description='The list of consolidated bill by period')
     billStacked: list[dict[str, Any]] = Field(..., description='The list of bill stacked by card/period')
     series: list[str] = Field(..., description='The list of available series for the bill stacked')
-    
+
 
 class GetCreditCardBillHistoryResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True,

@@ -1,10 +1,9 @@
-import uuid
 
-from pydantic import Field, BaseModel, ConfigDict, AliasGenerator
+from pydantic import AliasGenerator, BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
 from rolf_common.schemas import SuccessResponseBase
 
-from schemas.core import CurrencySchema, BankSchema, IndexerTypeSchema, IndexerSchema, LiquiditySchema, ExpensesByCategory, TaxFeeSchema
+from schemas.core import BankSchema, CurrencySchema, ExpensesByCategory, IndexerSchema, IndexerTypeSchema, LiquiditySchema, TaxFeeSchema
 from schemas.finance import FundsBrSchema
 
 

@@ -1,13 +1,16 @@
 import pytest_asyncio
 from rolf_common.managers import BaseDataManager
 
-from data_mock.investment.base import get_open_investment_objective_mock, get_funds_br_investment_type_mock
+from data_mock.investment.base import get_funds_br_investment_type_mock, get_investment_category_mock, get_open_investment_objective_mock
 from data_mock.investment.brazilian_funds import get_brazilian_fund_investment_mock, get_brazilian_fund_investment_statement_mock
-from data_mock.investment.investment import get_fixed_income_br_investment_type_mock, get_investment_mock, get_investment_statement_mock, get_investment_category_mock
-from models.investment import InvestmentTypeModel, InvestmentModel, InvestmentStatementModel, InvestmentObjectiveModel, InvestmentCategoryModel
+from data_mock.investment.investment import (
+    get_fixed_income_br_investment_type_mock,
+    get_investment_mock,
+    get_investment_statement_mock,
+)
+from models.investment import InvestmentCategoryModel, InvestmentModel, InvestmentObjectiveModel, InvestmentStatementModel, InvestmentTypeModel
 from models.investment_brazilian_fund import InvestmentBrazilianFundsModel, InvestmentBrazilianFundsStatementModel
-from routers.account import create_account
-from schemas.investment import InvestmentTypeSchema, InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema, InvestmentCategorySchema
+from schemas.investment import InvestmentCategorySchema, InvestmentObjectiveSchema, InvestmentSchema, InvestmentStatementSchema, InvestmentTypeSchema
 from schemas.investment_brazilian_fund import InvestmentBrazilianFundSchema, InvestmentBrazilianFundStatementSchema
 
 

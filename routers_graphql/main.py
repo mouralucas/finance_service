@@ -1,13 +1,11 @@
-from fastapi import Depends, Security, Request
-from starlette.responses import JSONResponse, HTMLResponse
-from sqlalchemy.ext.asyncio import AsyncSession
-from rolf_common.services import get_user
-from rolf_common.schemas.auth import RequiredUser
-from fastapi import APIRouter
-from ariadne import QueryType, MutationType, load_schema_from_path, make_executable_schema, graphql
+from ariadne import MutationType, QueryType, graphql, load_schema_from_path, make_executable_schema
 from ariadne.explorer import ExplorerGraphiQL
-from resolvers.finance_dashboard import bind_finance_dashboard_resolvers 
+from fastapi import APIRouter, Depends, Request
+from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.responses import HTMLResponse, JSONResponse
+
 from backend.database import get_session
+from resolvers.finance_dashboard import bind_finance_dashboard_resolvers
 
 router = APIRouter(tags=["GraphQL"], prefix='/graphql')
 

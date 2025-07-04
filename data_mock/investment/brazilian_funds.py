@@ -7,9 +7,9 @@ from dateutil.relativedelta import relativedelta
 
 from data_mock.account import get_open_account_mock
 from data_mock.common import default_model_dict
-from data_mock.core import get_currency_mock, get_country_mock, get_tax_mock
-from data_mock.investment.base import get_funds_br_investment_type_mock, get_brazilian_fund_mock
-from services.utils.datetime import get_period, get_period_range, get_previous_period, get_period_dates
+from data_mock.core import get_country_mock, get_currency_mock, get_tax_mock
+from data_mock.investment.base import get_brazilian_fund_mock, get_funds_br_investment_type_mock
+from services.utils.datetime import get_period, get_period_dates, get_period_range, get_previous_period
 
 
 def get_brazilian_fund_investment_mock():

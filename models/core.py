@@ -3,7 +3,7 @@ import uuid
 from decimal import Decimal
 
 from rolf_common.models import SQLModel
-from sqlalchemy import String, SmallInteger, ForeignKey, Numeric
+from sqlalchemy import ForeignKey, Numeric, SmallInteger, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 

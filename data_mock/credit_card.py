@@ -7,9 +7,8 @@ from dateutil.relativedelta import relativedelta
 from data_mock.account import get_open_account_mock
 from data_mock.core import get_currency_mock
 
-
 default_model_dict = {
-    'created_at': datetime.datetime.now(datetime.timezone.utc),
+    'created_at': datetime.datetime.now(datetime.UTC),
     'active': True
 }
 

@@ -1,8 +1,10 @@
+import datetime
+
 import pytest
 from starlette import status
-import datetime
+
 from services.credit_card import CreditCardService
-from services.utils.datetime import get_period, get_installments_due_dates
+from services.utils.datetime import get_installments_due_dates, get_period
 
 
 @pytest.mark.asyncio

@@ -5,11 +5,11 @@ from typing import Any
 
 from dateutil.relativedelta import relativedelta
 
-from data_mock.core import get_bank_mock, get_currency_mock, get_category_mock
+from data_mock.core import get_bank_mock, get_category_mock, get_currency_mock
 from services.utils.datetime import get_period, get_randon_date
 
 default_model_dict = {
-    'created_at': datetime.datetime.now(datetime.timezone.utc),
+    'created_at': datetime.datetime.now(datetime.UTC),
     'active': True
 }
 
@@ -48,7 +48,7 @@ def get_open_account_mock() -> list[dict[str, Any]]:
             'description': 'Conta de pagamento e investimentos',
             'branch': '123-4',
             'number': '123456',
-            'open_date': datetime.datetime.now(datetime.timezone.utc) - relativedelta(years=5, months=7, days=21),
+            'open_date': datetime.datetime.now(datetime.UTC) - relativedelta(years=5, months=7, days=21),
             'type_id': account_types[0]['id'],
             'currency_id': currencies[0]['id'],
         },
@@ -61,7 +61,7 @@ def get_open_account_mock() -> list[dict[str, Any]]:
             'description': 'Conta de pagamentos',
             'branch': '567-8',
             'number': '789123',
-            'open_date': datetime.datetime.now(datetime.timezone.utc) - relativedelta(years=2, months=8, days=0),
+            'open_date': datetime.datetime.now(datetime.UTC) - relativedelta(years=2, months=8, days=0),
             'type_id': account_types[0]['id'],
             'currency_id': currencies[0]['id'],
         },
@@ -74,7 +74,7 @@ def get_open_account_mock() -> list[dict[str, Any]]:
             'description': 'Conta de investimentos',
             'branch': '123-4',
             'number': '123456',
-            'open_date': datetime.datetime.now(datetime.timezone.utc) - relativedelta(years=5, months=7, days=21),
+            'open_date': datetime.datetime.now(datetime.UTC) - relativedelta(years=5, months=7, days=21),
             'type_id': account_types[1]['id'],
             'currency_id': currencies[0]['id'],
         }
@@ -98,8 +98,8 @@ def get_closed_account_mock() -> list[dict[str, Any]]:
             'description': 'Conta de salário e pagamentos',
             'branch': '1212-1',
             'number': '123654',
-            'open_date': datetime.datetime.now(datetime.timezone.utc) - relativedelta(years=15, months=3, days=11),
-            'close_date': datetime.datetime.now(datetime.timezone.utc) - relativedelta(years=0, months=3, days=1),
+            'open_date': datetime.datetime.now(datetime.UTC) - relativedelta(years=15, months=3, days=11),
+            'close_date': datetime.datetime.now(datetime.UTC) - relativedelta(years=0, months=3, days=1),
             'type_id': account_types[0]['id'],
             'currency_id': currencies[0]['id']
         }
@@ -114,8 +114,8 @@ def get_account_transaction_mock() -> list[dict[str, Any]]:
     categories = get_category_mock()
 
     account_transactions: list[dict[str, Any]] = []
-    start_date = datetime.datetime.now(datetime.timezone.utc)-relativedelta(months=3)
-    end_date = datetime.datetime.now(datetime.timezone.utc)
+    start_date = datetime.datetime.now(datetime.UTC)-relativedelta(months=3)
+    end_date = datetime.datetime.now(datetime.UTC)
 
     for i in range(0, 35):
         transaction_date = get_randon_date(start_date, end_date)
@@ -133,7 +133,7 @@ def get_account_transaction_mock() -> list[dict[str, Any]]:
                 'transaction_amount': amount,
                 'transaction_date': transaction_date,
                 'category_id': category,
-                'description': 'Transaction {number}'.format(number=i),
+                'description': f'Transaction {i}',
                 'transaction_currency_id': currencies[0]['id'],
                 'origin': 'TEST',
             }
@@ -156,7 +156,7 @@ def get_account_transaction_mock() -> list[dict[str, Any]]:
                 'transaction_amount': amount,
                 'transaction_date': transaction_date,
                 'category_id': category,
-                'description': 'Transaction {number}'.format(number=i),
+                'description': f'Transaction {i}',
                 'transaction_currency_id': currencies[0]['id'],
                 'origin': 'TEST',
             }

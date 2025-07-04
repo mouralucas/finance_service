@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import date, datetime
 
 from dateutil.relativedelta import relativedelta
 from fastapi import HTTPException
@@ -9,11 +9,27 @@ from starlette import status
 
 from managers.credit_card import CreditCardManager
 from models.credit_card import CreditCardModel, CreditCardTransactionModel
-from schemas.credit_card import CreditCardSchema, CreditCardTransactionSchema, CreditCardBillSchema, CreditCardBillHistorySchema, InstallmentsDueDates
-from schemas.request.credit_card import CreateCreditCardRequest, GetCreditCardRequest, CreateCreditCardTransactionRequest, CancelCreditCardRequest, GetCreditCardBillRequest, GetCreditCardTransactionsRequest, GetInstallmentsDueDatesRequest
-from schemas.response.credit_card import CreateCreditCardResponse, GetCreditCardResponse, CreateCreditCardTransactionResponse, CancelCreditCardResponse, GetCreditCardTransactionResponse, GetCreditCardBillConsolidatedResponse, \
-    GetCreditCardBillHistoryResponse, GetInstallmentsDueDatesResponse
-from services.utils.datetime import get_period, get_period_range, get_installments_due_dates
+from schemas.credit_card import CreditCardBillHistorySchema, CreditCardBillSchema, CreditCardSchema, CreditCardTransactionSchema, InstallmentsDueDates
+from schemas.request.credit_card import (
+    CancelCreditCardRequest,
+    CreateCreditCardRequest,
+    CreateCreditCardTransactionRequest,
+    GetCreditCardBillRequest,
+    GetCreditCardRequest,
+    GetCreditCardTransactionsRequest,
+    GetInstallmentsDueDatesRequest,
+)
+from schemas.response.credit_card import (
+    CancelCreditCardResponse,
+    CreateCreditCardResponse,
+    CreateCreditCardTransactionResponse,
+    GetCreditCardBillConsolidatedResponse,
+    GetCreditCardBillHistoryResponse,
+    GetCreditCardResponse,
+    GetCreditCardTransactionResponse,
+    GetInstallmentsDueDatesResponse,
+)
+from services.utils.datetime import get_installments_due_dates, get_period
 
 
 class CreditCardService(BaseService):

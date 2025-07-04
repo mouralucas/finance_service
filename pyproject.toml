@@ -1,0 +1,29 @@
+[tool.ruff]
+
+src = ["."] 
+
+# Configurações de estilo
+line-length = 150
+target-version = "py311"
+
+select = [
+    "F",    # pyflakes (erros básicos)
+    "E",    # pycodestyle (estilo)
+    "W",    # pycodestyle warnings
+    "I",    # isort (ordem de imports)
+    "N",    # pep8-naming (nomes de funções/variáveis/classes)
+    "UP",   # pyupgrade (modernização de sintaxe)
+    "C90",  # mccabe (complexidade)
+]
+
+# Regras a ignorar (se necessário)
+ignore = []
+
+# Arquivos e pastas a ignorar
+exclude = [
+    ".venv",
+    "__pycache__",
+    "build",
+    "dist",
+    "alembic",
+]

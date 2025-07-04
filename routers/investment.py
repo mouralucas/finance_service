@@ -5,11 +5,34 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from backend.database import get_session
-from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, CreateStatementRequest, GetStatementRequest, LiquidateInvestmentRequest, GetObjectiveRequest, CreateObjectiveRequest, GetObjectiveSummaryRequest, \
-    GetPerformanceRequest, UpdateInvestmentRequest
+from schemas.request.investment import (
+    CreateInvestmentRequest,
+    CreateObjectiveRequest,
+    CreateStatementRequest,
+    GetInvestmentRequest,
+    GetObjectiveRequest,
+    GetObjectiveSummaryRequest,
+    GetPerformanceRequest,
+    GetStatementRequest,
+    LiquidateInvestmentRequest,
+    UpdateInvestmentRequest,
+)
 from schemas.request.investment_brazilian_fixed_income import CreateFixedIncomeInvestmentBrazilRequest
-from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, CreateStatementResponse, GetStatementResponse, LiquidateInvestmentResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse, \
-    GetInvestmentWithoutObjectives, GetObjectiveSummaryResponse, GetInvestmentAllocationResponse, GetInvestmentPerformanceResponse, UpdateInvestmentResponse
+from schemas.response.investment import (
+    CreateInvestmentResponse,
+    CreateObjectiveResponse,
+    CreateStatementResponse,
+    GetInvestmentAllocationResponse,
+    GetInvestmentPerformanceResponse,
+    GetInvestmentResponse,
+    GetInvestmentTypeResponse,
+    GetInvestmentWithoutObjectives,
+    GetObjectiveResponse,
+    GetObjectiveSummaryResponse,
+    GetStatementResponse,
+    LiquidateInvestmentResponse,
+    UpdateInvestmentResponse,
+)
 from services.investment import InvestmentService
 
 router = APIRouter(prefix="/investment", tags=['Investments'])

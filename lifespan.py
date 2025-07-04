@@ -1,5 +1,5 @@
 from rolf_common.backend.logger import set_log_handler
-from rolf_common.backend.nosql_database import set_db_connection, get_db_connection, NoSqlDatabaseSessionManager
+from rolf_common.backend.nosql_database import NoSqlDatabaseSessionManager, get_db_connection, set_db_connection
 from rolf_common.managers.logs import BaseLogDataManager
 
 from backend.settings import settings

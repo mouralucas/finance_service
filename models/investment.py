@@ -3,8 +3,8 @@ from datetime import date
 from decimal import Decimal
 
 from rolf_common.models import SQLModel
-from sqlalchemy import String, ForeignKey, JSON, Numeric, Text
-from sqlalchemy.orm import mapped_column, Mapped, relationship
+from sqlalchemy import JSON, ForeignKey, Numeric, String, Text
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
 class InvestmentCategoryModel(SQLModel):

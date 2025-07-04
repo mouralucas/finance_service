@@ -4,11 +4,11 @@ from typing import cast
 from fastapi import HTTPException
 from rolf_common.managers import BaseDataManager
 from rolf_common.models import SQLModel
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from models.core import CurrencyModel, BankModel, IndexerTypeModel, IndexerModel, LiquidityModel, PeriodicityModel, IndexerSeriesModel, TaxFeeModel
+from models.core import BankModel, CurrencyModel, IndexerModel, IndexerSeriesModel, IndexerTypeModel, LiquidityModel, PeriodicityModel, TaxFeeModel
 from models.investment import FundsBrModel
 
 

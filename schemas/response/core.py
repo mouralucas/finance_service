@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 
-from schemas.core import CategorySchema, CurrencySchema, CountrySchema
+from schemas.core import CategorySchema, CountrySchema
 
 
 class GetCategoryResponse(BaseModel):

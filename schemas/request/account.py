@@ -2,9 +2,8 @@ import datetime
 import uuid
 from decimal import Decimal
 
-from pydantic import BaseModel, Field, ConfigDict, AliasGenerator
-from fastapi import Query
-from pydantic.alias_generators import to_camel, to_snake
+from pydantic import AliasGenerator, BaseModel, ConfigDict, Field
+from pydantic.alias_generators import to_camel
 from rolf_common.schemas.base import DefaultModel
 
 

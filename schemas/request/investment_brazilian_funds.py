@@ -2,7 +2,7 @@ import uuid
 from datetime import date
 from decimal import Decimal
 
-from pydantic import Field, BaseModel, model_validator, ConfigDict, AliasGenerator
+from pydantic import AliasGenerator, BaseModel, ConfigDict, Field, model_validator
 from pydantic.alias_generators import to_camel
 
 from schemas.request.investment import CreateInvestmentBaseRequest, CreateInvestmentStatementBaseRequest

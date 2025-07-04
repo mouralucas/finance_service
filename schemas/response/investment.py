@@ -1,11 +1,15 @@
-from pydantic import Field, BaseModel, ConfigDict, AliasGenerator
+from pydantic import AliasGenerator, BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
 
 from schemas.core import ChartSeriesSchema
-from schemas.investment import (InvestmentSchema, InvestmentStatementSchema,
-                                InvestmentObjectiveSchema, InvestmentTypeSchema,
-                                InvestmentAllocationSchema, InvestmentPerformanceDataSchema)
-from schemas.investment_brazilian_fund import InvestmentBrazilianFundSchema
+from schemas.investment import (
+    InvestmentAllocationSchema,
+    InvestmentObjectiveSchema,
+    InvestmentPerformanceDataSchema,
+    InvestmentSchema,
+    InvestmentStatementSchema,
+    InvestmentTypeSchema,
+)
 
 
 class CreateInvestmentResponse(BaseModel):

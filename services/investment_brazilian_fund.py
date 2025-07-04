@@ -8,8 +8,17 @@ from managers.investment_brazilian_fund import InvestmentBrazilianFundManager
 from models.investment_brazilian_fund import InvestmentBrazilianFundsModel, InvestmentBrazilianFundsStatementModel
 from schemas.investment_brazilian_fund import InvestmentBrazilianFundSchema, InvestmentBrazilianFundStatementSchema
 from schemas.request.investment import GetBrazilianFundInvestmentsRequest
-from schemas.request.investment_brazilian_funds import CreateBrazilianFundInvestmentStatementRequest, CreateBrazilianFundInvestmentRequest, GetBrazilianFundInvestmentStatementRequest
-from schemas.response.investment_brazilian_funds import CreateBrazilianFundInvestmentResponse, CreateBrazilianFundInvestmentStatementResponse, GetBrazilianFundInvestmentStatementResponse, GetBrazilianFundInvestmentsResponse
+from schemas.request.investment_brazilian_funds import (
+    CreateBrazilianFundInvestmentRequest,
+    CreateBrazilianFundInvestmentStatementRequest,
+    GetBrazilianFundInvestmentStatementRequest,
+)
+from schemas.response.investment_brazilian_funds import (
+    CreateBrazilianFundInvestmentResponse,
+    CreateBrazilianFundInvestmentStatementResponse,
+    GetBrazilianFundInvestmentsResponse,
+    GetBrazilianFundInvestmentStatementResponse,
+)
 from services.investment import InvestmentService
 from services.utils.datetime import get_period
 
@@ -101,7 +110,7 @@ class InvestmentBrazilianFundService(InvestmentService):
 
         response = GetBrazilianFundInvestmentStatementResponse(
             quantity=len(statements) if statements else 0,
-            statements=[InvestmentBrazilianFundStatementSchema.model_validate(statement) for statement in statements]
+            statements=[InvestmentBrazilianFundStatementSchema.model_validate(statement) for statement in statements] if statements else [],
         )
 
         return response

@@ -1,7 +1,7 @@
 import uuid
 
-from pydantic import Field, BaseModel, ConfigDict, AliasGenerator
-from pydantic.alias_generators import to_snake, to_camel
+from pydantic import AliasGenerator, BaseModel, ConfigDict, Field
+from pydantic.alias_generators import to_camel, to_snake
 
 
 class BankSchema(BaseModel):

@@ -1,11 +1,8 @@
-import uuid
 
 import pytest_asyncio
-import datetime
-
 from rolf_common.managers import BaseDataManager
 
-from data_mock.credit_card import get_credit_card_mock, get_cancelled_credit_card_mock
+from data_mock.credit_card import get_cancelled_credit_card_mock, get_credit_card_mock
 from models.credit_card import CreditCardModel
 from schemas.credit_card import CreditCardSchema
 

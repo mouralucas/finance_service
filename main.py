@@ -6,10 +6,8 @@ from rolf_common.base_middleware import LogsMiddleware
 from starlette.middleware.cors import CORSMiddleware
 
 from backend.settings import settings
-from lifespan import start_log_service, shutdown_log_service
-from routers import (account, credit_card, core,
-                     investment, investment_brazilian_funds,
-                     integration, finance)
+from lifespan import shutdown_log_service, start_log_service
+from routers import account, core, credit_card, finance, integration, investment, investment_brazilian_funds
 from routers_graphql import main
 
 

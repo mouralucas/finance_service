@@ -1,8 +1,6 @@
-import datetime
-import uuid
 
 from fastapi import APIRouter, Depends, Security
-from rolf_common.backend.logger import get_logger
+
 # from rolf_common.backend.logger import logger
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import get_user
@@ -10,10 +8,23 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from backend.database import get_session
-from schemas.request.account import CreateAccountRequest, GetAccountRequest, CreateAccountTransactionRequest, \
-    CloseAccountRequest, CreateBalanceRequest, GetBalanceRequest, UpdateAccountTransactionRequest, GetAccountTransactionRequest
-from schemas.response.account import CreateAccountResponse, GetAccountResponse, CloseAccountResponse, \
-    GetAccountTransactionResponse, CreateAccountTransactionResponse
+from schemas.request.account import (
+    CloseAccountRequest,
+    CreateAccountRequest,
+    CreateAccountTransactionRequest,
+    CreateBalanceRequest,
+    GetAccountRequest,
+    GetAccountTransactionRequest,
+    GetBalanceRequest,
+    UpdateAccountTransactionRequest,
+)
+from schemas.response.account import (
+    CloseAccountResponse,
+    CreateAccountResponse,
+    CreateAccountTransactionResponse,
+    GetAccountResponse,
+    GetAccountTransactionResponse,
+)
 from services.account import AccountService
 
 router = APIRouter(prefix="/account", tags=['Account'])

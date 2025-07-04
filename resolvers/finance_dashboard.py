@@ -1,4 +1,5 @@
-from ariadne import QueryType, MutationType
+from ariadne import MutationType, QueryType
+
 
 async def resolve_hello_world(_, info):
     return "Hello you MF"

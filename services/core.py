@@ -1,10 +1,10 @@
+
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import BaseService
 from sqlalchemy.ext.asyncio import AsyncSession
-from unicodedata import category
 
 from managers.core import CoreManager
-from schemas.core import CategorySchema, CurrencySchema, CountrySchema
+from schemas.core import CategorySchema, CountrySchema
 from schemas.response.core import GetCategoryResponse, GetCountryResponse
 
 

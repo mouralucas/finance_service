@@ -1,10 +1,6 @@
-from datetime import timedelta
 
 import pytest
-from dateutil.relativedelta import relativedelta
 from starlette import status
-
-from tests.utils import random_date
 
 
 @pytest.mark.asyncio

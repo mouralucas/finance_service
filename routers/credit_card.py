@@ -5,9 +5,23 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from backend.database import get_session
-from schemas.request.credit_card import CreateCreditCardRequest, CreateCreditCardTransactionRequest, GetCreditCardRequest, CancelCreditCardRequest, GetCreditCardBillRequest, GetCreditCardTransactionsRequest, GetInstallmentsDueDatesRequest
-from schemas.response.credit_card import CreateCreditCardResponse, CreateCreditCardTransactionResponse, GetCreditCardTransactionResponse, GetCreditCardBillConsolidatedResponse, GetCreditCardBillHistoryResponse, \
-    GetInstallmentsDueDatesResponse
+from schemas.request.credit_card import (
+    CancelCreditCardRequest,
+    CreateCreditCardRequest,
+    CreateCreditCardTransactionRequest,
+    GetCreditCardBillRequest,
+    GetCreditCardRequest,
+    GetCreditCardTransactionsRequest,
+    GetInstallmentsDueDatesRequest,
+)
+from schemas.response.credit_card import (
+    CreateCreditCardResponse,
+    CreateCreditCardTransactionResponse,
+    GetCreditCardBillConsolidatedResponse,
+    GetCreditCardBillHistoryResponse,
+    GetCreditCardTransactionResponse,
+    GetInstallmentsDueDatesResponse,
+)
 from services.credit_card import CreditCardService
 
 router = APIRouter(prefix="/creditcard", tags=['Credit cards'])

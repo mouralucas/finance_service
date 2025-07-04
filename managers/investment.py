@@ -4,13 +4,13 @@ from typing import Any, cast
 from fastapi import HTTPException
 from rolf_common.managers import BaseDataManager
 from rolf_common.models import SQLModel
-from sqlalchemy import select, update, Executable, RowMapping, func, case, literal
+from sqlalchemy import Executable, RowMapping, case, func, literal, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 from starlette import status
 
-from models.core import IndexerSeriesModel, CurrencyModel, BankModel
-from models.investment import InvestmentModel, InvestmentTypeModel, InvestmentStatementModel, InvestmentObjectiveModel, InvestmentCategoryModel
+from models.core import BankModel, CurrencyModel, IndexerSeriesModel
+from models.investment import InvestmentCategoryModel, InvestmentModel, InvestmentObjectiveModel, InvestmentStatementModel, InvestmentTypeModel
 from services.utils.datetime import get_previous_period
 
 

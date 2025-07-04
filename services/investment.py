@@ -11,14 +11,44 @@ from starlette import status
 from managers.account import AccountManager
 from managers.finance import FinanceManager
 from managers.investment import InvestmentManager
-from models.investment import InvestmentModel, InvestmentStatementModel, InvestmentObjectiveModel
+from models.investment import InvestmentModel, InvestmentObjectiveModel, InvestmentStatementModel
 from schemas.core import ChartSeriesSchema
-from schemas.investment import InvestmentSchema, InvestmentStatementSchema, InvestmentObjectiveSchema, InvestmentTypeSchema, InvestmentAllocationSchema, InvestmentPerformanceDataSchema
-from schemas.request.investment import CreateInvestmentRequest, GetInvestmentRequest, LiquidateInvestmentRequest, CreateStatementRequest, GetStatementRequest, CreateObjectiveRequest, GetObjectiveRequest, GetObjectiveSummaryRequest, \
-    GetPerformanceRequest, UpdateInvestmentRequest
+from schemas.investment import (
+    InvestmentAllocationSchema,
+    InvestmentObjectiveSchema,
+    InvestmentPerformanceDataSchema,
+    InvestmentSchema,
+    InvestmentStatementSchema,
+    InvestmentTypeSchema,
+)
+from schemas.request.investment import (
+    CreateInvestmentRequest,
+    CreateObjectiveRequest,
+    CreateStatementRequest,
+    GetInvestmentRequest,
+    GetObjectiveRequest,
+    GetObjectiveSummaryRequest,
+    GetPerformanceRequest,
+    GetStatementRequest,
+    LiquidateInvestmentRequest,
+    UpdateInvestmentRequest,
+)
 from schemas.request.investment_brazilian_fixed_income import CreateFixedIncomeInvestmentBrazilRequest
-from schemas.response.investment import CreateInvestmentResponse, GetInvestmentResponse, LiquidateInvestmentResponse, CreateStatementResponse, GetStatementResponse, CreateObjectiveResponse, GetObjectiveResponse, GetInvestmentTypeResponse, \
-    GetInvestmentWithoutObjectives, GetObjectiveSummaryResponse, GetInvestmentAllocationResponse, GetInvestmentPerformanceResponse, UpdateInvestmentResponse
+from schemas.response.investment import (
+    CreateInvestmentResponse,
+    CreateObjectiveResponse,
+    CreateStatementResponse,
+    GetInvestmentAllocationResponse,
+    GetInvestmentPerformanceResponse,
+    GetInvestmentResponse,
+    GetInvestmentTypeResponse,
+    GetInvestmentWithoutObjectives,
+    GetObjectiveResponse,
+    GetObjectiveSummaryResponse,
+    GetStatementResponse,
+    LiquidateInvestmentResponse,
+    UpdateInvestmentResponse,
+)
 from services.utils.datetime import get_period, get_previous_period
 
 
@@ -283,7 +313,7 @@ class InvestmentService(BaseService):
 
         investments = await self.investment_manager.get_investments({'active': True, 'objective_id': params.id})
         if not investments:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No investment for objective '{objective_title}'".format(objective_title=objective.title))
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"No investment for objective '{objective.title}'")
         investment_ids = [investment['InvestmentModel'].id for investment in investments]
 
         statements = await self.investment_manager.get_latest_investment_statements(investment_ids=investment_ids)

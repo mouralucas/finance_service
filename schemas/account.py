@@ -2,7 +2,7 @@ import datetime
 import uuid
 from decimal import Decimal
 
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from schemas.credit_card import CreditCardSchema
 

@@ -6,8 +6,8 @@ from dateutil.relativedelta import relativedelta
 
 from data_mock.account import get_open_account_mock
 from data_mock.common import default_model_dict
-from data_mock.core import get_currency_mock, get_index_type_mock, get_indexer_mock, get_liquidity_mock, get_country_mock
-from data_mock.investment.base import get_investment_category_mock, get_fixed_income_br_investment_type_mock
+from data_mock.core import get_country_mock, get_currency_mock, get_index_type_mock, get_indexer_mock, get_liquidity_mock
+from data_mock.investment.base import get_fixed_income_br_investment_type_mock
 from services.utils.datetime import get_period
 
 

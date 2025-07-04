@@ -1,19 +1,17 @@
 import datetime
 import uuid
 from typing import Any, cast
-from unicodedata import category
 
 from fastapi import HTTPException
 from rolf_common.managers import BaseDataManager
 from rolf_common.models import SQLModel
-from sqlalchemy import select, update, func, case, RowMapping, literal_column, union_all, union, delete, literal, and_
+from sqlalchemy import RowMapping, and_, case, delete, func, literal, literal_column, select, union_all, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 from starlette import status
 
-from models.account import AccountModel, AccountTransactionModel, AccountBalanceModel
-from models.core import CurrencyModel, CategoryModel
-from models.credit_card import CreditCardTransactionModel
+from models.account import AccountBalanceModel, AccountModel, AccountTransactionModel
+from models.core import CategoryModel, CurrencyModel
 from services.utils.datetime import get_current_period
 
 

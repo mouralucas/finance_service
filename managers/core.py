@@ -1,13 +1,9 @@
-import uuid
-from typing import cast
 
-from fastapi import HTTPException
 from rolf_common.managers import BaseDataManager
-from sqlalchemy import func, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from starlette import status
 
-from models.core import IndexerModel, PeriodicityModel, IndexerSeriesModel, CategoryModel, CountryModel, CategoryExpenseTypeUserModel
+from models.core import CategoryExpenseTypeUserModel, CategoryModel, CountryModel
 
 
 class CoreManager(BaseDataManager):

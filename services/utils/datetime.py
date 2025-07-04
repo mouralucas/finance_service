@@ -1,13 +1,13 @@
 import calendar
 import random
-from datetime import datetime, date, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 from typing import Any
 
 from dateutil.relativedelta import relativedelta
 
 
 def get_current_period():
-    today = datetime.now(timezone.utc)
+    today = datetime.now(UTC)
     month = today.month
     year = today.year
 
@@ -65,7 +65,7 @@ def get_period_range(start_period: int, end_period: int = None) -> list[int]:
     :return: A list with all periods between start_period and end_period.
     """
     if not end_period:
-        today = datetime.now(timezone.utc)
+        today = datetime.now(UTC)
         end_period = today.year * 100 + today.month
 
     start_month = start_period % 100

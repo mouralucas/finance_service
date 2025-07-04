@@ -1,6 +1,6 @@
 from datetime import date
 
-from services.utils.datetime import get_period_range, get_period, get_previous_period, get_installments_due_dates
+from services.utils.datetime import get_installments_due_dates, get_period, get_period_range, get_previous_period
 
 
 def test_get_period():

@@ -1,15 +1,22 @@
-from fastapi import APIRouter
-from fastapi import Depends, Security
+from fastapi import APIRouter, Depends, Security
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import get_user
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.util import await_only
 from starlette import status
 
 from backend.database import get_session
-from schemas.request.finance import GetSummaryRequest, GetTaxFeeRequest, GetCurrencyCostAverage, CreateBrazilianFundRequest
-from schemas.response.finance import GetCurrencyResponse, GetBankResponse, GetIndexerTypeResponse, GetIndexerResponse, GetLiquidityResponse, GetExpensesByCategoryResponse, GetTaxFeeResponse, CreateBrazilianFundResponse, \
-    GetBrazilianFundsResponse
+from schemas.request.finance import CreateBrazilianFundRequest, GetCurrencyCostAverage, GetSummaryRequest, GetTaxFeeRequest
+from schemas.response.finance import (
+    CreateBrazilianFundResponse,
+    GetBankResponse,
+    GetBrazilianFundsResponse,
+    GetCurrencyResponse,
+    GetExpensesByCategoryResponse,
+    GetIndexerResponse,
+    GetIndexerTypeResponse,
+    GetLiquidityResponse,
+    GetTaxFeeResponse,
+)
 from services.finance import FinanceService
 
 router = APIRouter(prefix="/finance", tags=['Finance'])

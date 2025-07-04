@@ -1,9 +1,10 @@
 import uuid
 from datetime import date
-from pydantic import AliasGenerator, ConfigDict, Field
-from pydantic.alias_generators import to_camel
+
+from pydantic import Field
 
 from schemas.request.investment import CreateInvestmentBaseRequest
+
 
 class CreateFixedIncomeInvestmentBrazilRequest(CreateInvestmentBaseRequest):
     issue_date: date = Field(..., description='The date the investment was issued')

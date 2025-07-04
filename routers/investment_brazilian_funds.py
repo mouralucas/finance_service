@@ -3,13 +3,20 @@ from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import get_user
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
-from uvicorn.config import resolve_reload_patterns
 
 from backend.database import get_session
-from schemas.request.investment import GetInvestmentRequest, GetBrazilianFundInvestmentsRequest
-from schemas.request.investment_brazilian_funds import CreateBrazilianFundInvestmentStatementRequest, CreateBrazilianFundInvestmentRequest, GetBrazilianFundInvestmentStatementRequest
-from schemas.response.investment import GetInvestmentResponse
-from schemas.response.investment_brazilian_funds import CreateBrazilianFundInvestmentResponse, CreateBrazilianFundInvestmentStatementResponse, GetBrazilianFundInvestmentStatementResponse, GetBrazilianFundInvestmentsResponse
+from schemas.request.investment import GetBrazilianFundInvestmentsRequest
+from schemas.request.investment_brazilian_funds import (
+    CreateBrazilianFundInvestmentRequest,
+    CreateBrazilianFundInvestmentStatementRequest,
+    GetBrazilianFundInvestmentStatementRequest,
+)
+from schemas.response.investment_brazilian_funds import (
+    CreateBrazilianFundInvestmentResponse,
+    CreateBrazilianFundInvestmentStatementResponse,
+    GetBrazilianFundInvestmentsResponse,
+    GetBrazilianFundInvestmentStatementResponse,
+)
 from services.investment_brazilian_fund import InvestmentBrazilianFundService
 
 router = APIRouter(prefix="/investment/funds/br", tags=['Investments'])

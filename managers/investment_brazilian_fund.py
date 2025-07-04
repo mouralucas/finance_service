@@ -1,14 +1,13 @@
 import uuid
-from typing import Any, cast
+from typing import cast
 
-from fastapi import HTTPException
 from rolf_common.models import SQLModel
-from sqlalchemy import select, RowMapping
+from sqlalchemy import RowMapping, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from starlette import status
 
 from managers.investment import InvestmentManager
 from models.investment_brazilian_fund import InvestmentBrazilianFundsModel, InvestmentBrazilianFundsStatementModel
+
 
 class InvestmentBrazilianFundManager(InvestmentManager):
     def __init__(self, session: AsyncSession):

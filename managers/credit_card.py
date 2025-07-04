@@ -3,9 +3,9 @@ from typing import Any, cast
 
 from rolf_common.managers import BaseDataManager
 from rolf_common.models import SQLModel
-from sqlalchemy import select, update, RowMapping, func
-from sqlalchemy.orm import aliased
+from sqlalchemy import RowMapping, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import aliased
 
 from models.core import CategoryModel, CurrencyModel
 from models.credit_card import CreditCardModel, CreditCardTransactionModel
