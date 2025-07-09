@@ -72,3 +72,17 @@ class BalanceSchema(BaseModel):
     transactions: Decimal = Field(None, description="The difference between incoming and outgoing")
     earning: Decimal = Field(None, description="How much the account profits in the period, if set")
     balance: Decimal = Field(None, description="How many money is in the account by the end of the period")
+
+
+class AccountBalanceSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    # id: uuid.UUID = Field(..., serialization_alias='balanceId', description='The id of the balance')
+    # account_id: uuid.UUID = Field(..., serialization_alias='accountId', description='Account identification')
+    period: int = Field(..., description='The period of the balance')
+    previous_balance: Decimal = Field(None, description="The balance from the past period")
+    incoming: Decimal = Field(None, description="The amount o money that enter the account in the period")
+    outgoing: Decimal = Field(None, description="The amount o money that leave the account in the period")
+    transactions: Decimal = Field(None, description="The difference between incoming and outgoing")
+    earnings: Decimal = Field(None, description="How much the account profits in the period, if set")
+    balance: Decimal = Field(None, description="How many money is in the account by the end of the period")

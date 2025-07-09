@@ -11,7 +11,7 @@ from managers.account import AccountManager
 from managers.credit_card import CreditCardManager
 from models.account import AccountBalanceModel, AccountModel, AccountTransactionModel
 from models.credit_card import CreditCardModel
-from schemas.account import AccountSchema, AccountTransactionSchema
+from schemas.account import AccountBalanceSchema, AccountSchema, AccountTransactionSchema, BalanceSchema
 from schemas.request.account import (
     CloseAccountRequest,
     CreateAccountRequest,
@@ -82,7 +82,7 @@ class AccountService(BaseService):
         params = params.model_dump()
         params['owner_id'] = self.user['user_id']
 
-        accounts: list[AccountModel] = await self.account_manager.get_accounts(params=params)
+        accounts: list[AccountModel] | None = await self.account_manager.get_accounts(params=params)
 
         response = GetAccountResponse(
             quantity=len(accounts) if accounts else 0,
@@ -201,16 +201,12 @@ class AccountService(BaseService):
         return response
 
     async def get_balance(self, params: GetBalanceRequest) -> GetBalanceResponse:
-        balance = await self.account_manager.get_balance_beta(account_id=params.account_id, period=202407)
-        # balance = await self.account_manager.get_monthly_account_report(account_id=params.account_id)
-        # account: AccountModel = await self.account_manager.get_account_by_id(account_id=params.account_id, raise_exception=True)
-        # balance = await self.account_manager.get_balance(params.account_id, params.start_period, params.end_period)
-        #
-        # response = GetBalanceResponse(
-        #     account_name=account.nickname,
-        #     quantity=len(balance) if balance else 0,
-        #     balance=[BalanceSchema.model_validate(data["AccountBalanceModel"]) for data in balance] if balance else []
-        # )
-        #
-        # return response
+        balance = await self.account_manager.get_balance_beta(account_id=params.account_id, period=202501)
+        
+        response = GetBalanceResponse(
+            account_name="account.nickname",
+            quantity=len(balance) if balance else 0,
+            balance=[AccountBalanceSchema.model_validate(data) for data in balance] if balance else []
+        )
+        return response
 

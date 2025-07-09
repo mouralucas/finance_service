@@ -168,7 +168,7 @@ class AccountManager(BaseDataManager):
 
         return balance
 
-    async def get_balance_beta(self, account_id: uuid.UUID, period: int):
+    async def get_balance_beta(self, account_id: uuid.UUID, period: int) -> list[dict[Any, Any]] | None:
         t = AccountTransactionModel  # sua tabela de transações
 
         stmt = select(
@@ -182,7 +182,7 @@ class AccountManager(BaseDataManager):
                         else_=0
                     )
                 ), 0
-            ).label("initial_value"),
+            ).label("previous_balance"),
 
             # Entradas: positivas, excluindo earnings
             func.coalesce(
@@ -192,7 +192,7 @@ class AccountManager(BaseDataManager):
                         else_=0
                     )
                 ), 0
-            ).label("inflow"),
+            ).label("incoming"),
 
             # Rendimentos: qualquer valor com categoria 'earnings'
             func.coalesce(
@@ -212,7 +212,7 @@ class AccountManager(BaseDataManager):
                         else_=0
                     )
                 ), 0
-            ).label("outflow"),
+            ).label("outgoing"),
 
             # Saldo no período (balance = inflow + earnings + outflow)
             func.coalesce(
@@ -222,7 +222,7 @@ class AccountManager(BaseDataManager):
                         else_=0
                     )
                 ), 0
-            ).label("balance"),
+            ).label("transactions"),
 
             # Saldo final acumulado até o fim do período
             func.coalesce(
@@ -232,14 +232,14 @@ class AccountManager(BaseDataManager):
                         else_=0
                     )
                 ), 0
-            ).label("final_balance"),
+            ).label("balance")
         ).where(
             t.account_id == account_id
         )
 
         balance = await self.get_all(stmt)
-        balance = balance[0]
-        print('')
+
+        return [dict(transaction.items()) for transaction in balance] if balance else None
 
     async def get_monthly_account_report(self, account_id: uuid.UUID):
         t = AccountTransactionModel

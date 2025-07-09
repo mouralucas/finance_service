@@ -2,10 +2,10 @@ from pydantic import AliasGenerator, BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
 from rolf_common.schemas import SuccessResponseBase
 
-from schemas.account import AccountSchema, AccountTransactionSchema, BalanceSchema
+from schemas.account import AccountBalanceSchema, AccountSchema, AccountTransactionSchema, BalanceSchema
 
 
-class CreateAccountResponse(SuccessResponseBase):
+class CreateAccountResponse(BaseModel):
     account: AccountSchema = Field(..., serialization_alias='account', description='The new account created by the user')
 
 
@@ -13,19 +13,19 @@ class CloseAccountResponse(CreateAccountResponse):
     pass
 
 
-class GetAccountResponse(SuccessResponseBase):
+class GetAccountResponse(BaseModel):
     quantity: int = Field(..., serialization_alias='quantity', description='The number of accounts fetched')
     accounts: list[AccountSchema] | None = Field(None, serialization_alias='accounts', description='The accounts of the user')
 
 
-class CreateAccountTransactionResponse(SuccessResponseBase):
+class CreateAccountTransactionResponse(BaseModel):
     transaction: AccountTransactionSchema = Field(..., serialization_alias='transaction', description='The entry statement created by the user')
 
 
 class UpdateTransactionResponse(CreateAccountTransactionResponse):
     pass
 
-class GetAccountTransactionResponse(SuccessResponseBase):
+class GetAccountTransactionResponse(BaseModel):
     quantity: int = Field(..., description='The number of transactions')
     transactions: list[AccountTransactionSchema] = Field(..., description='The account transactions')
 
@@ -38,7 +38,7 @@ class CreateBalanceResponse(BaseModel):
     periods_saved: int = Field(..., description='The number of periods saved')
 
 
-class GetBalanceResponse(SuccessResponseBase):
+class GetBalanceResponse(BaseModel):
     quantity: int = Field(..., serialization_alias='quantity', description='The number of periods fetched for the account')
     account_name: str = Field(..., serialization_alias='accountName', description='The account name')
-    balance: list[BalanceSchema] = Field(..., serialization_alias='balance', description='The balance for the account in selected period range')
+    balance: list[AccountBalanceSchema] = Field(..., serialization_alias='balance', description='The balance for the account in selected period range')
