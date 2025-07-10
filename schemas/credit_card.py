@@ -67,6 +67,9 @@ class CreditCardBillSchema(BaseModel):
 
 
 class CreditCardsTotalBillByCardSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True,
+                              alias_generator=AliasGenerator(serialization_alias=to_camel))
+    
     nickname: str = Field(..., description='The nickname of the credit card')
     currency_symbol: str = Field(..., description='The currency symbol for the credit card')
     total_installments: float = Field(..., description='The total amount for the installments')
