@@ -69,6 +69,7 @@ class CreditCardBillSchema(BaseModel):
 class CreditCardsTotalBillByCardSchema(BaseModel):
     nickname: str = Field(..., description='The nickname of the credit card')
     currency_symbol: str = Field(..., description='The currency symbol for the credit card')
+    total_installments: float = Field(..., description='The total amount for the installments')
     total: float = Field(..., description='The total for the credit card')
 
 

@@ -168,10 +168,12 @@ class CreditCardService(BaseService):
 
         bill_periods = {}
         for i in bill_by_card:
-            # The bill_by_card response returns the values for cards in the same period in different rows, so we need to group them by period
+            # The bill_by_card response returns the values for cards in the same
+            #  period in different rows, so we need to group them by period
             period = i['period']
             card = i['credit_card']
             total_amount = i['total_amount']
+            total_installments = i['total_installments']
             currency_symbol = i['currency_symbol']
 
             if period not in bill_periods:
@@ -196,6 +198,7 @@ class CreditCardService(BaseService):
             bill_periods[period]['credit_cards'].append({
                 'nickname': card,
                 'currency_symbol': currency_symbol,
+                'total_installments': total_installments,
                 'total': total_amount,
             })
 

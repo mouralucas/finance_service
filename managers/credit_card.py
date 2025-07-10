@@ -3,7 +3,7 @@ from typing import Any, cast
 
 from rolf_common.managers import BaseDataManager
 from rolf_common.models import SQLModel
-from sqlalchemy import RowMapping, func, select, update
+from sqlalchemy import RowMapping, case, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 
@@ -58,7 +58,7 @@ class CreditCardManager(BaseDataManager):
         return [credit_card['CreditCardModel'] for credit_card in credit_cards] if credit_cards else None
 
     # Transactions
-    async def create_credit_card_transaction(self, transactions: list[CreditCardTransactionModel]) -> list[CreditCardTransactionModel]:
+    async def create_credit_card_transaction(self, transactions: list[CreditCardTransactionModel]) -> list[CreditCardTransactionModel] | None:
         new_bill_entries = await self.add_all(transactions)
         [await self.session.refresh(i) for i in new_bill_entries]
 
@@ -66,7 +66,7 @@ class CreditCardManager(BaseDataManager):
 
     async def get_credit_card_transactions(self, owner_id: uuid.UUID,
                                            start_period: int = None, end_period: int = None,
-                                           parent_id: int = None) -> list[dict[str, Any]]:
+                                           parent_id: int = None) -> list[dict[Any, Any]] | None:
         transaction_alias = aliased(CreditCardTransactionModel)
         category_alias = aliased(CategoryModel)
         card_alias = aliased(CreditCardModel)
@@ -121,7 +121,7 @@ class CreditCardManager(BaseDataManager):
         return [dict(transaction.items()) for transaction in transactions] if transactions else None
 
     # Bill
-    async def get_bill_history_aggregated(self, owner_id: uuid.UUID, start_period: int, end_period: int) -> list[dict[str, Any]]:
+    async def get_bill_history_aggregated(self, owner_id: uuid.UUID, start_period: int, end_period: int) -> list[dict[Any, Any]] | None:
         """
         Created by: Lucas Penha de Moura - 29/10/2024
 
@@ -158,7 +158,7 @@ class CreditCardManager(BaseDataManager):
 
         return [dict(i.items()) for i in result] if result else None
 
-    async def get_bill_history_by_card(self, owner_id: uuid.UUID, start_period: int, end_period: int) -> list[dict[str, Any]] | None:
+    async def get_bill_history_by_card(self, owner_id: uuid.UUID, start_period: int, end_period: int) -> list[dict[Any, Any]] | None:
         """
         Created by: Lucas Penha de Moura - 30/10/2024
 
@@ -174,6 +174,14 @@ class CreditCardManager(BaseDataManager):
                 CreditCardTransactionModel.period,
                 CreditCardModel.nickname.label('credit_card'),
                 CurrencyModel.symbol.label('currency_symbol'),
+                func.round_(
+                    func.sum(
+                        case(
+                            (CreditCardTransactionModel.is_installment, CreditCardTransactionModel.transaction_amount*-1),
+                            else_=0
+                        )
+                    ), 2
+                ).label("total_installments"),
                 func.round_(
                     func.sum(CreditCardTransactionModel.amount * -1)
                     , 2
