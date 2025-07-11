@@ -14,7 +14,7 @@ from schemas.request.investment import (
     GetObjectiveSummaryRequest,
     GetPerformanceRequest,
     GetStatementRequest,
-    LiquidateInvestmentRequest,
+    SettleInvestmentRequest,
     UpdateInvestmentRequest,
 )
 from schemas.request.investment_brazilian_fixed_income import CreateFixedIncomeInvestmentBrazilRequest
@@ -30,7 +30,7 @@ from schemas.response.investment import (
     GetObjectiveResponse,
     GetObjectiveSummaryResponse,
     GetStatementResponse,
-    LiquidateInvestmentResponse,
+    SettleInvestmentResponse,
     UpdateInvestmentResponse,
 )
 from services.investment import InvestmentService
@@ -80,13 +80,13 @@ async def get_investments(
     return await InvestmentService(session=session, user=user).get_investments(params=params)
 
 
-@router.post('/liquidate', summary='Liquidate an investment', description='Liquidate an investment')
-async def liquidate(
-        investment: LiquidateInvestmentRequest,
+@router.post('/settle', summary='Settle an investment', description='Settle an investment')
+async def settle(
+        investment: SettleInvestmentRequest,
         session: AsyncSession = Depends(get_session),
         user: RequiredUser = Security(get_user)
-) -> LiquidateInvestmentResponse:
-    response = await InvestmentService(session=session, user=user).liquidate_investment(investment)
+) -> SettleInvestmentResponse:
+    response = await InvestmentService(session=session, user=user).settle_investment(investment)
 
     return response
 

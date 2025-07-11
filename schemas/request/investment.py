@@ -131,7 +131,7 @@ class GetInvestmentRequest(BaseModel):
     is_liquidated: bool | None = Field(None, description='Whether the investment is liquidated')
 
 
-class LiquidateInvestmentRequest(BaseModel):
+class SettleInvestmentRequest(BaseModel):
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
         alias=to_camel
     ))

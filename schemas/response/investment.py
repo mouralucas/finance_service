@@ -34,7 +34,7 @@ class GetInvestmentTypeResponse(BaseModel):
     investment_types: list[InvestmentTypeSchema] = Field(..., description='The list of investment types')
 
 
-class LiquidateInvestmentResponse(CreateInvestmentResponse):
+class SettleInvestmentResponse(CreateInvestmentResponse):
     # It implements exactly the same data as CreateInvestment. A new class is created to maintain the pattern every router has its response
     pass
 

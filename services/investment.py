@@ -30,7 +30,7 @@ from schemas.request.investment import (
     GetObjectiveSummaryRequest,
     GetPerformanceRequest,
     GetStatementRequest,
-    LiquidateInvestmentRequest,
+    SettleInvestmentRequest,
     UpdateInvestmentRequest,
 )
 from schemas.request.investment_brazilian_fixed_income import CreateFixedIncomeInvestmentBrazilRequest
@@ -46,7 +46,7 @@ from schemas.response.investment import (
     GetObjectiveResponse,
     GetObjectiveSummaryResponse,
     GetStatementResponse,
-    LiquidateInvestmentResponse,
+    SettleInvestmentResponse,
     UpdateInvestmentResponse,
 )
 from services.utils.datetime import get_period, get_previous_period
@@ -123,22 +123,24 @@ class InvestmentService(BaseService):
 
         return response
 
-    async def liquidate_investment(self, investment_liquidate: LiquidateInvestmentRequest) -> LiquidateInvestmentResponse:
+    async def settle_investment(self, investment_settlement: SettleInvestmentRequest) -> SettleInvestmentResponse:
         """
         Created by: Lucas Penha de Moura - 14/08/2024
 
-            Update an investment with the values of a liquidation (date, amount and taxes)
+            Update an investment with the values of a settlement (date, amount and taxes)
         :param investment_liquidate: The object of LiquidateInvestmentRequest
         :return:
         """
-        current_investment = await InvestmentManager(self.session).get_investment_by_id(investment_liquidate.id)
-        investment_liquidate = investment_liquidate.model_dump()
+        current_investment: InvestmentModel | None = await InvestmentManager(self.session).get_investment_by_id(investment_settlement.id)
+        if not current_investment:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Investment not found')
+        investment_settlement_ = investment_settlement.model_dump()
 
         current_investment.is_liquidated = True
-        current_investment.liquidation_date = investment_liquidate['liquidation_date']
-        current_investment.liquidation_amount = investment_liquidate['liquidation_amount']
+        current_investment.liquidation_date = investment_settlement_['liquidation_date']
+        current_investment.liquidation_amount = investment_settlement_['liquidation_amount']
 
-        response = LiquidateInvestmentResponse(
+        response = SettleInvestmentResponse(
             investment=InvestmentSchema.model_validate(current_investment),
         )
 
