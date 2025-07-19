@@ -1,25 +1,25 @@
-fastapi==0.115.6
-pydantic==2.10.3
-pydantic-settings==2.6.1
-uvicorn==0.22.0
-sqlalchemy[asyncio]==2.0.36
-starlette==0.40.0
-httpx==0.24.1
+fastapi==0.116.1
+pydantic==2.11.7
+pydantic-settings==2.10.1
+uvicorn==0.35.0
+sqlalchemy[asyncio]==2.0.41
+starlette==0.47.1
+httpx==0.28.1
 python-dateutil~=2.9.0.post0
 git+https://github.com/mouralucas/rolf_common.git@main#egg=rolf_common
 
 # GraphQL support
 ariadne==0.26.2
 
-#Database
+# Database
 asyncpg==0.30.0
-alembic==1.13.3
-aiosqlite==0.20.0
+alembic==1.16.4
+aiosqlite==0.21.0
 
-# tests
+# Tests
 # To run in Pycharm Configuration, change working directory to project root
-pytest==8.3.4
-pytest-asyncio==0.24.0
+pytest==8.4.1
+pytest-asyncio==1.1.0
 
 # Linter
-ruff
+ruff==0.12.1

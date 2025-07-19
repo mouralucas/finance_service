@@ -16,8 +16,8 @@ async def test_get_investment_type(client, create_fixed_income_br_investment_typ
     assert 'investmentTypes' in data
     assert type(data['investmentTypes']) is list
 
-    for investmentType in data['investmentTypes']:
-        assert 'investmentTypeName' in investmentType
+    for investment_type in data['investmentTypes']:
+        assert 'investmentTypeName' in investment_type
 
 
 @pytest.mark.asyncio

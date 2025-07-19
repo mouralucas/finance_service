@@ -96,7 +96,7 @@ async def test_create_investment(client, create_open_account, create_fixed_incom
 
 
 @pytest.mark.asyncio
-async def test_create_liquidated_investment(client, create_open_account, create_fixed_income_br_investment_type, create_indexer_type,
+async def test_create_settled_investment(client, create_open_account, create_fixed_income_br_investment_type, create_indexer_type,
                                             create_indexer, create_liquidity, create_currency, create_country):
     accounts = create_open_account
 
