@@ -164,7 +164,7 @@ async def test_create_settled_investment(client, create_open_account, create_fix
 
 
 @pytest.mark.asyncio
-async def test_liquidate_investment(client, create_investment):
+async def test_settle_investment(client, create_investment):
     investments = create_investment
 
     investment_id = investments[0].id
@@ -196,7 +196,7 @@ async def test_liquidate_investment(client, create_investment):
         'taxDetail': tax_detail,
         'feeDetail': fee_detail
     }
-    response = await client.post('/investment/liquidate', json=payload)
+    response = await client.post('/investment/settle', json=payload)
 
     assert response.status_code == status.HTTP_200_OK
 

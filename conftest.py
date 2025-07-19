@@ -1,6 +1,8 @@
 import uuid
 
-from httpx import AsyncClient
+import pytest_asyncio
+from httpx import AsyncClient, ASGITransport
+
 from rolf_common.models import Base
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import get_user
@@ -49,5 +51,6 @@ def override_user_service():
 
 @pytest_asyncio.fixture(scope='function', autouse=True)
 async def client():
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
         yield client

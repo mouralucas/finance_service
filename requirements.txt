@@ -19,7 +19,7 @@ aiosqlite==0.21.0
 # Tests
 # To run in Pycharm Configuration, change working directory to project root
 pytest==8.4.1
-pytest-asyncio==1.1.0
+pytest-asyncio==1.0.0
 
 # Linter
 ruff==0.12.1
