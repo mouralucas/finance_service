@@ -18,14 +18,13 @@ class InvestmentBrazilianFundManager(InvestmentManager):
 
         return new_investment_fund
 
-    async def get_brazilian_fund_investment(self, investment_id: uuid.UUID, is_settled: bool) -> list[InvestmentBrazilianFundsModel]:
-        query = select(InvestmentBrazilianFundsModel)
+    async def get_brazilian_fund_investment(self, investment_id: uuid.UUID | None, is_settled: bool) -> list[InvestmentBrazilianFundsModel]:
+        query = select(InvestmentBrazilianFundsModel).where(
+            InvestmentBrazilianFundsModel.is_settled == is_settled
+        )
 
         if investment_id:
             query = query.where(InvestmentBrazilianFundsModel.id == investment_id)
-
-        if is_settled:
-            query = query.where(InvestmentBrazilianFundsModel.is_settled == True)
 
         result = await self.get_all(query)
 
