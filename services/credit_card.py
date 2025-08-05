@@ -93,7 +93,9 @@ class CreditCardService(BaseService):
 
         entry_list = []
         for i in transaction.installments:
-            new_bill_entry = CreditCardTransactionModel(**transaction.model_dump(exclude={'installment', 'is_international_transaction', 'tax_detail', 'tot_installments'}))
+            new_bill_entry = CreditCardTransactionModel(**transaction.model_dump(exclude={'installment',
+                                                                                          'is_international_transaction',
+                                                                                          'tax_detail', 'tot_installments'}))
 
             new_bill_entry.owner_id = owner_id
             new_bill_entry.amount = i.amount  # TODO: check this warning
@@ -135,7 +137,9 @@ class CreditCardService(BaseService):
         return response
 
     async def get_credit_card_bill_evolution(self, params: GetCreditCardBillRequest) -> GetCreditCardBillConsolidatedResponse:
-        bill_consolidated = await self.credit_card_manager.get_bill_history_aggregated(owner_id=self.user['user_id'], start_period=params.start_period, end_period=params.end_period)
+        bill_consolidated = await self.credit_card_manager.get_bill_history_aggregated(owner_id=self.user['user_id'],
+                                                                                       start_period=params.start_period,
+                                                                                       end_period=params.end_period)
         average = sum(item['total_amount'] for item in bill_consolidated) / len(bill_consolidated) if bill_consolidated else 0
 
         stacked_bill = {}
@@ -157,14 +161,16 @@ class CreditCardService(BaseService):
             bill=[CreditCardBillSchema.model_validate(bill) for bill in bill_consolidated] if bill_consolidated else [],
             average=average,
             goal=2300,
-            billStacked=list(stacked_bill.values()),
+            bill_stacked=list(stacked_bill.values()),
             series=list(series),
         )
 
         return response
 
     async def get_credit_card_bill_history(self, params: GetCreditCardBillRequest) -> GetCreditCardBillHistoryResponse:
-        bill_by_card = await self.credit_card_manager.get_bill_history_by_card(owner_id=self.user['user_id'], start_period=params.start_period, end_period=params.end_period)
+        bill_by_card = await self.credit_card_manager.get_bill_history_by_card(owner_id=self.user['user_id'],
+                                                                               start_period=params.start_period,
+                                                                               end_period=params.end_period)
 
         bill_periods = {}
         for i in bill_by_card:
@@ -214,8 +220,8 @@ class CreditCardService(BaseService):
     async def get_installments_due_date(self, params: GetInstallmentsDueDatesRequest) -> GetInstallmentsDueDatesResponse:
         credit_card = await CreditCardManager(session=self.session).get_credit_card_by_id(params.credit_card_id)
 
-        installments_due_dates = get_installments_due_dates(transaction_date=params.transaction_date, due_day=credit_card.due_day, close_day=credit_card.close_day,
-                                                            tot_installments=params.tot_installments)
+        installments_due_dates = get_installments_due_dates(transaction_date=params.transaction_date, due_day=credit_card.due_day,
+                                                            close_day=credit_card.close_day, tot_installments=params.tot_installments)
 
         response = GetInstallmentsDueDatesResponse(
             due_dates=[InstallmentsDueDates.model_validate(due_date) for due_date in installments_due_dates],

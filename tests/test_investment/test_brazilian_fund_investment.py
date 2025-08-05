@@ -15,12 +15,10 @@ async def test_create_brazilian_fund_investment(client, create_brazilian_funds, 
 
     name = 'Lucas Fundo de Investimento FIM'
     account_id = accounts[0].id
-    account_name = accounts[0].nickname
     price = 3.25789
     amount = 1250.00
     quantity = price * amount
     investment_type_id = investment_types[0].id
-    investment_type_name = investment_types[0].name
     currency_id = 'BRL'
     country_id = 'BR'
     fund_id = br_funds[0].id
@@ -77,7 +75,8 @@ async def test_create_brazilian_fund_investment(client, create_brazilian_funds, 
 
 
 @pytest.mark.asyncio
-async def test_create_brazilian_fund_investment_statement(client, create_tax, create_currency, create_country, create_bank, create_open_account, create_funds_br_investment_type,
+async def test_create_brazilian_fund_investment_statement(client, create_tax, create_currency, create_country, create_bank,
+                                                          create_open_account, create_funds_br_investment_type,
                                                           create_brazilian_fund_investment):
     """
         This test verifies if the contribution in period is being calculated correctly.

@@ -25,7 +25,7 @@ class InvestmentBrazilianFundManager(InvestmentManager):
             query = query.where(InvestmentBrazilianFundsModel.id == investment_id)
 
         if is_settled:
-            query = query.where(InvestmentBrazilianFundsModel.is_settled == True)
+            query = query.where(InvestmentBrazilianFundsModel.is_settled)
 
         result = await self.get_all(query)
 

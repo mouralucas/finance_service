@@ -50,9 +50,9 @@ class InvestmentModel(SQLModel):
     owner_id: Mapped[uuid.UUID] = mapped_column('owner_id')
     name: Mapped[str] = mapped_column('name', String(200))
     custodian_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('bank.id'))
-    custodiam: Mapped['BankModel'] = relationship(foreign_keys=[custodian_id], lazy='subquery')
+    custodiam: Mapped['BankModel'] = relationship(foreign_keys=[custodian_id], lazy='subquery')  # noqa: F821
     account_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('account.id'))
-    account: Mapped['AccountModel'] = relationship(foreign_keys=[account_id], lazy='subquery')
+    account: Mapped['AccountModel'] = relationship(foreign_keys=[account_id], lazy='subquery')  # noqa: F821
 
     type_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('investment_type.id'))
     type: Mapped[InvestmentTypeModel] = relationship(foreign_keys=[type_id], lazy='subquery')
@@ -65,19 +65,19 @@ class InvestmentModel(SQLModel):
     contracted_rate: Mapped[str] = mapped_column('contracted_rate', String(50), nullable=True)
 
     currency_id: Mapped[str] = mapped_column(ForeignKey('currency.id'))
-    currency: Mapped['CurrencyModel'] = relationship(foreign_keys=[currency_id], lazy='subquery')
+    currency: Mapped['CurrencyModel'] = relationship(foreign_keys=[currency_id], lazy='subquery')  # noqa: F821
 
     indexer_type_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('indexer_type.id'))
     indexer_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('indexer.id'))
-    indexer: Mapped['IndexerModel'] = relationship(foreign_keys=[indexer_id], lazy='subquery')
+    indexer: Mapped['IndexerModel'] = relationship(foreign_keys=[indexer_id], lazy='subquery')  # noqa: F821
     liquidity_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('liquidity.id'))
-    liquidity: Mapped['LiquidityModel'] = relationship(foreign_keys=[liquidity_id], lazy='subquery')
+    liquidity: Mapped['LiquidityModel'] = relationship(foreign_keys=[liquidity_id], lazy='subquery')  # noqa: F821
     is_liquidated: Mapped[bool] = mapped_column('is_liquidated', default=False)
     liquidation_date: Mapped[date] = mapped_column('liquidation_date', nullable=True)
     liquidation_amount: Mapped[Decimal] = mapped_column('liquidation_amount', Numeric(precision=15, scale=5), nullable=True)
 
     country_id: Mapped[str] = mapped_column(ForeignKey('country.id'))
-    country: Mapped['CountryModel'] = relationship(foreign_keys=[country_id], lazy='noload')
+    country: Mapped['CountryModel'] = relationship(foreign_keys=[country_id], lazy='noload')  # noqa: F821
 
     observation: Mapped[str] = mapped_column('observation', Text, nullable=True)
 
@@ -107,7 +107,8 @@ class InvestmentStatementModel(SQLModel):
     at_maturity: Mapped[bool] = mapped_column('at_maturity', default=False)
     value_change: Mapped[Decimal] = mapped_column('value_change', Numeric(precision=15, scale=5), nullable=True)
     percentage_change: Mapped[Decimal] = mapped_column('percentage_change', Numeric(precision=9, scale=3), nullable=True)
-    index_percent_change: Mapped[Decimal] = mapped_column('index_change', Numeric(precision=9, scale=3), nullable=True)  # how much the index changed in the period
+    index_percent_change: Mapped[Decimal] = mapped_column('index_change', Numeric(precision=9, scale=3), nullable=True,
+                                                          doc='How mach the index changed in the period')
 
 
 class InvestmentObjectiveModel(SQLModel):
@@ -133,14 +134,21 @@ class FundsBrModel(SQLModel):
     status: Mapped[str] = mapped_column('status', String(150), nullable=True)
     start_date: Mapped[date] = mapped_column('start_date', doc='The day that the fund start')
 
-    minimum_balance: Mapped[Decimal] = mapped_column('minimum_balance', Numeric(precision=18, scale=8), doc='The minimum amount to be in the fund')
-    minimum_investment: Mapped[Decimal] = mapped_column('minimum_investment', Numeric(precision=18, scale=8), doc='The minimum amount for every transaction in the fund')
-    minimum_withdraw: Mapped[Decimal] = mapped_column('minimum_withdraw', Numeric(precision=18, scale=8), doc='The minimum amount for every transaction in the fund')
-    initial_investment: Mapped[Decimal] = mapped_column('initial_investment', Numeric(precision=18, scale=8), doc='The initial amount to be in the fund')
+    minimum_balance: Mapped[Decimal] = mapped_column('minimum_balance', Numeric(precision=18, scale=8),
+                                                     doc='The minimum amount to be in the fund')
+    minimum_investment: Mapped[Decimal] = mapped_column('minimum_investment', Numeric(precision=18, scale=8),
+                                                        doc='The minimum amount for every transaction in the fund')
+    minimum_withdraw: Mapped[Decimal] = mapped_column('minimum_withdraw', Numeric(precision=18, scale=8),
+                                                      doc='The minimum amount for every transaction in the fund')
+    initial_investment: Mapped[Decimal] = mapped_column('initial_investment', Numeric(precision=18, scale=8),
+                                                        doc='The initial amount to be in the fund')
 
-    investment_quotation: Mapped[str] = mapped_column('investment_quotation', String(25), doc='The number of days until the quotation after the investment')
-    redemption_quotation: Mapped[str] = mapped_column('redemption_quotation', String(25), doc='The number of days until the quotation after the redemption')
-    redemption_settlement: Mapped[str] = mapped_column('redemption_settlement', String(25), doc='The number of days until the redemption is settled to the investor')
+    investment_quotation: Mapped[str] = mapped_column('investment_quotation', String(25),
+                                                      doc='The number of days until the quotation after the investment')
+    redemption_quotation: Mapped[str] = mapped_column('redemption_quotation', String(25),
+                                                      doc='The number of days until the quotation after the redemption')
+    redemption_settlement: Mapped[str] = mapped_column('redemption_settlement', String(25),
+                                                       doc='The number of days until the redemption is settled to the investor')
 
     fees: Mapped[list[dict]] = mapped_column('fees', JSON, doc='The list of fees that apply to the investment')
 
@@ -167,8 +175,10 @@ class InvestmentBase(SQLModel):
     objective_id: Mapped[str] = mapped_column(ForeignKey('investment_objective.id'), nullable=True)
     is_settled: Mapped[bool] = mapped_column('is_settled', default=False)
 
-    tax: Mapped[list[dict]] = mapped_column('tax', type_=JSON, nullable=True, doc='Tax information. What taxes are levied on investments and its rates')
-    fee: Mapped[list[dict]] = mapped_column('fee', type_=JSON, nullable=True, doc='Fee information. What fees are levied on investments and its rates')
+    tax: Mapped[list[dict]] = mapped_column('tax', type_=JSON, nullable=True,
+                                            doc='Tax information. What taxes are levied on investments and its rates')
+    fee: Mapped[list[dict]] = mapped_column('fee', type_=JSON, nullable=True,
+                                            doc='Fee information. What fees are levied on investments and its rates')
 
     observation: Mapped[str] = mapped_column('observation', Text, nullable=True)
 
@@ -190,5 +200,5 @@ class InvestmentStatementBaseModel(SQLModel):
 """
 Criar a tabela FundsBr que conterá as informações básica do fundo (ver canal oficial para essas informações)
 Ao adicionar um extrato, verificar na tabela InvestmentFundsBr se houve um investimento naquele mes, se sim, incluir no "aporte do mes" na tabela
-    do extrato, assim ao calcular a evolução essa valor é somado ao valor inicial do mês e não distorce o cálculo da performance 
+    do extrato, assim ao calcular a evolução essa valor é somado ao valor inicial do mês e não distorce o cálculo da performance
 """

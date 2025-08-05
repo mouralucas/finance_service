@@ -77,13 +77,13 @@ class CreateInvestmentRequest(BaseModel):
 
     objective_id: uuid.UUID | None = Field(None, description='The id of the objective')
 
-    @model_validator(mode='before')
-    def check_liquidation(cls, data: dict) -> dict:
-        if (data.get('liquidationAmount') and not data.get('liquidationDate') or
-                not data.get('liquidationAmount') and data.get('liquidationDate')):
+    @model_validator(mode='after')
+    def check_settlement(self):
+        if (self.liquidation_amount and not self.liquidation_date or
+            not self.liquidation_amount and self.liquidation_date):
             raise ValueError('both liquidation date and amount must be specified')
 
-        return data
+        return self
 
 
 class UpdateInvestmentRequest(CreateInvestmentRequest):
@@ -137,13 +137,15 @@ class SettleInvestmentRequest(BaseModel):
     ))
 
     id: uuid.UUID = Field(..., alias='investmentId', description='The unique identifier of the investment')
-    gross_amount: Decimal = Field(None, description='The gross amount of the investment at liquidation')
-    net_amount: Decimal = Field(None, description='The net amount of the investment at liquidation')
-    tax_detail: list[TaxFeeRequest] = Field(None, description='The tax detail of the investment')
-    fee_detail: list[TaxFeeRequest] = Field(None, description='The fee detail of the investment')
+    gross_amount: Decimal | None = Field(None, description='The gross amount of the investment at liquidation')
+    net_amount: Decimal | None = Field(None, description='The net amount of the investment at liquidation')
+    tax_detail: list[TaxFeeRequest] | None = Field(None, description='The tax detail of the investment')
+    fee_detail: list[TaxFeeRequest] | None = Field(None, description='The fee detail of the investment')
 
-    liquidation_date: datetime.date = Field(None, alias='liquidationDate', description='The date that the investment was liquidated')
-    liquidation_amount: Decimal = Field(None, alias='liquidationAmount', description='The amount liquidated, after tax and fees, usually the same as net_amount')
+    liquidation_date: datetime.date | None = Field(None, alias='liquidationDate', description='The date that the investment was liquidated')
+    liquidation_amount: Decimal | None = Field(None, alias='liquidationAmount',
+                                               description='The amount liquidated, after tax and fees, \
+                                                   usually the same as net_amount')
 
 
 class CreateStatementRequest(BaseModel):
@@ -173,15 +175,15 @@ class GetStatementRequest(BaseModel):
     end_period: int | None = Field(None, description='The end period of the statement')
     period: int | None = Field(None, description='The period of the statement')
 
-    @model_validator(mode='before')
-    def check_periods(cls, data: dict) -> dict:
-        if data.get('period') and (data.get('startPeriod') or data.get('endPeriod')):
+    @model_validator(mode='after')
+    def validate_periods(self):
+        if self.period and (self.start_period or self.end_period):
             raise ValueError('only specific period or a range is allowed')
 
-        if data.get('startPeriod') and data.get('endPeriod') and (data.get('endPeriod') < data.get('startPeriod')):
+        if self.start_period and self.end_period and (self.end_period < self.start_period):
             raise ValueError('start period must be before end period')
 
-        return data
+        return self
 
 
 class CreateObjectiveRequest(BaseModel):

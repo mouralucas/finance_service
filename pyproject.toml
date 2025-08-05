@@ -1,11 +1,17 @@
 [tool.ruff]
-
-src = ["."] 
-
-# Configurações de estilo
+src = ["."]
 line-length = 150
 target-version = "py311"
 
+exclude = [
+    ".venv",
+    "__pycache__",
+    "build",
+    "dist",
+    "alembic",
+]
+
+[tool.ruff.lint]
 select = [
     "F",    # pyflakes (erros básicos)
     "E",    # pycodestyle (estilo)
@@ -16,14 +22,4 @@ select = [
     "C90",  # mccabe (complexidade)
 ]
 
-# Regras a ignorar (se necessário)
 ignore = []
-
-# Arquivos e pastas a ignorar
-exclude = [
-    ".venv",
-    "__pycache__",
-    "build",
-    "dist",
-    "alembic",
-]

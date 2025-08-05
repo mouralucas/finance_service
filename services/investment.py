@@ -161,7 +161,8 @@ class InvestmentService(BaseService):
 
         response = GetInvestmentTypeResponse(
             quantity=len(investment_types) if investment_types else 0,
-            investment_types=[InvestmentTypeSchema.model_validate(data['InvestmentTypeModel']) for data in investment_types] if investment_types else [],
+            investment_types=[InvestmentTypeSchema.model_validate(data['InvestmentTypeModel']) for data in investment_types] \
+                if investment_types else [],
         )
 
         return response
@@ -186,15 +187,18 @@ class InvestmentService(BaseService):
 
         # If it is the first statement period must be the same as the investment
         if not previous_statements and get_period(investment.transaction_date) != statement.period:
-            raise HTTPException(status_code=status.HTTP_412_PRECONDITION_FAILED, detail='First statement period must be the sabe as transaction period')
+            raise HTTPException(status_code=status.HTTP_412_PRECONDITION_FAILED,
+                                detail='First statement period must be the sabe as transaction period')
 
         # check if the statement period is less then investment
         if statement.period < get_period(investment.transaction_date):
-            raise HTTPException(status_code=status.HTTP_412_PRECONDITION_FAILED, detail='Statement period cannot be before transaction period')
+            raise HTTPException(status_code=status.HTTP_412_PRECONDITION_FAILED,
+                                detail='Statement period cannot be before transaction period')
 
         # Check if the statement from last period exists
         if last_statement and last_statement.period != get_previous_period(statement.period):
-            raise HTTPException(status_code=status.HTTP_412_PRECONDITION_FAILED, detail='Statement must be the following period of the last statement')
+            raise HTTPException(status_code=status.HTTP_412_PRECONDITION_FAILED,
+                                detail='Statement must be the following period of the last statement')
 
         # Set the model with the new statement
         new_statement = InvestmentStatementModel(**statement.model_dump(exclude={'tax_details', 'fee_details'}))
@@ -346,10 +350,14 @@ class InvestmentService(BaseService):
         objectives_allocation = await self.investment_manager.get_allocation_by_objectives(owner_id=self.user['user_id'])
 
         response = GetInvestmentAllocationResponse(
-            type_allocation=[InvestmentAllocationSchema.model_validate(allocation) for allocation in type_allocation] if type_allocation else [],
-            category_allocation=[InvestmentAllocationSchema.model_validate(allocation) for allocation in category_allocation] if category_allocation else [],
-            custodian_allocation=[InvestmentAllocationSchema.model_validate(allocation) for allocation in custodian_allocation] if custodian_allocation else [],
-            objective_allocation=[InvestmentAllocationSchema.model_validate(allocation) for allocation in objectives_allocation] if objectives_allocation else []
+            type_allocation=[InvestmentAllocationSchema.model_validate(allocation) \
+                for allocation in type_allocation] if type_allocation else [],
+            category_allocation=[InvestmentAllocationSchema.model_validate(allocation) \
+                for allocation in category_allocation] if category_allocation else [],
+            custodian_allocation=[InvestmentAllocationSchema.model_validate(allocation)\
+                for allocation in custodian_allocation] if custodian_allocation else [],
+            objective_allocation=[InvestmentAllocationSchema.model_validate(allocation) \
+                for allocation in objectives_allocation] if objectives_allocation else []
         )
 
         return response

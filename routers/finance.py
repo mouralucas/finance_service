@@ -62,7 +62,7 @@ async def get_indexer_type(
 
 
 @router.get('/indexer', summary='Get indexers')
-async def get_indexer_type(
+async def get_indexer(
         session: AsyncSession = Depends(get_session),
         user: RequiredUser = Security(get_user)
 ) -> GetIndexerResponse:

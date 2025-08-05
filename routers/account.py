@@ -98,8 +98,10 @@ async def create_balance(
     return await AccountService(session=session, user=user).create_balance(params=params)
 
 
-@router.get('/balance', summary='Get the balance', description='Get the balance for a account in the specified period range. If no period is specified, '
-                                                               'the range is from the first period with transaction to close account or current period')
+@router.get('/balance', summary='Get the balance', description='Get the balance for a account in the specified period range. '
+                                                               'If no period is specified, '
+                                                               'the range is from the first period with transaction to close '
+                                                               'account or current period')
 async def get_balance(
         params: GetBalanceRequest = Depends(),
         session: AsyncSession = Depends(get_session),

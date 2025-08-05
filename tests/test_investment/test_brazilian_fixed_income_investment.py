@@ -53,4 +53,5 @@ async def test_create_funds_br_investment(client, create_funds_br_investment_typ
         'initialInvestment': initial_investment,
     }
     # response = await client.post('/investment/funds/br', json=payload)
+    assert payload is not None  # Placeholder assertion, replace with actual API call when implemented
     assert True

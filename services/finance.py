@@ -97,7 +97,7 @@ class FinanceService(BaseService):
     # Dashboards services
     async def get_expenses_by_category(self) -> GetExpensesByCategoryResponse:
         # TODO: How to solve the problem with different currencies?
-        exclude_categories = []
+        # exclude_categories = []
 
         account_ = await AccountManager(session=self.session).get_account_expenses_by_category(owner_id=self.user['user_id'], period=202411)
         credit_card_ = await CreditCardManager(session=self.session).get_credit_card_expense_by_category(owner_id=self.user['user_id'], period=202411)

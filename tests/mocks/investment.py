@@ -17,7 +17,8 @@ from schemas.investment_brazilian_fund import InvestmentBrazilianFundSchema, Inv
 @pytest_asyncio.fixture
 async def create_investment_category(test_session) -> list[InvestmentCategorySchema]:
     data_ = await BaseDataManager(test_session).add_or_ignore_all(InvestmentCategoryModel, get_investment_category_mock())
-    investment_categories: list[InvestmentCategorySchema] = [InvestmentCategorySchema.model_validate(data['InvestmentCategoryModel']) for data in data_]
+    investment_categories: list[InvestmentCategorySchema] = \
+        [InvestmentCategorySchema.model_validate(data['InvestmentCategoryModel']) for data in data_] if data_ else []
 
     return investment_categories
 
@@ -66,8 +67,10 @@ async def create_brazilian_fund_investment_statement(
         create_funds_br_investment_type, create_currency, create_country,
         create_brazilian_fund_investment
 ) -> list[InvestmentBrazilianFundStatementSchema]:
-    data_ = await BaseDataManager(test_session).add_or_ignore_all(InvestmentBrazilianFundsStatementModel, get_brazilian_fund_investment_statement_mock())
-    br_funds_investment_statement = [InvestmentBrazilianFundStatementSchema.model_validate(data['InvestmentBrazilianFundsStatementModel']) for data in data_]
+    data_ = await BaseDataManager(test_session).add_or_ignore_all(InvestmentBrazilianFundsStatementModel,
+                                                                  get_brazilian_fund_investment_statement_mock())
+    br_funds_investment_statement = [InvestmentBrazilianFundStatementSchema\
+        .model_validate(data['InvestmentBrazilianFundsStatementModel']) for data in data_] if data_ else []
 
     return br_funds_investment_statement
 

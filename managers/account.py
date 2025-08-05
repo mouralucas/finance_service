@@ -138,7 +138,7 @@ class AccountManager(BaseDataManager):
         :param end_period:  The end period for the balance
         :param current_period: Return the balance for the current period
 
-        :return: 
+        :return:
         """
         # TODO: this balance will need to separate the currencies available
         query = (
@@ -298,7 +298,8 @@ class AccountManager(BaseDataManager):
         """
         Created by: Lucas Penha de Moura - 27/09/2024
             This function feches the transactions by an account in a given period range.
-            The return of this function is a list of rows that contains all incoming and outgoing transactions, plus the earnings of the account, if set.
+            The return of this function is a list of rows that contains all incoming and outgoing transactions,
+                plus the earnings of the account, if set.
 
         :param account_id: The id of the account
         :param period_range: The range of periods
@@ -334,7 +335,8 @@ class AccountManager(BaseDataManager):
                 func.coalesce(
                     func.sum(
                         case(
-                            (AccountTransactionModel.category_id == uuid.UUID('dcef92cb-9664-4dc4-9adb-afe556016fe2'), AccountTransactionModel.amount),
+                            (AccountTransactionModel.category_id == uuid.UUID('dcef92cb-9664-4dc4-9adb-afe556016fe2'),
+                             AccountTransactionModel.amount),
                             else_=0
                         )
                     ), 0
@@ -345,7 +347,7 @@ class AccountManager(BaseDataManager):
                 AccountTransactionModel,
                 (period_series.c.period == AccountTransactionModel.period) &
                 (AccountTransactionModel.account_id == account_id) &
-                (AccountTransactionModel.active == True)
+                (AccountTransactionModel.active)
             )
             .group_by(period_series.c.period)
             .order_by(period_series.c.period)
@@ -380,7 +382,8 @@ class AccountManager(BaseDataManager):
                 func.coalesce(
                     func.sum(
                         case(
-                            (AccountTransactionModel.category_id == uuid.UUID('dcef92cb-9664-4dc4-9adb-afe556016fe2'), AccountTransactionModel.amount),
+                            (AccountTransactionModel.category_id == uuid.UUID('dcef92cb-9664-4dc4-9adb-afe556016fe2'),
+                             AccountTransactionModel.amount),
                             else_=0
                         )
                     ), 0

@@ -14,7 +14,6 @@ async def test_create_investment(client, create_open_account, create_fixed_incom
     liquidity = create_liquidity
     currency_id = accounts[0].currency_id
 
-    custodian_id = account.bank_id
     name = 'Investment in an asset'
     type_id = investment_types[0].id
     transaction_date = '2024-08-10'
@@ -109,18 +108,19 @@ async def test_create_settled_investment(client, create_open_account, create_fix
     price = 112.47
     amount = quantity * price
     contracted_rate = '115% do CDI'
-    tax_detail = [{
-        'currencyId': 'BRL',
-        'id': 'a6c45a5a-f75f-475c-afa1-1cf02cd3fd04',
-        'amount': amount * 0.15
-    }]
-    fee_detail = [
-        {
-            'currencyId': 'BRL',
-            'id': 'a187d754-73c9-46d3-ac57-7cc78ea01e6f',
-            'amount': amount * 0.01
-        }
-    ]
+    # TODO: add tax and fee details to the payload
+    # tax_detail = [{
+    #     'currencyId': 'BRL',
+    #     'id': 'a6c45a5a-f75f-475c-afa1-1cf02cd3fd04',
+    #     'amount': amount * 0.15
+    # }]
+    # fee_detail = [
+    #     {
+    #         'currencyId': 'BRL',
+    #         'id': 'a187d754-73c9-46d3-ac57-7cc78ea01e6f',
+    #         'amount': amount * 0.01
+    #     }
+    # ]
     indexer_type_id = create_indexer_type[0].id
     indexer_id = create_indexer[0].id
     liquidity_id = create_liquidity[0].id

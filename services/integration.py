@@ -24,7 +24,8 @@ class BcbIntegrationService:
         indexer = await self.finance_manager.get_indexer_by_id(indexer_id=params.indexer_id, raise_exception=True)
         periodicity = await self.finance_manager.get_periodicity_by_id(periodicity_id=params.periodicity_id, raise_exception=True)
 
-        latest_period = await self.finance_manager.get_latest_finance_series_period(indexer_id=params.indexer_id, periodicity_id=params.periodicity_id)
+        latest_period = await self.finance_manager.get_latest_finance_series_period(indexer_id=params.indexer_id,
+                                                                                    periodicity_id=params.periodicity_id)
 
         if latest_period:
             last_date_available = get_period_dates(latest_period) if latest_period else None

@@ -65,7 +65,8 @@ async def test_create_transaction_no_installment(client, create_valid_credit_car
 
     entries = data['transaction']
     for entry in entries:
-        due_date = CreditCardService.set_due_date(datetime.datetime.strptime(transaction_date, "%Y-%m-%d").date(), close_day, due_day, installment=entry['currentInstallment'])
+        due_date = CreditCardService.set_due_date(datetime.datetime.strptime(transaction_date, "%Y-%m-%d").date(),
+                                                  close_day, due_day, installment=entry['currentInstallment'])
         period = get_period(due_date)
 
         assert 'transactionId' in entry
@@ -159,7 +160,8 @@ async def test_create_transaction_with_installment(client, create_valid_credit_c
     entries = data['transaction']
 
     for idx, entry in enumerate(entries):
-        due_date = CreditCardService.set_due_date(datetime.datetime.strptime(transaction_date, "%Y-%m-%d").date(), close_day, due_day, installment=entry['currentInstallment'])
+        due_date = CreditCardService.set_due_date(datetime.datetime.strptime(transaction_date, "%Y-%m-%d").date(),
+                                                  close_day, due_day, installment=entry['currentInstallment'])
         period = get_period(due_date)
 
         assert 'amount' in entry

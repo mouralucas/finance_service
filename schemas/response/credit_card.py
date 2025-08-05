@@ -2,7 +2,6 @@ from typing import Any
 
 from pydantic import AliasGenerator, BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
-from rolf_common.schemas import SuccessResponseBase
 
 from schemas.credit_card import CreditCardBillHistorySchema, CreditCardBillSchema, CreditCardSchema, CreditCardTransactionSchema, InstallmentsDueDates
 
@@ -21,12 +20,15 @@ class GetCreditCardResponse(BaseModel):
 
 
 class CreateCreditCardTransactionResponse(BaseModel):
-    transaction: list[CreditCardTransactionSchema] = Field(..., serialization_alias='transaction', description='The transaction(s) created. If installments transaction, will return more than one transaction')
+    transaction: list[CreditCardTransactionSchema] = Field(..., serialization_alias='transaction',
+                                                           description='The transaction(s) created. If installments transaction, \
+                                                               will return more than one transaction')
 
 
 class GetCreditCardTransactionResponse(BaseModel):
     quantity: int = Field(..., serialization_alias='quantity', description='The number of credit cards transactions')
-    transactions: list[CreditCardTransactionSchema] = Field(..., serialization_alias='transactions', description='The list of the credit transactions')
+    transactions: list[CreditCardTransactionSchema] = Field(..., serialization_alias='transactions',
+                                                            description='The list of the credit transactions')
 
 
 class GetInstallmentsDueDatesResponse(BaseModel):
@@ -45,7 +47,7 @@ class GetCreditCardBillConsolidatedResponse(BaseModel):
     average: float | None = Field(None, description='The average credit card bill')
     goal: float | None = Field(None, description='The goal credit card bill')
     bill: list[CreditCardBillSchema] | None = Field(..., description='The list of consolidated bill by period')
-    billStacked: list[dict[str, Any]] = Field(..., description='The list of bill stacked by card/period')
+    bill_stacked: list[dict[str, Any]] = Field(..., description='The list of bill stacked by card/period')
     series: list[str] = Field(..., description='The list of available series for the bill stacked')
 
 

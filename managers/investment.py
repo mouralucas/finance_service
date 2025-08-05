@@ -87,12 +87,12 @@ class InvestmentManager(BaseDataManager):
                 investment_alias.liquidation_date,
                 func.coalesce(investment_alias.liquidation_amount, 0).label('liquidation_amount'),
                 case(
-                    (statement_alias.gross_amount == None,
+                    (statement_alias.gross_amount.is_not(None),
                      investment_alias.amount),
                     else_=statement_alias.gross_amount
                 ).label('gross_amount'),
                 case(
-                    (statement_alias.gross_amount != None,
+                    (statement_alias.gross_amount.is_not(None),
                      ((statement_alias.gross_amount - investment_alias.amount) / investment_alias.amount) * 100),
                     else_=0
                 ).label('percentage_change'),
@@ -118,10 +118,12 @@ class InvestmentManager(BaseDataManager):
         )
 
         if is_liquidated is not None and is_liquidated:
-            query = query.where(investment_alias.is_liquidated == True)
+            query = query.where(investment_alias.is_liquidated)
 
         if is_liquidated is not None and not is_liquidated:
-            query = query.where(investment_alias.is_liquidated == False)
+            query = query.where(
+                ~investment_alias.is_liquidated
+                                )
 
         investments: list[RowMapping] = await self.get_all(query)
 
@@ -133,7 +135,8 @@ class InvestmentManager(BaseDataManager):
 
         return statement
 
-    async def get_statement(self, investment_id: uuid.UUID, period: int = None, start_period: int = None, end_period: int = None) -> list[InvestmentStatementModel] | None:
+    async def get_statement(self, investment_id: uuid.UUID, period: int = None, start_period: int = None,
+                            end_period: int = None) -> list[InvestmentStatementModel] | None:
         # TODO: get also cdi or the selected indexer with the statement for each period
         query = (
             select(InvestmentStatementModel)
@@ -246,7 +249,7 @@ class InvestmentManager(BaseDataManager):
             )
             .where(
                 InvestmentModel.owner_id == owner_id,
-                InvestmentModel.is_liquidated == False
+                ~InvestmentModel.is_liquidated
             )
         )
 
@@ -275,7 +278,7 @@ class InvestmentManager(BaseDataManager):
         query = (
             select(
                 case(
-                    (parent_investment_type.name != None, parent_investment_type.name),
+                    (parent_investment_type.name.is_not(None), parent_investment_type.name),
                     else_=InvestmentTypeModel.name
                 ).label('name'),
                 func.sum(InvestmentStatementModel.gross_amount).label('total')
@@ -289,12 +292,13 @@ class InvestmentManager(BaseDataManager):
                 (InvestmentStatementModel.investment_id == subquery_latest_period.c.investment_id) &
                 (InvestmentStatementModel.period == subquery_latest_period.c.latest_period)
             )
-            .where(InvestmentModel.is_liquidated == False,
-                   InvestmentModel.owner_id == owner_id)
+            .where(
+                ~InvestmentModel.is_liquidated,
+                InvestmentModel.owner_id == owner_id)
             .group_by(
                 case(
 
-                    (parent_investment_type.name != None, parent_investment_type.name),
+                    (parent_investment_type.name.is_not(None), parent_investment_type.name),
                     else_=InvestmentTypeModel.name
                 )
             )
@@ -330,7 +334,7 @@ class InvestmentManager(BaseDataManager):
                 (InvestmentStatementModel.period == subquery_latest_period.c.latest_period)
             )
             .where(
-                InvestmentModel.is_liquidated == False,
+                ~InvestmentModel.is_liquidated,
                 InvestmentModel.owner_id == owner_id,
             )
             .group_by(InvestmentCategoryModel.name)
@@ -364,7 +368,7 @@ class InvestmentManager(BaseDataManager):
                 (InvestmentStatementModel.period == subquery_latest_period.c.latest_period)
             )
             .where(
-                InvestmentModel.is_liquidated == False,
+                ~InvestmentModel.is_liquidated,
                 InvestmentModel.owner_id == owner_id,
             )
             .group_by(BankModel.name)
@@ -387,7 +391,7 @@ class InvestmentManager(BaseDataManager):
         query = (
             select(
                 case(
-                    (InvestmentObjectiveModel.title == None, literal('Não alocado')),
+                    (InvestmentObjectiveModel.title.is_(None), literal('Não alocado')),
                     else_=InvestmentObjectiveModel.title
                 ).label('name'),
                 func.sum(InvestmentStatementModel.gross_amount).label('total')
@@ -401,7 +405,7 @@ class InvestmentManager(BaseDataManager):
                 (InvestmentStatementModel.period == subquery_latest_period.c.latest_period)
             )
             .where(
-                InvestmentModel.is_liquidated == False,
+                ~InvestmentModel.is_liquidated,
                 InvestmentModel.owner_id == owner_id,
             )
             .group_by(InvestmentObjectiveModel.title)

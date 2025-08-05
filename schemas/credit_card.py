@@ -13,12 +13,14 @@ class CreditCardSchema(BaseModel):
     id: uuid.UUID = Field(..., serialization_alias='creditCardId', description='The id of the credit card')
     active: bool = Field(..., description='Whether the credit card is active (cancelled) or not')
     owner_id: uuid.UUID = Field(..., serialization_alias='ownerId', description='The id of the card owner')
-    nickname: str = Field(..., serialization_alias='nickname', description='The nickname of the card', json_schema_extra={'example': 'My credit card for bank X'})
+    nickname: str = Field(..., serialization_alias='nickname', description='The nickname of the card',
+                          json_schema_extra={'example': 'My credit card for bank X'})
     # Problem with AccountSchema with crossed imports
     # account: AccountSchema | None = Field(None, serialization_alias='account', description='The account object')
     account_id: uuid.UUID | None = Field(None, serialization_alias='accountId', description='The id of the account, if any')
     currency: CurrencySchema = Field(..., serialization_alias='currency', description='The currency of the card')
-    currency_id: str = Field(..., serialization_alias='currencyId', description='The id of the currency of the card', json_schema_extra={'example': 'BRL'})
+    currency_id: str = Field(..., serialization_alias='currencyId',
+                             description='The id of the currency of the card', json_schema_extra={'example': 'BRL'})
     issue_date: datetime.date | None = Field(None, serialization_alias='issueDate', description='The date that the card was issued')
     cancellation_date: datetime.date | None = Field(None, serialization_alias='cancellationDate', description='The date that the card was cancelled')
     due_day: int | None = Field(None, serialization_alias='dueDay', description='The day that the card id due')
@@ -42,8 +44,10 @@ class CreditCardTransactionSchema(BaseModel):
     currency_id: str = Field(..., serialization_alias='currencyId', description='The id of the currency of the bill entry')
     currency_symbol: str | None = Field(None, serialization_alias='currencySymbol', description='The currency symbol')
 
-    transaction_currency_id: str | None = Field(None, serialization_alias='transactionCurrencyId', description='The id of original currency of transaction')
-    transaction_currency_symbol: str | None = Field(None, serialization_alias='transactionCurrencySymbol', description='The transaction currency symbol')
+    transaction_currency_id: str | None = Field(None, serialization_alias='transactionCurrencyId',
+                                                description='The id of original currency of transaction')
+    transaction_currency_symbol: str | None = Field(None, serialization_alias='transactionCurrencySymbol',
+                                                    description='The transaction currency symbol')
     transaction_amount: float = Field(..., serialization_alias='transactionAmount', description='The amount of the bill entry')
 
     is_installment: bool = Field(..., serialization_alias='isInstallment', description='Whether the bill entry is installment')
@@ -69,7 +73,7 @@ class CreditCardBillSchema(BaseModel):
 class CreditCardsTotalBillByCardSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True,
                               alias_generator=AliasGenerator(serialization_alias=to_camel))
-    
+
     nickname: str = Field(..., description='The nickname of the credit card')
     currency_symbol: str = Field(..., description='The currency symbol for the credit card')
     total_installments: float = Field(..., description='The total amount for the installments')

@@ -51,7 +51,8 @@ class AccountTransactionSchema(BaseModel):
     description: str | None = Field(None, description="Description of the transaction")
     operation_type: str | None = Field(None, serialization_alias='operationType', description="Transaction operation type")
     transaction_currency_id: str = Field(..., serialization_alias='transactionCurrencyId', description="Transaction currency identification")
-    transaction_currency_symbol: str | None = Field(None, serialization_alias='transactionCurrencySymbol', description='The transaction currency symbol')
+    transaction_currency_symbol: str | None = Field(None, serialization_alias='transactionCurrencySymbol',
+                                                    description='The transaction currency symbol')
     transaction_amount: float = Field(..., serialization_alias='transactionAmount', description="Transaction amount")
     exchange_rate: float | None = Field(None, serialization_alias='exchangeRate', description="Exchange rate")
     tax_perc: float | None = Field(None, serialization_alias='taxPerc', description="Tax percentage")

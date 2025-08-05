@@ -15,6 +15,7 @@ def get_current_period():
 
 
 def get_period(reference_date: date | datetime) -> int:
+    # TODO: add support for str param
     year = reference_date.year
     month = reference_date.month
     return year * 100 + month

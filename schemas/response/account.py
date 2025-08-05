@@ -1,8 +1,7 @@
 from pydantic import AliasGenerator, BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
-from rolf_common.schemas import SuccessResponseBase
 
-from schemas.account import AccountBalanceSchema, AccountSchema, AccountTransactionSchema, BalanceSchema
+from schemas.account import AccountBalanceSchema, AccountSchema, AccountTransactionSchema
 
 
 class CreateAccountResponse(BaseModel):
@@ -41,4 +40,5 @@ class CreateBalanceResponse(BaseModel):
 class GetBalanceResponse(BaseModel):
     quantity: int = Field(..., serialization_alias='quantity', description='The number of periods fetched for the account')
     account_name: str = Field(..., serialization_alias='accountName', description='The account name')
-    balance: list[AccountBalanceSchema] = Field(..., serialization_alias='balance', description='The balance for the account in selected period range')
+    balance: list[AccountBalanceSchema] = Field(..., serialization_alias='balance',
+                                                description='The balance for the account in selected period range')

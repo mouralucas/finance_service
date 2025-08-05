@@ -62,7 +62,8 @@ class IndexerSchema(BaseModel):
         serialization_alias=to_camel,
     ))
 
-    id: uuid.UUID = Field(serialization_alias='indexerId', description=' The unique identification of the index', json_schema_extra={'example': uuid.uuid4()})
+    id: uuid.UUID = Field(serialization_alias='indexerId', description=' The unique identification of the index',
+                          json_schema_extra={'example': uuid.uuid4()})
     name: str = Field(..., serialization_alias='indexerName', description='The name of the index')
     description: str | None = Field(None, description='The description of the index')
 

@@ -34,12 +34,12 @@ class GetBrazilianFundInvestmentStatementRequest(BaseModel):
     end_period: int | None = Field(None, description='The end period of the statement')
     period: int | None = Field(None, description='The period of the statement')
 
-    @model_validator(mode='before')
-    def check_periods(cls, data: dict) -> dict:
-        if data.get('period') and (data.get('startPeriod') or data.get('endPeriod')):
+    @model_validator(mode='after')
+    def check_periods(self):
+        if self.period and (self.start_period or self.end_period):
             raise ValueError('only specific period or a range is allowed')
 
-        if data.get('startPeriod') and data.get('endPeriod') and (data.get('endPeriod') < data.get('startPeriod')):
+        if self.start_period and self.end_period and (self.end_period < self.start_period):
             raise ValueError('start period must be before end period')
 
-        return data
+        return self

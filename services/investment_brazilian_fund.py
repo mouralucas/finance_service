@@ -66,7 +66,8 @@ class InvestmentBrazilianFundService(InvestmentService):
 
         # If it is the first statement period must be the same as the investment
         if not last_statement and statement.period != get_period(fund_investments[0].transaction_date):
-            raise HTTPException(status_code=status.HTTP_412_PRECONDITION_FAILED, detail='The period for the first statement must be the same as the investment')
+            raise HTTPException(status_code=status.HTTP_412_PRECONDITION_FAILED,
+                                detail='The period for the first statement must be the same as the investment')
 
         # Add the statement information to a new statement object
         new_statement = InvestmentBrazilianFundsStatementModel(**statement.model_dump(exclude={'tax_details', 'fee_details'}))

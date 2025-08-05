@@ -92,3 +92,5 @@ async def test_get_statement(client, create_investment_statement):
 
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
+
+    assert 'statement' in data

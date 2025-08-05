@@ -11,7 +11,7 @@ from managers.account import AccountManager
 from managers.credit_card import CreditCardManager
 from models.account import AccountBalanceModel, AccountModel, AccountTransactionModel
 from models.credit_card import CreditCardModel
-from schemas.account import AccountBalanceSchema, AccountSchema, AccountTransactionSchema, BalanceSchema
+from schemas.account import AccountBalanceSchema, AccountSchema, AccountTransactionSchema
 from schemas.request.account import (
     CloseAccountRequest,
     CreateAccountRequest,
@@ -130,7 +130,9 @@ class AccountService(BaseService):
         return response
 
     async def get_transactions(self, params: GetAccountTransactionRequest) -> GetAccountTransactionResponse:
-        transactions = await self.account_manager.get_transactions(owner_id=self.user['user_id'], start_period=params.start_period, end_period=params.end_period)
+        transactions = await self.account_manager.get_transactions(owner_id=self.user['user_id'],
+                                                                   start_period=params.start_period,
+                                                                   end_period=params.end_period)
 
         response = GetAccountTransactionResponse(
             quantity=len(transactions) if transactions else 0,
@@ -146,7 +148,8 @@ class AccountService(BaseService):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Account not exists')
 
         # Get balance from the last period with registered transactions until the account is closed or current period
-        min_period: int = await self.account_manager.get_only_one(select(func.min(AccountTransactionModel.period)).where(AccountTransactionModel.account_id == params.account_id))
+        min_period: int = await self.account_manager.get_only_one(select(func.min(AccountTransactionModel.period))\
+            .where(AccountTransactionModel.account_id == params.account_id))
         max_period: int = get_period(account.close_date) if account.close_date else get_current_period()
 
         # TODO: create better validation
@@ -157,7 +160,8 @@ class AccountService(BaseService):
         period_range: list[int] = get_period_range(min_period, max_period)
 
         # Fetch all transactions grouped by period
-        transactions_by_period = await self.account_manager.get_consolidated_transactions_by_period(account_id=params.account_id, period_range=period_range)
+        transactions_by_period = await self.account_manager.get_consolidated_transactions_by_period(account_id=params.account_id,
+                                                                                                    period_range=period_range)
 
         # The first balance available always starts with 'previous_balance' at zero, even if in actual account have more transactions
         # The user should add the previous amount as a transaction, so the calculation is correct at the end
@@ -202,7 +206,7 @@ class AccountService(BaseService):
 
     async def get_balance(self, params: GetBalanceRequest) -> GetBalanceResponse:
         balance = await self.account_manager.get_balance_beta(account_id=params.account_id, period=202501)
-        
+
         response = GetBalanceResponse(
             account_name="account.nickname",
             quantity=len(balance) if balance else 0,

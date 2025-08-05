@@ -197,10 +197,6 @@ async def test_create_transaction_closed_account(client, create_closed_account, 
 
 @pytest.mark.asyncio
 async def test_get_transactions_no_filter(client, create_account_transaction):
-    transactions = create_account_transaction
-
-    qtd_transactions = len(transactions)
-
     response = await client.get('/account/transaction')
 
     assert response.status_code == status.HTTP_200_OK
@@ -221,4 +217,6 @@ async def test_create_balance(client, create_open_account, create_account_transa
     assert 'periodsSaved' in data
     assert data['periodsSaved'] >= 3 # The mock inserts data from 3 months ago to today, so at least 3 periods are saved
     assert 'accountNickname' in data
-    assert data['accountNickname'] == str(create_open_account[0].nickname) # This follow the rules on insertion, open_account[0] is used in create_transaction so it is the same as transactions[0].account.nickname
+    # This follow the rules on insertion, open_account[0] is used in create_transaction
+    #   so it is the same as transactions[0].account.nickname
+    assert data['accountNickname'] == str(create_open_account[0].nickname)
