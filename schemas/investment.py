@@ -1,6 +1,5 @@
 import uuid
 from datetime import date
-from decimal import Decimal
 
 from pydantic import AliasGenerator, BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel, to_snake
@@ -59,15 +58,15 @@ class InvestmentSchema(BaseModel):
     liquidity_name: str | None = Field(None, description='The name of the investment liquidity')
     is_liquidated: bool = Field(False, description='Whether the investment is liquidated')
     liquidation_date: date | None = Field(None, description='The date that the investment was liquidated')
-    liquidation_amount: Decimal | None = Field(None, description='The amount liquidated, after tax')
+    liquidation_amount: float | None = Field(None, description='The amount liquidated, after tax')
     country_id: str = Field(..., description='The id of the country')
     country_name: str | None = Field(None, description='The name of the country of the investment')
 
     observation: str | None = Field(None, description='Observations of the investment')
     objective_id: uuid.UUID | None = Field(None, description='The id of the objective')
 
-    gross_amount: Decimal | None = Field(None, description='The gross amount of last period available')
-    percentage_change: Decimal | None = Field(None, description='The percentage change from start to last period available')
+    gross_amount: float | None = Field(None, description='The gross amount of last period available')
+    percentage_change: float | None = Field(None, description='The percentage change from start to last period available')
 
 
 class InvestmentBaseSchema(BaseModel):
@@ -106,7 +105,7 @@ class TaxFeeSchema(BaseModel):
     ))
 
     id: uuid.UUID = Field(..., serialization_alias='taxFeeId', description='The identification of the tax/fee')
-    amount: Decimal = Field(..., description='The amount of the tax/fee')
+    amount: float = Field(..., description='The amount of the tax/fee')
     currency_id: str = Field('BRL', description='The currency of the tax/fee')
 
 
@@ -152,7 +151,7 @@ class InvestmentObjectiveSchema(BaseModel):
     owner_id: uuid.UUID = Field(..., description='The id of the owner of the objective')
     title: str = Field(..., description='The title of the objective')
     description: str | None = Field(None, description='The description of the objective')
-    amount: Decimal = Field(..., description='The amount of the objective')
+    amount: float = Field(..., description='The amount of the objective')
     estimated_deadline: date | None = Field(None, description='The date that are expected to reach the objective')
 
 
@@ -164,7 +163,7 @@ class InvestmentAllocationSchema(BaseModel):
     ))
 
     name: str = Field(..., description='The name of the allocation')
-    total: Decimal = Field(..., description='The total amount allocated')
+    total: float = Field(..., description='The total amount allocated')
 
 
 # Performance
