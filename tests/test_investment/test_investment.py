@@ -90,8 +90,8 @@ async def test_create_investment(client, create_open_account, create_fixed_incom
     assert 'currencyId' in data['investment']
     assert data['investment']['currencyId'] == str(currency_id)
 
-    assert 'isLiquidated' in data['investment']
-    assert data['investment']['isLiquidated'] is False
+    assert 'isSettled' in data['investment']
+    assert data['investment']['isSettled'] is False
 
 
 @pytest.mark.asyncio
@@ -126,8 +126,8 @@ async def test_create_settled_investment(client, create_open_account, create_fix
     liquidity_id = create_liquidity[0].id
     currency_id = create_currency[0].id
     country_id = 'BR'
-    liquidation_date = '2024-08-01'
-    liquidation_amount = price + (price * 0.2)  # (about 20%)
+    settlement_date = '2024-08-01'
+    settlement_amount = price + (price * 0.2)  # (about 20%)
 
     payload = {
         'custodianId': str(custodian_id),
@@ -145,8 +145,8 @@ async def test_create_settled_investment(client, create_open_account, create_fix
         'indexerId': str(indexer_id),
         'liquidityId': str(liquidity_id),
         'countryId': country_id,
-        'liquidationDate': liquidation_date,
-        'liquidationAmount': liquidation_amount
+        'settlementDate': settlement_date,
+        'settlementAmount': settlement_amount
     }
     response = await client.post('/investment', json=payload)
 
@@ -155,12 +155,12 @@ async def test_create_settled_investment(client, create_open_account, create_fix
 
     assert 'investment' in data
 
-    assert 'liquidationDate' in data['investment']
-    assert data['investment']['liquidationDate'] == liquidation_date
-    assert 'liquidationAmount' in data['investment']
-    assert float(data['investment']['liquidationAmount']) == liquidation_amount
-    assert 'isLiquidated' in data['investment']
-    assert data['investment']['isLiquidated'] is True
+    assert 'settlementDate' in data['investment']
+    assert data['investment']['settlementDate'] == settlement_date
+    assert 'settlementAmount' in data['investment']
+    assert float(data['investment']['settlementAmount']) == settlement_amount
+    assert 'isSettled' in data['investment']
+    assert data['investment']['isSettled'] is True
 
 
 @pytest.mark.asyncio
@@ -168,29 +168,29 @@ async def test_settle_investment(client, create_investment):
     investments = create_investment
 
     investment_id = investments[0].id
-    liquidation_date = '2025-08-09'
+    settlement_date = '2025-08-09'
     gross_amount = 300.54
     net_amount = 250.32
-    liquidation_amount = 250.32
+    settlement_amount = 250.32
     tax_detail = [
         {
             'currencyId': 'BRL',
             'taxFeeId': 'a6c45a5a-f75f-475c-afa1-1cf02cd3fd04',
-            'amount': liquidation_amount * 0.15
+            'amount': settlement_amount * 0.15
         }
     ]
     fee_detail = [
         {
             'currencyId': 'BRL',
             'taxFeeId': 'a187d754-73c9-46d3-ac57-7cc78ea01e6f',
-            'amount': liquidation_amount * 0.01
+            'amount': settlement_amount * 0.01
         }
     ]
 
     payload = {
         'investmentId': str(investment_id),
-        'liquidationDate': liquidation_date,
-        'liquidationAmount': liquidation_amount,
+        'settlementDate': settlement_date,
+        'settlementAmount': settlement_amount,
         'grossAmount': gross_amount,
         'netAmount': net_amount,
         'taxDetail': tax_detail,
@@ -203,9 +203,9 @@ async def test_settle_investment(client, create_investment):
     data = response.json()
 
     assert 'investment' in data
-    assert 'isLiquidated' in data['investment']
-    assert data['investment']['isLiquidated'] is True
-    assert 'liquidationDate' in data['investment']
-    assert data['investment']['liquidationDate'] == liquidation_date
-    assert 'liquidationAmount' in data['investment']
-    assert float(data['investment']['liquidationAmount']) == liquidation_amount
+    assert 'isSettled' in data['investment']
+    assert data['investment']['isSettled'] is True
+    assert 'settlementDate' in data['investment']
+    assert data['investment']['settlementDate'] == settlement_date
+    assert 'settlementAmount' in data['investment']
+    assert float(data['investment']['settlementAmount']) == settlement_amount

@@ -55,11 +55,11 @@ class CreateInvestmentRequest(BaseModel):
 
     type_id: uuid.UUID = Field(..., alias='investmentTypeId', description='The id of the investment type')
     transaction_date: datetime.date = Field(..., description='The date of the investment')
-    maturity_date: datetime.date = Field(None, description='The date that the investment will be liquidated')
+    maturity_date: datetime.date | None = Field(None, description='The date that the investment will be liquidated')
 
-    quantity: Decimal = Field(None, description='The quantity of the investment bought')
-    price: Decimal = Field(None, description='The unit price for the investment')
-    amount: Decimal = Field(None, description='The total bought. Quantity * price')
+    quantity: Decimal | None = Field(None, description='The quantity of the investment bought')
+    price: Decimal | None = Field(None, description='The unit price for the investment')
+    amount: Decimal | None = Field(None, description='The total bought. Quantity * price')
     contracted_rate: str = Field(..., description='The rate of the investment')
 
     currency_id: str = Field(..., description='The id of the currency')
@@ -67,21 +67,21 @@ class CreateInvestmentRequest(BaseModel):
     indexer_type_id: uuid.UUID = Field(..., description='The type of the index for the investment')
     indexer_id: uuid.UUID = Field(..., description='The id of the investment index')
     liquidity_id: uuid.UUID = Field(..., description='The id of investment liquidity')
-    liquidation_date: datetime.date | None = Field(None, description='The date that the investment was liquidated')
-    liquidation_amount: Decimal | None = Field(None, description='The amount liquidated, after tax')
+    settlement_date: datetime.date | None = Field(None, description='The date that the investment was liquidated')
+    settlement_amount: Decimal | None = Field(None, description='The amount liquidated, after tax')
     # tax_detail: TaxFeeRequest | None = Field(None, description='The tax detail of the investment')
     # fee_detail: TaxFeeRequest | None= Field(None, description='The fee detail of the investment')
     country_id: str = Field(..., description='The id of the country')
 
-    observation: str = Field(None, description='Observations for the investment')
+    observation: str | None = Field(None, description='Observations for the investment')
 
     objective_id: uuid.UUID | None = Field(None, description='The id of the objective')
 
     @model_validator(mode='after')
     def check_settlement(self):
-        if (self.liquidation_amount and not self.liquidation_date or
-            not self.liquidation_amount and self.liquidation_date):
-            raise ValueError('both liquidation date and amount must be specified')
+        if (self.settlement_amount and not self.settlement_date or
+            not self.settlement_amount and self.settlement_date):
+            raise ValueError('both settlement date and amount must be specified')
 
         return self
 
@@ -128,7 +128,7 @@ class GetInvestmentRequest(BaseModel):
     id: uuid.UUID | None = Field(None, alias='investmentId', description='The id of the investment')
     start_date: datetime.date | None = Field(None, description='The start date of the filter')
     end_date: datetime.date | None = Field(None, description='The end date of the filter')
-    is_liquidated: bool | None = Field(None, description='Whether the investment is liquidated')
+    is_settled: bool | None = Field(None, description='Whether the investment is settled')
 
 
 class SettleInvestmentRequest(BaseModel):
@@ -137,13 +137,13 @@ class SettleInvestmentRequest(BaseModel):
     ))
 
     id: uuid.UUID = Field(..., alias='investmentId', description='The unique identifier of the investment')
-    gross_amount: Decimal | None = Field(None, description='The gross amount of the investment at liquidation')
-    net_amount: Decimal | None = Field(None, description='The net amount of the investment at liquidation')
+    gross_amount: Decimal | None = Field(None, description='The gross amount of the investment at settlement')
+    net_amount: Decimal | None = Field(None, description='The net amount of the investment at settlement')
     tax_detail: list[TaxFeeRequest] | None = Field(None, description='The tax detail of the investment')
     fee_detail: list[TaxFeeRequest] | None = Field(None, description='The fee detail of the investment')
 
-    liquidation_date: datetime.date | None = Field(None, alias='liquidationDate', description='The date that the investment was liquidated')
-    liquidation_amount: Decimal | None = Field(None, alias='liquidationAmount',
+    settlement_date: datetime.date | None = Field(None, description='The date that the investment was liquidated')
+    settlement_amount: Decimal | None = Field(None,
                                                description='The amount liquidated, after tax and fees, \
                                                    usually the same as net_amount')
 

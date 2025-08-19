@@ -74,8 +74,8 @@ class InvestmentService(BaseService):
         new_investment.owner_id = self.user['user_id']
         new_investment.custodian_id = custodian_id
 
-        if investment.liquidation_date and investment.liquidation_date <= datetime.date.today() and investment.liquidation_amount:
-            new_investment.is_liquidated = True
+        if investment.settlement_date and investment.settlement_date <= datetime.date.today() and investment.settlement_amount:
+            new_investment.is_settled = True
 
         new_investment = await self.investment_manager.create_investment(new_investment)
 
@@ -136,9 +136,9 @@ class InvestmentService(BaseService):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Investment not found')
         investment_settlement_ = investment_settlement.model_dump()
 
-        current_investment.is_liquidated = True
-        current_investment.liquidation_date = investment_settlement_['liquidation_date']
-        current_investment.liquidation_amount = investment_settlement_['liquidation_amount']
+        current_investment.is_settled = True
+        current_investment.settlement_date = investment_settlement_['settlement_date']
+        current_investment.settlement_amount = investment_settlement_['settlement_amount']
 
         response = SettleInvestmentResponse(
             investment=InvestmentSchema.model_validate(current_investment),

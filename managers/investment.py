@@ -47,7 +47,7 @@ class InvestmentManager(BaseDataManager):
 
         return investment
 
-    async def get_investments(self, owner_id: uuid.UUID, is_liquidated: bool) -> list[dict[str, Any]]:
+    async def get_investments(self, owner_id: uuid.UUID, is_liquidated: bool | None) -> list[dict[str, Any]]:
         investment_alias = aliased(InvestmentModel)
         currency_alias = aliased(CurrencyModel)
         type_alias = aliased(InvestmentTypeModel)
@@ -84,8 +84,8 @@ class InvestmentManager(BaseDataManager):
                 investment_alias.indexer_id,
                 investment_alias.indexer_type_id,
                 investment_alias.country_id,
-                investment_alias.liquidation_date,
-                func.coalesce(investment_alias.liquidation_amount, 0).label('liquidation_amount'),
+                investment_alias.settlement_date,
+                func.coalesce(investment_alias.settlement_amount, 0),
                 case(
                     (statement_alias.gross_amount.is_not(None),
                      investment_alias.amount),
@@ -118,11 +118,11 @@ class InvestmentManager(BaseDataManager):
         )
 
         if is_liquidated is not None and is_liquidated:
-            query = query.where(investment_alias.is_liquidated)
+            query = query.where(investment_alias.is_settled)
 
         if is_liquidated is not None and not is_liquidated:
             query = query.where(
-                ~investment_alias.is_liquidated
+                ~investment_alias.is_settled
                                 )
 
         investments: list[RowMapping] = await self.get_all(query)
@@ -249,7 +249,7 @@ class InvestmentManager(BaseDataManager):
             )
             .where(
                 InvestmentModel.owner_id == owner_id,
-                ~InvestmentModel.is_liquidated
+                ~InvestmentModel.is_settled
             )
         )
 
@@ -293,7 +293,7 @@ class InvestmentManager(BaseDataManager):
                 (InvestmentStatementModel.period == subquery_latest_period.c.latest_period)
             )
             .where(
-                ~InvestmentModel.is_liquidated,
+                ~InvestmentModel.is_settled,
                 InvestmentModel.owner_id == owner_id)
             .group_by(
                 case(
@@ -334,7 +334,7 @@ class InvestmentManager(BaseDataManager):
                 (InvestmentStatementModel.period == subquery_latest_period.c.latest_period)
             )
             .where(
-                ~InvestmentModel.is_liquidated,
+                ~InvestmentModel.is_settled,
                 InvestmentModel.owner_id == owner_id,
             )
             .group_by(InvestmentCategoryModel.name)
@@ -368,7 +368,7 @@ class InvestmentManager(BaseDataManager):
                 (InvestmentStatementModel.period == subquery_latest_period.c.latest_period)
             )
             .where(
-                ~InvestmentModel.is_liquidated,
+                ~InvestmentModel.is_settled,
                 InvestmentModel.owner_id == owner_id,
             )
             .group_by(BankModel.name)
@@ -405,7 +405,7 @@ class InvestmentManager(BaseDataManager):
                 (InvestmentStatementModel.period == subquery_latest_period.c.latest_period)
             )
             .where(
-                ~InvestmentModel.is_liquidated,
+                ~InvestmentModel.is_settled,
                 InvestmentModel.owner_id == owner_id,
             )
             .group_by(InvestmentObjectiveModel.title)

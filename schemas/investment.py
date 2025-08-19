@@ -56,9 +56,9 @@ class InvestmentSchema(BaseModel):
     indexer_name: str | None = Field(None, description='The name of the investment index')
     liquidity_id: uuid.UUID = Field(..., description='The id of investment liquidity')
     liquidity_name: str | None = Field(None, description='The name of the investment liquidity')
-    is_liquidated: bool = Field(False, description='Whether the investment is liquidated')
-    liquidation_date: date | None = Field(None, description='The date that the investment was liquidated')
-    liquidation_amount: float | None = Field(None, description='The amount liquidated, after tax')
+    is_settled: bool = Field(False, description='Whether the investment is settled')
+    settlement_date: date | None = Field(None, description='The date that the investment was settled')
+    settlement_amount: float | None = Field(None, description='The amount settled, after tax')
     country_id: str = Field(..., description='The id of the country')
     country_name: str | None = Field(None, description='The name of the country of the investment')
 
