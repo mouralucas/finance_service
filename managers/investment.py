@@ -47,7 +47,7 @@ class InvestmentManager(BaseDataManager):
 
         return investment
 
-    async def get_investments(self, owner_id: uuid.UUID, is_liquidated: bool | None) -> list[dict[str, Any]]:
+    async def get_investments(self, owner_id: uuid.UUID, is_settled: bool | None) -> list[dict[str, Any]]:
         investment_alias = aliased(InvestmentModel)
         currency_alias = aliased(CurrencyModel)
         type_alias = aliased(InvestmentTypeModel)
@@ -117,10 +117,10 @@ class InvestmentManager(BaseDataManager):
             .order_by(investment_alias.transaction_date)
         )
 
-        if is_liquidated is not None and is_liquidated:
+        if is_settled is not None and is_settled:
             query = query.where(investment_alias.is_settled)
 
-        if is_liquidated is not None and not is_liquidated:
+        if is_settled is not None and not is_settled:
             query = query.where(
                 ~investment_alias.is_settled
                                 )

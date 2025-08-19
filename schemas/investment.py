@@ -94,7 +94,7 @@ class InvestmentBaseSchema(BaseModel):
     objective_id: uuid.UUID | None = Field(None, description='The id of the objective')
     objective_name: str | None = Field(None, description='The name of the objective')
 
-    is_liquidated: bool = Field(False, description='Whether the investment is liquidated')
+    is_settled: bool = Field(False, description='Whether the investment is liquidated')
 
     observation: str | None = Field(None, description='Observations of the investment')
 
