@@ -22,7 +22,7 @@ from data_mock.investment.base import get_brazilian_fund_mock
 from data_mock.investment.investment import (
     get_fixed_income_br_investment_type_mock,
     get_investment_category_mock,
-    get_investment_mock,
+    get_active_investment_mock,
     get_investment_statement_mock,
 )
 from models.account import AccountModel, AccountTransactionModel, AccountTypeModel
@@ -69,7 +69,7 @@ async def populate():
         # Investment data
         await BaseDataManager(session).add_or_ignore_all(InvestmentCategoryModel, get_investment_category_mock())
         await BaseDataManager(session).add_or_ignore_all(InvestmentTypeModel, get_fixed_income_br_investment_type_mock())
-        await BaseDataManager(session).add_or_ignore_all(InvestmentModel, get_investment_mock())
+        await BaseDataManager(session).add_or_ignore_all(InvestmentModel, get_active_investment_mock())
         await BaseDataManager(session).add_or_ignore_all(InvestmentStatementModel, get_investment_statement_mock())
         await BaseDataManager(session).add_or_ignore_all(FundsBrModel, get_brazilian_fund_mock())
 

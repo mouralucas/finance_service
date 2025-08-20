@@ -11,7 +11,7 @@ from data_mock.investment.base import get_fixed_income_br_investment_type_mock
 from services.utils.datetime import get_period
 
 
-def get_investment_mock() -> list[dict[str, Any]]:
+def get_active_investment_mock() -> list[dict[str, Any]]:
     accounts = get_open_account_mock()
     investment_types = get_fixed_income_br_investment_type_mock()
     currencies = get_currency_mock()
@@ -20,7 +20,7 @@ def get_investment_mock() -> list[dict[str, Any]]:
     liquidity = get_liquidity_mock()
     countries = get_country_mock()
 
-    investments: list[dict[str, Any]] = [
+    active_investments: list[dict[str, Any]] = [
         {
             **default_model_dict,
             'id': uuid.UUID('a14f064a-c4fb-4b2a-bef3-17b163ed7261'),
@@ -60,14 +60,137 @@ def get_investment_mock() -> list[dict[str, Any]]:
             'indexer_id': indexer[1]['id'],
             'liquidity_id': liquidity[0]['id'],
             'country_id': countries[0]['id'],
+        },
+        {
+            **default_model_dict,
+            'id': uuid.UUID('aef6cc90-7f97-445b-afda-a78bcd8c8ae2'),
+            'owner_id': uuid.UUID('adf52a1e-7a19-11ed-a1eb-0242ac120002'),
+            'custodian_id': accounts[1]['bank_id'],
+            'account_id': accounts[1]['id'],
+            'name': "LCI de teste",
+            'type_id': investment_types[2]['id'],
+            'transaction_date': datetime.date.today() - relativedelta(years=1, months=0, days=15),
+            'maturity_date': datetime.date.today() + relativedelta(years=1, months=1, days=9),
+            'quantity': 1,
+            'price': 1100,
+            'amount': 1100 * 1,
+            'contracted_rate': '81% do CDI',
+            'currency_id': currencies[0]['id'],
+            'indexer_type_id': index_types[0]['id'],
+            'indexer_id': indexer[1]['id'],
+            'liquidity_id': liquidity[0]['id'],
+            'country_id': countries[0]['id'],
+        },
+{
+            **default_model_dict,
+            'id': uuid.UUID('bc631321-a7d3-4739-a85c-afbadbebcab3'),
+            'owner_id': uuid.UUID('adf52a1e-7a19-11ed-a1eb-0242ac120002'),
+            'custodian_id': accounts[1]['bank_id'],
+            'account_id': accounts[1]['id'],
+            'name': "LCA de teste",
+            'type_id': investment_types[3]['id'],
+            'transaction_date': datetime.date.today() - relativedelta(years=0, months=0, days=15),
+            'maturity_date': datetime.date.today() + relativedelta(years=2, months=3, days=0),
+            'quantity': 1,
+            'price': 1000,
+            'amount': 1000 * 1,
+            'contracted_rate': '83% do CDI',
+            'currency_id': currencies[0]['id'],
+            'indexer_type_id': index_types[0]['id'],
+            'indexer_id': indexer[1]['id'],
+            'liquidity_id': liquidity[0]['id'],
+            'country_id': countries[0]['id'],
         }
     ]
 
-    return investments
+    return active_investments
 
+
+def get_settled_investment_mock() -> list[dict[str, Any]]:
+    accounts = get_open_account_mock()
+    investment_types = get_fixed_income_br_investment_type_mock()
+    currencies = get_currency_mock()
+    index_types = get_index_type_mock()
+    indexer = get_indexer_mock()
+    liquidity = get_liquidity_mock()
+    countries = get_country_mock()
+
+    settled_investments: list[dict[str, Any]] = [
+        {
+            **default_model_dict,
+            'id': uuid.UUID('de720e34-27c8-47fc-a6c2-e6127755beae'),
+            'owner_id': uuid.UUID('adf52a1e-7a19-11ed-a1eb-0242ac120002'),
+            'custodian_id': accounts[2]['bank_id'],
+            'account_id': accounts[2]['id'],  # XP
+            'name': 'Settled CDB de teste 1',
+            'type_id': investment_types[0]['id'],
+            'transaction_date': datetime.date.today() - relativedelta(years=2, months=0, days=0),
+            'maturity_date': datetime.date.today(),
+            'quantity': 1.02,
+            'price': 150.65,
+            'amount': 1.02 * 150.65,
+            'contracted_rate': 'Pré fixado 12%',
+            'currency_id': currencies[0]['id'],
+            'indexer_type_id': index_types[1]['id'],
+            'indexer_id': indexer[0]['id'],
+            'liquidity_id': liquidity[0]['id'],
+            'country_id': countries[0]['id'],
+            'is_settled': True,
+            'settlement_date': datetime.date.today(),
+            'settlement_amount': (1.02 * 150.65) + (1.02 * 150.65) * 0.12,
+        },
+        {
+            **default_model_dict,
+            'id': uuid.UUID('e9f4f03a-a42c-4883-9ff9-d6ad95757191'),
+            'owner_id': uuid.UUID('adf52a1e-7a19-11ed-a1eb-0242ac120002'),
+            'custodian_id': accounts[1]['bank_id'],
+            'account_id': accounts[1]['id'],
+            'name': "CDB Banco Outro liquidado",
+            'type_id': investment_types[0]['id'],
+            'transaction_date': datetime.date.today() - relativedelta(years=4, months=0, days=28),
+            'maturity_date': datetime.date.today(),
+            'quantity': 998.3,
+            'price': 1.50,
+            'amount': 998.3 * 1.50,
+            'contracted_rate': '110% do CDI',
+            'currency_id': currencies[0]['id'],
+            'indexer_type_id': index_types[0]['id'],
+            'indexer_id': indexer[1]['id'],
+            'liquidity_id': liquidity[0]['id'],
+            'country_id': countries[0]['id'],
+            'is_settled': True,
+            'settlement_date': datetime.date.today(),
+            'settlement_amount': (998.3 * 1.50) + (998.3 * 1.50) * 0.40,
+        },
+        {
+            **default_model_dict,
+            'id': uuid.UUID('c85ce93d-e56c-4b20-b86c-3ed941966c6e'),
+            'owner_id': uuid.UUID('adf52a1e-7a19-11ed-a1eb-0242ac120002'),
+            'custodian_id': accounts[1]['bank_id'],
+            'account_id': accounts[1]['id'],
+            'name': "LCI de teste liquidado",
+            'type_id': investment_types[2]['id'],
+            'transaction_date': datetime.date.today() - relativedelta(years=1, months=0, days=15),
+            'maturity_date': datetime.date.today(),
+            'quantity': 1,
+            'price': 1100,
+            'amount': 1100 * 1,
+            'contracted_rate': '81% do CDI',
+            'currency_id': currencies[0]['id'],
+            'indexer_type_id': index_types[0]['id'],
+            'indexer_id': indexer[1]['id'],
+            'liquidity_id': liquidity[0]['id'],
+            'country_id': countries[0]['id'],
+            'is_settled': True,
+            'settlement_date': datetime.date.today(),
+            'settlement_amount': (1100) + (1100) * 0.12,            
+        },
+    ]
+
+    return settled_investments
 
 def get_investment_statement_mock() -> list[dict[str, Any]]:
-    investments = get_investment_mock()
+    investments = get_active_investment_mock()
 
     statements: list[dict[str, Any]] = [
         {

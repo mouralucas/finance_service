@@ -21,7 +21,7 @@ async def test_get_investment_type(client, create_fixed_income_br_investment_typ
 
 
 @pytest.mark.asyncio
-async def test_create_first_investment_statement(client, create_investment, create_tax):
+async def test_create_first_investment_statement(client, create_active_investment, create_tax):
     """
         The first statement should have the same period as the investment
     :param client:
@@ -29,7 +29,7 @@ async def test_create_first_investment_statement(client, create_investment, crea
     :param create_tax:
     :return:
     """
-    investments = create_investment
+    investments = create_active_investment
 
     investment_id = str(investments[0].id)
     period = get_period(investments[0].transaction_date)

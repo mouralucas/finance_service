@@ -5,8 +5,9 @@ from data_mock.investment.base import get_funds_br_investment_type_mock, get_inv
 from data_mock.investment.brazilian_funds import get_brazilian_fund_investment_mock, get_brazilian_fund_investment_statement_mock
 from data_mock.investment.investment import (
     get_fixed_income_br_investment_type_mock,
-    get_investment_mock,
+    get_active_investment_mock,
     get_investment_statement_mock,
+    get_settled_investment_mock,
 )
 from models.investment import InvestmentCategoryModel, InvestmentModel, InvestmentObjectiveModel, InvestmentStatementModel, InvestmentTypeModel
 from models.investment_brazilian_fund import InvestmentBrazilianFundsModel, InvestmentBrazilianFundsStatementModel
@@ -40,12 +41,22 @@ async def create_funds_br_investment_type(test_session, create_investment_catego
 
 
 @pytest_asyncio.fixture
-async def create_investment(test_session, create_open_account, create_fixed_income_br_investment_type, create_currency,
+async def create_active_investment(test_session, create_open_account, create_fixed_income_br_investment_type, create_currency,
                             create_indexer_type, create_indexer, create_liquidity, create_country) -> list[InvestmentSchema]:
-    data_ = await BaseDataManager(test_session).add_or_ignore_all(InvestmentModel, get_investment_mock())
+    data_ = await BaseDataManager(test_session).add_or_ignore_all(InvestmentModel, get_active_investment_mock())
+    active_investments = [InvestmentSchema.model_validate(data["InvestmentModel"]) for data in data_]
+
+    return active_investments
+
+
+@pytest_asyncio.fixture
+async def create_settled_investment(test_session, create_open_account, create_fixed_income_br_investment_type, create_currency,
+                            create_indexer_type, create_indexer, create_liquidity, create_country) -> list[InvestmentSchema]:
+    data_ = await BaseDataManager(test_session).add_or_ignore_all(InvestmentModel, get_settled_investment_mock())
     investments = [InvestmentSchema.model_validate(data["InvestmentModel"]) for data in data_]
 
-    return investments
+    settled_investments = list(filter(lambda inv: inv.is_settled, investments))
+    return settled_investments
 
 
 @pytest_asyncio.fixture
@@ -76,7 +87,7 @@ async def create_brazilian_fund_investment_statement(
 
 
 @pytest_asyncio.fixture
-async def create_investment_statement(test_session, create_investment) -> list[InvestmentStatementSchema]:
+async def create_investment_statement(test_session, create_active_investment) -> list[InvestmentStatementSchema]:
     data_ = await BaseDataManager(test_session).add_or_ignore_all(InvestmentStatementModel, get_investment_statement_mock())
     statements = [InvestmentStatementSchema.model_validate(data["InvestmentStatementModel"]) for data in data_]
 

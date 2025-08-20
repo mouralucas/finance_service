@@ -11,7 +11,7 @@ async def test_get_investment_allocation(client):
 
 
 @pytest.mark.asyncio
-async def test_get_investment_performance(client, create_investment, create_indexer):
+async def test_get_investment_performance(client, create_active_investment, create_indexer):
     indexers = create_indexer
 
     payload = {

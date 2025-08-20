@@ -47,6 +47,20 @@ def get_fixed_income_br_investment_type_mock() -> list[dict[str, Any]]:
             'name': 'Fundo de investimento multimercado',
             'description': 'Fundo de investimento multimercado',
             'investment_category_id': investment_category[2]['id']
+        },
+        {
+            **default_model_dict,
+            'id': uuid.UUID('6d99736f-c50a-4d21-b773-040f6483d552'),
+            'name': 'LCI',
+            'description': 'Letra de Crédito Imobiliário',
+            'investment_category_id': investment_category[0]['id']
+        },
+        {
+            **default_model_dict,
+            'id': uuid.UUID('07d8dc0e-12b1-435f-a450-b110f3253e08'),
+            'name': 'LCA',
+            'description': 'Letra de Crédito do Agronegócio',
+            'investment_category_id': investment_category[0]['id']
         }
     ]
 

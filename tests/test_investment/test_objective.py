@@ -44,7 +44,7 @@ async def test_get_open_objectives(client, create_open_investment_objectives):
 
 
 @pytest.mark.asyncio
-async def test_check_investments_for_objectives(client, create_investment):
+async def test_check_investments_for_objectives(client, create_active_investment):
     """
     Created by: Lucas Penha de Moura - 21/09/2024
         This test checks the function that looks for an investment without an objective

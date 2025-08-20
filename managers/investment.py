@@ -84,8 +84,9 @@ class InvestmentManager(BaseDataManager):
                 investment_alias.indexer_id,
                 investment_alias.indexer_type_id,
                 investment_alias.country_id,
+                investment_alias.is_settled,
                 investment_alias.settlement_date,
-                func.coalesce(investment_alias.settlement_amount, 0),
+                investment_alias.settlement_amount,
                 case(
                     (statement_alias.gross_amount.is_not(None),
                      investment_alias.amount),

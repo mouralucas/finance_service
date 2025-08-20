@@ -164,8 +164,8 @@ async def test_create_settled_investment(client, create_open_account, create_fix
 
 
 @pytest.mark.asyncio
-async def test_settle_investment(client, create_investment):
-    investments = create_investment
+async def test_settle_investment(client, create_active_investment):
+    investments = create_active_investment
 
     investment_id = investments[0].id
     settlement_date = '2025-08-09'
@@ -209,3 +209,58 @@ async def test_settle_investment(client, create_investment):
     assert data['investment']['settlementDate'] == settlement_date
     assert 'settlementAmount' in data['investment']
     assert float(data['investment']['settlementAmount']) == settlement_amount
+
+
+@pytest.mark.asyncio
+async def test_get_active_investments(client, create_active_investment, create_settled_investment):
+    active_investments = create_active_investment
+    len_active_investments = len(active_investments)
+    len_settled_investments = len(create_settled_investment)
+    len_all_investments = len_active_investments + len_settled_investments
+
+    payload = {
+        'isSettled': False
+    }
+    response = await client.get('/investment', params=payload)
+    assert response.status_code == status.HTTP_200_OK
+
+    data = response.json()
+    assert 'investments' in data
+
+    assert len(data['investments']) <= len_all_investments
+    assert len(data['investments']) == len_active_investments
+
+    for invstment in data['investments']:
+        assert 'isSettled' in invstment
+        assert invstment['isSettled'] is False
+        assert 'settlementDate' in invstment
+        assert invstment['settlementDate'] is None
+        assert 'settlementAmount' in invstment
+        assert invstment['settlementAmount'] is None
+
+@pytest.mark.asyncio
+async def test_get_settled_investments(client, create_active_investment, create_settled_investment):
+    active_investments = create_active_investment
+    len_active_investments = len(active_investments)
+    len_settled_investments = len(create_settled_investment)
+    len_all_investments = len_active_investments + len_settled_investments
+
+    payload = {
+        'isSettled': True
+    }
+    response = await client.get('/investment', params=payload)
+    assert response.status_code == status.HTTP_200_OK
+
+    data = response.json()
+    assert 'investments' in data
+
+    assert len(data['investments']) <= len_all_investments
+    assert len(data['investments']) == len_settled_investments
+
+    for invstment in data['investments']:
+        assert 'isSettled' in invstment
+        assert invstment['isSettled'] is True
+        assert 'settlementDate' in invstment
+        assert invstment['settlementDate'] is not None
+        assert 'settlementAmount' in invstment
+        assert invstment['settlementAmount'] is not None
