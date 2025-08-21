@@ -6,4 +6,4 @@ async def resolve_hello_world(_, info):
 
 
 def bind_finance_dashboard_resolvers(query: QueryType, mutation: MutationType):
-    query.set_field('helloWorld', resolver=resolve_hello_world)
+    query.set_field('helloWorldQuery', resolver=resolve_hello_world)
