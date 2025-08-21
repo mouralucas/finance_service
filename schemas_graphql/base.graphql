@@ -1,10 +1,5 @@
 type Query {
-    getHelloWorld: helloWorld
-}
-
-
-type helloWorld {
-    helloWorld: String
+    getHelloWorld: String
 }
 
 type Mutation {

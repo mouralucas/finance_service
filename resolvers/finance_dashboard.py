@@ -2,6 +2,7 @@ from ariadne import MutationType, QueryType
 
 
 async def resolve_hello_world(_, info):
+    print('Opa')
     return "Hello you MF"
 
 
