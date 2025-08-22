@@ -100,7 +100,7 @@ class FinanceManager(BaseDataManager):
 
         return cast(PeriodicityModel, periodicity)
 
-    async def get_latest_finance_series_period(self, indexer_id: uuid.UUID, periodicity_id: uuid.UUID) -> int:
+    async def get_latest_finance_series_period(self, indexer_id: uuid.UUID, periodicity_id: uuid.UUID) -> int | None:
         """
         Created by: Lucas Penha de Moura - 05/12/2024
             Get the latest series period for an indexer and periodicity
@@ -121,3 +121,15 @@ class FinanceManager(BaseDataManager):
         latest_period = await self.get_only_one(select_statement=sql_statement)
 
         return cast(int, latest_period) if latest_period else None
+
+    async def get_indexer_series(self) -> list[IndexerSeriesModel] | None:
+        query = select(IndexerSeriesModel) \
+        .where(
+            IndexerSeriesModel.indexer_id == '2a2b100f-17d9-4c61-b3b4-f06662113953',
+            IndexerSeriesModel.period > 202401
+            )
+        
+        indexer_series = await self.get_all(query)
+
+        return [i['IndexerSeriesModel'] for i in indexer_series] if indexer_series else None
+        

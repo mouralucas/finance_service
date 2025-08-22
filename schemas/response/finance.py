@@ -4,7 +4,7 @@ from pydantic.alias_generators import to_camel
 from rolf_common.schemas import SuccessResponseBase
 
 from schemas.core import BankSchema, CurrencySchema, ExpensesByCategory, IndexerSchema, IndexerTypeSchema, LiquiditySchema, TaxFeeSchema
-from schemas.finance import FundsBrSchema
+from schemas.finance import FundsBrSchema, IndexerSeries
 
 
 class GetSummaryResponse(SuccessResponseBase):
@@ -49,6 +49,14 @@ class GetIndexerResponse(BaseModel):
     indexers: list[IndexerSchema] = Field(..., description='The list of indexers')
 
 
+class GetIndexerSeriesResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
+        serialization_alias=to_camel,
+    ))
+
+    quantity: int = Field(..., description='The quantity of data available in response')
+    series: list[IndexerSeries] = Field(..., description='The list of indexer series')
+
 class GetLiquidityResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
         serialization_alias=to_camel
@@ -69,8 +77,10 @@ class GetTaxFeeResponse(BaseModel):
 
     tax_fee: list[TaxFeeSchema] = Field(..., description='The tax or fee list')
 
+
 class CreateBrazilianFundResponse(BaseModel):
     fund: FundsBrSchema = Field(..., description='The created fund')
+
 
 class GetBrazilianFundsResponse(BaseModel):
     quantity: int = Field(..., description='The quantity of funds available')

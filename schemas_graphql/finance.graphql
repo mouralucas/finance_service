@@ -1,0 +1,25 @@
+type IndexerSeries {
+    id: ID!
+    indexer_id: String!
+    indexer_name: String
+    date: String
+    period: Int
+    value: Float
+    periodicity_id: String!
+    periodicity_name: String
+    unit: String
+}
+
+# Input types
+input GetIndexerSeriesInput {
+    indexer_id: String!
+    periodicity_id: String
+    startPeriod: Int
+    endPeriod: Int
+}
+
+# Response types
+type GetIndexerSeriesResponse {
+    quantity: Int!,
+    series: [IndexerSeries]
+}

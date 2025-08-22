@@ -1,9 +1,10 @@
+from unittest.mock import Base
 import uuid
 from datetime import date
 
 from pydantic import AliasGenerator, BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel, to_snake
-
+import datetime
 
 class TaxFeeQuotationSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
@@ -39,3 +40,19 @@ class FundsBrSchema(BaseModel):
     fees: list[TaxFeeQuotationSchema] | None = Field(None, description='The fee details of the fund fees')
 
     benchmark: str | None = Field(None, description='The benchmark of the fund')
+
+
+class IndexerSeries(BaseModel):
+    model_config = ConfigDict(
+        from_attributes=True, alias_generator=AliasGenerator(serialization_alias=to_camel)
+    )
+
+    id: uuid.UUID = Field(...)
+    indexer_id: uuid.UUID = Field(..., description='The internal id of the indexer')
+    indexer_name: str | None = Field(None, description='The name of the indexer')
+    date: datetime.date | None = Field(None, description='The reference date of the value')
+    period: int | None = Field(None, description='The reference period of the value')
+    value: float = Field(..., description='The value of the indexer at the date/period')
+    periodicity_id: uuid.UUID = Field(..., description='The internal id of periodocity')
+    periodocity_name: str | None = Field(None, description='The name of the periodicity')
+    unit: str = Field(..., description='The unit of the value')

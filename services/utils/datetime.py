@@ -55,7 +55,7 @@ def get_previous_period(period: int = get_current_period(), offset: int = 1) -> 
     return year * 100 + month
 
 
-def get_period_range(start_period: int, end_period: int = None) -> list[int]:
+def get_period_range(start_period: int, end_period: int | None = None) -> list[int]:
     """
     Created by: Lucas Penha de Moura - 27/09/2024
         Creates randon date between two specified dates.

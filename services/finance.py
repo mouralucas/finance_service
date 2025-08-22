@@ -7,8 +7,8 @@ from managers.credit_card import CreditCardManager
 from managers.finance import FinanceManager
 from models.investment import FundsBrModel
 from schemas.core import BankSchema, CurrencySchema, ExpensesByCategory, IndexerSchema, IndexerTypeSchema, LiquiditySchema, TaxFeeSchema
-from schemas.finance import FundsBrSchema
-from schemas.request.finance import CreateBrazilianFundRequest, GetSummaryRequest, GetTaxFeeRequest
+from schemas.finance import FundsBrSchema, IndexerSeries
+from schemas.request.finance import CreateBrazilianFundRequest, GetIndexerSeriesRequest, GetSummaryRequest, GetTaxFeeRequest
 from schemas.response.finance import (
     CreateBrazilianFundResponse,
     GetBankResponse,
@@ -16,6 +16,7 @@ from schemas.response.finance import (
     GetCurrencyResponse,
     GetExpensesByCategoryResponse,
     GetIndexerResponse,
+    GetIndexerSeriesResponse,
     GetIndexerTypeResponse,
     GetLiquidityResponse,
     GetTaxFeeResponse,
@@ -140,3 +141,15 @@ class FinanceService(BaseService):
         )
 
         return response
+
+    # Indexer series data
+    async def get_indexer_series(self, params: GetIndexerSeriesRequest) -> GetIndexerSeriesResponse:
+        series = await self.finance_manager.get_indexer_series()
+
+        response = GetIndexerSeriesResponse(
+            quantity=len(series) if series else 0,
+            series=[IndexerSeries.model_validate(serie) for serie in series] if series else []
+        )
+
+        return response
+

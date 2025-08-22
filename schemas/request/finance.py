@@ -73,3 +73,14 @@ class CreateBrazilianFundRequest(BaseModel):
     fees: list[TaxFeeQuotationRequest] | None = Field(None, description='The fee details of the fund fees')
 
     benchmark: str | None = Field(None, description='The benchmark of the fund')
+
+
+class GetIndexerSeriesRequest(BaseModel):
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True, alias_generator=AliasGenerator(
+        alias=to_camel
+    ))
+
+    indexer_id: uuid.UUID = Field(..., description='The ID of the indexer')
+    periodicity_id: uuid.UUID = Field(uuid.UUID('dc5b3bf8-2b84-423a-9a90-e7e194e355fa'), description='The ID of wanted periodocity. Defaults to monthly')
+    startPeriod: int | None = Field(None)
+    endPeriod: int | None = Field(None)

@@ -1,5 +1,6 @@
 type Query {
     getHelloWorld: String
+    getIndexerSeries(params: GetIndexerSeriesInput! ): GetIndexerSeriesResponse
 }
 
 type Mutation {
