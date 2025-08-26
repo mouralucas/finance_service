@@ -4,9 +4,6 @@ from schemas.request.finance import GetIndexerSeriesRequest
 from services.finance import FinanceService
 
 
-async def resolve_hello_world(_, info):
-    return "Hello you MF"
-
 
 async def resolve_get_indexer_series(_, info, params):
     params = GetIndexerSeriesRequest.model_validate(params)
@@ -18,5 +15,4 @@ async def resolve_get_indexer_series(_, info, params):
     return indexer_series.model_dump()
 
 def bind_finance_dashboard_resolvers(query: QueryType, mutation: MutationType):
-    query.set_field('getHelloWorld', resolver=resolve_hello_world)
     query.set_field('getIndexerSeries', resolver=resolve_get_indexer_series)

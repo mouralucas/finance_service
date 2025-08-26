@@ -79,14 +79,14 @@ class AccountService(BaseService):
         return response
 
     async def get_accounts(self, params: GetAccountRequest) -> GetAccountResponse:
-        params = params.model_dump()
-        params['owner_id'] = self.user['user_id']
+        params_ = params.model_dump()
+        params_['owner_id'] = self.user['user_id']
 
-        accounts: list[AccountModel] | None = await self.account_manager.get_accounts(params=params)
+        accounts: list[AccountModel] | None = await self.account_manager.get_accounts(params=params_)
 
         response = GetAccountResponse(
             quantity=len(accounts) if accounts else 0,
-            accounts=[AccountSchema.model_validate(data) for data in accounts] if accounts else None
+            accounts=[AccountSchema.model_validate(data) for data in accounts] if accounts else []
         )
 
         return response

@@ -14,7 +14,7 @@ class CloseAccountResponse(CreateAccountResponse):
 
 class GetAccountResponse(BaseModel):
     quantity: int = Field(..., serialization_alias='quantity', description='The number of accounts fetched')
-    accounts: list[AccountSchema] | None = Field(None, serialization_alias='accounts', description='The accounts of the user')
+    accounts: list[AccountSchema] = Field(..., serialization_alias='accounts', description='The accounts of the user')
 
 
 class CreateAccountTransactionResponse(BaseModel):

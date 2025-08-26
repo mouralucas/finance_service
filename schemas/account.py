@@ -39,7 +39,7 @@ class AccountTransactionSchema(BaseModel):
     owner_id: uuid.UUID | None = Field(..., serialization_alias="ownerId", description="Account owner")
     # account object
     account_id: uuid.UUID = Field(..., serialization_alias="accountId", description="Account identification")
-    account_nickname: str = Field(None, serialization_alias='accountNickname', description='The nickname of the account')
+    account_nickname: str | None = Field(None, serialization_alias='accountNickname', description='The nickname of the account')
     period: int = Field(..., description="Transaction period")
     currency_id: str = Field(..., serialization_alias="currencyId", description="Account currency")
     currency_symbol: str | None = Field(None, serialization_alias='currencySymbol', description='The currency symbol')

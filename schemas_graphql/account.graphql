@@ -1,0 +1,30 @@
+extend type Query {
+    getAccounts(params: GetAccountsRequest): GetAccountResponse
+}
+
+# Account types
+input GetAccountsRequest {
+    accountId: String
+    currencyId: String
+    active: Boolean
+}
+
+type GetAccountResponse {
+    quantity: Int!
+    accounts: [Account]!
+}
+
+type Account {
+    accountId: ID!
+    active: Boolean!
+    bankId: String!
+    nickname: String!
+    description: String
+    branch: String
+    number: String
+    openDate: String
+    closeDate: String
+    typeId: String!
+    currencyId: String!
+    # credit cards
+}
