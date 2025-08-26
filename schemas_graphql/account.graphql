@@ -1,5 +1,6 @@
 extend type Query {
     getAccounts(params: GetAccountsRequest): GetAccountResponse
+    getAccountBalance(params: GetAccountBalanceRequest): GetAccountBalanceResponse
 }
 
 # Account types
@@ -12,6 +13,17 @@ input GetAccountsRequest {
 type GetAccountResponse {
     quantity: Int!
     accounts: [Account]!
+}
+
+input GetAccountBalanceRequest {
+    accountId: String!
+    period: Int!
+}
+
+type GetAccountBalanceResponse {
+    quantity: Int!
+    accountName: String!
+    balance: [AccountBalance]!
 }
 
 type Account {
@@ -27,4 +39,14 @@ type Account {
     typeId: String!
     currencyId: String!
     # credit cards
+}
+
+type AccountBalance {
+    period: Int!
+    previousBalance: Float!
+    incoming: Float!
+    outgoing: Float!
+    transactions: Float!
+    earnings: Float!
+    balance: Float!
 }

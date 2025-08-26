@@ -1,8 +1,9 @@
 import datetime
 import uuid
 from decimal import Decimal
+from pydantic.alias_generators import to_camel
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import AliasGenerator, BaseModel, ConfigDict, Field
 
 from schemas.credit_card import CreditCardSchema
 
@@ -64,26 +65,28 @@ class AccountTransactionSchema(BaseModel):
 
 class BalanceSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-
+    # Not used
     id: uuid.UUID = Field(..., serialization_alias='balanceEntryId', description='The id of the balance entry')
     account_id: uuid.UUID = Field(..., serialization_alias='accountId', description='Account identification')
-    previous_balance: Decimal = Field(None, description="The balance from the past period")
-    incoming: Decimal = Field(None, description="The amount o money that enter the account in the period")
-    outgoing: Decimal = Field(None, description="The amount o money that leave the account in the period")
-    transactions: Decimal = Field(None, description="The difference between incoming and outgoing")
-    earning: Decimal = Field(None, description="How much the account profits in the period, if set")
-    balance: Decimal = Field(None, description="How many money is in the account by the end of the period")
+    previous_balance: float = Field(0, description="The balance from the past period")
+    incoming: float = Field(0, description="The amount o money that enter the account in the period")
+    outgoing: float = Field(0, description="The amount o money that leave the account in the period")
+    transactions: float = Field(0, description="The difference between incoming and outgoing")
+    earning: float = Field(0, description="How much the account profits in the period, if set")
+    balance: float = Field(0, description="How many money is in the account by the end of the period")
 
 
 class AccountBalanceSchema(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
+        serialization_alias=to_camel
+    ))
 
     # id: uuid.UUID = Field(..., serialization_alias='balanceId', description='The id of the balance')
     # account_id: uuid.UUID = Field(..., serialization_alias='accountId', description='Account identification')
     period: int = Field(..., description='The period of the balance')
-    previous_balance: Decimal = Field(None, description="The balance from the past period")
-    incoming: Decimal = Field(None, description="The amount o money that enter the account in the period")
-    outgoing: Decimal = Field(None, description="The amount o money that leave the account in the period")
-    transactions: Decimal = Field(None, description="The difference between incoming and outgoing")
-    earnings: Decimal = Field(None, description="How much the account profits in the period, if set")
-    balance: Decimal = Field(None, description="How many money is in the account by the end of the period")
+    previous_balance: float = Field(0, description="The balance from the past period")
+    incoming: float = Field(0, description="The amount o money that enter the account in the period")
+    outgoing: float = Field(0, description="The amount o money that leave the account in the period")
+    transactions: float = Field(0, description="The difference between incoming and outgoing")
+    earnings: float = Field(0, description="How much the account profits in the period, if set")
+    balance: float = Field(0, description="How many money is in the account by the end of the period")

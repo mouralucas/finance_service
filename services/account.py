@@ -205,7 +205,7 @@ class AccountService(BaseService):
         return response
 
     async def get_balance(self, params: GetBalanceRequest) -> GetBalanceResponse:
-        balance = await self.account_manager.get_balance_beta(account_id=params.account_id, period=202501)
+        balance = await self.account_manager.get_balance_beta(account_id=params.account_id, period=params.period)
 
         response = GetBalanceResponse(
             account_name="account.nickname",

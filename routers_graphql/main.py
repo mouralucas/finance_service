@@ -31,9 +31,9 @@ schema = make_executable_schema(type_defs, query, mutation)
 async def finance_dashboard(
     request: Request,
     session: AsyncSession = Depends(get_session),
-    #user: RequiredUser = Security(get_user)
+    user: RequiredUser = Security(get_user)
 ):
-    user = RequiredUser(user_id=uuid.uuid4())
+    #user = RequiredUser(user_id=uuid.uuid4())
 
     data = await request.json()
     value = {"request": request, "session": session, "user": user}

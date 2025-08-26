@@ -24,6 +24,7 @@ from schemas.response.account import (
     CreateAccountTransactionResponse,
     GetAccountResponse,
     GetAccountTransactionResponse,
+    GetBalanceResponse,
 )
 from services.account import AccountService
 
@@ -106,5 +107,5 @@ async def get_balance(
         params: GetBalanceRequest = Depends(),
         session: AsyncSession = Depends(get_session),
         user: RequiredUser = Security(get_user)
-):
+) -> GetBalanceResponse:
     return await AccountService(session, user).get_balance(params=params)
