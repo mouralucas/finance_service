@@ -1,9 +1,8 @@
 import datetime
 import uuid
-from decimal import Decimal
-from pydantic.alias_generators import to_camel
 
 from pydantic import AliasGenerator, BaseModel, ConfigDict, Field
+from pydantic.alias_generators import to_camel
 
 from schemas.credit_card import CreditCardSchema
 
@@ -61,19 +60,6 @@ class AccountTransactionSchema(BaseModel):
     spread_perc: float | None = Field(None, serialization_alias='spreadPerc', description="Spread percentage")
     spread: float | None = Field(None, serialization_alias='spread', description="Spread amount")
     effective_rate: float | None = Field(None, serialization_alias='effectiveRate', description="Effective rate")
-
-
-class BalanceSchema(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-    # Not used
-    id: uuid.UUID = Field(..., serialization_alias='balanceEntryId', description='The id of the balance entry')
-    account_id: uuid.UUID = Field(..., serialization_alias='accountId', description='Account identification')
-    previous_balance: float = Field(0, description="The balance from the past period")
-    incoming: float = Field(0, description="The amount o money that enter the account in the period")
-    outgoing: float = Field(0, description="The amount o money that leave the account in the period")
-    transactions: float = Field(0, description="The difference between incoming and outgoing")
-    earning: float = Field(0, description="How much the account profits in the period, if set")
-    balance: float = Field(0, description="How many money is in the account by the end of the period")
 
 
 class AccountBalanceSchema(BaseModel):

@@ -1,8 +1,8 @@
 
 
 from ariadne import MutationType, QueryType
+
 from schemas.request.account import GetAccountRequest, GetBalanceRequest
-from schemas.response.account import GetAccountResponse
 from services.account import AccountService
 
 

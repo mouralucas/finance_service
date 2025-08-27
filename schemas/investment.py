@@ -117,13 +117,19 @@ class InvestmentStatementSchema(BaseModel):
     id: uuid.UUID = Field(..., serialization_alias='investmentStatementId', description='The id of the statement')
     investment_id: uuid.UUID = Field(..., description='The id of the investment')
     investment: InvestmentSchema | None = Field(None, description='The object of the investment')
-    reference_date: date = Field(..., description='The date of the investment')
     period: int = Field(..., description='The period of the statement')
+    previous_amount: float = Field(..., description='The previous amount for the investment')
     gross_amount: float = Field(..., description='The gross amount of the investment in the period')
     total_tax: float = Field(..., description='The total tax amount of the investment in the period')
     tax_detail: list[TaxFeeSchema] | None = Field(..., description='The detail of taxes')
     total_fee: float = Field(..., description='The total fee of the investment in the period')
     fee_detail: list[TaxFeeSchema] | None = Field(..., description='The detail of fees')
+    reference_date: date = Field(..., description='The date of the investment')
+    at_maturity: bool = Field(..., description='Wheter the investment is at maturity')
+    # TODO: check if the value and percentage change can be null and set this fields to required
+    #   update tests also
+    value_change: float | None = Field(None, description='How much the value change from last statement')
+    percentage_change: float | None = Field(None, description='How much, in %, the value change from last statement')
     net_amount: float = Field(..., description='The net amount of the investment in the period')
 
 

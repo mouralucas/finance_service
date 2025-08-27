@@ -1,8 +1,7 @@
 from ariadne import MutationType, QueryType
+
 from schemas.request.finance import GetIndexerSeriesRequest
-
 from services.finance import FinanceService
-
 
 
 async def resolve_get_indexer_series(_, info, params):

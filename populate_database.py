@@ -20,9 +20,9 @@ from data_mock.core import (
 from data_mock.credit_card import get_cancelled_credit_card_mock, get_credit_card_mock
 from data_mock.investment.base import get_brazilian_fund_mock
 from data_mock.investment.investment import (
+    get_active_investment_mock,
     get_fixed_income_br_investment_type_mock,
     get_investment_category_mock,
-    get_active_investment_mock,
     get_investment_statement_mock,
 )
 from models.account import AccountModel, AccountTransactionModel, AccountTypeModel

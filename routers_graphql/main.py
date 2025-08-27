@@ -1,10 +1,9 @@
-import uuid
 from ariadne import MutationType, QueryType, graphql, load_schema_from_path, make_executable_schema
 from ariadne.explorer import ExplorerGraphiQL
 from fastapi import APIRouter, Depends, Request, Security
-from sqlalchemy.ext.asyncio import AsyncSession
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import get_user
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.responses import HTMLResponse, JSONResponse
 
 from backend.database import get_session

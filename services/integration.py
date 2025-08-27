@@ -8,7 +8,7 @@ from managers.core import CoreManager
 from managers.finance import FinanceManager
 from models.core import IndexerSeriesModel
 from schemas.request.integration import CreateIndexerSeriesRequest
-from services.utils.datetime import get_current_period, get_period, get_period_dates, get_previous_period
+from services.utils.datetime import get_period, get_period_dates
 
 
 class BcbIntegrationService:
@@ -27,8 +27,8 @@ class BcbIntegrationService:
         latest_period = await self.finance_manager.get_latest_finance_series_period(indexer_id=params.indexer_id,
                                                                                     periodicity_id=params.periodicity_id)
 
-        current_period = get_current_period()
-        previous_period = get_previous_period()
+        # current_period = get_current_period()
+        # previous_period = get_previous_period()
         if latest_period:
             last_date_available = get_period_dates(latest_period) if latest_period else None
             next_date = last_date_available[0] + relativedelta(months=1)

@@ -183,7 +183,7 @@ def get_settled_investment_mock() -> list[dict[str, Any]]:
             'country_id': countries[0]['id'],
             'is_settled': True,
             'settlement_date': datetime.date.today(),
-            'settlement_amount': (1100) + (1100) * 0.12,            
+            'settlement_amount': (1100) + (1100) * 0.12,
         },
     ]
 

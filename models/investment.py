@@ -73,8 +73,9 @@ class InvestmentModel(SQLModel):
     liquidity_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('liquidity.id'))
     liquidity: Mapped['LiquidityModel'] = relationship(foreign_keys=[liquidity_id], lazy='subquery')  # noqa: F821
     is_settled: Mapped[bool] = mapped_column('is_liquidated', default=False)
-    settlement_date: Mapped[date] = mapped_column('liquidation_date', nullable=True) # TODO: change name in database 
-    settlement_amount: Mapped[Decimal] = mapped_column('liquidation_amount', Numeric(precision=15, scale=5), nullable=True)  # TODO: change name in database
+    settlement_date: Mapped[date] = mapped_column('liquidation_date', nullable=True) # TODO: change name in database
+    settlement_amount: Mapped[Decimal] = mapped_column('liquidation_amount', Numeric(precision=15, scale=5),
+                                                        nullable=True)  # TODO: change name in database
 
     country_id: Mapped[str] = mapped_column(ForeignKey('country.id'))
     country: Mapped['CountryModel'] = relationship(foreign_keys=[country_id], lazy='noload')  # noqa: F821

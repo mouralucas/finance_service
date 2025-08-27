@@ -136,9 +136,14 @@ class InvestmentManager(BaseDataManager):
 
         return statement
 
-    async def get_statement(self, investment_id: uuid.UUID, period: int = None, start_period: int = None,
-                            end_period: int = None) -> list[InvestmentStatementModel] | None:
+    async def get_statement(
+            self, investment_id: uuid.UUID,
+            period: int | None= None,
+            start_period: int | None = None,
+            end_period: int | None = None
+     ) -> list[InvestmentStatementModel] | None:
         # TODO: get also cdi or the selected indexer with the statement for each period
+        #   Create query to get percentage variation between every period
         query = (
             select(InvestmentStatementModel)
             .where(InvestmentStatementModel.investment_id == investment_id)
@@ -154,7 +159,7 @@ class InvestmentManager(BaseDataManager):
         if end_period:
             query = query.where(InvestmentStatementModel.period <= end_period)
 
-        result: list[RowMapping] = await self.get_all(query, unique_result=True)
+        result: list[RowMapping] | None = await self.get_all(query, unique_result=True)
         statements = [statement['InvestmentStatementModel'] for statement in result] if result else None
 
         return statements

@@ -128,8 +128,7 @@ class FinanceManager(BaseDataManager):
             IndexerSeriesModel.indexer_id == '2a2b100f-17d9-4c61-b3b4-f06662113953',
             IndexerSeriesModel.period > 202401
             )
-        
+
         indexer_series = await self.get_all(query)
 
         return [i['IndexerSeriesModel'] for i in indexer_series] if indexer_series else None
-        

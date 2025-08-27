@@ -4,8 +4,8 @@ from rolf_common.managers import BaseDataManager
 from data_mock.investment.base import get_funds_br_investment_type_mock, get_investment_category_mock, get_open_investment_objective_mock
 from data_mock.investment.brazilian_funds import get_brazilian_fund_investment_mock, get_brazilian_fund_investment_statement_mock
 from data_mock.investment.investment import (
-    get_fixed_income_br_investment_type_mock,
     get_active_investment_mock,
+    get_fixed_income_br_investment_type_mock,
     get_investment_statement_mock,
     get_settled_investment_mock,
 )

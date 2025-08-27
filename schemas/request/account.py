@@ -86,12 +86,10 @@ class GetAccountTransactionRequest(BaseModel):
 
 
 class CreateBalanceRequest(DefaultModel):
-    account_id: uuid.UUID = Field(None, description='The id of the account')
-    start_period: int = Field(None, description='The start period of the balance')
+    account_id: uuid.UUID = Field(..., description='The id of the account')
+    start_period: int | None = Field(None, description='The start period of the balance')
 
 
 class GetBalanceRequest(DefaultModel):
     account_id: uuid.UUID = Field(..., description='The id of the account')
     period: int = Field(..., description='The period of the balance')
-    # start_period: int | None = Field(None, description='The start period of the balance')
-    # end_period: int | None = Field(None, description='The end period of the balance')

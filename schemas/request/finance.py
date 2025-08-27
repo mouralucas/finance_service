@@ -81,6 +81,7 @@ class GetIndexerSeriesRequest(BaseModel):
     ))
 
     indexer_id: uuid.UUID = Field(..., description='The ID of the indexer')
-    periodicity_id: uuid.UUID = Field(uuid.UUID('dc5b3bf8-2b84-423a-9a90-e7e194e355fa'), description='The ID of wanted periodocity. Defaults to monthly')
-    startPeriod: int | None = Field(None)
-    endPeriod: int | None = Field(None)
+    periodicity_id: uuid.UUID = Field(uuid.UUID('dc5b3bf8-2b84-423a-9a90-e7e194e355fa'),
+                                      description='The ID of wanted periodocity. Defaults to monthly')
+    start_period: int | None = Field(None)
+    end_period: int | None = Field(None)
