@@ -1,0 +1,44 @@
+extend type Query {
+    getInvestments(params: GetInvestmentsRequest): GetInvestmentsResponse
+}
+
+input GetInvestmentsRequest {
+    investmentId: String
+    startDate: String
+    endDate: String
+    isSettled: Boolean
+}
+
+type GetInvestmentsResponse {
+    quantity: Int!
+    investments: [Investment]!
+}
+
+type Investment {
+    investmentId: String!
+    custodianId: String!
+    accountId: String
+    name: String!
+    typeId: String!
+    transactionDate: String!
+    maturityDate: String
+    quantity: Float!
+    price: Float!
+    amount: Float!
+    contractedRate: String
+    currencyId: String!
+    currencySymbol: String
+    indexerTypeId: String!
+    indexerTypeName: String
+    indexerId: String!
+    indexerName: String!
+    liquidityId: String!
+    liquidityName: String!
+    isSettled: Boolean!
+    settlementDate: String
+    settlementAmount: Float
+    countryId: String!
+    countryName: String
+    observation: String
+    objectiveId: String
+}

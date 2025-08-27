@@ -116,7 +116,7 @@ class InvestmentStatementSchema(BaseModel):
 
     id: uuid.UUID = Field(..., serialization_alias='investmentStatementId', description='The id of the statement')
     investment_id: uuid.UUID = Field(..., description='The id of the investment')
-    investment: InvestmentSchema | None = Field(None, description='The object of the investment')
+    # investment: InvestmentSchema | None = Field(None, description='The object of the investment')
     period: int = Field(..., description='The period of the statement')
     previous_amount: float = Field(..., description='The previous amount for the investment')
     gross_amount: float = Field(..., description='The gross amount of the investment in the period')

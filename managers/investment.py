@@ -143,7 +143,7 @@ class InvestmentManager(BaseDataManager):
             end_period: int | None = None
      ) -> list[InvestmentStatementModel] | None:
         # TODO: get also cdi or the selected indexer with the statement for each period
-        #   Create query to get percentage variation between every period
+        #  Add a join to get currency_id from investment
         query = (
             select(InvestmentStatementModel)
             .where(InvestmentStatementModel.investment_id == investment_id)
