@@ -1,5 +1,6 @@
 extend type Query {
     getInvestments(params: GetInvestmentsRequest): GetInvestmentsResponse
+    getInvestmentStatements(params: GetInvestmentStatementRequest): GetInvestmentStatementResponse
 }
 
 input GetInvestmentsRequest {
@@ -41,4 +42,32 @@ type Investment {
     countryName: String
     observation: String
     objectiveId: String
+}
+
+
+input GetInvestmentStatementRequest {
+    investmentId: String!
+    startDate: String
+    endDate: String
+    period: Int
+}
+
+type GetInvestmentStatementResponse {
+    quantity: Int!
+    statement: [InvestmentStatement]!
+}
+
+type InvestmentStatement {
+    investmentStatementId: String!
+    ivnestmentId: String!
+    period: Int!
+    previousAmount: Float!
+    grossAmount: Float!
+    totalTax: Float!
+    totalFee: Float!
+    referenceDate: String!
+    atMaturity: Boolean!
+    valueChange: Float
+    percentageChange: Float
+    netAmount: Float!
 }
