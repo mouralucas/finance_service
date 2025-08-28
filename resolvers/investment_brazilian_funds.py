@@ -1,5 +1,6 @@
 
 from ariadne import MutationType, QueryType
+
 from schemas.request.investment import GetBrazilianFundInvestmentsRequest
 from services.investment_brazilian_fund import InvestmentBrazilianFundService
 
@@ -7,7 +8,8 @@ from services.investment_brazilian_fund import InvestmentBrazilianFundService
 async def get_investments_brazilian_funds(_, info, params):
     params_ = GetBrazilianFundInvestmentsRequest.model_validate(params)
 
-    investments = await InvestmentBrazilianFundService(session=info.context['session'], user=info.context['user']).get_brazilian_fund_investments(params=params_)
+    investments = await InvestmentBrazilianFundService(session=info.context['session'],
+     user=info.context['user']).get_brazilian_fund_investments(params=params_)
 
     return investments.model_dump(by_alias=True)
 

@@ -1,6 +1,7 @@
 
 
 from ariadne import MutationType, QueryType
+
 from schemas.request.investment import GetInvestmentRequest, GetStatementRequest
 from services.investment import InvestmentService
 
