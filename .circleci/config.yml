@@ -56,8 +56,6 @@ workflows:
               only:
                 - develop
       - test-service:
-          requires:
-            - lint-ruff
           filters:
             branches:
               only:
