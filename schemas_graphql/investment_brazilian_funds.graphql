@@ -1,0 +1,40 @@
+extend type Query {
+    getInvestmentsBrazilianFunds(params: GetInvestmentBrazilianFundsRequest): GetInvestmentBrazilianFundsResponse
+}
+
+input GetInvestmentBrazilianFundsRequest {
+    investmentId: String
+    isSettled: Boolean = false
+}
+
+type GetInvestmentBrazilianFundsResponse {
+    quantity: Int!
+    investments: [InvestmentBrazilianFund]!
+}
+
+type InvestmentBrazilianFund {
+    investmentId: String!
+    ownerId: String!
+    custodianId: String!
+    accountId: String!
+    name: String!
+    price: Float!
+    quantity: Float!
+    amount:Float!
+    transactionDate: String!
+    investmentTypeId: String # unecessary, will be removed soon
+    countryId: String  # unecessary, will be removed soon
+    currencyId: String!
+    currencySymbol: String!
+    objectiveId: String
+    objectiveName: String
+    isSettled: Boolean!
+    observation: String
+    
+    fundId: String!
+    fundName: String
+    investmentQuotationDate: String
+    investmentSettlementDate: String
+    redemptionQuotationDate: String
+    reemptionSettlementDate: String
+}

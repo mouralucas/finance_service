@@ -10,6 +10,7 @@ from backend.database import get_session
 from resolvers.account import bind_account_resolvers
 from resolvers.finance import bind_finance_dashboard_resolvers
 from resolvers.investment import bind_investment_resovlers
+from resolvers.investment_brazilian_funds import bind_investment_brazilian_funds_resolvers
 
 router = APIRouter(tags=["GraphQL"], prefix='/graphql/finance')
 
@@ -17,6 +18,7 @@ type_defs = (
     load_schema_from_path("schemas_graphql/schema.graphql") +
     load_schema_from_path("schemas_graphql/account.graphql") +
     load_schema_from_path("schemas_graphql/investment_deprecated.graphql") +
+    load_schema_from_path("schemas_graphql/investment_brazilian_funds.graphql") +
     load_schema_from_path("schemas_graphql/finance.graphql")
 )
 
@@ -26,6 +28,7 @@ mutation = MutationType()
 bind_finance_dashboard_resolvers(query, mutation)
 bind_account_resolvers(query, mutation)
 bind_investment_resovlers(query, mutation)
+bind_investment_brazilian_funds_resolvers(query, mutation)
 
 schema = make_executable_schema(type_defs, query, mutation)
 
