@@ -13,4 +13,4 @@ async def update_index_series(
         params: CreateIndexerSeriesRequest,
         session: AsyncSession = Depends(get_session)
 ):
-    await BcbIntegrationService(session=session).get_indexer(params=params)
+    await BcbIntegrationService(session=session).create_indexer_data(params=params)

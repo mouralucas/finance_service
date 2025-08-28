@@ -118,6 +118,7 @@ class IndexerSeriesModel(SQLModel):
     periodicity_id: Mapped[uuid.UUID] = mapped_column(ForeignKey('periodicity.id'))
     periodicity_name: Mapped[str] = mapped_column('periodicity_name', String(100))
     unit: Mapped[str] = mapped_column('unit', String(10))
+    # bcb_code: Mapped[str] = mapped_column('bcb_code', String(10), doc='The code in sgs')
 
 
 class LiquidityModel(SQLModel):

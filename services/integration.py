@@ -19,7 +19,7 @@ class BcbIntegrationService:
         self.core_manager = CoreManager(self.session)
         self.finance_manager = FinanceManager(self.session)
 
-    async def get_indexer(self, params: CreateIndexerSeriesRequest):
+    async def create_indexer_data(self, params: CreateIndexerSeriesRequest):
 
         indexer = await self.finance_manager.get_indexer_by_id(indexer_id=params.indexer_id, raise_exception=True)
         periodicity = await self.finance_manager.get_periodicity_by_id(periodicity_id=params.periodicity_id, raise_exception=True)
@@ -36,6 +36,10 @@ class BcbIntegrationService:
             sgs_param = 'dataInicial=' + next_date.strftime('%d/%m/%Y')
         else:
             sgs_param = ''
+
+        if str(periodicity.id) == 'b9f83ad5-7701-4098-bdaf-ee092f3247eb':
+            next_date = datetime.datetime.now() - relativedelta(years=5)
+            sgs_param = 'dataInicial=' + next_date.strftime('%d/%m/%Y')
 
         async with AsyncClient() as client:
             response = await client.get(self.url_bcb.format(resource_code=params.indexer_code, params=sgs_param))
