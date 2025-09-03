@@ -5,12 +5,11 @@ from backend.database import get_session
 from schemas.request.integration import CreateIndexerSeriesRequest
 from services.integration import BcbIntegrationService
 
-router = APIRouter(prefix="/integration", tags=['Integrations'])
+router = APIRouter(prefix="/integration", tags=["Integrations"])
 
 
-@router.post('/indexer/series')
+@router.post("/indexer/series")
 async def update_index_series(
-        params: CreateIndexerSeriesRequest,
-        session: AsyncSession = Depends(get_session)
+    params: CreateIndexerSeriesRequest, session: AsyncSession = Depends(get_session)
 ):
     await BcbIntegrationService(session=session).create_indexer_data(params=params)

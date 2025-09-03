@@ -1,4 +1,3 @@
-
 from rolf_common.managers import BaseDataManager
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,19 +9,25 @@ class CoreManager(BaseDataManager):
     def __init__(self, session: AsyncSession):
         super().__init__(session=session)
 
-    async def get_categories(self) -> list[CategoryModel]:
+    async def get_categories(self) -> list[CategoryModel] | None:
         query = select(CategoryModel)
 
         categories = await self.get_all(query)
 
-        return [category['CategoryModel'] for category in categories]
+        return (
+            [category["CategoryModel"] for category in categories]
+            if categories
+            else None
+        )
 
-    async def get_countries(self) -> list[CountryModel]:
+    async def get_countries(self) -> list[CountryModel] | None:
         query = select(CountryModel)
 
         countries = await self.get_all(query)
 
-        return [country['CountryModel'] for country in countries] if countries else None
+        return [country["CountryModel"] for country in countries] if countries else None
 
-    async def create_category_expense_relation(self, relation: CategoryExpenseTypeUserModel):
+    async def create_category_expense_relation(
+        self, relation: CategoryExpenseTypeUserModel
+    ):
         pass

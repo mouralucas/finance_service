@@ -1,38 +1,76 @@
 import pytest_asyncio
 from rolf_common.managers import BaseDataManager
 
-from data_mock.account import get_account_transaction_mock, get_account_type_mock, get_closed_account_mock, get_open_account_mock
+from data_mock.account import (
+    get_account_transaction_mock,
+    get_account_type_mock,
+    get_closed_account_mock,
+    get_open_account_mock,
+)
 from models.account import AccountModel, AccountTransactionModel, AccountTypeModel
 from schemas.account import AccountSchema, AccountTransactionSchema, AccountTypeSchema
 
 
 @pytest_asyncio.fixture
 async def create_account_type(test_session) -> list[AccountTypeSchema]:
-    data_ = await BaseDataManager(test_session).add_or_ignore_all(AccountTypeModel, get_account_type_mock())
-    account_types = [AccountTypeSchema.model_validate(data["AccountTypeModel"]) for data in data_]
+    data_ = await BaseDataManager(test_session).add_or_ignore_all(
+        AccountTypeModel, get_account_type_mock()
+    )
+    account_types = (
+        [AccountTypeSchema.model_validate(data["AccountTypeModel"]) for data in data_]
+        if data_
+        else []
+    )
 
     return account_types
 
 
 @pytest_asyncio.fixture
-async def create_open_account(test_session, create_bank, create_account_type, create_currency) -> list[AccountSchema]:
-    data_ = await BaseDataManager(test_session).add_or_ignore_all(AccountModel, get_open_account_mock())
-    account_list = [AccountSchema.model_validate(data["AccountModel"]) for data in data_]
+async def create_open_account(
+    test_session, create_bank, create_account_type, create_currency
+) -> list[AccountSchema]:
+    data_ = await BaseDataManager(test_session).add_or_ignore_all(
+        AccountModel, get_open_account_mock()
+    )
+    account_list = (
+        [AccountSchema.model_validate(data["AccountModel"]) for data in data_]
+        if data_
+        else []
+    )
 
     return account_list
 
 
 @pytest_asyncio.fixture
-async def create_closed_account(test_session, create_account_type, create_bank, create_currency) -> list[AccountSchema]:
-    data_ = await BaseDataManager(test_session).add_or_ignore_all(AccountModel, get_closed_account_mock())
-    account_list = [AccountSchema.model_validate(data["AccountModel"]) for data in data_]
+async def create_closed_account(
+    test_session, create_account_type, create_bank, create_currency
+) -> list[AccountSchema]:
+    data_ = await BaseDataManager(test_session).add_or_ignore_all(
+        AccountModel, get_closed_account_mock()
+    )
+    account_list = (
+        [AccountSchema.model_validate(data["AccountModel"]) for data in data_]
+        if data_
+        else []
+    )
 
     return account_list
 
 
 @pytest_asyncio.fixture
-async def create_account_transaction(test_session, create_open_account, create_currency, create_category) -> list[AccountTransactionSchema]:
-    data_ = await BaseDataManager(test_session).add_or_ignore_all(AccountTransactionModel, get_account_transaction_mock())
-    account_transaction_list = [AccountTransactionSchema.model_validate(data['AccountTransactionModel']) for data in data_]
+async def create_account_transaction(
+    test_session, create_open_account, create_currency, create_category
+) -> list[AccountTransactionSchema]:
+    data_ = await BaseDataManager(test_session).add_or_ignore_all(
+        AccountTransactionModel, get_account_transaction_mock()
+    )
+    account_transaction_list = (
+        [
+            AccountTransactionSchema.model_validate(data["AccountTransactionModel"])
+            for data in data_
+        ]
+        if data_
+        else []
+    )
 
     return account_transaction_list

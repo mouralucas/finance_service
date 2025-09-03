@@ -3,15 +3,28 @@ from contextlib import asynccontextmanager
 from typing import Any
 
 from sqlalchemy import event
-from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import (
+    AsyncConnection,
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 
 from backend.settings import settings
 
 
 class DatabaseSessionManager:
-    def __init__(self, host: str, engine_kwargs: dict[str, Any] = {}, expire_on_commit: bool = True, test_db=False):
+    def __init__(
+        self,
+        host: str,
+        engine_kwargs: dict[str, Any] = {},
+        expire_on_commit: bool = True,
+        test_db=False,
+    ):
         self._engine = create_async_engine(host, **engine_kwargs)
-        self._sessionmaker = async_sessionmaker(autocommit=False, bind=self._engine, expire_on_commit=expire_on_commit)
+        self._sessionmaker = async_sessionmaker(
+            autocommit=False, bind=self._engine, expire_on_commit=expire_on_commit
+        )
 
         if test_db:
             # Enable foreign key support for SQLite only for tests
@@ -54,15 +67,19 @@ class DatabaseSessionManager:
             raise
         finally:
             """
-                Closes the database session after the context is exited.
-                The commit is only applied when the context is exited.
+            Closes the database session after the context is exited.
+            The commit is only applied when the context is exited.
             """
             await session.commit()
             await session.close()
 
 
-sessionmanager = DatabaseSessionManager(settings.finance_database_url, {"echo": settings.echo_sql})
-test_sessionmanager = DatabaseSessionManager(settings.test_database_url, {"echo": settings.echo_test_sql}, test_db=True)
+sessionmanager = DatabaseSessionManager(
+    settings.finance_database_url, {"echo": settings.echo_sql}
+)
+test_sessionmanager = DatabaseSessionManager(
+    settings.test_database_url, {"echo": settings.echo_test_sql}, test_db=True
+)
 
 
 async def get_session():

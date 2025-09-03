@@ -122,8 +122,13 @@ def get_randon_date(start_date: date, end_date: date) -> date:
     return random_date
 
 
-def get_installments_due_dates(transaction_date: date, close_day: int, due_day: int,
-                               tot_installments: int = 1, return_str: bool = False) -> list[date | Any]:
+def get_installments_due_dates(
+    transaction_date: date,
+    close_day: int,
+    due_day: int,
+    tot_installments: int = 1,
+    return_str: bool = False,
+) -> list[date | Any]:
     month = transaction_date.month
     year = transaction_date.year
 
@@ -146,10 +151,7 @@ def get_installments_due_dates(transaction_date: date, close_day: int, due_day: 
         if i > 1:
             due_date += relativedelta(months=i - 1)
         installments_due_dates.append(
-            {
-                'current_installment': i,
-                'due_date': due_date.date()
-            }
+            {"current_installment": i, "due_date": due_date.date()}
         )
 
     if return_str:

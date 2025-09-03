@@ -27,7 +27,9 @@ class CreditCardManager(BaseDataManager):
             .values(**fields)
         )
 
-        updated_credit_card = await self.update_one(sql_statement=stmt, sql_model=credit_card)
+        updated_credit_card = await self.update_one(
+            sql_statement=stmt, sql_model=credit_card
+        )
 
         return updated_credit_card
 
@@ -40,7 +42,9 @@ class CreditCardManager(BaseDataManager):
 
         return credit_card
 
-    async def get_credit_cards(self, owner_id, credit_card_id=None, is_active=None) -> list[CreditCardModel] | None:
+    async def get_credit_cards(
+        self, owner_id, credit_card_id=None, is_active=None
+    ) -> list[CreditCardModel] | None:
         query = (
             select(CreditCardModel)
             .where(CreditCardModel.owner_id == owner_id)
@@ -55,18 +59,31 @@ class CreditCardManager(BaseDataManager):
 
         credit_cards: list[RowMapping] = await self.get_all(query)
 
-        return [credit_card['CreditCardModel'] for credit_card in credit_cards] if credit_cards else None
+        return (
+            [credit_card["CreditCardModel"] for credit_card in credit_cards]
+            if credit_cards
+            else None
+        )
 
     # Transactions
-    async def create_credit_card_transaction(self, transactions: list[CreditCardTransactionModel]) -> list[CreditCardTransactionModel] | None:
+    async def create_credit_card_transaction(
+        self, transactions: list[CreditCardTransactionModel]
+    ) -> list[CreditCardTransactionModel] | None:
         new_bill_entries = await self.add_all(transactions)
         [await self.session.refresh(i) for i in new_bill_entries]
 
-        return [cast(CreditCardTransactionModel, transaction) for transaction in new_bill_entries]
+        return [
+            cast(CreditCardTransactionModel, transaction)
+            for transaction in new_bill_entries
+        ]
 
-    async def get_credit_card_transactions(self, owner_id: uuid.UUID,
-                                           start_period: int = None, end_period: int = None,
-                                           parent_id: int = None) -> list[dict[Any, Any]] | None:
+    async def get_credit_card_transactions(
+        self,
+        owner_id: uuid.UUID,
+        start_period: int | None = None,
+        end_period: int | None = None,
+        parent_id: int | None = None,
+    ) -> list[dict[Any, Any]] | None:
         transaction_alias = aliased(CreditCardTransactionModel)
         category_alias = aliased(CategoryModel)
         card_alias = aliased(CreditCardModel)
@@ -78,33 +95,40 @@ class CreditCardManager(BaseDataManager):
                 transaction_alias.id,
                 transaction_alias.period,
                 transaction_alias.transaction_date,
-                func.round_(transaction_alias.amount, 2).label('amount'),
+                func.round_(transaction_alias.amount, 2).label("amount"),
                 transaction_alias.description,
                 transaction_alias.due_date,
                 transaction_alias.credit_card_id,
-                card_alias.nickname.label('credit_card_nickname'),
+                card_alias.nickname.label("credit_card_nickname"),
                 transaction_alias.category_id,
-                category_alias.name.label('category_name'),
+                category_alias.name.label("category_name"),
                 transaction_alias.currency_id,
-                currency_alias.symbol.label('currency_symbol'),
-                func.round_(transaction_alias.transaction_amount, 2).label('transaction_amount'),
+                currency_alias.symbol.label("currency_symbol"),
+                func.round_(transaction_alias.transaction_amount, 2).label(
+                    "transaction_amount"
+                ),
                 transaction_alias.transaction_currency_id,
-                transaction_currency_alias.symbol.label('transaction_currency_symbol'),
+                transaction_currency_alias.symbol.label("transaction_currency_symbol"),
                 transaction_alias.is_installment,
                 transaction_alias.current_installment,
                 transaction_alias.installments,
                 transaction_alias.created_at,
-                transaction_alias.edited_at
+                transaction_alias.edited_at,
             )
             .select_from(transaction_alias)
-            .where(
-                transaction_alias.owner_id == owner_id
-            )
+            .where(transaction_alias.owner_id == owner_id)
             .join(card_alias, transaction_alias.credit_card_id == card_alias.id)
             .join(category_alias, transaction_alias.category_id == category_alias.id)
             .join(currency_alias, transaction_alias.currency_id == currency_alias.id)
-            .join(transaction_currency_alias, transaction_alias.transaction_currency_id == transaction_currency_alias.id)
-            .order_by(transaction_alias.transaction_date.desc(), transaction_alias.created_at.desc())
+            .join(
+                transaction_currency_alias,
+                transaction_alias.transaction_currency_id
+                == transaction_currency_alias.id,
+            )
+            .order_by(
+                transaction_alias.transaction_date.desc(),
+                transaction_alias.created_at.desc(),
+            )
         )
 
         if start_period is not None:
@@ -118,10 +142,16 @@ class CreditCardManager(BaseDataManager):
 
         transactions = await self.get_all(query)
 
-        return [dict(transaction.items()) for transaction in transactions] if transactions else None
+        return (
+            [dict(transaction.items()) for transaction in transactions]
+            if transactions
+            else None
+        )
 
     # Bill
-    async def get_bill_history_aggregated(self, owner_id: uuid.UUID, start_period: int, end_period: int) -> list[dict[Any, Any]] | None:
+    async def get_bill_history_aggregated(
+        self, owner_id: uuid.UUID, start_period: int, end_period: int
+    ) -> list[dict[Any, Any]] | None:
         """
         Created by: Lucas Penha de Moura - 29/10/2024
 
@@ -134,23 +164,19 @@ class CreditCardManager(BaseDataManager):
             select(
                 CreditCardModel.nickname,
                 CreditCardTransactionModel.period,
-                func.sum(
-                    CreditCardTransactionModel.amount * -1
-                ).label('total_amount')
+                func.sum(CreditCardTransactionModel.amount * -1).label("total_amount"),
             )
             .select_from(CreditCardTransactionModel)
             .outerjoin(
-                CreditCardModel, CreditCardModel.id == CreditCardTransactionModel.credit_card_id
+                CreditCardModel,
+                CreditCardModel.id == CreditCardTransactionModel.credit_card_id,
             )
             .where(
                 CreditCardTransactionModel.owner_id == owner_id,
                 CreditCardTransactionModel.period >= start_period,
-                CreditCardTransactionModel.period <= end_period
+                CreditCardTransactionModel.period <= end_period,
             )
-            .group_by(
-                CreditCardModel.nickname,
-                CreditCardTransactionModel.period
-            )
+            .group_by(CreditCardModel.nickname, CreditCardTransactionModel.period)
             .order_by(CreditCardTransactionModel.period)
         )
 
@@ -158,11 +184,14 @@ class CreditCardManager(BaseDataManager):
 
         return [dict(i.items()) for i in result] if result else None
 
-    async def get_bill_history_by_card(self, owner_id: uuid.UUID, start_period: int, end_period: int) -> list[dict[Any, Any]] | None:
+    async def get_bill_history_by_card(
+        self, owner_id: uuid.UUID, start_period: int, end_period: int
+    ) -> list[dict[Any, Any]] | None:
         """
         Created by: Lucas Penha de Moura - 30/10/2024
 
-            This query fetches the total amount spent by card/period for the owner in the period range
+            This query fetches the total amount spent by card/period for the owner
+                in the period range
 
         :param owner_id: The id og the owner of the transactions
         :param start_period: the start period of the transactions
@@ -172,33 +201,39 @@ class CreditCardManager(BaseDataManager):
         query = (
             select(
                 CreditCardTransactionModel.period,
-                CreditCardModel.nickname.label('credit_card'),
-                CurrencyModel.symbol.label('currency_symbol'),
+                CreditCardModel.nickname.label("credit_card"),
+                CurrencyModel.symbol.label("currency_symbol"),
                 func.round_(
                     func.sum(
                         case(
-                            (CreditCardTransactionModel.is_installment, CreditCardTransactionModel.transaction_amount*-1),
-                            else_=0
+                            (
+                                CreditCardTransactionModel.is_installment,
+                                CreditCardTransactionModel.transaction_amount * -1,
+                            ),
+                            else_=0,
                         )
-                    ), 2
+                    ),
+                    2,
                 ).label("total_installments"),
-                func.round_(
-                    func.sum(CreditCardTransactionModel.amount * -1)
-                    , 2
-                ).label('total_amount')
+                func.round_(func.sum(CreditCardTransactionModel.amount * -1), 2).label(
+                    "total_amount"
+                ),
             )
             .select_from(CreditCardTransactionModel)
-            .join(CreditCardModel, CreditCardModel.id == CreditCardTransactionModel.credit_card_id)
+            .join(
+                CreditCardModel,
+                CreditCardModel.id == CreditCardTransactionModel.credit_card_id,
+            )
             .join(CurrencyModel, CreditCardModel.currency_id == CurrencyModel.id)
             .where(
                 CreditCardTransactionModel.owner_id == owner_id,
                 CreditCardTransactionModel.period >= start_period,
-                CreditCardTransactionModel.period <= end_period
+                CreditCardTransactionModel.period <= end_period,
             )
             .group_by(
                 CreditCardTransactionModel.period,
                 CreditCardModel.nickname,
-                CurrencyModel.symbol
+                CurrencyModel.symbol,
             )
             .order_by(CreditCardTransactionModel.period.desc())
         )
@@ -208,24 +243,32 @@ class CreditCardManager(BaseDataManager):
         return [dict(i.items()) for i in result] if result else []
 
     # Dashboard
-    async def get_credit_card_expense_by_category(self, owner_id: uuid.UUID, period: int) -> list[RowMapping]:
+    async def get_credit_card_expense_by_category(
+        self, owner_id: uuid.UUID, period: int
+    ) -> list[RowMapping]:
         credit_card_transaction_alias = aliased(CreditCardTransactionModel)
         category_alias = aliased(CategoryModel)
         category_parent_alias = aliased(CategoryModel)
 
         query = (
             select(
-                func.sum(credit_card_transaction_alias.amount * -1).label('total'),
-                category_parent_alias.id.label('category_id'),
-                category_parent_alias.name.label('category_name'),
+                func.sum(credit_card_transaction_alias.amount * -1).label("total"),
+                category_parent_alias.id.label("category_id"),
+                category_parent_alias.name.label("category_name"),
             )
             .select_from(credit_card_transaction_alias)
-            .join(category_alias, credit_card_transaction_alias.category_id == category_alias.id)
-            .join(category_parent_alias, category_alias.parent_id == category_parent_alias.id)
+            .join(
+                category_alias,
+                credit_card_transaction_alias.category_id == category_alias.id,
+            )
+            .join(
+                category_parent_alias,
+                category_alias.parent_id == category_parent_alias.id,
+            )
             .where(
                 credit_card_transaction_alias.owner_id == owner_id,
                 credit_card_transaction_alias.period == period,
-                credit_card_transaction_alias.amount < 0
+                credit_card_transaction_alias.amount < 0,
             )
             .group_by(
                 category_parent_alias.id,

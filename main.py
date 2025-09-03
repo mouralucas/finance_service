@@ -7,7 +7,15 @@ from starlette.middleware.cors import CORSMiddleware
 
 from backend.settings import settings
 from lifespan import shutdown_log_service, start_log_service
-from routers import account, core, credit_card, finance, integration, investment, investment_brazilian_funds
+from routers import (
+    account,
+    core,
+    credit_card,
+    finance,
+    integration,
+    investment,
+    investment_brazilian_funds,
+)
 from routers_graphql import main
 
 
@@ -32,7 +40,7 @@ app = FastAPI(
     lifespan=lifespan,
     swagger_ui_parameters={"defaultModelsExpandDepth": -1},
     docs_url="/",
-    root_path='/api/finance/' + settings.project_name,
+    root_path="/api/finance/" + settings.project_name,
     redoc_url="/redoc",
 )
 

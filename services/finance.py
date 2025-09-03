@@ -6,9 +6,22 @@ from managers.account import AccountManager
 from managers.credit_card import CreditCardManager
 from managers.finance import FinanceManager
 from models.investment import FundsBrModel
-from schemas.core import BankSchema, CurrencySchema, ExpensesByCategory, IndexerSchema, IndexerTypeSchema, LiquiditySchema, TaxFeeSchema
+from schemas.core import (
+    BankSchema,
+    CurrencySchema,
+    ExpensesByCategory,
+    IndexerSchema,
+    IndexerTypeSchema,
+    LiquiditySchema,
+    TaxFeeSchema,
+)
 from schemas.finance import FundsBrSchema, IndexerSeries
-from schemas.request.finance import CreateBrazilianFundRequest, GetIndexerSeriesRequest, GetSummaryRequest, GetTaxFeeRequest
+from schemas.request.finance import (
+    CreateBrazilianFundRequest,
+    GetIndexerSeriesRequest,
+    GetSummaryRequest,
+    GetTaxFeeRequest,
+)
 from schemas.response.finance import (
     CreateBrazilianFundResponse,
     GetBankResponse,
@@ -41,16 +54,26 @@ class FinanceService(BaseService):
 
         response = GetCurrencyResponse(
             quantity=len(currencies) if currencies else 0,
-            currencies=[CurrencySchema.model_validate(currency) for currency in currencies] if currencies else [],
+            currencies=(
+                [CurrencySchema.model_validate(currency) for currency in currencies]
+                if currencies
+                else []
+            ),
         )
 
         return response
 
     async def get_tax_fee(self, params: GetTaxFeeRequest) -> GetTaxFeeResponse:
-        tax_fees = await  self.finance_manager.get_tax_fee(country_id=params.country_id, tax_fee_type=params.type)
+        tax_fees = await self.finance_manager.get_tax_fee(
+            country_id=params.country_id, tax_fee_type=params.type
+        )
 
         response = GetTaxFeeResponse(
-            tax_fee=[TaxFeeSchema.model_validate(tax_fee) for tax_fee in tax_fees] if tax_fees else [],
+            tax_fee=(
+                [TaxFeeSchema.model_validate(tax_fee) for tax_fee in tax_fees]
+                if tax_fees
+                else []
+            ),
         )
 
         return response
@@ -60,7 +83,7 @@ class FinanceService(BaseService):
 
         response = GetBankResponse(
             quantity=len(banks) if banks else 0,
-            banks=[BankSchema.model_validate(bank) for bank in banks] if banks else []
+            banks=[BankSchema.model_validate(bank) for bank in banks] if banks else [],
         )
 
         return response
@@ -70,7 +93,14 @@ class FinanceService(BaseService):
 
         response = GetIndexerTypeResponse(
             quantity=len(indexer_types) if indexer_types else 0,
-            indexer_types=[IndexerTypeSchema.model_validate(indexer_type) for indexer_type in indexer_types] if indexer_types else [],
+            indexer_types=(
+                [
+                    IndexerTypeSchema.model_validate(indexer_type)
+                    for indexer_type in indexer_types
+                ]
+                if indexer_types
+                else []
+            ),
         )
 
         return response
@@ -80,17 +110,25 @@ class FinanceService(BaseService):
 
         response = GetIndexerResponse(
             quantity=len(indexers) if indexers else 0,
-            indexers=[IndexerSchema.model_validate(indexer) for indexer in indexers] if indexers else [],
+            indexers=(
+                [IndexerSchema.model_validate(indexer) for indexer in indexers]
+                if indexers
+                else []
+            ),
         )
 
         return response
 
     async def get_liquidity(self) -> GetLiquidityResponse:
-        liquidity = await  self.finance_manager.get_liquidity()
+        liquidity = await self.finance_manager.get_liquidity()
 
         response = GetLiquidityResponse(
             quantity=len(liquidity) if liquidity else 0,
-            liquidity=[LiquiditySchema.model_validate(i) for i in liquidity] if liquidity else []
+            liquidity=(
+                [LiquiditySchema.model_validate(i) for i in liquidity]
+                if liquidity
+                else []
+            ),
         )
 
         return response
@@ -100,8 +138,14 @@ class FinanceService(BaseService):
         # TODO: How to solve the problem with different currencies?
         # exclude_categories = []
 
-        account_ = await AccountManager(session=self.session).get_account_expenses_by_category(owner_id=self.user['user_id'], period=202411)
-        credit_card_ = await CreditCardManager(session=self.session).get_credit_card_expense_by_category(owner_id=self.user['user_id'], period=202411)
+        account_ = await AccountManager(
+            session=self.session
+        ).get_account_expenses_by_category(owner_id=self.user["user_id"], period=202411)
+        credit_card_ = await CreditCardManager(
+            session=self.session
+        ).get_credit_card_expense_by_category(
+            owner_id=self.user["user_id"], period=202411
+        )
 
         transactions_by_category = {}
         for item in [dict(row) for row in account_ + credit_card_]:
@@ -113,16 +157,23 @@ class FinanceService(BaseService):
                 transactions_by_category[category_id] = item
 
         response = GetExpensesByCategoryResponse(
-            expenses_by_category=[ExpensesByCategory.model_validate(transaction) for transaction in list(transactions_by_category.values())],
+            expenses_by_category=[
+                ExpensesByCategory.model_validate(transaction)
+                for transaction in list(transactions_by_category.values())
+            ],
         )
 
         return response
 
     # Funds service
-    async def create_br_fund(self, fund: CreateBrazilianFundRequest) -> CreateBrazilianFundResponse:
+    async def create_br_fund(
+        self, fund: CreateBrazilianFundRequest
+    ) -> CreateBrazilianFundResponse:
         fund_model = FundsBrModel(**fund.model_dump())
-        fund_model.owner_id = self.user['user_id']
-        fund_model.fees = [fee.model_dump(mode='json') for fee in fund.fees] if fund.fees else None
+        fund_model.owner_id = self.user["user_id"]
+        fund_model.fees = (
+            [fee.model_dump(mode="json") for fee in fund.fees] if fund.fees else None
+        )
 
         new_fund = await self.finance_manager.create_fund(fund_model)
 
@@ -137,19 +188,26 @@ class FinanceService(BaseService):
 
         response = GetBrazilianFundsResponse(
             quantity=len(funds) if funds else 0,
-            funds=[FundsBrSchema.model_validate(fund) for fund in funds] if funds else []
+            funds=(
+                [FundsBrSchema.model_validate(fund) for fund in funds] if funds else []
+            ),
         )
 
         return response
 
     # Indexer series data
-    async def get_indexer_series(self, params: GetIndexerSeriesRequest) -> GetIndexerSeriesResponse:
+    async def get_indexer_series(
+        self, params: GetIndexerSeriesRequest
+    ) -> GetIndexerSeriesResponse:
         series = await self.finance_manager.get_indexer_series()
 
         response = GetIndexerSeriesResponse(
             quantity=len(series) if series else 0,
-            series=[IndexerSeries.model_validate(serie) for serie in series] if series else []
+            series=(
+                [IndexerSeries.model_validate(serie) for serie in series]
+                if series
+                else []
+            ),
         )
 
         return response
-

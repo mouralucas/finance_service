@@ -1,6 +1,11 @@
 from datetime import date
 
-from services.utils.datetime import get_installments_due_dates, get_period, get_period_range, get_previous_period
+from services.utils.datetime import (
+    get_installments_due_dates,
+    get_period,
+    get_period_range,
+    get_previous_period,
+)
 
 
 def test_get_period():
@@ -60,12 +65,16 @@ def test_get_installments_due_date():
     # Expecting dates:
     # 2024-12-20
     # 2025-01-20
-    installments_due_dates = get_installments_due_dates(transaction_date=transaction_date, due_day=due_day, close_day=close_day,
-                                                        tot_installments=tot_installments)
+    installments_due_dates = get_installments_due_dates(
+        transaction_date=transaction_date,
+        due_day=due_day,
+        close_day=close_day,
+        tot_installments=tot_installments,
+    )
     assert type(installments_due_dates) is list
     assert len(installments_due_dates) == tot_installments
-    assert date(2024, 12, 20) == installments_due_dates[0]['due_date']
-    assert date(2025, 1, 20) == installments_due_dates[1]['due_date']
+    assert date(2024, 12, 20) == installments_due_dates[0]["due_date"]
+    assert date(2025, 1, 20) == installments_due_dates[1]["due_date"]
 
     # Test day after close, but in the same month
     transaction_date = date(2024, 12, 14)
@@ -79,15 +88,19 @@ def test_get_installments_due_date():
     # 2025-03-20
     # 2025-04-20
     # 2025-05-20
-    installments_due_dates = get_installments_due_dates(transaction_date=transaction_date, due_day=due_day, close_day=close_day,
-                                                        tot_installments=tot_installments)
+    installments_due_dates = get_installments_due_dates(
+        transaction_date=transaction_date,
+        due_day=due_day,
+        close_day=close_day,
+        tot_installments=tot_installments,
+    )
     assert type(installments_due_dates) is list
     assert len(installments_due_dates) == tot_installments
-    assert date(2025, 1, 20) == installments_due_dates[0]['due_date']
-    assert date(2025, 2, 20) == installments_due_dates[1]['due_date']
-    assert date(2025, 3, 20) == installments_due_dates[2]['due_date']
-    assert date(2025, 4, 20) == installments_due_dates[3]['due_date']
-    assert date(2025, 5, 20) == installments_due_dates[4]['due_date']
+    assert date(2025, 1, 20) == installments_due_dates[0]["due_date"]
+    assert date(2025, 2, 20) == installments_due_dates[1]["due_date"]
+    assert date(2025, 3, 20) == installments_due_dates[2]["due_date"]
+    assert date(2025, 4, 20) == installments_due_dates[3]["due_date"]
+    assert date(2025, 5, 20) == installments_due_dates[4]["due_date"]
 
     # Test day before close, but in the month before
     transaction_date = date(2024, 11, 25)
@@ -101,13 +114,17 @@ def test_get_installments_due_date():
     # 2025-03-20
     # 2025-04-20
     # 2025-05-20
-    installments_due_dates = get_installments_due_dates(transaction_date=transaction_date, due_day=due_day, close_day=close_day,
-                                                        tot_installments=tot_installments)
+    installments_due_dates = get_installments_due_dates(
+        transaction_date=transaction_date,
+        due_day=due_day,
+        close_day=close_day,
+        tot_installments=tot_installments,
+    )
     assert type(installments_due_dates) is list
     assert len(installments_due_dates) == tot_installments
-    assert date(2024, 12, 20) == installments_due_dates[0]['due_date']
-    assert date(2025, 1, 20) == installments_due_dates[1]['due_date']
-    assert date(2025, 2, 20) == installments_due_dates[2]['due_date']
+    assert date(2024, 12, 20) == installments_due_dates[0]["due_date"]
+    assert date(2025, 1, 20) == installments_due_dates[1]["due_date"]
+    assert date(2025, 2, 20) == installments_due_dates[2]["due_date"]
 
     # Test at close day
     transaction_date = date(2024, 12, 13)
@@ -121,14 +138,18 @@ def test_get_installments_due_date():
     # 2025-03-20
     # 2025-04-20
     # 2025-05-20
-    installments_due_dates = get_installments_due_dates(transaction_date=transaction_date, due_day=due_day, close_day=close_day,
-                                                        tot_installments=tot_installments)
+    installments_due_dates = get_installments_due_dates(
+        transaction_date=transaction_date,
+        due_day=due_day,
+        close_day=close_day,
+        tot_installments=tot_installments,
+    )
     assert type(installments_due_dates) is list
     assert len(installments_due_dates) == tot_installments
-    assert date(2025, 1, 20) == installments_due_dates[0]['due_date']
-    assert date(2025, 2, 20) == installments_due_dates[1]['due_date']
-    assert date(2025, 3, 20) == installments_due_dates[2]['due_date']
-    assert date(2025, 4, 20) == installments_due_dates[3]['due_date']
+    assert date(2025, 1, 20) == installments_due_dates[0]["due_date"]
+    assert date(2025, 2, 20) == installments_due_dates[1]["due_date"]
+    assert date(2025, 3, 20) == installments_due_dates[2]["due_date"]
+    assert date(2025, 4, 20) == installments_due_dates[3]["due_date"]
 
     # Test at day after close
     transaction_date = date(2024, 12, 12)
@@ -142,11 +163,13 @@ def test_get_installments_due_date():
     # 2025-03-20
     # 2025-04-20
     # 2025-05-20
-    installments_due_dates = get_installments_due_dates(transaction_date=transaction_date, due_day=due_day,
-                                                        close_day=close_day, tot_installments=tot_installments)
+    installments_due_dates = get_installments_due_dates(
+        transaction_date=transaction_date,
+        due_day=due_day,
+        close_day=close_day,
+        tot_installments=tot_installments,
+    )
     assert type(installments_due_dates) is list
     assert len(installments_due_dates) == tot_installments
-    assert date(2024, 12, 20) == installments_due_dates[0]['due_date']
-    assert date(2025, 1, 20) == installments_due_dates[1]['due_date']
-
-
+    assert date(2024, 12, 20) == installments_due_dates[0]["due_date"]
+    assert date(2025, 1, 20) == installments_due_dates[1]["due_date"]

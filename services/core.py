@@ -1,4 +1,3 @@
-
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import BaseService
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -19,7 +18,11 @@ class CoreService(BaseService):
 
         response = GetCategoryResponse(
             quantity=len(categories) if categories else 0,
-            categories=[CategorySchema.model_validate(category) for category in categories] if categories else [],
+            categories=(
+                [CategorySchema.model_validate(category) for category in categories]
+                if categories
+                else []
+            ),
         )
 
         return response
@@ -29,7 +32,11 @@ class CoreService(BaseService):
 
         response = GetCountryResponse(
             quantity=len(countries) if countries else 0,
-            countries=[CountrySchema.model_validate(country) for country in countries] if countries else []
+            countries=(
+                [CountrySchema.model_validate(country) for country in countries]
+                if countries
+                else []
+            ),
         )
 
         return response

@@ -1,7 +1,7 @@
 [tool.ruff]
 src = ["."]
-line-length = 150
-target-version = "py311"
+line-length = 88
+target-version = "py312"
 
 exclude = [
     ".venv",
@@ -13,13 +13,17 @@ exclude = [
 
 [tool.ruff.lint]
 select = [
-    "F",    # pyflakes (erros básicos)
-    "E",    # pycodestyle (estilo)
+    "F",    # pyflakes (basic errors)
+    "E",    # pycodestyle (style)
     "W",    # pycodestyle warnings
-    "I",    # isort (ordem de imports)
-    "N",    # pep8-naming (nomes de funções/variáveis/classes)
-    "UP",   # pyupgrade (modernização de sintaxe)
-    "C90",  # mccabe (complexidade)
+    "I",    # isort (import order)
+    "N",    # pep8-naming (functions/variables/classes names)
+    "UP",   # pyupgrade (syntax upgrades)
+    "C90",  # mccabe (complexity)
 ]
 
 ignore = []
+
+[tool.black]
+line-length = 88
+target-version = ["py312"]

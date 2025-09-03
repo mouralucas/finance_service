@@ -13,7 +13,7 @@ from schemas.investment import (
 
 
 class CreateInvestmentResponse(BaseModel):
-    investment: InvestmentSchema = Field(..., description='The investment created')
+    investment: InvestmentSchema = Field(..., description="The investment created")
 
 
 class UpdateInvestmentResponse(CreateInvestmentResponse):
@@ -21,44 +21,59 @@ class UpdateInvestmentResponse(CreateInvestmentResponse):
 
 
 class GetInvestmentResponse(BaseModel):
-    quantity: int = Field(..., description='The total number of investment returned')
-    investments: list[InvestmentSchema] = Field(..., description='The list of investments')
+    quantity: int = Field(..., description="The total number of investment returned")
+    investments: list[InvestmentSchema] = Field(
+        ..., description="The list of investments"
+    )
 
 
 class GetInvestmentTypeResponse(BaseModel):
-    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
-        serialization_alias=to_camel
-    ))
+    model_config = ConfigDict(
+        from_attributes=True,
+        alias_generator=AliasGenerator(serialization_alias=to_camel),
+    )
 
-    quantity: int = Field(..., description='The number of types returned')
-    investment_types: list[InvestmentTypeSchema] = Field(..., description='The list of investment types')
+    quantity: int = Field(..., description="The number of types returned")
+    investment_types: list[InvestmentTypeSchema] = Field(
+        ..., description="The list of investment types"
+    )
 
 
 class SettleInvestmentResponse(CreateInvestmentResponse):
-    # It implements exactly the same data as CreateInvestment. A new class is created to maintain the pattern every router has its response
+    # It implements exactly the same data as CreateInvestment.
+    # A new class is created to maintain the pattern every router has its response
     pass
 
 
 class CreateStatementResponse(BaseModel):
-    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
-        serialization_alias=to_camel
-    ))
+    model_config = ConfigDict(
+        from_attributes=True,
+        alias_generator=AliasGenerator(serialization_alias=to_camel),
+    )
 
-    investment_statement: InvestmentStatementSchema = Field(..., description='The investment statement')
+    investment_statement: InvestmentStatementSchema = Field(
+        ..., description="The investment statement"
+    )
 
 
 class GetStatementResponse(BaseModel):
-    quantity: int = Field(..., description='The total number of statement returned')
-    statement: list[InvestmentStatementSchema] | None = Field(None, description='The investment statement')
+    quantity: int = Field(..., description="The total number of statement returned")
+    statement: list[InvestmentStatementSchema] | None = Field(
+        None, description="The investment statement"
+    )
 
 
 class CreateObjectiveResponse(BaseModel):
-    objective: InvestmentObjectiveSchema = Field(..., description='The investment objective')
+    objective: InvestmentObjectiveSchema = Field(
+        ..., description="The investment objective"
+    )
 
 
 class GetObjectiveResponse(BaseModel):
-    quantity: int = Field(..., description='The total number of objectives returned')
-    objectives: list[InvestmentObjectiveSchema] = Field(..., description='The list of investment objectives')
+    quantity: int = Field(..., description="The total number of objectives returned")
+    objectives: list[InvestmentObjectiveSchema] = Field(
+        ..., description="The list of investment objectives"
+    )
 
 
 class GetInvestmentWithoutObjectives(GetInvestmentResponse):
@@ -66,34 +81,53 @@ class GetInvestmentWithoutObjectives(GetInvestmentResponse):
 
 
 class GetObjectiveSummaryResponse(BaseModel):
-    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
-        serialization_alias=to_camel
-    ))
+    model_config = ConfigDict(
+        from_attributes=True,
+        alias_generator=AliasGenerator(serialization_alias=to_camel),
+    )
 
-    objective_title: str = Field(..., description='The title of the objective')
-    amount_stipulated: float = Field(..., description='The amount stipulated when objective was created')
-    amount_invested: float = Field(..., description='The amount invested so far in this objective')
-    perc_completed: float = Field(..., description='The percentage completed of the objective')
+    objective_title: str = Field(..., description="The title of the objective")
+    amount_stipulated: float = Field(
+        ..., description="The amount stipulated when objective was created"
+    )
+    amount_invested: float = Field(
+        ..., description="The amount invested so far in this objective"
+    )
+    perc_completed: float = Field(
+        ..., description="The percentage completed of the objective"
+    )
 
 
 # Dashboard information
 class GetInvestmentAllocationResponse(BaseModel):
-    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
-        serialization_alias=to_camel
-    ))
+    model_config = ConfigDict(
+        from_attributes=True,
+        alias_generator=AliasGenerator(serialization_alias=to_camel),
+    )
 
-    type_allocation: list[InvestmentAllocationSchema] | list = Field(..., description='The list of investment allocated by type')
-    category_allocation: list[InvestmentAllocationSchema] | list = Field(..., description='The list of investment allocated by category')
-    custodian_allocation: list[InvestmentAllocationSchema] | list = Field(..., description='The list of investment allocated by category')
-    objective_allocation: list[InvestmentAllocationSchema] | list = Field(..., description='The list of investment allocated by objective')
+    type_allocation: list[InvestmentAllocationSchema] | list = Field(
+        ..., description="The list of investment allocated by type"
+    )
+    category_allocation: list[InvestmentAllocationSchema] | list = Field(
+        ..., description="The list of investment allocated by category"
+    )
+    custodian_allocation: list[InvestmentAllocationSchema] | list = Field(
+        ..., description="The list of investment allocated by category"
+    )
+    objective_allocation: list[InvestmentAllocationSchema] | list = Field(
+        ..., description="The list of investment allocated by objective"
+    )
 
 
 class GetInvestmentPerformanceResponse(BaseModel):
-    model_config = ConfigDict(from_attributes=True, alias_generator=AliasGenerator(
-        serialization_alias=to_camel
-    ))
+    model_config = ConfigDict(
+        from_attributes=True,
+        alias_generator=AliasGenerator(serialization_alias=to_camel),
+    )
 
-    indexer_name: str = Field(..., description='The name of the indexer')
-    data: list[InvestmentPerformanceDataSchema] = Field(..., description='The investment performance data')
-    series: list[ChartSeriesSchema] = Field(..., description='The performance series')
-    total_invested: float = Field(..., description='The total invested')
+    indexer_name: str = Field(..., description="The name of the indexer")
+    data: list[InvestmentPerformanceDataSchema] = Field(
+        ..., description="The investment performance data"
+    )
+    series: list[ChartSeriesSchema] = Field(..., description="The performance series")
+    total_invested: float = Field(..., description="The total invested")
