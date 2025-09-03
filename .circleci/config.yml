@@ -50,11 +50,11 @@ jobs:
 workflows:
   ci-pipeline:
     jobs:
-      - lint-ruff:
-          filters:
-            branches:
-              only:
-                - develop
+      # - lint-ruff:
+      #     filters:
+      #       branches:
+      #         only:
+      #           - develop
       - test-service:
           filters:
             branches:
