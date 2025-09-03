@@ -1,0 +1,17 @@
+extend type Query {
+    getCategories: GetCategoryResponse
+}
+
+
+type GetCategoryResponse {
+    quantity: Int!
+    categories: [Category]!
+}
+
+type Category {
+    categoryId: ID!
+    categoryName: String!
+    description: String
+    comment: String
+    order: Int
+}

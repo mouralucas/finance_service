@@ -85,8 +85,9 @@ class CategorySchema(BaseModel):
     ))
 
     id: uuid.UUID = Field(..., serialization_alias='categoryId', description='The unique id of the category')
-    name: str = Field(..., description='The name of the category')
-    comment: str | None = Field(None, description='The description of the category')
+    name: str = Field(..., serialization_alias='categoryName', description='The name of the category')
+    description: str | None = Field(None, description='The description of the category')
+    comment: str | None = Field(None, description='The comments of the category')
     order: int | None = Field(None, description='The order of the category')
 
 

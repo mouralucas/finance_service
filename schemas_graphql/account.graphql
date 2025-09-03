@@ -1,10 +1,10 @@
 extend type Query {
-    getAccounts(params: GetAccountsRequest): GetAccountResponse
-    getAccountBalance(params: GetAccountBalanceRequest): GetAccountBalanceResponse
+    getAccounts(params: GetAccountsInput): GetAccountResponse
+    getAccountBalance(params: GetAccountBalanceInput): GetAccountBalanceResponse
 }
 
-# Account types
-input GetAccountsRequest {
+# Account schemas
+input GetAccountsInput {
     accountId: String
     currencyId: String
     active: Boolean
@@ -13,17 +13,6 @@ input GetAccountsRequest {
 type GetAccountResponse {
     quantity: Int!
     accounts: [Account]!
-}
-
-input GetAccountBalanceRequest {
-    accountId: String!
-    period: Int!
-}
-
-type GetAccountBalanceResponse {
-    quantity: Int!
-    accountName: String!
-    balance: [AccountBalance]!
 }
 
 type Account {
@@ -39,6 +28,18 @@ type Account {
     typeId: String!
     currencyId: String!
     # credit cards
+}
+
+# Account balance schemas
+input GetAccountBalanceInput {
+    accountId: String!
+    period: Int!
+}
+
+type GetAccountBalanceResponse {
+    quantity: Int!
+    accountName: String!
+    balance: [AccountBalance]!
 }
 
 type AccountBalance {

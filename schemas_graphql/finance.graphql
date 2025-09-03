@@ -1,34 +1,46 @@
 extend type Query {
     getHelloWorld: String
     getIndexerSeries(params: GetIndexerSeriesInput! ): GetIndexerSeriesResponse
+    getCurrencies: GetCurrenciesResponse
 }
 
 extend type Mutation {
     _empty: String
 }
 
-type IndexerSeries {
-    id: ID!
-    indexer_id: String!
-    indexer_name: String
-    date: String
-    period: Int
-    value: Float
-    periodicity_id: String!
-    periodicity_name: String
-    unit: String
-}
-
-# Input types
+# Indexer series schemas
 input GetIndexerSeriesInput {
-    indexer_id: String!
-    periodicity_id: String
+    indexerId: String!
+    periodicityId: String
     startPeriod: Int
     endPeriod: Int
 }
 
-# Response types
 type GetIndexerSeriesResponse {
     quantity: Int!,
     series: [IndexerSeries]
+}
+
+type IndexerSeries {
+    id: ID!
+    indexerId: String!
+    indexerName: String
+    date: String
+    period: Int
+    value: Float
+    periodicityId: String!
+    periodicityName: String
+    unit: String
+}
+
+# Currency schemas
+type GetCurrenciesResponse {
+    quantity: Int!
+    currencies: [Currency]!
+}
+
+type Currency {
+    currencyId: ID!
+    name: String!
+    symbol: String!
 }
