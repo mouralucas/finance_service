@@ -28,7 +28,7 @@
 .idea/**/dbnavigator.xml
 
 # Remove launch from git
-.vscode
+.vscode/launch.json
 
 # Gradle
 .idea/**/gradle.xml

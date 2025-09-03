@@ -1,0 +1,22 @@
+{
+    // --- Tests ---
+    "python.testing.pytestArgs": [
+        "tests"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+
+    // --- Formatter: Black ---
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter"
+    },
+    "editor.formatOnSave": true,
+
+    // --- Linter: Ruff ---
+    "python.linting.enabled": true,
+    "ruff.linting.enabled": true,
+    "ruff.linting.run": "onSave",
+
+    // --- Automatic imports organization ---
+    "ruff.organizeImports": true
+}

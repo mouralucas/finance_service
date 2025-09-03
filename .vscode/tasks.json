@@ -1,0 +1,45 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Format Code (Black)",
+      "type": "shell",
+      "command": "${command:python.interpreterPath} -m black .",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Lint Code (Ruff)",
+      "type": "shell",
+      "command": "${command:python.interpreterPath} -m ruff check .",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Run Tests (Pytest)",
+      "type": "shell",
+      "command": "${command:python.interpreterPath} -m pytest tests",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Format + Lint + Test",
+      "type": "shell",
+      "command": "${command:python.interpreterPath} -m black . && ${command:python.interpreterPath} -m ruff . && ${command:python.interpreterPath} -m pytest tests",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    }
+  ]
+}

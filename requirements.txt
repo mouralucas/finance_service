@@ -21,5 +21,6 @@ aiosqlite==0.21.0
 pytest==8.4.1
 pytest-asyncio==1.0.0
 
-# Linter
+# Linter and formatter
 ruff==0.12.1
+black==25.1.0
