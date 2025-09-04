@@ -27,6 +27,7 @@ type Account {
     closeDate: String
     typeId: String!
     currencyId: String!
+    currencySymbol: String!
     # credit cards
 }
 

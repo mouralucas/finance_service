@@ -20,7 +20,10 @@ class AccountTypeSchema(BaseModel):
 
 
 class AccountSchema(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(
+        from_attributes=True,
+        alias_generator=AliasGenerator(serialization_alias=to_camel),
+    )
 
     id: uuid.UUID = Field(
         ..., serialization_alias="accountId", description="Unique account id"
@@ -28,28 +31,18 @@ class AccountSchema(BaseModel):
     active: bool = Field(
         ..., description="Whether the account is active (open) or closed"
     )
-    bank_id: uuid.UUID = Field(
-        ..., serialization_alias="bankId", description="Bank account id"
-    )
+    bank_id: uuid.UUID = Field(..., description="Bank account id")
     nickname: str = Field(..., description="Nickname of the account")
     description: str | None = Field(None, description="Description of the account")
     branch: str | None = Field(None, description="Branch of bank")
     number: str | None = Field(None, description="Account number")
-    open_date: datetime.date = Field(
-        ..., serialization_alias="openDate", description="Account open date"
-    )
-    close_date: datetime.date | None = Field(
-        None, serialization_alias="closeDate", description="Account close date"
-    )
-    type_id: uuid.UUID = Field(
-        ..., serialization_alias="typeId", description="Account type"
-    )
-    currency_id: str = Field(
-        ..., serialization_alias="currencyId", description="Account currency"
-    )
+    open_date: datetime.date = Field(..., description="Account open date")
+    close_date: datetime.date | None = Field(None, description="Account close date")
+    type_id: uuid.UUID = Field(..., description="Account type")
+    currency_id: str = Field(..., description="Account currency")
+    currency_symbol: str | None = Field(None, description="The symbol of the currency")
     credit_cards: list[CreditCardSchema] | None = Field(
         None,
-        serialization_alias="creditCards",
         description="List of credit cards of the account",
     )
 

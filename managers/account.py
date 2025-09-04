@@ -35,8 +35,21 @@ class AccountManager(BaseDataManager):
 
         return cast(AccountModel, new_account)
 
-    async def get_accounts(self, params: dict[str, Any]) -> list[AccountModel] | None:
-        stmt = select(AccountModel)
+    async def get_accounts(self, params: dict[str, Any]) -> list[dict[Any, Any]] | None:
+        stmt = select(
+            AccountModel.id,
+            AccountModel.active,
+            AccountModel.bank_id,
+            AccountModel.nickname,
+            AccountModel.description,
+            AccountModel.branch,
+            AccountModel.number,
+            AccountModel.open_date,
+            AccountModel.close_date,
+            AccountModel.type_id,
+            AccountModel.currency_id,
+            CurrencyModel.symbol.label("currency_symbol"),
+        ).join(CurrencyModel, CurrencyModel.id == AccountModel.currency_id)
 
         for key, value in params.items():
             if value:
@@ -44,7 +57,11 @@ class AccountManager(BaseDataManager):
 
         accounts: list[RowMapping] | None = await self.get_all(stmt, unique_result=True)
 
-        return [account["AccountModel"] for account in accounts] if accounts else None
+        return (
+            [dict(transaction.items()) for transaction in accounts]
+            if accounts
+            else None
+        )
 
     async def update_account(
         self, account: SQLModel, fields: dict[str, Any]
@@ -94,7 +111,7 @@ class AccountManager(BaseDataManager):
         return cast(AccountTransactionModel, updated_transaction)
 
     async def get_transactions(
-        self, owner_id: uuid.UUID, start_period: int, end_period: int
+        self, owner_id: uuid.UUID, start_period: int | None, end_period: int | None
     ) -> list[dict[Any, Any]] | None:
         transaction_alias = aliased(AccountTransactionModel)
         account_alias = aliased(AccountModel)

@@ -95,9 +95,7 @@ class AccountService(BaseService):
         params_ = params.model_dump()
         params_["owner_id"] = self.user["user_id"]
 
-        accounts: list[AccountModel] | None = await self.account_manager.get_accounts(
-            params=params_
-        )
+        accounts = await self.account_manager.get_accounts(params=params_)
 
         response = GetAccountResponse(
             quantity=len(accounts) if accounts else 0,
