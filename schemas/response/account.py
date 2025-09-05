@@ -32,9 +32,13 @@ class GetAccountResponse(BaseModel):
 
 
 class CreateAccountTransactionResponse(BaseModel):
+    model_config = ConfigDict(
+        from_attributes=True,
+        alias_generator=AliasGenerator(serialization_alias=to_camel),
+    )
+
     transaction: AccountTransactionSchema = Field(
         ...,
-        serialization_alias="transaction",
         description="The entry statement created by the user",
     )
 

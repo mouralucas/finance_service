@@ -1,6 +1,10 @@
 from ariadne import MutationType, QueryType
 
-from schemas.request.account import GetAccountRequest, GetBalanceRequest
+from schemas.request.account import (
+    CreateAccountTransactionRequest,
+    GetAccountRequest,
+    GetBalanceRequest,
+)
 from services.account import AccountService
 
 
@@ -12,6 +16,20 @@ async def get_accounts_resolver(_, info, params):
     ).get_accounts(params=params_)
 
     return accounts.model_dump(by_alias=True)
+
+
+async def get_account_transactions(_, info, params):
+    pass
+
+
+async def create_account_transactions_resolver(_, info, transaction):
+    transaction_ = CreateAccountTransactionRequest.model_validate(transaction)
+
+    new_transaction = await AccountService(
+        session=info.context["session"], user=info.context["user"]
+    ).create_transaction(transaction=transaction_)
+
+    return new_transaction.model_dump(by_alias=True)
 
 
 async def get_account_balance_resolver(_, info, params):
@@ -26,5 +44,8 @@ async def get_account_balance_resolver(_, info, params):
 
 def bind_account_resolvers(query: QueryType, mutation: MutationType):
     query.set_field("getAccounts", resolver=get_accounts_resolver)
-
     query.set_field("getAccountBalance", resolver=get_account_balance_resolver)
+
+    mutation.set_field(
+        "createAccountTransaction", resolver=create_account_transactions_resolver
+    )

@@ -86,7 +86,7 @@ async def create_transaction(
     user: RequiredUser = Security(get_user),
 ) -> CreateAccountTransactionResponse:
     return await AccountService(session=session, user=user).create_transaction(
-        statement_entry=transaction
+        transaction=transaction
     )
 
 

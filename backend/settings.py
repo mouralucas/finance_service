@@ -10,8 +10,7 @@ class FinanceSettings(Settings):
 
     # Database and test settings
     finance_database_url: str = (
-        "postgresql+asyncpg://dev-user:password@localhost\
-            :5434/finance_dev_db"
+        "postgresql+asyncpg://dev-user:password@localhost:5434/finance_dev_db"
     )
     test_database_url: str = "sqlite+aiosqlite:///:memory:"
     echo_sql: bool = False

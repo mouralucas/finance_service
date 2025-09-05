@@ -3,6 +3,10 @@ extend type Query {
     getAccountBalance(params: GetAccountBalanceInput): GetAccountBalanceResponse
 }
 
+extend type Mutation {
+    createAccountTransaction(transaction: CreateAccountTransactionInput): CreateAccountTransactionResponse
+}
+
 # Account schemas
 input GetAccountsInput {
     accountId: String
@@ -29,6 +33,60 @@ type Account {
     currencyId: String!
     currencySymbol: String!
     # credit cards
+}
+
+# Account transactions schemas
+input CreateAccountTransactionInput {
+    transactionId: String
+    accountId: String!
+    currencyId: String!
+    amount: Float!
+    transactionDate: String!
+    categoryId: String!
+    description: String
+    transactionCurrencyId: String
+    transactionAmount: Float
+    exchangeRate: Float
+    taxPerc: Float
+    tax: Float
+    spreadPerc: Float
+    spread: Float
+    effectiveRate: Float
+    origin: String
+    isValidated: Boolean
+    # Not needed in input, find a way to remove 
+    currencySymbol: String 
+    createdAt: String
+    lastEditedAt: String
+    period: Int
+    ownerId: String
+}
+
+type CreateAccountTransactionResponse {
+    transaction: AccountTransaction
+}
+
+type AccountTransaction {
+    transactionId: ID!
+    ownerId: String!
+    accountId: String!
+    accountNickname: String
+    period: Int!
+    currencyId: String!
+    currencySymbol: String
+    amount: Float!
+    transactionDate: String!
+    categoryId: String
+    categoryName: String
+    description: String
+    transactionCurrencyId: String
+    transactionAmount: Float
+    exchangeRate: Float
+    taxPerc: Float
+    tax: Float
+    spreadPerc: Float
+    spread: Float
+    effectiveRate: Float
 }
 
 # Account balance schemas

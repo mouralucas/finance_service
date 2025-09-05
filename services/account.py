@@ -110,17 +110,18 @@ class AccountService(BaseService):
 
     # Transactions
     async def create_transaction(
-        self, statement_entry: CreateAccountTransactionRequest
+        self, transaction: CreateAccountTransactionRequest
     ) -> CreateAccountTransactionResponse:
-        account = await self.account_manager.get_account_by_id(
-            statement_entry.account_id
+        account: AccountModel | None = await self.account_manager.get_account_by_id(
+            transaction.account_id
         )
-        if not account.active:
+        if not account or not account.active:
             raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN, detail="Account is not active"
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Account not found or not active",
             )
 
-        new_statement = AccountTransactionModel(**statement_entry.model_dump())
+        new_statement = AccountTransactionModel(**transaction.model_dump())
 
         new_statement.owner_id = self.user["user_id"]
         new_statement.currency = account.currency
