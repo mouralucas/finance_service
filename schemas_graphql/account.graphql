@@ -54,12 +54,6 @@ input CreateAccountTransactionInput {
     effectiveRate: Float
     origin: String
     isValidated: Boolean
-    # Not needed in input, find a way to remove 
-    currencySymbol: String 
-    createdAt: String
-    lastEditedAt: String
-    period: Int
-    ownerId: String
 }
 
 type CreateAccountTransactionResponse {
