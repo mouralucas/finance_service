@@ -4,7 +4,8 @@ extend type Query {
 }
 
 extend type Mutation {
-    createAccountTransaction(transaction: CreateAccountTransactionInput): CreateAccountTransactionResponse
+    createAccountTransaction(transaction: CreateAccountTransactionInput): CreateUpdateAccountTransactionResponse
+    updateAccountTransaction(transaction: UpdateAccountTransactionInput): CreateUpdateAccountTransactionResponse
 }
 
 # Account schemas
@@ -37,7 +38,7 @@ type Account {
 
 # Account transactions schemas
 input CreateAccountTransactionInput {
-    transactionId: String
+    transactionId: Int
     accountId: String!
     currencyId: String!
     amount: Float!
@@ -56,7 +57,29 @@ input CreateAccountTransactionInput {
     isValidated: Boolean
 }
 
-type CreateAccountTransactionResponse {
+
+input UpdateAccountTransactionInput {
+    # Update is the same as create, but without any field required, except transactionId
+    transactionId: Int
+    accountId: String
+    currencyId: String
+    amount: Float
+    transactionDate: String
+    categoryId: String
+    description: String
+    transactionCurrencyId: String
+    transactionAmount: Float
+    exchangeRate: Float
+    taxPerc: Float
+    tax: Float
+    spreadPerc: Float
+    spread: Float
+    effectiveRate: Float
+    origin: String
+    isValidated: Boolean
+}
+
+type CreateUpdateAccountTransactionResponse {
     transaction: AccountTransaction
 }
 

@@ -4,6 +4,7 @@ from schemas.request.account import (
     CreateAccountTransactionRequest,
     GetAccountRequest,
     GetBalanceRequest,
+    UpdateAccountTransactionRequest,
 )
 from services.account import AccountService
 
@@ -32,6 +33,16 @@ async def create_account_transactions_resolver(_, info, transaction):
     return new_transaction.model_dump(by_alias=True)
 
 
+async def update_account_transactions_resolver(_, info, transaction):
+    transaction_ = UpdateAccountTransactionRequest.model_validate(transaction)
+
+    new_transaction = await AccountService(
+        session=info.context["session"], user=info.context["user"]
+    ).update_transaction(transaction=transaction_)
+
+    return new_transaction.model_dump(by_alias=True)
+
+
 async def get_account_balance_resolver(_, info, params):
     params_ = GetBalanceRequest.model_validate(params)
 
@@ -48,4 +59,8 @@ def bind_account_resolvers(query: QueryType, mutation: MutationType):
 
     mutation.set_field(
         "createAccountTransaction", resolver=create_account_transactions_resolver
+    )
+
+    mutation.set_field(
+        "updateAccountTransaction", resolver=update_account_transactions_resolver
     )
