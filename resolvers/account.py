@@ -22,11 +22,11 @@ async def get_accounts_resolver(_, info, params):
 
 async def get_account_transactions(_, info, params):
     params = GetAccountTransactionRequest.model_validate(params)
-    
+
     transactions = await AccountService(
         session=info.context["session"], user=info.context["user"]
     ).get_transactions(params=params)
-    
+
     return transactions.model_dump(by_alias=True)
 
 
