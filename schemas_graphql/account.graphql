@@ -1,5 +1,6 @@
 extend type Query {
     getAccounts(params: GetAccountsInput): GetAccountResponse
+    getAccountTransactions(params: GetAccountTransactionInput): GetAccountTransactionResponse
     getAccountBalance(params: GetAccountBalanceInput): GetAccountBalanceResponse
 }
 
@@ -37,6 +38,19 @@ type Account {
 }
 
 # Account transactions schemas
+input GetAccountTransactionInput {
+    accountId: String
+    startPeriod: Int
+    endPeriod: Int
+}
+
+
+type GetAccountTransactionResponse {
+    quantity: Int!
+    transactions: [AccountTransaction]!
+}
+
+
 input CreateAccountTransactionInput {
     transactionId: Int
     accountId: String!
