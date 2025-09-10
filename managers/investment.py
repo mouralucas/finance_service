@@ -105,7 +105,7 @@ class InvestmentManager(BaseDataManager):
                 investment_alias.settlement_amount,
                 case(
                     (
-                        statement_alias.gross_amount.is_not(None),
+                        statement_alias.gross_amount.is_(None),
                         investment_alias.amount,
                     ),
                     else_=statement_alias.gross_amount,
