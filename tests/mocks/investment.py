@@ -27,16 +27,16 @@ from models.investment_brazilian_fund import (
     InvestmentBrazilianFundsModel,
     InvestmentBrazilianFundsStatementModel,
 )
+from schemas.investment_brazilian_fund import (
+    InvestmentBrazilianFundSchema,
+    InvestmentBrazilianFundStatementSchema,
+)
 from schemas.investment_deprecated import (
     InvestmentCategorySchema,
     InvestmentObjectiveSchema,
     InvestmentSchema,
     InvestmentStatementSchema,
     InvestmentTypeSchema,
-)
-from schemas.investment_brazilian_fund import (
-    InvestmentBrazilianFundSchema,
-    InvestmentBrazilianFundStatementSchema,
 )
 
 

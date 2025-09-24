@@ -2,7 +2,6 @@ from pydantic import AliasGenerator, BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
 
 from schemas.core import ChartSeriesSchema, ChartSeriesSchemaV2
-from schemas.investment import InvestmentPerformance
 from schemas.investment_deprecated import (
     InvestmentAllocationSchema,
     InvestmentObjectiveSchema,
@@ -139,8 +138,7 @@ class GetInvestmentPerformanceResponseV2(BaseModel):
         from_attributes=True,
         alias_generator=AliasGenerator(serialization_alias=to_camel),
     )
-    
+
     x_label: list[int] = Field(...)
     data: list[ChartSeriesSchemaV2] = Field(...)
     indexer_name: str
-    

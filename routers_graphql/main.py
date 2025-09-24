@@ -16,11 +16,11 @@ from backend.database import get_session
 from resolvers.account import bind_account_resolvers
 from resolvers.core import bind_core_resolvers
 from resolvers.finance import bind_finance_dashboard_resolvers
-from resolvers.investment_deprecated import bind_investment_deprecated_resovlers
 from resolvers.investment import bind_investment_resovlers
 from resolvers.investment_brazilian_funds import (
     bind_investment_brazilian_funds_resolvers,
 )
+from resolvers.investment_deprecated import bind_investment_deprecated_resovlers
 
 router = APIRouter(tags=["GraphQL"], prefix="/graphql/finance")
 

@@ -12,15 +12,16 @@ def get_periodocity_mock() -> list[dict[str, Any]]:
     periodicity = [
         {
             **default_model_dict,
-            'id': uuid.UUID('dc5b3bf8-2b84-423a-9a90-e7e194e355fa'),
+            "id": uuid.UUID("dc5b3bf8-2b84-423a-9a90-e7e194e355fa"),
             "name": "Mensal",
-            'description': 'Periodicidade mensal',
-            "order": 1
+            "description": "Periodicidade mensal",
+            "order": 1,
         }
     ]
-    
+
     return periodicity
-    
+
+
 def get_currency_mock() -> list[dict[str, Any]]:
     currencies = [
         {

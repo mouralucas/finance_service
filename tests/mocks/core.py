@@ -190,11 +190,11 @@ async def create_periodicity(test_session):
     data_ = await BaseDataManager(test_session).add_or_ignore_all(
         PeriodicityModel, get_periodocity_mock()
     )
-    
+
     periodicity = (
         [PeriodicitySchema.model_validate(data["PeriodicityModel"]) for data in data_]
         if data_
         else []
     )
-    
+
     return periodicity

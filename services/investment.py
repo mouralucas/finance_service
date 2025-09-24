@@ -1,12 +1,14 @@
-from rolf_common.services import BaseService
 from rolf_common.schemas.auth import RequiredUser
+from rolf_common.services import BaseService
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from managers.finance import FinanceManager
 from managers.investment import InvestmentManager
 from schemas.core import ChartSeriesSchemaV2
 from schemas.request.investment import GetPerformanceRequest
-from schemas.response.investment import GetInvestmentPerformanceResponse, GetInvestmentPerformanceResponseV2
+from schemas.response.investment import (
+    GetInvestmentPerformanceResponseV2,
+)
 
 
 class InvestmentService(BaseService):
@@ -14,10 +16,11 @@ class InvestmentService(BaseService):
         super().__init__(session=session)
         self.user = user.model_dump()
         self.investment_manager = InvestmentManager(session=self.session)
-        
-    
+
     # Dashboard
-    async def get_performance(self, params: GetPerformanceRequest) -> GetInvestmentPerformanceResponseV2:
+    async def get_performance(
+        self, params: GetPerformanceRequest
+    ) -> GetInvestmentPerformanceResponseV2:
         """
         Created by: Lucas Penha de Moura - 22/09/2025
 
@@ -31,23 +34,23 @@ class InvestmentService(BaseService):
             period_range=params.period_range,
             indexer_id=params.indexer_id,
         )
-        
+
         if not performance_portfolio:
             # TODO: add new schema response
-            return 
+            return
 
         indexer = await FinanceManager(session=self.session).get_indexer_by_id(
             indexer_id=params.indexer_id, raise_exception=True
         )
-        investment = None
-        if params.investment_id:
-            investment = await self.investment_manager.get_investment_by_id(
-                investment_id=params.investment_id
-            )
+        # investment = None
+        # if params.investment_id:
+        #     investment = await self.investment_manager.get_investment_by_id(
+        #         investment_id=params.investment_id
+        #     )
 
         accumulated_indexer = 1.0
         accumulated_variation = 1.0
-        
+
         period_performance = []
         for item in performance_portfolio:
             indexer_variation_decimal = (
@@ -67,21 +70,21 @@ class InvestmentService(BaseService):
                     "variation": (accumulated_variation - 1) * 100,
                 }
             )
-            
+
         x_value = [item["period"] for item in period_performance]
-        indexerVariationData = [item["indexer_variation"] for item in period_performance]
-        variationData = [item["variation"] for item in period_performance]
+        indexer_variation_data = [
+            item["indexer_variation"] for item in period_performance
+        ]
+        variation_data = [item["variation"] for item in period_performance]
 
         # montar series
         series = [
-            {"data": indexerVariationData, "label": "Variação do indexer"},
-            {"data": variationData, "label": "Variação"},
+            {"data": indexer_variation_data, "label": "Variação do indexer"},
+            {"data": variation_data, "label": "Variação"},
         ]
-        
+
         return GetInvestmentPerformanceResponseV2(
             x_label=x_value,
             data=[ChartSeriesSchemaV2.model_validate(item) for item in series],
             indexer_name=indexer.name,
         )
-
-    

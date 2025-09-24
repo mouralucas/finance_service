@@ -25,7 +25,6 @@ from schemas.response.investment import (
     CreateObjectiveResponse,
     CreateStatementResponse,
     GetInvestmentAllocationResponse,
-    GetInvestmentPerformanceResponse,
     GetInvestmentPerformanceResponseV2,
     GetInvestmentResponse,
     GetInvestmentTypeResponse,
@@ -235,6 +234,6 @@ async def get_performance(
     session: AsyncSession = Depends(get_session),
     user: RequiredUser = Security(get_user),
 ) -> GetInvestmentPerformanceResponseV2:
-    return await InvestmentService(
-        session=session, user=user
-    ).get_performance(params=params)
+    return await InvestmentService(session=session, user=user).get_performance(
+        params=params
+    )

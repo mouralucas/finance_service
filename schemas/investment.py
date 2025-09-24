@@ -1,7 +1,8 @@
-from pydantic import BaseModel, ConfigDict, AliasGenerator, Field
+from pydantic import AliasGenerator, BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
 
 from schemas.core import ChartSeriesSchemaV2
+
 
 class InvestmentPerformance(BaseModel):
     model_config = ConfigDict(
