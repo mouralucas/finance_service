@@ -26,6 +26,7 @@ from schemas.response.investment import (
     CreateStatementResponse,
     GetInvestmentAllocationResponse,
     GetInvestmentPerformanceResponse,
+    GetInvestmentPerformanceResponseV2,
     GetInvestmentResponse,
     GetInvestmentTypeResponse,
     GetInvestmentWithoutObjectives,
@@ -36,6 +37,7 @@ from schemas.response.investment import (
     UpdateInvestmentResponse,
 )
 from services.investment import InvestmentService
+from services.investment_deprecated import InvestmentServiceDeprecated
 
 router = APIRouter(prefix="/investment", tags=["Investments"])
 
@@ -52,9 +54,9 @@ async def create_investment(
     session: AsyncSession = Depends(get_session),
     user: RequiredUser = Security(get_user),
 ) -> CreateInvestmentResponse:
-    response = await InvestmentService(session=session, user=user).create_investment(
-        investment
-    )
+    response = await InvestmentServiceDeprecated(
+        session=session, user=user
+    ).create_investment(investment)
 
     return response
 
@@ -70,7 +72,7 @@ async def create_fixed_income_br_investment(
     session: AsyncSession = Depends(get_session),
     user: RequiredUser = Security(get_user),
 ):
-    return await InvestmentService(
+    return await InvestmentServiceDeprecated(
         session=session, user=user
     ).create_fixed_incoming_br_investment(investment=investment)
 
@@ -81,9 +83,9 @@ async def update_investment(
     session: AsyncSession = Depends(get_session),
     user: RequiredUser = Security(get_user),
 ) -> UpdateInvestmentResponse:
-    return await InvestmentService(session=session, user=user).update_investment(
-        investment=investment
-    )
+    return await InvestmentServiceDeprecated(
+        session=session, user=user
+    ).update_investment(investment=investment)
 
 
 @router.get("", summary="Get investments", description="Get investment base on filters")
@@ -92,9 +94,9 @@ async def get_investments(
     session: AsyncSession = Depends(get_session),
     user: RequiredUser = Security(get_user),
 ) -> GetInvestmentResponse:
-    return await InvestmentService(session=session, user=user).get_investments(
-        params=params
-    )
+    return await InvestmentServiceDeprecated(
+        session=session, user=user
+    ).get_investments(params=params)
 
 
 @router.post(
@@ -105,9 +107,9 @@ async def settle(
     session: AsyncSession = Depends(get_session),
     user: RequiredUser = Security(get_user),
 ) -> SettleInvestmentResponse:
-    response = await InvestmentService(session=session, user=user).settle_investment(
-        investment
-    )
+    response = await InvestmentServiceDeprecated(
+        session=session, user=user
+    ).settle_investment(investment)
 
     return response
 
@@ -117,7 +119,9 @@ async def get_investment_types(
     session: AsyncSession = Depends(get_session),
     user: RequiredUser = Security(get_user),
 ) -> GetInvestmentTypeResponse:
-    return await InvestmentService(session=session, user=user).get_investment_types()
+    return await InvestmentServiceDeprecated(
+        session=session, user=user
+    ).get_investment_types()
 
 
 @router.post(
@@ -131,9 +135,9 @@ async def create_statement(
     session: AsyncSession = Depends(get_session),
     user: RequiredUser = Security(get_user),
 ) -> CreateStatementResponse:
-    return await InvestmentService(session=session, user=user).create_statement(
-        statement=statement
-    )
+    return await InvestmentServiceDeprecated(
+        session=session, user=user
+    ).create_statement(statement=statement)
 
 
 @router.get(
@@ -146,7 +150,7 @@ async def get_statement(
     session: AsyncSession = Depends(get_session),
     user: RequiredUser = Security(get_user),
 ) -> GetStatementResponse:
-    return await InvestmentService(session=session, user=user).get_statement(
+    return await InvestmentServiceDeprecated(session=session, user=user).get_statement(
         params=params
     )
 
@@ -162,7 +166,7 @@ async def create_objective(
     session: AsyncSession = Depends(get_session),
     user: RequiredUser = Security(get_user),
 ) -> CreateObjectiveResponse:
-    return await InvestmentService(session, user).create_objective(objective)
+    return await InvestmentServiceDeprecated(session, user).create_objective(objective)
 
 
 @router.get(
@@ -175,7 +179,9 @@ async def get_objective(
     session: AsyncSession = Depends(get_session),
     user: RequiredUser = Security(get_user),
 ) -> GetObjectiveResponse:
-    return await InvestmentService(session, user).get_objectives(params=params)
+    return await InvestmentServiceDeprecated(session, user).get_objectives(
+        params=params
+    )
 
 
 @router.get(
@@ -188,7 +194,7 @@ async def get_objective_summary(
     session: AsyncSession = Depends(get_session),
     user: RequiredUser = Security(get_user),
 ) -> GetObjectiveSummaryResponse:
-    response = await InvestmentService(
+    response = await InvestmentServiceDeprecated(
         session=session, user=user
     ).get_objective_summary(params=params)
 
@@ -200,7 +206,7 @@ async def get_investments_without_objectives(
     session: AsyncSession = Depends(get_session),
     user: RequiredUser = Security(get_user),
 ) -> GetInvestmentWithoutObjectives:
-    return await InvestmentService(
+    return await InvestmentServiceDeprecated(
         session=session, user=user
     ).get_investment_without_objective()
 
@@ -214,7 +220,7 @@ async def get_allocation(
     session: AsyncSession = Depends(get_session),
     user: RequiredUser = Security(get_user),
 ) -> GetInvestmentAllocationResponse:
-    return await InvestmentService(
+    return await InvestmentServiceDeprecated(
         session=session, user=user
     ).get_investment_allocation()
 
@@ -228,7 +234,7 @@ async def get_performance(
     params: GetPerformanceRequest = Depends(),
     session: AsyncSession = Depends(get_session),
     user: RequiredUser = Security(get_user),
-) -> GetInvestmentPerformanceResponse:
-    return await InvestmentService(session=session, user=user).get_performance(
-        params=params
-    )
+) -> GetInvestmentPerformanceResponseV2:
+    return await InvestmentService(
+        session=session, user=user
+    ).get_performance(params=params)

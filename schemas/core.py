@@ -206,3 +206,16 @@ class ChartSeriesSchema(BaseModel):
 
     value: str = Field(..., description="The value of series")
     name: str = Field(..., description="The name of the series")
+
+
+class ChartSeriesSchemaV2(BaseModel): 
+   model_config = ConfigDict(
+        from_attributes=True,
+        populate_by_name=True,
+        alias_generator=AliasGenerator(
+            serialization_alias=to_camel,
+        ),
+    )
+   
+   data: list[float] = Field(...)
+   label: str = Field(...)

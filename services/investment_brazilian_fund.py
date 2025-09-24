@@ -25,11 +25,11 @@ from schemas.response.investment_brazilian_funds import (
     GetBrazilianFundInvestmentsResponse,
     GetBrazilianFundInvestmentStatementResponse,
 )
-from services.investment import InvestmentService
+from services.investment_deprecated import InvestmentServiceDeprecated
 from services.utils.datetime import get_period
 
 
-class InvestmentBrazilianFundService(InvestmentService):
+class InvestmentBrazilianFundService(InvestmentServiceDeprecated):
     def __init__(self, session: AsyncSession, user: RequiredUser):
         super().__init__(session, user)
         self.investment_brazilian_fund_manager = InvestmentBrazilianFundManager(session)

@@ -326,7 +326,7 @@ class GetPerformanceRequest(BaseModel):
         None, description="The id of the investment"
     )
     indexer_id: uuid.UUID = Field(
-        "2a2b100f-17d9-4c61-b3b4-f06662113953",
+        uuid.UUID("2a2b100f-17d9-4c61-b3b4-f06662113953"),
         description="The unique identifier of the indexer - Default is CDI",
     )
     period_range: int = Field(

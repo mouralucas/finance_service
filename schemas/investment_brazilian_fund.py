@@ -4,7 +4,7 @@ from datetime import date
 from pydantic import Field
 
 from schemas.finance import FundsBrSchema
-from schemas.investment import InvestmentBaseSchema, InvestmentStatementBase
+from schemas.investment_deprecated import InvestmentBaseSchema, InvestmentStatementBase
 
 
 class InvestmentBrazilianFundSchema(InvestmentBaseSchema):

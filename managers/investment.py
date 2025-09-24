@@ -518,10 +518,10 @@ class InvestmentManager(BaseDataManager):
     async def get_performance_portfolio(
         self,
         owner_id: uuid.UUID,
-        investment_id: uuid.UUID,
+        investment_id: uuid.UUID | None,
         indexer_id: uuid.UUID,
         period_range: int,
-    ) -> list[dict]:
+    ) -> list[dict] | None:
         """
         Created by: Lucas Penha de Moura - 17/10/2024
             Fetches the sum of gross, net and previous amount for the period range
@@ -565,7 +565,8 @@ class InvestmentManager(BaseDataManager):
             .outerjoin(
                 IndexerSeriesModel,
                 (IndexerSeriesModel.period == InvestmentStatementModel.period)
-                & (IndexerSeriesModel.indexer_id == indexer_id),
+                & (IndexerSeriesModel.indexer_id == indexer_id) 
+                & (IndexerSeriesModel.periodicity_id == 'dc5b3bf8-2b84-423a-9a90-e7e194e355fa'),
             )
             .where(InvestmentModel.owner_id == owner_id)
             .group_by(InvestmentStatementModel.period, IndexerSeriesModel.value)

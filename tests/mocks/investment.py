@@ -27,7 +27,7 @@ from models.investment_brazilian_fund import (
     InvestmentBrazilianFundsModel,
     InvestmentBrazilianFundsStatementModel,
 )
-from schemas.investment import (
+from schemas.investment_deprecated import (
     InvestmentCategorySchema,
     InvestmentObjectiveSchema,
     InvestmentSchema,

@@ -15,3 +15,8 @@ type Category {
     comment: String
     order: Int
 }
+
+type LineChartSeries {
+    data: [String]!
+    label: String!
+}

@@ -1,0 +1,16 @@
+# This file contains the schemas for genral Investment functions that aggreagates all
+#   investment types
+
+extend type Query {
+    getInvestmentPerformance(params: GetInvestmentPerformanceInput): GetInvestmentPerformanceResponse
+}
+
+
+input GetInvestmentPerformanceInput {
+    investmentId: String
+}
+
+type GetInvestmentPerformanceResponse {
+    xLabel: [String]! 
+    data: [LineChartSeries!]!
+}
