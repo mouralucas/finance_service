@@ -11,6 +11,7 @@ from data_mock.core import (
     get_index_type_mock,
     get_indexer_mock,
     get_liquidity_mock,
+    get_periodocity_mock,
     get_tax_mock,
 )
 from data_mock.investment.base import get_brazilian_fund_mock
@@ -22,6 +23,7 @@ from models.core import (
     IndexerModel,
     IndexerTypeModel,
     LiquidityModel,
+    PeriodicityModel,
     TaxFeeModel,
 )
 from models.investment import FundsBrModel
@@ -33,6 +35,7 @@ from schemas.core import (
     IndexerSchema,
     IndexerTypeSchema,
     LiquiditySchema,
+    PeriodicitySchema,
     TaxSchema,
 )
 from schemas.finance import FundsBrSchema
@@ -180,3 +183,18 @@ async def create_brazilian_funds(test_session):
     )
 
     return brazilian_funds
+
+
+@pytest_asyncio.fixture
+async def create_periodicity(test_session):
+    data_ = await BaseDataManager(test_session).add_or_ignore_all(
+        PeriodicityModel, get_periodocity_mock()
+    )
+    
+    periodicity = (
+        [PeriodicitySchema.model_validate(data["PeriodicityModel"]) for data in data_]
+        if data_
+        else []
+    )
+    
+    return periodicity

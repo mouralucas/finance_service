@@ -8,7 +8,19 @@ default_model_dict = {
 }
 
 
-# TODO: create periodicity mock and add to populate_database
+def get_periodocity_mock() -> list[dict[str, Any]]:
+    periodicity = [
+        {
+            **default_model_dict,
+            'id': uuid.UUID('dc5b3bf8-2b84-423a-9a90-e7e194e355fa'),
+            "name": "Mensal",
+            'description': 'Periodicidade mensal',
+            "order": 1
+        }
+    ]
+    
+    return periodicity
+    
 def get_currency_mock() -> list[dict[str, Any]]:
     currencies = [
         {

@@ -195,6 +195,17 @@ class ExpensesByCategory(BaseModel):
     total: float = Field(..., description="The total amount by category")
 
 
+class PeriodicitySchema(BaseModel):
+    model_config = ConfigDict(
+        from_attributes=True,
+        alias_generator=AliasGenerator(serialization_alias=to_camel),
+    )
+
+    id: uuid.UUID = Field(...)
+    description: str | None = Field(None)
+    order: int | None = Field(None)
+
+
 # Default Series schema for charts:
 class ChartSeriesSchema(BaseModel):
     model_config = ConfigDict(
@@ -208,14 +219,14 @@ class ChartSeriesSchema(BaseModel):
     name: str = Field(..., description="The name of the series")
 
 
-class ChartSeriesSchemaV2(BaseModel): 
-   model_config = ConfigDict(
+class ChartSeriesSchemaV2(BaseModel):
+    model_config = ConfigDict(
         from_attributes=True,
         populate_by_name=True,
         alias_generator=AliasGenerator(
             serialization_alias=to_camel,
         ),
     )
-   
-   data: list[float] = Field(...)
-   label: str = Field(...)
+
+    data: list[float] = Field(...)
+    label: str = Field(...)

@@ -566,7 +566,7 @@ class InvestmentManager(BaseDataManager):
                 IndexerSeriesModel,
                 (IndexerSeriesModel.period == InvestmentStatementModel.period)
                 & (IndexerSeriesModel.indexer_id == indexer_id) 
-                & (IndexerSeriesModel.periodicity_id == 'dc5b3bf8-2b84-423a-9a90-e7e194e355fa'),
+                & (IndexerSeriesModel.periodicity_id == uuid.UUID('dc5b3bf8-2b84-423a-9a90-e7e194e355fa')),
             )
             .where(InvestmentModel.owner_id == owner_id)
             .group_by(InvestmentStatementModel.period, IndexerSeriesModel.value)
