@@ -15,6 +15,7 @@ from starlette.responses import HTMLResponse, JSONResponse
 from backend.database import get_session
 from resolvers.account import bind_account_resolvers
 from resolvers.core import bind_core_resolvers
+from resolvers.credit_card import bind_credit_card_resolvers
 from resolvers.finance import bind_finance_dashboard_resolvers
 from resolvers.investment import bind_investment_resovlers
 from resolvers.investment_brazilian_funds import (
@@ -25,13 +26,7 @@ from resolvers.investment_deprecated import bind_investment_deprecated_resovlers
 router = APIRouter(tags=["GraphQL"], prefix="/graphql/finance")
 
 type_defs = (
-    load_schema_from_path("schemas_graphql/schema.graphql")
-    + load_schema_from_path("schemas_graphql/core.graphql")
-    + load_schema_from_path("schemas_graphql/account.graphql")
-    + load_schema_from_path("schemas_graphql/investment_deprecated.graphql")
-    + load_schema_from_path("schemas_graphql/investment.graphql")
-    + load_schema_from_path("schemas_graphql/investment_brazilian_funds.graphql")
-    + load_schema_from_path("schemas_graphql/finance.graphql")
+    load_schema_from_path("schemas_graphql/")
 )
 
 query = QueryType()
@@ -40,6 +35,7 @@ mutation = MutationType()
 bind_finance_dashboard_resolvers(query, mutation)
 bind_core_resolvers(query, mutation)
 bind_account_resolvers(query, mutation)
+bind_credit_card_resolvers(query, mutation)
 bind_investment_deprecated_resovlers(query, mutation)
 bind_investment_resovlers(query, mutation)
 bind_investment_brazilian_funds_resolvers(query, mutation)

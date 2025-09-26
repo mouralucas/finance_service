@@ -1,0 +1,26 @@
+extend type Query {
+    getCreditCards(params: GetCreditCardsInput): GetCreditCardsResponse
+}
+
+input GetCreditCardsInput {
+    id: String
+    active: Boolean
+}
+
+type GetCreditCardsResponse {
+    quantity: Int!
+    creditCards: [CreditCard]!
+}
+
+type CreditCard {
+    creditCardId: String!
+    active: Boolean!
+    ownerId: String!
+    nickname: String!
+    accountId: String
+    currencyId: String!
+    issueDate: String
+    cancellationDate: String
+    dueDate: Int
+    closeDay: Int
+}
