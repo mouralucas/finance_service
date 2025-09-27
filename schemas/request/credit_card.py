@@ -42,7 +42,7 @@ class GetCreditCardRequest(BaseModel):
     )
 
     id: uuid.UUID | None = Field(
-        Query(None, alias="creditCardId", description="The id of the credit card")
+        None, alias="creditCardId", description="The id of the credit card"
     )
     active: bool = Field(True, description="Whether the credit card is valid or not")
 
