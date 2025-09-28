@@ -318,6 +318,11 @@ class CreditCardService(BaseService):
         credit_card = await CreditCardManager(
             session=self.session
         ).get_credit_card_by_id(params.credit_card_id)
+        if not credit_card:
+            raise HTTPException(
+                detail="Cartão de crédito não encontrado",
+                status_code=status.HTTP_404_NOT_FOUND,
+            )
 
         installments_due_dates = get_installments_due_dates(
             transaction_date=params.transaction_date,

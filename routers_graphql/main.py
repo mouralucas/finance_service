@@ -25,9 +25,7 @@ from resolvers.investment_deprecated import bind_investment_deprecated_resovlers
 
 router = APIRouter(tags=["GraphQL"], prefix="/graphql/finance")
 
-type_defs = (
-    load_schema_from_path("schemas_graphql/")
-)
+type_defs = load_schema_from_path("schemas_graphql/")
 
 query = QueryType()
 mutation = MutationType()

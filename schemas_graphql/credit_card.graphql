@@ -1,7 +1,9 @@
 extend type Query {
     getCreditCards(params: GetCreditCardsInput): GetCreditCardsResponse
+    getCreditCardInstallmentDueDates(params: GetInstallmentsDueDatesInput): GetInstallmentsDueDatesResponse
 }
 
+# Get credit cards
 input GetCreditCardsInput {
     id: String
     active: Boolean
@@ -23,4 +25,20 @@ type CreditCard {
     cancellationDate: String
     dueDate: Int
     closeDay: Int
+}
+
+# Credit card installments
+input GetInstallmentsDueDatesInput {
+    creditCardId: String!
+    totInstallments: Int!
+    transactionDate: String!
+}
+
+type GetInstallmentsDueDatesResponse {
+    dueDates: [InstallmentsDueDates]!
+}
+
+type InstallmentsDueDates {
+    currentInstallment: Int!
+    dueDate: String!
 }
