@@ -64,8 +64,8 @@ class GetStatementResponse(BaseModel):
 
 
 class CreateObjectiveResponse(BaseModel):
-    objective: InvestmentObjectiveSchema = Field(
-        ..., description="The investment objective"
+    objective_created: bool = Field(
+        ..., description="Indicates if the objective was created"
     )
 
 

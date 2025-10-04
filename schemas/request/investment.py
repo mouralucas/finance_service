@@ -285,16 +285,18 @@ class GetStatementRequest(BaseModel):
 
 
 class CreateObjectiveRequest(BaseModel):
-    title: str = Field(..., alias="title", description="The title of the objective")
-    description: str = Field(
+    model_config = ConfigDict(
+        from_attributes=True, alias_generator=AliasGenerator(alias=to_camel)
+    )
+
+    title: str = Field(..., description="The title of the objective")
+    description: str | None = Field(
         None, alias="description", description="The description of the objective"
     )
-    amount: Decimal = Field(
-        None, alias="amount", description="The amount of the objective"
-    )
+    currency_id: str = Field(..., description="The currency of the objective")
+    amount: Decimal | None = Field(None, description="The amount of the objective")
     estimated_deadline: datetime.date | None = Field(
         None,
-        alias="estimatedDeadline",
         description="The estimated deadline of the objective",
     )
 

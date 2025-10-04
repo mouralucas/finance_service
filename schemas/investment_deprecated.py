@@ -267,6 +267,7 @@ class InvestmentStatementBase(BaseModel):
 class InvestmentObjectiveSchema(BaseModel):
     model_config = ConfigDict(
         from_attributes=True,
+        populate_by_name=True,
         alias_generator=AliasGenerator(
             serialization_alias=to_camel,
         ),
@@ -280,6 +281,8 @@ class InvestmentObjectiveSchema(BaseModel):
     description: str | None = Field(
         None, description="The description of the objective"
     )
+    currency_id: str = Field(..., description="The id of the currency")
+    currency_symbol: str | None = Field(None, description="The currency symbol")
     amount: float = Field(..., description="The amount of the objective")
     estimated_deadline: date | None = Field(
         None, description="The date that are expected to reach the objective"

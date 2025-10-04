@@ -22,7 +22,7 @@ type GetAccountResponse {
 }
 
 type Account {
-    accountId: ID!
+    accountId: String!
     active: Boolean!
     bankId: String!
     nickname: String!
@@ -98,7 +98,7 @@ type CreateUpdateAccountTransactionResponse {
 }
 
 type AccountTransaction {
-    transactionId: ID!
+    transactionId: Int!
     ownerId: String!
     accountId: String!
     accountNickname: String

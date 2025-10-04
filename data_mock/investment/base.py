@@ -5,7 +5,7 @@ from typing import Any
 from dateutil.relativedelta import relativedelta
 
 from data_mock.common import default_model_dict
-from data_mock.core import get_fee_mock
+from data_mock.core import get_currency_mock, get_fee_mock
 
 
 def get_investment_category_mock() -> list[dict[str, Any]]:
@@ -84,6 +84,8 @@ def get_funds_br_investment_type_mock() -> list[dict[str, Any]]:
 
 
 def get_open_investment_objective_mock() -> list[dict[str, Any]]:
+    currencies = get_currency_mock()
+
     open_objectives: list[dict[str, Any]] = [
         {
             **default_model_dict,
@@ -92,6 +94,7 @@ def get_open_investment_objective_mock() -> list[dict[str, Any]]:
             "title": "Meu objetivo futuro",
             "description": "Comprar casa na praia",
             "amount": 75500,
+            "currency_id": currencies[0]["id"],
             "estimated_deadline": date.today() + relativedelta(years=4),
         },
         {
@@ -101,6 +104,7 @@ def get_open_investment_objective_mock() -> list[dict[str, Any]]:
             "title": "Comprar um carro novo",
             "description": "Comprar um carro melhor que meu carro atual",
             "amount": 25000,
+            "currency_id": currencies[0]["id"],
             "estimated_deadline": date.today() + relativedelta(years=1, months=6),
         },
     ]

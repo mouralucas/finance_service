@@ -6,11 +6,14 @@ from starlette import status
 
 
 @pytest.mark.asyncio
-async def test_create_objective(client):
+async def test_create_objective(client, create_currency):
+    currencies = create_currency
+
     payload = {
         "title": "Meu objetivo",
         "description": "Comprar um apartamento na praia",
         "amount": 50000,
+        "currencyId": currencies[0].id,
         "estimatedDeadline": (
             datetime.datetime.now(datetime.UTC) + relativedelta(years=1, months=6)
         ).strftime("%Y-%m-%d"),
@@ -20,17 +23,7 @@ async def test_create_objective(client):
     assert response.status_code == status.HTTP_201_CREATED
     data = response.json()
 
-    assert "objective" in data
-    assert "objectiveId" in data["objective"]
-
-    assert "title" in data["objective"]
-    assert data["objective"]["title"] == payload["title"]
-    assert "description" in data["objective"]
-    assert data["objective"]["description"] == payload["description"]
-    assert "amount" in data["objective"]
-    assert float(data["objective"]["amount"]) == payload["amount"]
-    assert "estimatedDeadline" in data["objective"]
-    assert data["objective"]["estimatedDeadline"] == payload["estimatedDeadline"]
+    assert "objective_created" in data
 
 
 @pytest.mark.asyncio

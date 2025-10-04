@@ -363,10 +363,10 @@ class InvestmentServiceDeprecated(BaseService):
         new_objective_ = InvestmentObjectiveModel(**objective.model_dump())
         new_objective_.owner_id = self.user["user_id"]
 
-        new_objective = await self.investment_manager.create_objective(new_objective_)
+        await self.investment_manager.create_objective(new_objective_)
 
         response = CreateObjectiveResponse(
-            objective=InvestmentObjectiveSchema.model_validate(new_objective)
+            objective_created=True,
         )
 
         return response
@@ -386,12 +386,7 @@ class InvestmentServiceDeprecated(BaseService):
         response = GetObjectiveResponse(
             quantity=len(objectives) if objectives else 0,
             objectives=(
-                [
-                    InvestmentObjectiveSchema.model_validate(
-                        data["InvestmentObjectiveModel"]
-                    )
-                    for data in objectives
-                ]
+                [InvestmentObjectiveSchema.model_validate(data) for data in objectives]
                 if objectives
                 else []
             ),

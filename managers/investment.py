@@ -235,26 +235,45 @@ class InvestmentManager(BaseDataManager):
         return investment_types
 
     # Investment objectives
-    async def create_objective(self, objective: InvestmentObjectiveModel) -> SQLModel:
+    async def create_objective(
+        self, objective: InvestmentObjectiveModel
+    ) -> SQLModel | None:
         new_objective = await self.add_one(objective)
 
         return new_objective
 
     async def get_objectives(
-        self, owner_id: str, objective_id: uuid = None
-    ) -> list[RowMapping] | None:
-        query = select(InvestmentObjectiveModel).where(
-            InvestmentObjectiveModel.owner_id == owner_id
+        self, owner_id: str, objective_id: uuid.UUID | None = None
+    ) -> dict[Any, Any] | None:
+        query = (
+            select(
+                InvestmentObjectiveModel.id,
+                InvestmentObjectiveModel.owner_id,
+                InvestmentObjectiveModel.title,
+                InvestmentObjectiveModel.description,
+                InvestmentObjectiveModel.amount,
+                InvestmentObjectiveModel.estimated_deadline,
+                InvestmentObjectiveModel.currency_id,
+                CurrencyModel.symbol.label("currency_symbol"),
+            )
+            .join(
+                CurrencyModel, CurrencyModel.id == InvestmentObjectiveModel.currency_id
+            )
+            .where(InvestmentObjectiveModel.owner_id == owner_id)
         )
 
         if objective_id:
             query = query.where(InvestmentObjectiveModel.id == objective_id)
 
-        investment_objectives: list[RowMapping] = await self.get_all(
+        investment_objectives: list[RowMapping] | None = await self.get_all(
             query, unique_result=True
         )
 
-        return investment_objectives
+        return (
+            [dict(obj.items()) for obj in investment_objectives]
+            if investment_objectives
+            else None
+        )
 
     async def get_objective_by_id(
         self, objective_id: uuid.UUID
@@ -264,7 +283,7 @@ class InvestmentManager(BaseDataManager):
         return cast(InvestmentObjectiveModel, objective)
 
     async def get_objective_investments(
-        self, objective_id: uuid.UUID = None, with_objective: bool = None
+        self, objective_id: uuid.UUID | None = None, with_objective: bool | None = None
     ) -> list[InvestmentModel]:
         """
         Created by: Lucas Penha de Moura
@@ -285,7 +304,11 @@ class InvestmentManager(BaseDataManager):
 
         investments = await self.get_all(query)
 
-        return [investment["InvestmentModel"] for investment in investments]
+        return (
+            [investment["InvestmentModel"] for investment in investments]
+            if investments
+            else []
+        )
 
     # Dashboard
     async def get_total_invested(

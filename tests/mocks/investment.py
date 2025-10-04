@@ -218,6 +218,7 @@ async def create_investment_statement(
 @pytest_asyncio.fixture
 async def create_open_investment_objectives(
     test_session,
+    create_currency,
 ) -> list[InvestmentObjectiveSchema]:
     data_ = await BaseDataManager(test_session).add_or_ignore_all(
         InvestmentObjectiveModel, get_open_investment_objective_mock()

@@ -9,7 +9,7 @@ type GetCategoryResponse {
 }
 
 type Category {
-    categoryId: ID!
+    categoryId: String!
     categoryName: String!
     description: String
     comment: String

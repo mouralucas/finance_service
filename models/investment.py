@@ -185,6 +185,7 @@ class InvestmentObjectiveModel(SQLModel):
     estimated_deadline: Mapped[date] = mapped_column(
         "estimated_deadline", nullable=True
     )
+    currency_id: Mapped[str] = mapped_column(ForeignKey("currency.id"))
 
     # Investment reverse relation
     investments: Mapped[list["InvestmentModel"]] = relationship(
