@@ -7,7 +7,7 @@ from starlette import status
 from backend.database import get_session
 from schemas.request.finance import (
     CreateBrazilianFundRequest,
-    GetCurrencyCostAverage,
+    GetCurrencyAveragePrice,
     GetSummaryRequest,
     GetTaxFeeRequest,
 )
@@ -35,9 +35,9 @@ async def get_currencies(
     return await FinanceService(session=session, user=user).get_currencies()
 
 
-@router.get("/currency/cost-average")
+@router.get("/currency/average-price")
 async def get_currency_cost_average(
-    params: GetCurrencyCostAverage = Depends(),
+    params: GetCurrencyAveragePrice = Depends(),
     session: AsyncSession = Depends(get_session),
     user: RequiredUser = Security(get_user),
 ):

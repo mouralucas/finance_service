@@ -6,10 +6,14 @@ from pydantic import AliasGenerator, BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
 
 
-class GetCurrencyCostAverage(BaseModel):
+class GetCurrencyAveragePrice(BaseModel):
     model_config = ConfigDict(
         from_attributes=True, alias_generator=AliasGenerator(alias=to_camel)
     )
+
+    currency_id: str
+    start_date: date
+    end_date: date
 
 
 class GetSummaryRequest(BaseModel):

@@ -44,3 +44,18 @@ type Currency {
     name: String!
     symbol: String!
 }
+
+
+# Currency dashboard schemas
+input GetCurrencyAveragePriceInput {
+    currencyId: String!
+    startDate: String!
+    endDate: String!
+}
+
+type GetCurrencyAveragePriceResponse {
+    currencyId: String!
+    currencySymbol: String!
+    averagePrice: Float!
+
+}

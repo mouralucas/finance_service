@@ -211,3 +211,7 @@ class FinanceService(BaseService):
         )
 
         return response
+
+    # Currency exchange services
+    async def get_currency_avarage_price(self):
+        pass
