@@ -28,7 +28,7 @@ class InvestmentBrazilianFundManager(InvestmentManager):
     ) -> list[InvestmentBrazilianFundsModel]:
         query = select(InvestmentBrazilianFundsModel).where(
             InvestmentBrazilianFundsModel.owner_id == owner_id,
-            InvestmentBrazilianFundsModel.is_settled == is_settled
+            InvestmentBrazilianFundsModel.is_settled == is_settled,
         )
 
         if investment_id:
@@ -39,7 +39,11 @@ class InvestmentBrazilianFundManager(InvestmentManager):
 
         result = await self.get_all(query)
 
-        return [investment["InvestmentBrazilianFundsModel"] for investment in result] if result else []
+        return (
+            [investment["InvestmentBrazilianFundsModel"] for investment in result]
+            if result
+            else []
+        )
 
     async def get_brazilian_fund_investment_consolidated(self, fund_id: uuid.UUID):
         pass
