@@ -37,7 +37,11 @@ class InvestmentService(BaseService):
 
         if not performance_portfolio:
             # TODO: add new schema response
-            return
+            return GetInvestmentPerformanceResponseV2(
+                x_label=[],
+                data=[],
+                indexer_name="",
+            )
 
         indexer = await FinanceManager(session=self.session).get_indexer_by_id(
             indexer_id=params.indexer_id, raise_exception=True

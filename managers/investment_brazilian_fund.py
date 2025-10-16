@@ -39,7 +39,7 @@ class InvestmentBrazilianFundManager(InvestmentManager):
 
         result = await self.get_all(query)
 
-        return [investment["InvestmentBrazilianFundsModel"] for investment in result]
+        return [investment["InvestmentBrazilianFundsModel"] for investment in result] if result else []
 
     async def get_brazilian_fund_investment_consolidated(self, fund_id: uuid.UUID):
         pass
