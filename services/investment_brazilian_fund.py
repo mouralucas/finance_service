@@ -61,7 +61,9 @@ class InvestmentBrazilianFundService(InvestmentServiceDeprecated):
     ) -> GetBrazilianFundInvestmentsResponse:
         statements = (
             await self.investment_brazilian_fund_manager.get_brazilian_fund_investment(
-                investment_id=params.id, is_settled=params.is_settled
+                owner_id=self.user["user_id"],
+                investment_id=params.id, 
+                is_settled=params.is_settled
             )
         )
 
@@ -82,10 +84,9 @@ class InvestmentBrazilianFundService(InvestmentServiceDeprecated):
     async def create_brazilian_fund_investment_statement(
         self, statement: CreateBrazilianFundInvestmentStatementRequest
     ):
-        # fund: FundsBrModel = await FinanceManager(self.session)
-        #   .get_brazilian_fund_by_id(statement.fund_id)
         fund_investments = (
             await self.investment_brazilian_fund_manager.get_investments_by_fund_id(
+                owner_id=self.user["user_id"],
                 fund_id=statement.fund_id
             )
         )

@@ -24,9 +24,10 @@ class InvestmentBrazilianFundManager(InvestmentManager):
         return new_investment_fund
 
     async def get_brazilian_fund_investment(
-        self, investment_id: uuid.UUID | None, is_settled: bool
+        self, owner_id: uuid.UUID, investment_id: uuid.UUID | None, is_settled: bool
     ) -> list[InvestmentBrazilianFundsModel]:
         query = select(InvestmentBrazilianFundsModel).where(
+            InvestmentBrazilianFundsModel.owner_id == owner_id,
             InvestmentBrazilianFundsModel.is_settled == is_settled
         )
 
@@ -44,11 +45,14 @@ class InvestmentBrazilianFundManager(InvestmentManager):
         pass
 
     async def get_investments_by_fund_id(
-        self, fund_id: uuid.UUID
+        self, owner_id: uuid.UUID, fund_id: uuid.UUID
     ) -> list[InvestmentBrazilianFundsModel] | None:
         query = (
             select(InvestmentBrazilianFundsModel)
-            .where(InvestmentBrazilianFundsModel.fund_id == fund_id)
+            .where(
+                InvestmentBrazilianFundsModel.owner_id == owner_id,
+                InvestmentBrazilianFundsModel.fund_id == fund_id,
+            )
             .order_by(InvestmentBrazilianFundsModel.transaction_date)
         )
         investments = await self.get_all(query)
