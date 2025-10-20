@@ -9,18 +9,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from managers.account import AccountManager
-from managers.finance import FinanceManager
 from managers.investment import InvestmentManager
 from models.investment import (
     InvestmentModel,
     InvestmentObjectiveModel,
     InvestmentStatementModel,
 )
-from schemas.core import ChartSeriesSchema
 from schemas.investment_deprecated import (
     InvestmentAllocationSchema,
     InvestmentObjectiveSchema,
-    InvestmentPerformanceDataSchema,
     InvestmentSchema,
     InvestmentStatementSchema,
     InvestmentTypeSchema,
@@ -32,7 +29,6 @@ from schemas.request.investment import (
     GetInvestmentRequest,
     GetObjectiveRequest,
     GetObjectiveSummaryRequest,
-    GetPerformanceRequest,
     GetStatementRequest,
     SettleInvestmentRequest,
     UpdateInvestmentRequest,
@@ -45,7 +41,6 @@ from schemas.response.investment import (
     CreateObjectiveResponse,
     CreateStatementResponse,
     GetInvestmentAllocationResponse,
-    GetInvestmentPerformanceResponse,
     GetInvestmentResponse,
     GetInvestmentTypeResponse,
     GetInvestmentWithoutObjectives,
@@ -528,91 +523,6 @@ class InvestmentServiceDeprecated(BaseService):
                 if objectives_allocation
                 else []
             ),
-        )
-
-        return response
-
-    async def get_performance(
-        self, params: GetPerformanceRequest
-    ) -> GetInvestmentPerformanceResponse:
-        """
-        Created by: Lucas Penha de Moura - 04/12/2024
-
-            Get investments performance.
-        :param params: The object of PerformanceRequest with available parameters
-        :return: The performance of the investments
-        """
-        performance_portfolio = await self.investment_manager.get_performance_portfolio(
-            owner_id=self.user["user_id"],
-            investment_id=params.investment_id,
-            period_range=params.period_range,
-            indexer_id=params.indexer_id,
-        )
-
-        if not performance_portfolio:
-            return GetInvestmentPerformanceResponse(
-                indexer_name="",
-                total_invested=0,
-                data=[],
-                series=[],
-            )
-
-        indexer = await FinanceManager(session=self.session).get_indexer_by_id(
-            indexer_id=params.indexer_id, raise_exception=True
-        )
-        investment = None
-        if params.investment_id:
-            investment = await self.investment_manager.get_investment_by_id(
-                investment_id=params.investment_id
-            )
-
-        accumulated_indexer = 1.0
-        accumulated_variation = 1.0
-
-        period_performance = []
-        for item in performance_portfolio:
-            indexer_variation_decimal = (
-                float(item["indexer_variation"] / 100)
-                if item["indexer_variation"]
-                else 0
-            )
-            variation_decimal = float(item["variation"] / 100)
-
-            accumulated_indexer *= 1 + indexer_variation_decimal
-            accumulated_variation *= 1 + variation_decimal
-
-            period_performance.append(
-                {
-                    "period": item["period"],
-                    "indexer_variation": (accumulated_indexer - 1) * 100,
-                    "variation": (accumulated_variation - 1) * 100,
-                }
-            )
-
-        # TODO: check an better way to send the name without
-        #   use camel in python code (indexerVariation)
-        # For each key, except 'period', in period_performance,
-        #   must have a key/value in series list
-        series = [
-            {"value": "indexerVariation", "name": indexer.name},
-            {
-                "value": "variation",
-                "name": investment.name if investment else "Carteira",
-            },
-        ]
-
-        total_invested = await self.investment_manager.get_total_invested(
-            owner_id=self.user["user_id"]
-        )
-
-        response = GetInvestmentPerformanceResponse(
-            indexer_name=indexer.name,
-            data=[
-                InvestmentPerformanceDataSchema.model_validate(performance)
-                for performance in period_performance
-            ],
-            series=[ChartSeriesSchema.model_validate(serie) for serie in series],
-            total_invested=total_invested,
         )
 
         return response
