@@ -22,17 +22,53 @@ type GetAccountResponse {
 }
 
 type Account {
+    """
+    Account Id
+    """
     accountId: String!
+    """
+    Whether the account is active or not
+    """
     active: Boolean!
+    """
+    Bank Id
+    """
     bankId: String!
+    """
+    Account Nickname
+    """
     nickname: String!
+    """
+    Account Description
+    """
     description: String
+    """
+    Account Branch Number
+    """
     branch: String
+    """
+    Account Number
+    """
     number: String
+    """
+    Account Open Date
+    """
     openDate: String
+    """
+    Account Close Date
+    """
     closeDate: String
+    """
+    Account type id (checking, savings, etc.)
+    """
     typeId: String!
+    """
+    Account currency id
+    """
     currencyId: String!
+    """
+    Account Currency Symbol
+    """
     currencySymbol: String!
     # credit cards
 }
