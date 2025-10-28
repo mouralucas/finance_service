@@ -57,7 +57,9 @@ async def finance_dashboard(
     return JSONResponse(result, status_code=status_code)
 
 
-playground_html = ExplorerGraphiQL().html(None)
+playground_html = ExplorerGraphiQL(
+    title="Finance Service GraphQL API",
+).html(None)
 
 
 @router.get("", description="The GraphQL playground page")

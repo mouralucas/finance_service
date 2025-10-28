@@ -31,7 +31,9 @@ async def get_account_transactions(_, info: GraphQLResolveInfo, params):
     return transactions.model_dump(by_alias=True)
 
 
-async def create_account_transactions_resolver(_, info: GraphQLResolveInfo, transaction):
+async def create_account_transactions_resolver(
+    _, info: GraphQLResolveInfo, transaction
+):
     transaction_ = CreateAccountTransactionRequest.model_validate(transaction)
 
     new_transaction = await AccountService(
@@ -41,7 +43,9 @@ async def create_account_transactions_resolver(_, info: GraphQLResolveInfo, tran
     return new_transaction.model_dump(by_alias=True)
 
 
-async def update_account_transactions_resolver(_, info: GraphQLResolveInfo, transaction):
+async def update_account_transactions_resolver(
+    _, info: GraphQLResolveInfo, transaction
+):
     transaction_ = UpdateAccountTransactionRequest.model_validate(transaction)
 
     new_transaction = await AccountService(
