@@ -1,10 +1,11 @@
 from ariadne import MutationType, QueryType
+from graphql import GraphQLResolveInfo
 
 from schemas.request.finance import GetIndexerSeriesRequest
 from services.finance import FinanceService
 
 
-async def get_indexer_series_resolver(_, info, params):
+async def get_indexer_series_resolver(_, info: GraphQLResolveInfo, params):
     params = GetIndexerSeriesRequest.model_validate(params)
 
     indexer_series = await FinanceService(
@@ -14,7 +15,7 @@ async def get_indexer_series_resolver(_, info, params):
     return indexer_series.model_dump(by_alias=True)
 
 
-async def get_currencies_resolver(_, info):
+async def get_currencies_resolver(_, info: GraphQLResolveInfo):
     currencies = await FinanceService(
         session=info.context["session"], user=info.context["user"]
     ).get_currencies()
