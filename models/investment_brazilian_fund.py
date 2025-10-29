@@ -5,10 +5,14 @@ from decimal import Decimal
 from sqlalchemy import ForeignKey, Numeric
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from models.investment_deprecated import FundsBrModel, InvestmentBase, InvestmentStatementBaseModel
+from models.investment_deprecated import (
+    FundsBrModel,
+    InvestmentBaseModel,
+    InvestmentStatementBaseModel,
+)
 
 
-class InvestmentBrazilianFundsModel(InvestmentBase):
+class InvestmentBrazilianFundsModel(InvestmentBaseModel):
     """
     Created by: Lucas Penha de Moura - 02/04/2025
         This model is used to store the fund investments in Brazil.

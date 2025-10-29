@@ -18,11 +18,11 @@ from data_mock.investment.investment import (
 )
 from models.investment_deprecated import (
     InvestmentCategoryModel,
-    InvestmentModel,
     InvestmentObjectiveModel,
     InvestmentStatementModel,
     InvestmentTypeModel,
 )
+from models.investment import InvestmentModel
 from models.investment_brazilian_fund import (
     InvestmentBrazilianFundsModel,
     InvestmentBrazilianFundsStatementModel,

@@ -12,11 +12,11 @@ from starlette import status
 from models.core import BankModel, CurrencyModel, IndexerSeriesModel
 from models.investment_deprecated import (
     InvestmentCategoryModel,
-    InvestmentModel,
     InvestmentObjectiveModel,
     InvestmentStatementModel,
     InvestmentTypeModel,
 )
+from models.investment import InvestmentModel
 from services.utils.datetime import get_previous_period
 
 
