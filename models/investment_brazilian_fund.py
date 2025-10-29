@@ -5,7 +5,7 @@ from decimal import Decimal
 from sqlalchemy import ForeignKey, Numeric
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from models.investment import FundsBrModel, InvestmentBase, InvestmentStatementBaseModel
+from models.investment_deprecated import FundsBrModel, InvestmentBase, InvestmentStatementBaseModel
 
 
 class InvestmentBrazilianFundsModel(InvestmentBase):

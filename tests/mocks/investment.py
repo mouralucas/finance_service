@@ -16,7 +16,7 @@ from data_mock.investment.investment import (
     get_investment_statement_mock,
     get_settled_investment_mock,
 )
-from models.investment import (
+from models.investment_deprecated import (
     InvestmentCategoryModel,
     InvestmentModel,
     InvestmentObjectiveModel,

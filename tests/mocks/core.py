@@ -26,7 +26,7 @@ from models.core import (
     PeriodicityModel,
     TaxFeeModel,
 )
-from models.investment import FundsBrModel
+from models.investment_deprecated import FundsBrModel
 from schemas.core import (
     BankSchema,
     CategorySchema,

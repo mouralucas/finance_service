@@ -10,7 +10,7 @@ from sqlalchemy.orm import aliased
 from starlette import status
 
 from models.core import BankModel, CurrencyModel, IndexerSeriesModel
-from models.investment import (
+from models.investment_deprecated import (
     InvestmentCategoryModel,
     InvestmentModel,
     InvestmentObjectiveModel,

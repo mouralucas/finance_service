@@ -13,7 +13,7 @@ from backend.settings import settings
 from models.core import *
 from models.account import *
 from models.credit_card import *
-from models.investment import *
+from models.investment_deprecated import *
 from models.investment_brazilian_fund import *
 
 # this is the Alembic Config object, which provides
