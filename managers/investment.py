@@ -192,6 +192,40 @@ class InvestmentManager(BaseDataManager):
 
         return statements
 
+    async def get_statement_beta(self, investment_id: uuid.UUID):
+        m = InvestmentStatementModel
+
+        # Função de janela: pega o valor anterior de gross_amount dentro do mesmo investment_id
+        previous_gross = func.lag(m.gross_amount).over(
+            partition_by=m.investment_id,
+            order_by=m.period
+        )
+
+        stmt = (
+            select(
+                m.investment_id,
+                m.period,
+                m.gross_amount.label("current_amount"),
+                m.value_change,
+                m.percentage_change,
+                (m.gross_amount - previous_gross).label("variation_value"),
+                (
+                    ((m.gross_amount - previous_gross) / previous_gross * 100)
+                ).label("variation_percent"),
+            )
+        )
+        # stmt = stmt.where(m.period.between(202401, 202409))
+
+        stmt = stmt.order_by(m.investment_id, m.period)
+        
+        result = await self.get_all(stmt)
+        statements = (
+            [dict(statement) for statement in result]
+            if result
+            else None
+        )
+        return statements
+
     async def get_latest_investment_statements(self, investment_ids: list[uuid.UUID]):
         subquery = (
             select(
