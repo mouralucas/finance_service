@@ -1,10 +1,11 @@
 from ariadne import MutationType, QueryType
+from graphql import GraphQLResolveInfo
 
 from schemas.request.investment import GetInvestmentRequest, GetStatementRequest
 from services.investment_deprecated import InvestmentServiceDeprecated
 
 
-async def get_investments_resolver(_, info, params):
+async def get_investments_resolver(_, info: GraphQLResolveInfo, params):
     params_ = GetInvestmentRequest.model_validate(params)
 
     investments = await InvestmentServiceDeprecated(
@@ -14,7 +15,7 @@ async def get_investments_resolver(_, info, params):
     return investments.model_dump(by_alias=True)
 
 
-async def get_investment_statements_resolver(_, info, params):
+async def get_investment_statements_resolver(_, info: GraphQLResolveInfo, params):
     params_ = GetStatementRequest.model_validate(params)
 
     statements = await InvestmentServiceDeprecated(

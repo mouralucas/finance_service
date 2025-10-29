@@ -1,4 +1,5 @@
 from ariadne import MutationType, QueryType
+from graphql import GraphQLResolveInfo
 
 from schemas.request.credit_card import (
     GetCreditCardRequest,
@@ -7,7 +8,7 @@ from schemas.request.credit_card import (
 from services.credit_card import CreditCardService
 
 
-async def get_credit_cards_resolver(_, info, params):
+async def get_credit_cards_resolver(_, info: GraphQLResolveInfo, params):
     params_ = GetCreditCardRequest.model_validate(params)
 
     credit_cards = await CreditCardService(
@@ -17,7 +18,7 @@ async def get_credit_cards_resolver(_, info, params):
     return credit_cards.model_dump(by_alias=True)
 
 
-async def get_installments_due_dates_resolver(_, info, params):
+async def get_installments_due_dates_resolver(_, info: GraphQLResolveInfo, params):
     params_ = GetInstallmentsDueDatesRequest.model_validate(params)
 
     credit_cards = await CreditCardService(

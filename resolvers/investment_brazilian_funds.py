@@ -1,10 +1,11 @@
 from ariadne import MutationType, QueryType
+from graphql import GraphQLResolveInfo
 
 from schemas.request.investment import GetBrazilianFundInvestmentsRequest
 from services.investment_brazilian_fund import InvestmentBrazilianFundService
 
 
-async def get_investments_brazilian_funds(_, info, params):
+async def get_investments_brazilian_funds(_, info: GraphQLResolveInfo, params):
     params_ = GetBrazilianFundInvestmentsRequest.model_validate(params)
 
     investments = await InvestmentBrazilianFundService(

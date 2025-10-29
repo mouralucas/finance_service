@@ -1,4 +1,5 @@
 from ariadne import MutationType, QueryType
+from graphql import GraphQLResolveInfo
 
 from schemas.request.account import (
     CreateAccountTransactionRequest,
@@ -10,7 +11,7 @@ from schemas.request.account import (
 from services.account import AccountService
 
 
-async def get_accounts_resolver(_, info, params):
+async def get_accounts_resolver(_, info: GraphQLResolveInfo, params):
     params_ = GetAccountRequest.model_validate(params)
 
     accounts = await AccountService(
@@ -20,7 +21,7 @@ async def get_accounts_resolver(_, info, params):
     return accounts.model_dump(by_alias=True)
 
 
-async def get_account_transactions(_, info, params):
+async def get_account_transactions(_, info: GraphQLResolveInfo, params):
     params = GetAccountTransactionRequest.model_validate(params)
 
     transactions = await AccountService(
@@ -30,7 +31,9 @@ async def get_account_transactions(_, info, params):
     return transactions.model_dump(by_alias=True)
 
 
-async def create_account_transactions_resolver(_, info, transaction):
+async def create_account_transactions_resolver(
+    _, info: GraphQLResolveInfo, transaction
+):
     transaction_ = CreateAccountTransactionRequest.model_validate(transaction)
 
     new_transaction = await AccountService(
@@ -40,7 +43,9 @@ async def create_account_transactions_resolver(_, info, transaction):
     return new_transaction.model_dump(by_alias=True)
 
 
-async def update_account_transactions_resolver(_, info, transaction):
+async def update_account_transactions_resolver(
+    _, info: GraphQLResolveInfo, transaction
+):
     transaction_ = UpdateAccountTransactionRequest.model_validate(transaction)
 
     new_transaction = await AccountService(
@@ -50,7 +55,7 @@ async def update_account_transactions_resolver(_, info, transaction):
     return new_transaction.model_dump(by_alias=True)
 
 
-async def get_account_balance_resolver(_, info, params):
+async def get_account_balance_resolver(_, info: GraphQLResolveInfo, params):
     params_ = GetBalanceRequest.model_validate(params)
 
     balance = await AccountService(

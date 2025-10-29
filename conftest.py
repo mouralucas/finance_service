@@ -2,7 +2,7 @@ import uuid
 
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
-from rolf_common.models import Base
+from rolf_common.models import SQLModel
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import get_user
 
@@ -20,8 +20,8 @@ async def test_session():
         """
         For testing, all tables are dropped and then created again
         """
-        await connection.run_sync(Base.metadata.drop_all)
-        await connection.run_sync(Base.metadata.create_all)
+        await connection.run_sync(SQLModel.metadata.drop_all)
+        await connection.run_sync(SQLModel.metadata.create_all)
 
     async with test_sessionmanager.session() as session:
         yield session
