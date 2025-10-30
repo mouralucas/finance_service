@@ -13,10 +13,9 @@ from models.core import BankModel, CurrencyModel, IndexerSeriesModel
 from models.investment_deprecated import (
     InvestmentCategoryModel,
     InvestmentObjectiveModel,
-    InvestmentStatementModel,
     InvestmentTypeModel,
 )
-from models.investment import InvestmentModel
+from models.investment import InvestmentModel, InvestmentStatementModel
 from services.utils.datetime import get_previous_period
 
 

@@ -49,54 +49,6 @@ class InvestmentTypeModel(SQLModel):
     )
 
 
-class InvestmentStatementModel(SQLModel):
-    """
-    Created by: Lucas Penha de Moura - 11/08/2024
-        This model stores the values of each investment at the end of each month
-        The fee and tax stored here is only for reference, in case the investment
-            were liquidated that day
-    """
-
-    __tablename__ = "investment_statement"
-
-    investment_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("investment.id"))
-    investment: Mapped["InvestmentModel"] = relationship(
-        foreign_keys=[investment_id], lazy="subquery"
-    )
-    period: Mapped[int] = mapped_column("period")
-    previous_amount: Mapped[Decimal] = mapped_column(
-        "start_amount", Numeric(precision=15, scale=5), default=0
-    )
-    gross_amount: Mapped[Decimal] = mapped_column(
-        "gross_amount", Numeric(precision=15, scale=5)
-    )
-    total_tax: Mapped[Decimal] = mapped_column(
-        "total_tax", Numeric(precision=15, scale=5), default=0
-    )
-    total_fee: Mapped[Decimal] = mapped_column(
-        "total_fee", Numeric(precision=15, scale=5), default=0
-    )
-    net_amount: Mapped[Decimal] = mapped_column(
-        "net_amount", Numeric(precision=15, scale=5)
-    )
-    tax_detail: Mapped[list[dict]] = mapped_column("tax_detail", JSON, nullable=True)
-    fee_detail: Mapped[list[dict]] = mapped_column("fee_detail", JSON, nullable=True)
-    reference_date: Mapped[date] = mapped_column("reference_date")
-    at_maturity: Mapped[bool] = mapped_column("at_maturity", default=False)
-    value_change: Mapped[Decimal] = mapped_column(
-        "value_change", Numeric(precision=15, scale=5), nullable=True
-    )
-    percentage_change: Mapped[Decimal] = mapped_column(
-        "percentage_change", Numeric(precision=9, scale=3), nullable=True
-    )
-    index_percent_change: Mapped[Decimal] = mapped_column(
-        "index_change",
-        Numeric(precision=9, scale=3),
-        nullable=True,
-        doc="How mach the index changed in the period",
-    )
-
-
 class InvestmentObjectiveModel(SQLModel):
     __tablename__ = "investment_objective"
 

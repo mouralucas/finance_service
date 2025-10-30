@@ -2,19 +2,12 @@ from decimal import Decimal
 from rolf_common.models import SQLModel
 import uuid
 from datetime import date
-from models.investment_deprecated import InvestmentBaseModel
+from models.investment_deprecated import InvestmentBaseModel, InvestmentStatementBaseModel
 from sqlalchemy import ForeignKey, Numeric, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
 class InvestmentModel(InvestmentBaseModel):
-    """
-    Created by: Lucas Penha de Moura - 11/08/2024
-        This model stores the investment itself, using the values in the contract.
-        It does not show the position of the investment, although you can show the
-            amount at the end (settlement_amount)
-    """
-
     __tablename__ = "investment"
 
     transaction_date: Mapped[date] = mapped_column("transaction_date")
@@ -40,4 +33,26 @@ class InvestmentModel(InvestmentBaseModel):
     # TODO: check where this is used and remove the dependency
     objective: Mapped["InvestmentObjectiveModel"] = relationship(
         "InvestmentObjectiveModel", foreign_keys="InvestmentModel.objective_id", lazy="subquery"
+    )
+
+
+class InvestmentStatementModel(InvestmentStatementBaseModel):
+    __tablename__ = "investment_statement"
+
+    investment_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("investment.id"))
+    investment: Mapped["InvestmentModel"] = relationship(
+        foreign_keys=[investment_id], lazy="subquery"
+    )
+    at_maturity: Mapped[bool] = mapped_column("at_maturity", default=False)
+    value_change: Mapped[Decimal] = mapped_column(
+        "value_change", Numeric(precision=15, scale=5), nullable=True
+    )
+    percentage_change: Mapped[Decimal] = mapped_column(
+        "percentage_change", Numeric(precision=9, scale=3), nullable=True
+    )
+    index_percent_change: Mapped[Decimal] = mapped_column(
+        "index_change",
+        Numeric(precision=9, scale=3),
+        nullable=True,
+        doc="How mach the index changed in the period",
     )

@@ -12,9 +12,8 @@ from managers.account import AccountManager
 from managers.investment import InvestmentManager
 from models.investment_deprecated import (
     InvestmentObjectiveModel,
-    InvestmentStatementModel,
 )
-from models.investment import InvestmentModel
+from models.investment import InvestmentModel, InvestmentStatementModel
 from schemas.investment_deprecated import (
     InvestmentAllocationSchema,
     InvestmentObjectiveSchema,
