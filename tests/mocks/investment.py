@@ -16,15 +16,15 @@ from data_mock.investment.investment import (
     get_investment_statement_mock,
     get_settled_investment_mock,
 )
-from models.investment_deprecated import (
-    InvestmentCategoryModel,
-    InvestmentObjectiveModel,
-    InvestmentTypeModel,
-)
 from models.investment import InvestmentModel, InvestmentStatementModel
 from models.investment_brazilian_fund import (
     InvestmentBrazilianFundsModel,
     InvestmentBrazilianFundsStatementModel,
+)
+from models.investment_deprecated import (
+    InvestmentCategoryModel,
+    InvestmentObjectiveModel,
+    InvestmentTypeModel,
 )
 from schemas.investment_brazilian_fund import (
     InvestmentBrazilianFundSchema,

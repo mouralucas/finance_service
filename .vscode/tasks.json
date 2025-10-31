@@ -14,7 +14,7 @@
     {
       "label": "Lint Code (Ruff)",
       "type": "shell",
-      "command": "${command:python.interpreterPath} -m ruff check .",
+      "command": "${command:python.interpreterPath} -m ruff check . --fix",
       "group": "build",
       "presentation": {
         "reveal": "always",

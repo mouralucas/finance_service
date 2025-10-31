@@ -1,10 +1,14 @@
-from decimal import Decimal
-from rolf_common.models import SQLModel
 import uuid
 from datetime import date
-from models.investment_deprecated import InvestmentBaseModel, InvestmentStatementBaseModel
-from sqlalchemy import ForeignKey, Numeric, String, Text, text
+from decimal import Decimal
+
+from sqlalchemy import ForeignKey, Numeric, String, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from models.investment_deprecated import (
+    InvestmentBaseModel,
+    InvestmentStatementBaseModel,
+)
 
 
 class InvestmentModel(InvestmentBaseModel):
@@ -31,8 +35,10 @@ class InvestmentModel(InvestmentBaseModel):
         "settlement_amount", Numeric(precision=18, scale=8), nullable=True
     )
     # TODO: check where this is used and remove the dependency
-    objective: Mapped["InvestmentObjectiveModel"] = relationship(
-        "InvestmentObjectiveModel", foreign_keys="InvestmentModel.objective_id", lazy="subquery"
+    objective: Mapped["InvestmentObjectiveModel"] = relationship(  # noqa: F821
+        "InvestmentObjectiveModel",
+        foreign_keys="InvestmentModel.objective_id",
+        lazy="subquery",
     )
 
 

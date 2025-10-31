@@ -10,12 +10,12 @@ from sqlalchemy.orm import aliased
 from starlette import status
 
 from models.core import BankModel, CurrencyModel, IndexerSeriesModel
+from models.investment import InvestmentModel, InvestmentStatementModel
 from models.investment_deprecated import (
     InvestmentCategoryModel,
     InvestmentObjectiveModel,
     InvestmentTypeModel,
 )
-from models.investment import InvestmentModel, InvestmentStatementModel
 from services.utils.datetime import get_previous_period
 
 

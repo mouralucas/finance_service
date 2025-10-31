@@ -62,7 +62,7 @@ class InvestmentObjectiveModel(SQLModel):
     currency_id: Mapped[str] = mapped_column(ForeignKey("currency.id"))
 
     # Investment reverse relation
-    investments: Mapped[list["InvestmentModel"]] = relationship(
+    investments: Mapped[list["InvestmentModel"]] = relationship(  # noqa: F821
         back_populates="objective", lazy="subquery"
     )
 

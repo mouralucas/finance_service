@@ -10,10 +10,10 @@ from starlette import status
 
 from managers.account import AccountManager
 from managers.investment import InvestmentManager
+from models.investment import InvestmentModel, InvestmentStatementModel
 from models.investment_deprecated import (
     InvestmentObjectiveModel,
 )
-from models.investment import InvestmentModel, InvestmentStatementModel
 from schemas.investment_deprecated import (
     InvestmentAllocationSchema,
     InvestmentObjectiveSchema,
