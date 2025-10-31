@@ -3,7 +3,7 @@ from rolf_common.models import SQLModel
 import uuid
 from datetime import date
 from models.investment_deprecated import InvestmentBaseModel, InvestmentStatementBaseModel
-from sqlalchemy import ForeignKey, Numeric, String, Text
+from sqlalchemy import ForeignKey, Numeric, String, Text, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
@@ -54,5 +54,11 @@ class InvestmentStatementModel(InvestmentStatementBaseModel):
         "index_change",
         Numeric(precision=9, scale=3),
         nullable=True,
-        doc="How mach the index changed in the period",
+        doc="How much the index changed in the period",
+    )
+    contribution: Mapped[Decimal] = mapped_column(
+        "contribution",
+        Numeric(precision=18, scale=8),
+        server_default=text("0"),
+        doc="The amount of money that went in or out of the investment in the period",
     )
