@@ -224,10 +224,10 @@ class InvestmentStatementSchema(BaseModel):
     #   this fields to required
     #   update tests also
     value_change: float | None = Field(
-        None, description="How much the value change from last statement"
+        default=0, description="How much the value change from last statement"
     )
-    percentage_change: float = Field(
-        ..., description="How much, in %, the value change from last statement"
+    percentage_change: float | None = Field(
+        default=0, description="How much, in %, the value change from last statement"
     )
     net_amount: float = Field(
         ..., description="The net amount of the investment in the period"
