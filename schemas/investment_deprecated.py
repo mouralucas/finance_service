@@ -202,6 +202,9 @@ class InvestmentStatementSchema(BaseModel):
     previous_amount: float = Field(
         ..., description="The previous amount for the investment"
     )
+    contribution: float = Field(
+        ..., description="The contribution amount for the investment in the period"
+    )
     gross_amount: float = Field(
         ..., description="The gross amount of the investment in the period"
     )
@@ -223,8 +226,8 @@ class InvestmentStatementSchema(BaseModel):
     value_change: float | None = Field(
         None, description="How much the value change from last statement"
     )
-    percentage_change: float | None = Field(
-        None, description="How much, in %, the value change from last statement"
+    percentage_change: float = Field(
+        ..., description="How much, in %, the value change from last statement"
     )
     net_amount: float = Field(
         ..., description="The net amount of the investment in the period"

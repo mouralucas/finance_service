@@ -198,22 +198,40 @@ class InvestmentManager(BaseDataManager):
             partition_by=m.investment_id, order_by=m.period
         )
 
-        stmt = select(
-            m.investment_id,
-            m.period,
-            m.gross_amount.label("current_amount"),
-            m.value_change,
-            m.percentage_change,
-            (m.gross_amount - previous_gross).label("variation_value"),
-            ((m.gross_amount - previous_gross) / previous_gross * 100).label(
-                "variation_percent"
-            ),
+        adjusted_previous = func.coalesce(previous_gross, 0) + func.coalesce(
+            m.contribution, 0
         )
-        # stmt = stmt.where(m.period.between(202401, 202409))
 
-        stmt = stmt.order_by(m.investment_id, m.period)
+        variation_value = m.gross_amount - adjusted_previous
 
-        result = await self.get_all(stmt)
+        variation_percent = case(
+            (adjusted_previous != 0, (variation_value / adjusted_previous * 100)),
+            else_=None,
+        )
+
+        stmt = (
+            select(
+                m.id,
+                m.investment_id,
+                m.period,
+                func.coalesce(previous_gross, 0).label("previous_amount"),
+                m.gross_amount,
+                m.contribution,
+                m.total_tax,
+                m.tax_detail,
+                m.total_fee,
+                m.fee_detail,
+                m.reference_date,
+                m.at_maturity,
+                variation_value.label("value_change"),
+                variation_percent.label("percentage_change"),
+                m.net_amount,
+            )
+            .where(m.investment_id == investment_id)
+            .order_by(m.investment_id, m.period)
+        )
+
+        result: list[RowMapping] | None = await self.get_all(stmt)
         statements = [dict(statement) for statement in result] if result else None
         return statements
 
