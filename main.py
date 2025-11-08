@@ -12,11 +12,11 @@ from routers import (
     core,
     credit_card,
     finance,
+    graphql,
     integration,
     investment,
     investment_brazilian_funds,
 )
-from routers_graphql import main
 
 
 @asynccontextmanager
@@ -63,4 +63,4 @@ app.include_router(integration.router)
 app.include_router(finance.router)
 app.include_router(core.router)
 
-app.include_router(main.router)
+app.include_router(graphql.router)
