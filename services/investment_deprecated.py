@@ -333,8 +333,6 @@ class InvestmentServiceDeprecated(BaseService):
             end_period=params.end_period,
         )
 
-        # statement = await self.investment_manager.get_statement_beta(investment_id=params.investment_id)
-        
         response = GetStatementResponse(
             quantity=len(statement) if statement else 0,
             statement=(
