@@ -21,21 +21,6 @@ def get_period(reference_date: date | datetime) -> int:
     return year * 100 + month
 
 
-# def get_previous_period(period: int) -> int:
-#     year = period // 100
-#     month = period % 100
-#
-#     if month == 1:
-#         previous_period_year = year - 1
-#         previous_period_month = 12
-#     else:
-#         previous_period_year = year
-#         previous_period_month = month - 1
-#
-#     previous_period = (previous_period_year * 100) + previous_period_month
-#     return previous_period
-
-
 def get_previous_period(period: int = get_current_period(), offset: int = 1) -> int:
     """
     Created by: Lucas Penha de Moura - 25/10/2024
