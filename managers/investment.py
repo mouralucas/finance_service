@@ -49,7 +49,7 @@ class InvestmentManager(BaseDataManager):
 
     async def get_investment_by_id(
         self, investment_id: uuid.UUID, raise_exception: bool = False
-    ) -> InvestmentModel | None:
+    ) -> InvestmentModel:
         investment = await self.get_by_id(InvestmentModel, investment_id)
 
         if not investment and raise_exception:

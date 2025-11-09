@@ -5,6 +5,9 @@ extend type Query {
     getInvestmentPerformance(params: GetInvestmentPerformanceInput): GetInvestmentPerformanceResponse
 }
 
+extend type Mutation {
+    createInvestmentStatement(statement: CreateInvestmentStatementInput): CreateInvestmentStatementResponse
+}
 
 input GetInvestmentPerformanceInput {
     investmentId: String
@@ -13,4 +16,26 @@ input GetInvestmentPerformanceInput {
 type GetInvestmentPerformanceResponse {
     xLabel: [String]! 
     data: [LineChartSeries!]!
+}
+
+input TaxFeeDetail {
+    taxFeeId: String!
+    amount: Float!
+    currencyId: String!
+}
+
+input CreateInvestmentStatementInput {
+    investmentId: String!
+    period: Int!
+    contribution: Float!
+    referenceDate: Date!
+    grossAmount: Float!
+    netAmount: Float!
+    taxDetail: [TaxFeeDetail]
+    feeDedtail: [TaxFeeDetail]
+}
+
+type CreateInvestmentStatementResponse {
+    created: Boolean!
+    statementId: String!
 }

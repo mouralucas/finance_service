@@ -51,10 +51,8 @@ class CreateStatementResponse(BaseModel):
         alias_generator=AliasGenerator(serialization_alias=to_camel),
     )
 
-    investment_statement: InvestmentStatementSchema = Field(
-        ..., description="The investment statement"
-    )
-
+    created: bool = Field(..., description="Indicates if the statement was created")
+    statement_id: str = Field(..., description="The ID of the created statement")
 
 class GetStatementResponse(BaseModel):
     quantity: int = Field(..., description="The total number of statement returned")

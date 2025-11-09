@@ -14,7 +14,14 @@ async def get_investment_performance_resolver(_, info, params):
     return performance.model_dump(by_alias=True)
 
 
+async def create_statement_resolver(_, info, statement):
+    result = await InvestmentService(
+        session=info.context["session"], user=info.context["user"]
+    ).create_statement(statement=statement)
+
+
 def bind_investment_resovlers(query: QueryType, mutation: MutationType):
     query.set_field(
         "getInvestmentPerformance", resolver=get_investment_performance_resolver
     )
+    mutation.set_field("createInvestmentStatement", resolver=create_statement_resolver)

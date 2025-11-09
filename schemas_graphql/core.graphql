@@ -2,7 +2,6 @@ extend type Query {
     getCategories: GetCategoryResponse
 }
 
-
 type GetCategoryResponse {
     quantity: Int!
     categories: [Category]!
