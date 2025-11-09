@@ -54,6 +54,7 @@ class CreateStatementResponse(BaseModel):
     created: bool = Field(..., description="Indicates if the statement was created")
     statement_id: str = Field(..., description="The ID of the created statement")
 
+
 class GetStatementResponse(BaseModel):
     quantity: int = Field(..., description="The total number of statement returned")
     statement: list[InvestmentStatementSchema] | None = Field(

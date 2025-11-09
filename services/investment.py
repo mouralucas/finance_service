@@ -2,6 +2,7 @@ from fastapi import HTTPException
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import BaseService
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette import status
 
 from managers.finance import FinanceManager
 from managers.investment import InvestmentManager
@@ -11,8 +12,6 @@ from schemas.request.investment import GetPerformanceRequest
 from schemas.response.investment import (
     GetInvestmentPerformanceResponseV2,
 )
-from starlette import status
-
 from services.utils.datetime import get_period
 
 

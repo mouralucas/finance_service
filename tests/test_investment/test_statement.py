@@ -55,7 +55,7 @@ async def test_create_first_investment_statement(
     assert response.status_code == status.HTTP_201_CREATED
 
     data = response.json()
-    assert "created"in data
+    assert "created" in data
     assert data["created"] is True
 
 
