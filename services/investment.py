@@ -140,7 +140,6 @@ class InvestmentService(BaseService):
         )
 
         if not performance_portfolio:
-            # TODO: add new schema response
             return GetInvestmentPerformanceResponseV2(
                 x_label=[],
                 data=[],

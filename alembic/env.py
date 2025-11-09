@@ -13,8 +13,9 @@ from backend.settings import settings
 from models.core import *
 from models.account import *
 from models.credit_card import *
-from models.investment import *
+from models.investment_deprecated import *
 from models.investment_brazilian_fund import *
+from models.investment import *
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -25,7 +26,7 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-target_metadata = rolf_common.models.Base.metadata
+target_metadata = rolf_common.models.SQLModel.metadata
 
 
 # other values from the config, defined by the needs of env.py,

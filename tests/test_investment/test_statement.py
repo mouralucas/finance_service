@@ -55,27 +55,8 @@ async def test_create_first_investment_statement(
     assert response.status_code == status.HTTP_201_CREATED
 
     data = response.json()
-    assert "investmentStatement" in data
-    assert "investmentId" in data["investmentStatement"]
-    assert data["investmentStatement"]["investmentId"] == str(investment_id)
-    assert "period" in data["investmentStatement"]
-    assert data["investmentStatement"]["period"] == period
-    assert "grossAmount" in data["investmentStatement"]
-    assert float(data["investmentStatement"]["grossAmount"]) == gross_amount
-    assert "totalTax" in data["investmentStatement"]
-    assert float(data["investmentStatement"]["totalTax"]) == sum(
-        tax["amount"] for tax in tax_details
-    )
-    assert "totalFee" in data["investmentStatement"]
-    assert float(data["investmentStatement"]["totalFee"]) == 0
-    assert "netAmount" in data["investmentStatement"]
-    assert float(data["investmentStatement"]["netAmount"]) == net_amount
-
-    assert "taxDetail" in data["investmentStatement"]
-    assert type(data["investmentStatement"]["taxDetail"]) is list
-    assert "feeDetail" in data["investmentStatement"]
-    assert data["investmentStatement"]["feeDetail"] is None
-    # TODO: add test to tax and fee details
+    assert "created"in data
+    assert data["created"] is True
 
 
 @pytest.mark.asyncio

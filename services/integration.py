@@ -21,7 +21,7 @@ class BcbIntegrationService:
         self.finance_manager = FinanceManager(self.session)
 
     async def create_indexer_data(self, params: CreateIndexerSeriesRequest):
-
+        # TODO: refactor this method to be more clean
         indexer = await self.finance_manager.get_indexer_by_id(
             indexer_id=params.indexer_id, raise_exception=True
         )

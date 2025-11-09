@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from managers.account import AccountManager
 from managers.credit_card import CreditCardManager
 from managers.finance import FinanceManager
-from models.investment import FundsBrModel
+from models.investment_deprecated import FundsBrModel
 from schemas.core import (
     BankSchema,
     CurrencySchema,

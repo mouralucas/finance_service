@@ -45,7 +45,7 @@ from models.core import (
     TaxFeeModel,
 )
 from models.credit_card import CreditCardModel
-from models.investment import (
+from models.investment_deprecated import (
     FundsBrModel,
     InvestmentCategoryModel,
     InvestmentModel,

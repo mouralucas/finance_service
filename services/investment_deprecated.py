@@ -10,10 +10,9 @@ from starlette import status
 
 from managers.account import AccountManager
 from managers.investment import InvestmentManager
-from models.investment import (
-    InvestmentModel,
+from models.investment import InvestmentModel, InvestmentStatementModel
+from models.investment_deprecated import (
     InvestmentObjectiveModel,
-    InvestmentStatementModel,
 )
 from schemas.investment_deprecated import (
     InvestmentAllocationSchema,
@@ -311,9 +310,8 @@ class InvestmentServiceDeprecated(BaseService):
         new_statement = await self.investment_manager.create_statement(new_statement)
 
         response = CreateStatementResponse(
-            investment_statement=InvestmentStatementSchema.model_validate(
-                new_statement
-            ),
+            created=True,
+            statement_id=str(new_statement.id),
         )
 
         return response
@@ -326,11 +324,8 @@ class InvestmentServiceDeprecated(BaseService):
         :param params: The object of GetStatementRequest with available parameters
         :return:
         """
-        statement = await InvestmentManager(self.session).get_statement(
-            investment_id=params.investment_id,
-            period=params.period,
-            start_period=params.start_period,
-            end_period=params.end_period,
+        statement = await self.investment_manager.get_statement(
+            investment_id=params.investment_id
         )
 
         response = GetStatementResponse(

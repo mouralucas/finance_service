@@ -10,11 +10,10 @@ from sqlalchemy.orm import aliased
 from starlette import status
 
 from models.core import BankModel, CurrencyModel, IndexerSeriesModel
-from models.investment import (
+from models.investment import InvestmentModel, InvestmentStatementModel
+from models.investment_deprecated import (
     InvestmentCategoryModel,
-    InvestmentModel,
     InvestmentObjectiveModel,
-    InvestmentStatementModel,
     InvestmentTypeModel,
 )
 from services.utils.datetime import get_previous_period
@@ -159,40 +158,7 @@ class InvestmentManager(BaseDataManager):
 
         return statement
 
-    async def get_statement(
-        self,
-        investment_id: uuid.UUID,
-        period: int | None = None,
-        start_period: int | None = None,
-        end_period: int | None = None,
-    ) -> list[InvestmentStatementModel] | None:
-        # TODO: get also cdi or the selected indexer with the statement for each period
-        #  Add a join to get currency_id from investment
-        query = (
-            select(InvestmentStatementModel)
-            .where(InvestmentStatementModel.investment_id == investment_id)
-            .order_by(InvestmentStatementModel.period.desc())
-        )
-
-        if period:
-            query = query.where(InvestmentStatementModel.period == period)
-
-        if start_period:
-            query = query.where(InvestmentStatementModel.period >= start_period)
-
-        if end_period:
-            query = query.where(InvestmentStatementModel.period <= end_period)
-
-        result: list[RowMapping] | None = await self.get_all(query, unique_result=True)
-        statements = (
-            [statement["InvestmentStatementModel"] for statement in result]
-            if result
-            else None
-        )
-
-        return statements
-
-    async def get_statement_beta(self, investment_id: uuid.UUID):
+    async def get_statement(self, investment_id: uuid.UUID):
         m = InvestmentStatementModel
 
         previous_gross = func.lag(m.gross_amount).over(
@@ -200,14 +166,22 @@ class InvestmentManager(BaseDataManager):
         )
 
         stmt = select(
+            m.id,
+            m.previous_amount,
             m.investment_id,
+            m.contribution,
             m.period,
-            m.gross_amount.label("current_amount"),
-            m.value_change,
-            m.percentage_change,
-            (m.gross_amount - previous_gross).label("variation_value"),
+            m.gross_amount,
+            m.net_amount,
+            m.total_tax,
+            m.total_fee,
+            m.tax_detail,
+            m.fee_detail,
+            m.reference_date,
+            m.at_maturity,
+            (m.gross_amount - previous_gross).label("value_change"),
             ((m.gross_amount - previous_gross) / previous_gross * 100).label(
-                "variation_percent"
+                "percent_change"
             ),
         )
         # stmt = stmt.where(m.period.between(202401, 202409))

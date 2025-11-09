@@ -40,6 +40,5 @@ class TestInvestmentStatement:
 
         data = response.json()
 
-        assert "investmentStatement" in data
-        assert "investmentId" in data["investmentStatement"]
-        assert data["investmentStatement"]["investmentId"] == str(investments[0].id)
+        assert "created" in data
+        assert data["created"] is True
