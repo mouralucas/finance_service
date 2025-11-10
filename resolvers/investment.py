@@ -1,6 +1,6 @@
 from ariadne import MutationType, QueryType
 
-from schemas.request.investment import GetPerformanceRequest
+from schemas.request.investment import CreateStatementRequest, GetPerformanceRequest
 from services.investment import InvestmentService
 
 
@@ -15,9 +15,13 @@ async def get_investment_performance_resolver(_, info, params):
 
 
 async def create_statement_resolver(_, info, statement):
+    statement_ = CreateStatementRequest.model_validate(statement)
+
     result = await InvestmentService(
         session=info.context["session"], user=info.context["user"]
-    ).create_statement(statement=statement)
+    ).create_statement(statement=statement_)
+
+    return result.model_dump(by_alias=True)
 
 
 def bind_investment_resovlers(query: QueryType, mutation: MutationType):

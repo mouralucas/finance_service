@@ -225,6 +225,7 @@ class SettleInvestmentRequest(BaseModel):
 
 
 class CreateStatementRequest(BaseModel):
+    # TODO: use CreateInvestmentStatementBaseRequest
     model_config = ConfigDict(
         from_attributes=True, alias_generator=AliasGenerator(alias=to_camel)
     )
@@ -238,6 +239,7 @@ class CreateStatementRequest(BaseModel):
         description="The period of the statement",
         examples=["202408"],
     )
+    contribution: float = Field(0, description="The contribution amount for the period")
     reference_date: datetime.date = Field(
         ...,
         description="The date when the statement was calculated, \

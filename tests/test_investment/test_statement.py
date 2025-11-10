@@ -35,8 +35,9 @@ async def test_create_first_investment_statement(
     investment_id = str(investments[0].id)
     period = get_period(investments[0].transaction_date)
     gross_amount = 35.10
+    tax_total = 0.21
     tax_details = [
-        {"currencyId": "BRL", "taxFeeId": str(create_tax[0].id), "amount": 0.21}
+        {"currencyId": "BRL", "taxFeeId": str(create_tax[0].id), "amount": tax_total}
     ]
 
     net_amount = gross_amount - sum(tax["amount"] for tax in tax_details)
@@ -57,6 +58,29 @@ async def test_create_first_investment_statement(
     data = response.json()
     assert "created" in data
     assert data["created"] is True
+
+    payload = {"investmentId": investment_id}
+    response = await client.get("/investment/statement", params=payload)
+
+    assert response.status_code == status.HTTP_200_OK
+    data = response.json()
+
+    assert "statement" in data
+    assert len(data["statement"]) == 1
+    for statement in data["statement"]:
+        assert "investmentId" in statement
+        assert statement["investmentId"] == investment_id
+
+        assert "contribution" in statement
+        assert statement["contribution"] == investments[0].amount
+
+        assert "taxDetail" in statement
+        assert type(statement["taxDetail"]) is list
+        assert "feeDetail" in statement
+
+        assert "totalTax" in statement
+        assert statement["totalTax"] == tax_total
+        assert "totalFee" in statement
 
 
 @pytest.mark.asyncio

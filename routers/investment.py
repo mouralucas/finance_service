@@ -134,9 +134,9 @@ async def create_statement(
     session: AsyncSession = Depends(get_session),
     user: RequiredUser = Security(get_user),
 ) -> CreateStatementResponse:
-    return await InvestmentServiceDeprecated(
-        session=session, user=user
-    ).create_statement(statement=statement)
+    return await InvestmentService(session=session, user=user).create_statement(
+        statement=statement
+    )
 
 
 @router.get(

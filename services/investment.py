@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from fastapi import HTTPException
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import BaseService
@@ -6,13 +8,14 @@ from starlette import status
 
 from managers.finance import FinanceManager
 from managers.investment import InvestmentManager
-from models.investment import InvestmentModel
+from models.investment import InvestmentModel, InvestmentStatementModel
 from schemas.core import ChartSeriesSchemaV2
-from schemas.request.investment import GetPerformanceRequest
+from schemas.request.investment import CreateStatementRequest, GetPerformanceRequest
 from schemas.response.investment import (
+    CreateStatementResponse,
     GetInvestmentPerformanceResponseV2,
 )
-from services.utils.datetime import get_period
+from services.utils.datetime import get_period, get_previous_period
 
 
 class InvestmentService(BaseService):
@@ -22,11 +25,11 @@ class InvestmentService(BaseService):
         self.investment_manager = InvestmentManager(session=self.session)
 
     # Statement
-    async def create_statement(self, statement: dict):
+    async def create_statement(self, statement: CreateStatementRequest):
         # Get the investment
         investment: InvestmentModel = (
             await self.investment_manager.get_investment_by_id(
-                statement["investment_id"], raise_exception=True
+                statement.investment_id, raise_exception=True
             )
         )
 
@@ -36,27 +39,24 @@ class InvestmentService(BaseService):
         )
         last_statement = previous_statements[0] if previous_statements else None
 
-        # TODO: add check to verify if period already exists (if so return the values)
-
-        # If it is the first statement period must be the same as the investment
-        if (
-            not previous_statements
-            and get_period(investment.transaction_date) != statement.period
+        # The first statement should be the same period as the transaction date
+        if not last_statement and statement.period != get_period(
+            investment.transaction_date
         ):
             raise HTTPException(
                 status_code=status.HTTP_412_PRECONDITION_FAILED,
                 detail="First statement period must be the sabe as transaction period",
             )
 
-        # check if the statement period is less then investment
+        # The statement should not be before the last statement
         if statement.period < get_period(investment.transaction_date):
             raise HTTPException(
                 status_code=status.HTTP_412_PRECONDITION_FAILED,
                 detail="Statement period cannot be before transaction period",
             )
 
-        # Check if the statement from last period exists
-        if last_statement and last_statement.period != get_previous_period(
+        # The statement should be the following period of the last statement
+        if last_statement and last_statement["period"] != get_previous_period(
             statement.period
         ):
             raise HTTPException(
@@ -69,53 +69,40 @@ class InvestmentService(BaseService):
             **statement.model_dump(exclude={"tax_details", "fee_details"})
         )
 
+        # The fist statement have the total invested as contribution
+        if not last_statement:
+            new_statement.contribution = investment.amount
+
         # Serialize the tax/fee information
         new_statement.tax_detail = (
             [tax.model_dump(mode="json") for tax in statement.tax_details]
             if statement.tax_details
-            else None
+            else []
         )
         new_statement.fee_detail = (
             [fee.model_dump(mode="json") for fee in statement.fee_details]
             if statement.fee_details
-            else None
-        )
-
-        # Link the statement with the user
-        new_statement.owner_id = self.user["user_id"]
-
-        # Set previous amount
-        new_statement.previous_amount = (
-            last_statement.gross_amount if last_statement else investment.amount
+            else []
         )
 
         # Set the tax/fee totals
         new_statement.total_tax = (
-            sum(tax.amount for tax in statement.tax_details)
+            Decimal(sum(tax.amount for tax in statement.tax_details))
             if statement.tax_details
-            else 0.0
+            else Decimal("0")
         )
         new_statement.total_fee = (
-            sum(fee.amount for fee in statement.fee_details)
+            Decimal(sum(fee.amount for fee in statement.fee_details))
             if statement.fee_details
-            else 0.0
+            else Decimal("0")
         )
 
-        # Set the statistics
-        new_statement.value_change = (
-            new_statement.gross_amount - new_statement.previous_amount
-        )
-        new_statement.percentage_change = (
-            new_statement.value_change / new_statement.previous_amount * Decimal("100")
-        )
-
-        # Persist data in database
+        # Persist data
         new_statement = await self.investment_manager.create_statement(new_statement)
 
         response = CreateStatementResponse(
-            investment_statement=InvestmentStatementSchema.model_validate(
-                new_statement
-            ),
+            created=True,
+            statement_id=str(new_statement.id),
         )
 
         return response
