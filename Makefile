@@ -18,3 +18,8 @@ upgrade-database:
 # Create basic data in docker database
 insert-data:
 	source venv/bin/activate && $(PYTHON) populate-database.py
+
+
+# Lint GraphQL schema files (requires node/npm). Uses npx so installation isn't mandatory
+lint-graphql:
+	npx graphql-schema-linter 'schemas_graphql/**/*.graphql'

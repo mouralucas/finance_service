@@ -1,0 +1,11 @@
+{
+    "name": "finance_service",
+    "version": "1.0.0",
+    "private": true,
+    "devDependencies": {
+        "graphql-schema-linter": "^3.1.0"
+    },
+    "scripts": {
+        "lint:graphql": "graphql-schema-linter 'schemas_graphql/**/*.graphql'"
+    }
+}

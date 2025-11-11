@@ -194,3 +194,29 @@ conda remove -n <env_name> --all
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
+
+## Development
+
+### GraphQL lint
+
+This project includes GraphQL schema files in `schemas_graphql/`. To lint them you can use the provided npm script or the Makefile target.
+
+- Install dev dependencies (once):
+
+```sh
+npm install
+```
+
+- Run the linter with npm:
+
+```sh
+npm run lint:graphql
+```
+
+- Or run via Makefile (uses npx to execute the linter):
+
+```sh
+make lint-graphql
+```
+
+If you prefer not to install packages globally, `npx` will run the linter on demand.
