@@ -1,33 +1,39 @@
+version: "3.9"
+
 services:
   backend-finance-service:
-    image: 'mouralucas/rolf-services:finance'
-    build: .
+    image: mouralucas/rolf-services:finance
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: Dockerfile
     environment:
-      - finance_database_url=$finance_database_url
-      - auth_service_base_url=$auth_service_base_url
+      - finance_database_url=${finance_database_url}
+      - auth_service_base_url=${auth_service_base_url}
     ports:
       - "8003:8000"
 
   nginx:
-    restart: unless-stopped
     image: nginx
+    restart: unless-stopped
+    depends_on:
+      - backend-finance-service
     ports:
       - "9003:80"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
-    depends_on:
-      - "backend-finance-service"
     environment:
-      - server_host=$server_host
+      - server_host=${server_host}
     logging:
-      driver: "json-file"
+      driver: json-file
       options:
         max-size: "10m"
         max-file: "1"
 
   pg_finance_service:
-    container_name: 'pg_finance_service'
+    container_name: pg_finance_service
     image: postgres:15-alpine
+    platform: linux/amd64
     restart: always
     environment:
       POSTGRES_USER: dev-user
@@ -38,19 +44,5 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data:cached
 
-  mongo_finance_logs:
-    container_name: 'mongo_finance_logs'
-    image: mongo
-    restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: dev-user-logs
-      MONGO_INITDB_ROOT_PASSWORD: password
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongodb-data:/data/db
-    command: ["mongod", "--auth"]
-
 volumes:
   db-data:
-  mongodb-data:
