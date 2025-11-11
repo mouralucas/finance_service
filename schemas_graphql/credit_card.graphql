@@ -21,7 +21,7 @@ type CreditCard {
     nickname: String!
     accountId: String
     currencyId: String!
-    issueDate: String
+    issueDate: Date
     cancellationDate: String
     dueDate: Int
     closeDay: Int
@@ -31,7 +31,7 @@ type CreditCard {
 input GetInstallmentsDueDatesInput {
     creditCardId: String!
     totInstallments: Int!
-    transactionDate: String!
+    transactionDate: Date!
 }
 
 type GetInstallmentsDueDatesResponse {
@@ -40,5 +40,5 @@ type GetInstallmentsDueDatesResponse {
 
 type InstallmentsDueDates {
     currentInstallment: Int!
-    dueDate: String!
+    dueDate: Date!
 }

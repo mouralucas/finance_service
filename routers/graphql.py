@@ -13,6 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.responses import HTMLResponse, JSONResponse
 
 from backend.database import get_session
+from backend.graphql_scalars import date_scalar, datetime_scalar
 from resolvers.account import bind_account_resolvers
 from resolvers.core import bind_core_resolvers
 from resolvers.credit_card import bind_credit_card_resolvers
@@ -38,7 +39,9 @@ bind_investment_deprecated_resovlers(query, mutation)
 bind_investment_resovlers(query, mutation)
 bind_investment_brazilian_funds_resolvers(query, mutation)
 
-schema = make_executable_schema(type_defs, query, mutation)
+schema = make_executable_schema(
+    type_defs, query, mutation, date_scalar, datetime_scalar
+)
 
 
 @router.post("", description="The graphql endpoint")

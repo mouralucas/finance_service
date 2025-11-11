@@ -143,3 +143,22 @@ def get_installments_due_dates(
         pass
 
     return installments_due_dates
+
+
+def get_last_business_day(reference_date: date | str):
+    if isinstance(reference_date, str):
+        reference_date = datetime.strptime(reference_date, "%Y-%m-%d")
+
+    month, year = reference_date.month, reference_date.year
+
+    if month == 12:
+        next_month = date(year + 1, 1, 1)
+    else:
+        next_month = date(year, month + 1, 1)
+
+    month_last_day = next_month - timedelta(days=1)
+
+    while month_last_day.weekday() >= 5:
+        month_last_day -= timedelta(days=1)
+
+    return month_last_day

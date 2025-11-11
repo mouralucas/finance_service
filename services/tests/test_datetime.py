@@ -2,6 +2,7 @@ from datetime import date
 
 from services.utils.datetime import (
     get_installments_due_dates,
+    get_last_business_day,
     get_period,
     get_period_range,
     get_previous_period,
@@ -173,3 +174,14 @@ def test_get_installments_due_date():
     assert len(installments_due_dates) == tot_installments
     assert date(2024, 12, 20) == installments_due_dates[0]["due_date"]
     assert date(2025, 1, 20) == installments_due_dates[1]["due_date"]
+
+
+def test_get_last_business_day():
+    test_date = "2025-10-05"
+    last_day = get_last_business_day(test_date)
+
+    assert date(2025, 10, 31) == last_day
+
+    test_date = "2025-08-17"
+    last_day = get_last_business_day(test_date)
+    assert date(2025, 8, 29) == last_day

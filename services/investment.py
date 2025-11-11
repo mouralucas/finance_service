@@ -1,5 +1,7 @@
+import uuid
 from decimal import Decimal
 
+from dateutil.relativedelta import relativedelta
 from fastapi import HTTPException
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import BaseService
@@ -14,8 +16,13 @@ from schemas.request.investment import CreateStatementRequest, GetPerformanceReq
 from schemas.response.investment import (
     CreateStatementResponse,
     GetInvestmentPerformanceResponseV2,
+    GetStatementMetadataResponse,
 )
-from services.utils.datetime import get_period, get_previous_period
+from services.utils.datetime import (
+    get_last_business_day,
+    get_period,
+    get_previous_period,
+)
 
 
 class InvestmentService(BaseService):
@@ -25,11 +32,11 @@ class InvestmentService(BaseService):
         self.investment_manager = InvestmentManager(session=self.session)
 
     # Statement
-    async def create_statement(self, statement: CreateStatementRequest):
+    async def create_statement(self, input_statement: CreateStatementRequest):
         # Get the investment
         investment: InvestmentModel = (
             await self.investment_manager.get_investment_by_id(
-                statement.investment_id, raise_exception=True
+                input_statement.investment_id, raise_exception=True
             )
         )
 
@@ -40,7 +47,7 @@ class InvestmentService(BaseService):
         last_statement = previous_statements[0] if previous_statements else None
 
         # The first statement should be the same period as the transaction date
-        if not last_statement and statement.period != get_period(
+        if not last_statement and input_statement.period != get_period(
             investment.transaction_date
         ):
             raise HTTPException(
@@ -49,7 +56,7 @@ class InvestmentService(BaseService):
             )
 
         # The statement should not be before the last statement
-        if statement.period < get_period(investment.transaction_date):
+        if input_statement.period < get_period(investment.transaction_date):
             raise HTTPException(
                 status_code=status.HTTP_412_PRECONDITION_FAILED,
                 detail="Statement period cannot be before transaction period",
@@ -57,7 +64,7 @@ class InvestmentService(BaseService):
 
         # The statement should be the following period of the last statement
         if last_statement and last_statement["period"] != get_previous_period(
-            statement.period
+            input_statement.period
         ):
             raise HTTPException(
                 status_code=status.HTTP_412_PRECONDITION_FAILED,
@@ -66,7 +73,7 @@ class InvestmentService(BaseService):
 
         # Set the model with the new statement
         new_statement = InvestmentStatementModel(
-            **statement.model_dump(exclude={"tax_details", "fee_details"})
+            **input_statement.model_dump(exclude={"tax_details", "fee_details"})
         )
 
         # The fist statement have the total invested as contribution
@@ -75,25 +82,25 @@ class InvestmentService(BaseService):
 
         # Serialize the tax/fee information
         new_statement.tax_detail = (
-            [tax.model_dump(mode="json") for tax in statement.tax_details]
-            if statement.tax_details
+            [tax.model_dump(mode="json") for tax in input_statement.tax_details]
+            if input_statement.tax_details
             else []
         )
         new_statement.fee_detail = (
-            [fee.model_dump(mode="json") for fee in statement.fee_details]
-            if statement.fee_details
+            [fee.model_dump(mode="json") for fee in input_statement.fee_details]
+            if input_statement.fee_details
             else []
         )
 
         # Set the tax/fee totals
         new_statement.total_tax = (
-            Decimal(sum(tax.amount for tax in statement.tax_details))
-            if statement.tax_details
+            Decimal(sum(tax.amount for tax in input_statement.tax_details))
+            if input_statement.tax_details
             else Decimal("0")
         )
         new_statement.total_fee = (
-            Decimal(sum(fee.amount for fee in statement.fee_details))
-            if statement.fee_details
+            Decimal(sum(fee.amount for fee in input_statement.fee_details))
+            if input_statement.fee_details
             else Decimal("0")
         )
 
@@ -106,6 +113,31 @@ class InvestmentService(BaseService):
         )
 
         return response
+
+    async def get_statement_metadata(
+        self, investment_id: uuid.UUID
+    ) -> GetStatementMetadataResponse:
+        investment: InvestmentModel = (
+            await self.investment_manager.get_investment_by_id(
+                investment_id=investment_id
+            )
+        )
+        previous_statements = await self.investment_manager.get_statement(
+            investment_id=investment_id
+        )
+        last_statement = previous_statements[0] if previous_statements else None
+
+        if not last_statement:
+            return GetStatementMetadataResponse(
+                period=get_period(investment.transaction_date),
+                reference_date=get_last_business_day(investment.transaction_date),
+            )
+
+        next_month = last_statement["reference_date"] + relativedelta(months=1)
+        return GetStatementMetadataResponse(
+            period=get_period(next_month),
+            reference_date=get_last_business_day(next_month),
+        )
 
     # Dashboard
     async def get_performance(

@@ -3,6 +3,7 @@
 
 extend type Query {
     getInvestmentPerformance(params: GetInvestmentPerformanceInput): GetInvestmentPerformanceResponse
+    getStatementMetadata(params: GetStatementMetadataInput): GetStatementMetadataResponse
 }
 
 extend type Mutation {
@@ -38,4 +39,13 @@ input CreateInvestmentStatementInput {
 type CreateInvestmentStatementResponse {
     created: Boolean!
     statementId: String!
+}
+
+input GetStatementMetadataInput {
+    investmentId: String!
+}
+
+type GetStatementMetadataResponse {
+    period: Int!
+    referenceDate: Date!
 }

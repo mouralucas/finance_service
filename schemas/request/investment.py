@@ -63,6 +63,7 @@ class CreateInvestmentStatementBaseRequest(BaseModel):
     )
 
 
+# Investment Schemas
 class CreateInvestmentRequest(BaseModel):
     model_config = ConfigDict(
         from_attributes=True,
@@ -160,6 +161,7 @@ class UpdateInvestmentRequest(CreateInvestmentRequest):
     country_id: str | None = Field(None, description="The id of the country")
 
 
+# Brazilian Funds Investments Schemas
 class GetBrazilianFundInvestmentsRequest(BaseModel):
     model_config = ConfigDict(
         from_attributes=True, alias_generator=AliasGenerator(alias=to_camel)
@@ -171,6 +173,15 @@ class GetBrazilianFundInvestmentsRequest(BaseModel):
     is_settled: bool = Field(
         False, alias="isSettled", description="Whether the investment is settled"
     )
+
+
+# Statement Schemas
+class GetStatementMetadata(BaseModel):
+    model_config = ConfigDict(
+        from_attributes=True, alias_generator=AliasGenerator(alias=to_camel)
+    )
+
+    investment_id: uuid.UUID = Field(..., description="The id of the investment")
 
 
 # Old schemas

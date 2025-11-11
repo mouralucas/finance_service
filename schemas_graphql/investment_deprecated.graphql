@@ -21,7 +21,7 @@ type Investment {
     accountId: String
     name: String!
     typeId: String!
-    transactionDate: String!
+    transactionDate: Date!
     maturityDate: String
     quantity: Float!
     price: Float!

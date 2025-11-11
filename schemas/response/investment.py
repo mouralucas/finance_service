@@ -1,3 +1,5 @@
+from datetime import date
+
 from pydantic import AliasGenerator, BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
 
@@ -12,6 +14,7 @@ from schemas.investment_deprecated import (
 )
 
 
+# Investment Schemas
 class CreateInvestmentResponse(BaseModel):
     investment: InvestmentSchema = Field(..., description="The investment created")
 
@@ -45,6 +48,7 @@ class SettleInvestmentResponse(CreateInvestmentResponse):
     pass
 
 
+# Statement Schemas
 class CreateStatementResponse(BaseModel):
     model_config = ConfigDict(
         from_attributes=True,
@@ -62,6 +66,19 @@ class GetStatementResponse(BaseModel):
     )
 
 
+class GetStatementMetadataResponse(BaseModel):
+    model_config = ConfigDict(
+        from_attributes=True,
+        populate_by_name=True,
+        alias_generator=AliasGenerator(serialization_alias=to_camel),
+    )
+    period: int = Field(...)
+    reference_date: date = Field(
+        ..., description="The last business day of the month - ignores holidays"
+    )
+
+
+# Objectives Schemas
 class CreateObjectiveResponse(BaseModel):
     objective_created: bool = Field(
         ..., description="Indicates if the objective was created"
