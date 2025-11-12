@@ -93,7 +93,7 @@ class AccountManager(BaseDataManager):
         return cast(AccountTransactionModel, new_statement)
 
     async def update_transaction(
-        self, transaction_id, fields: list[dict[str, Any]]
+        self, transaction_id, fields: dict[str, Any]
     ) -> AccountTransactionModel:
         query = (
             update(AccountTransactionModel)

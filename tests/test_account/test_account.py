@@ -1,6 +1,27 @@
 import pytest
 from starlette import status
 
+from schemas.account import AccountTransactionSchema
+
+
+class TestAccounts:
+    @pytest.mark.asyncio
+    async def test_update_transaction(slef, client, create_account_transaction):
+        transaction: AccountTransactionSchema = create_account_transaction[0]
+        
+        new_amount = transaction.amount - 12.35
+        
+        payload = {
+            "transactionId": transaction.id,
+            "amount": new_amount
+        }
+        response = await client.patch("/account/transaction", json=payload)
+        assert response.status_code == status.HTTP_200_OK
+        
+        data = response.json()
+        assert "transaction"in data
+        assert "amount" in data["transaction"]
+        assert data["transaction"]["amount"] == new_amount
 
 @pytest.mark.asyncio
 async def test_create_account(
