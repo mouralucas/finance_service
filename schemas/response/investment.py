@@ -1,3 +1,4 @@
+import uuid
 from datetime import date
 
 from pydantic import AliasGenerator, BaseModel, ConfigDict, Field
@@ -56,7 +57,19 @@ class CreateStatementResponse(BaseModel):
     )
 
     created: bool = Field(..., description="Indicates if the statement was created")
-    statement_id: str = Field(..., description="The ID of the created statement")
+    statement_id: uuid.UUID = Field(..., description="The ID of the created statement")
+
+
+class UpdateStatementResponse(BaseModel):
+    model_config = ConfigDict(
+        from_attributes=True,
+        alias_generator=AliasGenerator(serialization_alias=to_camel),
+    )
+
+    updated: bool = Field(..., description="Indicates if the statement was created")
+    statement_id: uuid.UUID | None = Field(
+        ..., description="The ID of the created statement"
+    )
 
 
 class GetStatementResponse(BaseModel):

@@ -176,6 +176,19 @@ class GetBrazilianFundInvestmentsRequest(BaseModel):
 
 
 # Statement Schemas
+class UpdateStatementRequest(BaseModel):
+    model_config = ConfigDict(
+        from_attributes=True, alias_generator=AliasGenerator(alias=to_camel)
+    )
+
+    id: uuid.UUID = Field(..., alias="statementId")
+    contribution: Decimal | None = Field(None)
+    gross_amount: Decimal | None = Field(None)
+    net_amount: Decimal | None = Field(None)
+    tax_detail: list[TaxFeeRequest] | None = Field(None)
+    fee_detail: list[TaxFeeRequest] | None = Field(None)
+
+
 class GetStatementMetadata(BaseModel):
     model_config = ConfigDict(
         from_attributes=True, alias_generator=AliasGenerator(alias=to_camel)

@@ -158,7 +158,25 @@ class InvestmentManager(BaseDataManager):
 
         return statement
 
-    async def get_statement(self, investment_id: uuid.UUID):
+    async def update_statement(
+        self, statement_id: uuid.UUID, fields: dict[str, Any]
+    ) -> InvestmentStatementModel:
+        query = (
+            update(InvestmentStatementModel)
+            .where(InvestmentStatementModel.id == statement_id)
+            .values(**fields)
+        )
+
+        await self.session.execute(query)
+        await self.session.flush()
+
+        updated_statement = await self.get_by_id(
+            sql_model=InvestmentStatementModel, object_id=statement_id
+        )
+
+        return cast(InvestmentStatementModel, updated_statement)
+
+    async def get_statements(self, investment_id: uuid.UUID):
         m = InvestmentStatementModel
 
         previous_gross = func.lag(m.gross_amount).over(
@@ -201,6 +219,15 @@ class InvestmentManager(BaseDataManager):
         result: list[RowMapping] | None = await self.get_all(stmt)
         statements = [dict(statement) for statement in result] if result else None
         return statements
+
+    async def get_statement_by_id(
+        self, statement_id: uuid.UUID
+    ) -> InvestmentStatementModel | None:
+        statement = await self.get_by_id(
+            InvestmentStatementModel, object_id=statement_id
+        )
+
+        return cast(InvestmentStatementModel, statement)
 
     async def get_latest_investment_statements(self, investment_ids: list[uuid.UUID]):
         subquery = (

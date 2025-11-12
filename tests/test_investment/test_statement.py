@@ -1,7 +1,44 @@
 import pytest
 from starlette import status
 
+from schemas.investment_deprecated import InvestmentStatementSchema
 from services.utils.datetime import get_period
+
+
+class TestStatement:
+
+    @pytest.mark.asyncio
+    async def test_update_statement(
+        self, client, create_active_investment, create_investment_statement
+    ):
+        statement: InvestmentStatementSchema = create_investment_statement[0]
+
+        new_gross_amount = statement.gross_amount + 1.25
+
+        mutation = """
+        mutation UpdateStatement($statementId: String!, $grossAmount: Float!) {
+            updateInvestmentStatement(statement: { statementId: $statementId,
+                                        grossAmount: $grossAmount }) {
+                updated
+                statementId
+            }
+        }
+        """
+        variables = {"statementId": str(statement.id), "grossAmount": new_gross_amount}
+
+        response = await client.post(
+            "/graphql/finance",
+            json={"query": mutation, "variables": variables},
+            headers={"Content-Type": "application/json"},
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert "errors" not in data
+        assert data["data"]["updateInvestmentStatement"]["updated"] is True
+        assert data["data"]["updateInvestmentStatement"]["statementId"] == str(
+            statement.id
+        )
 
 
 @pytest.mark.asyncio

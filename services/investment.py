@@ -12,11 +12,16 @@ from managers.finance import FinanceManager
 from managers.investment import InvestmentManager
 from models.investment import InvestmentModel, InvestmentStatementModel
 from schemas.core import ChartSeriesSchemaV2
-from schemas.request.investment import CreateStatementRequest, GetPerformanceRequest
+from schemas.request.investment import (
+    CreateStatementRequest,
+    GetPerformanceRequest,
+    UpdateStatementRequest,
+)
 from schemas.response.investment import (
     CreateStatementResponse,
     GetInvestmentPerformanceResponseV2,
     GetStatementMetadataResponse,
+    UpdateStatementResponse,
 )
 from services.utils.datetime import (
     get_last_business_day,
@@ -32,7 +37,9 @@ class InvestmentService(BaseService):
         self.investment_manager = InvestmentManager(session=self.session)
 
     # Statement
-    async def create_statement(self, input_statement: CreateStatementRequest):
+    async def create_statement(
+        self, input_statement: CreateStatementRequest
+    ) -> CreateStatementResponse:
         # Get the investment
         investment: InvestmentModel = (
             await self.investment_manager.get_investment_by_id(
@@ -41,7 +48,7 @@ class InvestmentService(BaseService):
         )
 
         # Get previous statement
-        previous_statements = await self.investment_manager.get_statement(
+        previous_statements = await self.investment_manager.get_statements(
             investment_id=investment.id
         )
         last_statement = previous_statements[0] if previous_statements else None
@@ -109,7 +116,23 @@ class InvestmentService(BaseService):
 
         response = CreateStatementResponse(
             created=True,
-            statement_id=str(new_statement.id),
+            statement_id=new_statement.id,
+        )
+
+        return response
+
+    async def update_statement(
+        self, input_statement: UpdateStatementRequest
+    ) -> UpdateStatementResponse:
+        changed_fields = input_statement.model_dump(exclude_unset=True, exclude={"id"})
+
+        updated_statement = await self.investment_manager.update_statement(
+            statement_id=input_statement.id, fields=changed_fields
+        )
+
+        response = UpdateStatementResponse(
+            updated=updated_statement is not None,
+            statement_id=updated_statement.id if updated_statement else None,
         )
 
         return response
@@ -122,7 +145,7 @@ class InvestmentService(BaseService):
                 investment_id=investment_id
             )
         )
-        previous_statements = await self.investment_manager.get_statement(
+        previous_statements = await self.investment_manager.get_statements(
             investment_id=investment_id
         )
         last_statement = previous_statements[0] if previous_statements else None

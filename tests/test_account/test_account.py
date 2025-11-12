@@ -52,28 +52,23 @@ class TestAccount:
         assert "currencyId" in data["account"]
         assert data["account"]["currencyId"] == str(currency_id)
 
-    
 
 class TestAccountsStatement:
-    
+
     @pytest.mark.asyncio
-    async def test_update_transaction(slef, client, create_account_transaction):
+    async def test_update_transaction(self, client, create_account_transaction):
         transaction: AccountTransactionSchema = create_account_transaction[0]
-        
+
         new_amount = transaction.amount - 12.35
-        
-        payload = {
-            "transactionId": transaction.id,
-            "amount": new_amount
-        }
+
+        payload = {"transactionId": transaction.id, "amount": new_amount}
         response = await client.patch("/account/transaction", json=payload)
         assert response.status_code == status.HTTP_200_OK
-        
+
         data = response.json()
-        assert "transaction"in data
+        assert "transaction" in data
         assert "amount" in data["transaction"]
         assert round(data["transaction"]["amount"], 5) == round(new_amount, 5)
-
 
 
 @pytest.mark.asyncio

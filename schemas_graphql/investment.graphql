@@ -8,8 +8,11 @@ extend type Query {
 
 extend type Mutation {
     createInvestmentStatement(statement: CreateInvestmentStatementInput): CreateInvestmentStatementResponse
+    updateInvestmentStatement(statement: UpdateInvestmentStatementInput): UpdateInvestmentStatementResponse
 }
 
+
+# Performance Schemas
 input GetInvestmentPerformanceInput {
     investmentId: String
 }
@@ -19,6 +22,8 @@ type GetInvestmentPerformanceResponse {
     data: [LineChartSeries!]!
 }
 
+
+#  Statement Schemas
 input TaxFeeDetail {
     taxFeeId: String!
     amount: Float!
@@ -38,6 +43,21 @@ input CreateInvestmentStatementInput {
 
 type CreateInvestmentStatementResponse {
     created: Boolean!
+    statementId: String!
+}
+
+
+input UpdateInvestmentStatementInput {
+    statementId: String!
+    contribution: Float
+    grossAmount: Float
+    netAmount: Float
+    taxDetail: [TaxFeeDetail]
+    feeDedtail: [TaxFeeDetail]
+}
+
+type UpdateInvestmentStatementResponse {
+    updated: Boolean!
     statementId: String!
 }
 

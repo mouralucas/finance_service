@@ -215,7 +215,7 @@ class InvestmentServiceDeprecated(BaseService):
         :param params: The object of GetStatementRequest with available parameters
         :return:
         """
-        statement = await self.investment_manager.get_statement(
+        statement = await self.investment_manager.get_statements(
             investment_id=params.investment_id
         )
 

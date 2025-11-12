@@ -5,11 +5,32 @@ from schemas.request.investment import (
     CreateStatementRequest,
     GetPerformanceRequest,
     GetStatementMetadata,
+    UpdateStatementRequest,
 )
 from services.investment import InvestmentService
 
 
-async def get_investment_performance_resolver(_, info, params):
+async def create_statement_resolver(_, info: GraphQLResolveInfo, statement):
+    statement_ = CreateStatementRequest.model_validate(statement)
+
+    result = await InvestmentService(
+        session=info.context["session"], user=info.context["user"]
+    ).create_statement(input_statement=statement_)
+
+    return result.model_dump(by_alias=True)
+
+
+async def update_statement_resolver(_, info: GraphQLResolveInfo, statement) -> dict:
+    statement_ = UpdateStatementRequest.model_validate(statement)
+
+    result = await InvestmentService(
+        session=info.context["session"], user=info.context["user"]
+    ).update_statement(input_statement=statement_)
+
+    return result.model_dump(by_alias=True)
+
+
+async def get_investment_performance_resolver(_, info: GraphQLResolveInfo, params):
     params_ = GetPerformanceRequest.model_validate(params)
 
     performance = await InvestmentService(
@@ -29,16 +50,6 @@ async def get_statement_metadata_resolver(_, info: GraphQLResolveInfo, params: d
     return metadata.model_dump(by_alias=True)
 
 
-async def create_statement_resolver(_, info, statement):
-    statement_ = CreateStatementRequest.model_validate(statement)
-
-    result = await InvestmentService(
-        session=info.context["session"], user=info.context["user"]
-    ).create_statement(input_statement=statement_)
-
-    return result.model_dump(by_alias=True)
-
-
 def bind_investment_resovlers(query: QueryType, mutation: MutationType):
     query.set_field(
         "getInvestmentPerformance", resolver=get_investment_performance_resolver
@@ -46,3 +57,4 @@ def bind_investment_resovlers(query: QueryType, mutation: MutationType):
     query.set_field("getStatementMetadata", resolver=get_statement_metadata_resolver)
 
     mutation.set_field("createInvestmentStatement", resolver=create_statement_resolver)
+    mutation.set_field("updateInvestmentStatement", resolver=update_statement_resolver)
