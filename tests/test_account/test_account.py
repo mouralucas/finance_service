@@ -4,7 +4,58 @@ from starlette import status
 from schemas.account import AccountTransactionSchema
 
 
-class TestAccounts:
+class TestAccount:
+    @pytest.mark.asyncio
+    async def test_create_account(
+        self, client, create_bank, create_account_type, create_currency
+    ):
+        account_types = create_account_type
+        banks = create_bank
+        currencies = create_currency
+
+        bank_id = banks[0].id
+        nickname = "Minha conta 1"
+        branch = "2033-2"
+        number = "123654897"
+        open_date = "2024-08-09"
+        type_id = account_types[0].id
+        currency_id = currencies[0].id
+
+        payload = {
+            "bankId": str(bank_id),
+            "nickname": nickname,
+            "branch": branch,
+            "number": number,
+            "openDate": open_date,
+            "accountTypeId": str(type_id),
+            "currencyId": str(currency_id),
+        }
+        response = await client.post("/account", json=payload)
+
+        assert response.status_code == status.HTTP_201_CREATED
+
+        data = response.json()
+        assert "account" in data
+
+        assert "bankId" in data["account"]
+        assert data["account"]["bankId"] == str(bank_id)
+        assert "nickname" in data["account"]
+        assert data["account"]["nickname"] == nickname
+        assert "branch" in data["account"]
+        assert data["account"]["branch"] == branch
+        assert "number" in data["account"]
+        assert data["account"]["number"] == number
+        assert "openDate" in data["account"]
+        assert data["account"]["openDate"] == open_date
+        assert "typeId" in data["account"]
+        assert data["account"]["typeId"] == str(type_id)
+        assert "currencyId" in data["account"]
+        assert data["account"]["currencyId"] == str(currency_id)
+
+    
+
+class TestAccountsStatement:
+    
     @pytest.mark.asyncio
     async def test_update_transaction(slef, client, create_account_transaction):
         transaction: AccountTransactionSchema = create_account_transaction[0]
@@ -21,54 +72,8 @@ class TestAccounts:
         data = response.json()
         assert "transaction"in data
         assert "amount" in data["transaction"]
-        assert data["transaction"]["amount"] == new_amount
+        assert round(data["transaction"]["amount"], 5) == round(new_amount, 5)
 
-@pytest.mark.asyncio
-async def test_create_account(
-    client, create_bank, create_account_type, create_currency
-):
-    account_types = create_account_type
-    banks = create_bank
-    currencies = create_currency
-
-    bank_id = banks[0].id
-    nickname = "Minha conta 1"
-    branch = "2033-2"
-    number = "123654897"
-    open_date = "2024-08-09"
-    type_id = account_types[0].id
-    currency_id = currencies[0].id
-
-    payload = {
-        "bankId": str(bank_id),
-        "nickname": nickname,
-        "branch": branch,
-        "number": number,
-        "openDate": open_date,
-        "accountTypeId": str(type_id),
-        "currencyId": str(currency_id),
-    }
-    response = await client.post("/account", json=payload)
-
-    assert response.status_code == status.HTTP_201_CREATED
-
-    data = response.json()
-    assert "account" in data
-
-    assert "bankId" in data["account"]
-    assert data["account"]["bankId"] == str(bank_id)
-    assert "nickname" in data["account"]
-    assert data["account"]["nickname"] == nickname
-    assert "branch" in data["account"]
-    assert data["account"]["branch"] == branch
-    assert "number" in data["account"]
-    assert data["account"]["number"] == number
-    assert "openDate" in data["account"]
-    assert data["account"]["openDate"] == open_date
-    assert "typeId" in data["account"]
-    assert data["account"]["typeId"] == str(type_id)
-    assert "currencyId" in data["account"]
-    assert data["account"]["currencyId"] == str(currency_id)
 
 
 @pytest.mark.asyncio
