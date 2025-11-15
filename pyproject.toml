@@ -22,7 +22,9 @@ select = [
     "C90",  # mccabe (complexity)
 ]
 
-ignore = []
+ignore = [
+    "E731",  # ignore lambda assignments in Polyfactory factories
+]
 
 [tool.black]
 line-length = 88

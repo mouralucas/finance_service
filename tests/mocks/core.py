@@ -39,6 +39,7 @@ from schemas.core import (
     TaxSchema,
 )
 from schemas.finance import FundsBrSchema
+from tests.factory.core import BankFactory, CountryFactory
 
 
 @pytest_asyncio.fixture
@@ -198,3 +199,16 @@ async def create_periodicity(test_session):
     )
 
     return periodicity
+
+
+## New mocks using FActory
+@pytest_asyncio.fixture
+async def create_bank_beta(test_session):
+    BankFactory.__async_session__ = test_session
+    return await BankFactory.create_batch_async(size=5)
+
+
+@pytest_asyncio.fixture
+async def create_account_beta(test_session):
+    CountryFactory.__async_session__ = test_session
+    return await CountryFactory.create_batch_async(size=5)
