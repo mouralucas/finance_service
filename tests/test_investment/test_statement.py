@@ -1,7 +1,7 @@
 import pytest
 from starlette import status
 
-from schemas.investment_deprecated import InvestmentStatementSchema
+from schemas.investment_deprecated import InvestmentSchema, InvestmentStatementSchema
 from services.utils.datetime import get_period
 
 
@@ -74,7 +74,7 @@ class TestStatement:
         assert data["data"]["updateInvestmentStatement"]["statementId"] == str(
             statement.id
         )
-        
+
         query = """
             query GetInvestmentStatementById ($statementId: String!) {
                 getInvestmentStatementById(statement_id: $statementId) {
@@ -99,10 +99,7 @@ class TestStatement:
         assert updated_statement["investmentStatementId"] == str(statement.id)
         assert "grossAmount" in updated_statement
         assert updated_statement["grossAmount"] == new_gross_amount
-        
-        
-        
-        
+
     @pytest.mark.asyncio
     async def test_get_investment_statement_by_id(
         self, client, create_investment_statement
@@ -152,6 +149,39 @@ class TestStatement:
         fetched_statement = data["data"]["getInvestmentStatementById"]["statement"]
         # The returned ID should be the same as the request
         assert fetched_statement["investmentStatementId"] == str(statement.id)
+
+    @pytest.mark.asyncio
+    async def test_get_statement_metadata(self, client, create_active_investment):
+        investment: InvestmentSchema = create_active_investment[0]
+        # transaction_date = investment.transaction_date
+        amount = investment.amount
+
+        query = """
+            query GetStatementMetadata ($investmentId: String!) {
+                getStatementMetadata (
+                    params: { investmentId: $investmentId }
+                ) {
+                    period
+                    referenceDate
+                    contribution
+                }
+            }
+        """
+        variables = {"investmentId": str(investment.id)}
+
+        response = await client.post(
+            "/graphql/finance",
+            json={"query": query, "variables": variables},
+            headers={"Content-Type": "application/json"},
+        )
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert "data" in data
+        assert "getStatementMetadata" in data["data"]
+        assert "period" in data["data"]["getStatementMetadata"]
+        assert "contribution" in data["data"]["getStatementMetadata"]
+        assert data["data"]["getStatementMetadata"]["contribution"] == amount
+        # TODO: add validation to the period and reference date
 
 
 ## Old testing, should be in the test class
@@ -235,7 +265,7 @@ async def test_create_first_investment_statement(
 
 
 @pytest.mark.asyncio
-async def test_get_statement(client, create_investment_statement):
+async def test_get_statement_rest(client, create_investment_statement):
     statements = create_investment_statement
 
     investment = statements[0].investment

@@ -76,6 +76,7 @@ input GetStatementMetadataInput {
 type GetStatementMetadataResponse {
     period: Int!
     referenceDate: Date!
+    contribution: Float!
 }
 
 type Statement {

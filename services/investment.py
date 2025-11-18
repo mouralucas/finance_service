@@ -169,12 +169,14 @@ class InvestmentService(BaseService):
             return GetStatementMetadataResponse(
                 period=get_period(investment.transaction_date),
                 reference_date=get_last_business_day(investment.transaction_date),
+                contribution=float(investment.amount),
             )
 
         next_month = last_statement["reference_date"] + relativedelta(months=1)
         return GetStatementMetadataResponse(
             period=get_period(next_month),
             reference_date=get_last_business_day(next_month),
+            contribution=0,
         )
 
     # Dashboard
