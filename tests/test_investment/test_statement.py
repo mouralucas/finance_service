@@ -8,7 +8,42 @@ from services.utils.datetime import get_period
 class TestStatement:
 
     @pytest.mark.asyncio
-    async def test_update_statement(
+    async def test_create_investment_statement(self, client, create_active_investment):
+        investments = create_active_investment
+
+        payload = {
+            "investmentId": str(investments[0].id),
+            "period": get_period(investments[0].transaction_date),
+            # TODO: change to last day of month.
+            #  In future, the value will be automatically calculated based on the period
+            "referenceDate": investments[0].transaction_date.strftime("%Y-%m-%d"),
+            "grossAmount": investments[0].amount * 1.05,
+            "netAmount": (investments[0].amount * 1.05) - 3.60,
+            "taxDetails": [
+                {
+                    "taxFeeId": "9969f9fd-e397-489f-950e-6fc68d8f0d6b",
+                    "amount": 3.52,
+                    "currencyId": "BRL",
+                }
+            ],
+            "feeDetails": [
+                {
+                    "taxFeeId": "18a4ba92-1fef-4037-b0cf-14a7c3132453",
+                    "amount": 0.08,
+                    "currencyId": "BRL",
+                }
+            ],
+        }
+        response = await client.post("/investment/statement", json=payload)
+        assert response.status_code == status.HTTP_201_CREATED
+
+        data = response.json()
+
+        assert "created" in data
+        assert data["created"] is True
+
+    @pytest.mark.asyncio
+    async def test_update_investment_statement(
         self, client, create_active_investment, create_investment_statement
     ):
         statement: InvestmentStatementSchema = create_investment_statement[0]
@@ -40,7 +75,58 @@ class TestStatement:
             statement.id
         )
 
+    @pytest.mark.asyncio
+    async def test_get_investment_statement_by_id(
+        self, client, create_investment_statement
+    ):
+        statements = create_investment_statement
+        statement = statements[0]
 
+        query = """
+            query GetInvestmentStatementById ($statementId: String!) {
+                getInvestmentStatementById(statement_id: $statementId) {
+                    statement {
+                        investmentStatementId
+                        period
+                        previousAmount
+                        contribution
+                        grossAmount
+                        totalTax
+                        totalFee
+                        referenceDate
+                        atMaturity
+                        valueChange
+                        percentageChange
+                        netAmount
+                    }
+                }
+            }
+        """
+        variables = {"statementId": str(statement.id)}
+
+        response = await client.post(
+            "/graphql/finance",
+            json={"query": query, "variables": variables},
+            headers={"Content-Type": "application/json"},
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+
+        assert "data" in data
+        assert "getInvestmentStatementById" in data["data"]
+        assert "statement" in data["data"]["getInvestmentStatementById"]
+        assert (
+            "investmentStatementId"
+            in data["data"]["getInvestmentStatementById"]["statement"]
+        )
+
+        updated_statement = data["data"]["getInvestmentStatementById"]["statement"]
+        # The returned ID should be the same as the request
+        assert updated_statement["investmentStatementId"] == str(statement.id)
+
+
+## Old testing, should be in the test class
 @pytest.mark.asyncio
 async def test_get_investment_type(client, create_fixed_income_br_investment_type):
     response = await client.get("/investment/type")
@@ -102,9 +188,9 @@ async def test_create_first_investment_statement(
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
 
-    assert "statement" in data
-    assert len(data["statement"]) == 1
-    for statement in data["statement"]:
+    assert "statements" in data
+    assert len(data["statements"]) == 1
+    for statement in data["statements"]:
         assert "investmentId" in statement
         assert statement["investmentId"] == investment_id
 
@@ -133,4 +219,4 @@ async def test_get_statement(client, create_investment_statement):
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
 
-    assert "statement" in data
+    assert "statements" in data

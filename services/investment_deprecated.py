@@ -26,7 +26,7 @@ from schemas.request.investment import (
     GetInvestmentRequest,
     GetObjectiveRequest,
     GetObjectiveSummaryRequest,
-    GetStatementRequest,
+    GetStatementsRequest,
     SettleInvestmentRequest,
     UpdateInvestmentRequest,
 )
@@ -42,7 +42,7 @@ from schemas.response.investment import (
     GetInvestmentWithoutObjectives,
     GetObjectiveResponse,
     GetObjectiveSummaryResponse,
-    GetStatementResponse,
+    GetStatementsResponse,
     SettleInvestmentResponse,
     UpdateInvestmentResponse,
 )
@@ -207,7 +207,9 @@ class InvestmentServiceDeprecated(BaseService):
 
         return response
 
-    async def get_statement(self, params: GetStatementRequest) -> GetStatementResponse:
+    async def get_statement(
+        self, params: GetStatementsRequest
+    ) -> GetStatementsResponse:
         """
         Created by: Lucas Penha de Moura - 28/08/2024
 
@@ -219,9 +221,9 @@ class InvestmentServiceDeprecated(BaseService):
             investment_id=params.investment_id
         )
 
-        response = GetStatementResponse(
+        response = GetStatementsResponse(
             quantity=len(statement) if statement else 0,
-            statement=(
+            statements=(
                 [InvestmentStatementSchema.model_validate(data) for data in statement]
                 if statement
                 else []

@@ -13,7 +13,7 @@ from schemas.request.investment import (
     GetObjectiveRequest,
     GetObjectiveSummaryRequest,
     GetPerformanceRequest,
-    GetStatementRequest,
+    GetStatementsRequest,
     SettleInvestmentRequest,
     UpdateInvestmentRequest,
 )
@@ -31,7 +31,7 @@ from schemas.response.investment import (
     GetInvestmentWithoutObjectives,
     GetObjectiveResponse,
     GetObjectiveSummaryResponse,
-    GetStatementResponse,
+    GetStatementsResponse,
     SettleInvestmentResponse,
     UpdateInvestmentResponse,
 )
@@ -145,10 +145,10 @@ async def create_statement(
     description="Get statement base on filters",
 )
 async def get_statement(
-    params: GetStatementRequest = Depends(),
+    params: GetStatementsRequest = Depends(),
     session: AsyncSession = Depends(get_session),
     user: RequiredUser = Security(get_user),
-) -> GetStatementResponse:
+) -> GetStatementsResponse:
     return await InvestmentServiceDeprecated(session=session, user=user).get_statement(
         params=params
     )

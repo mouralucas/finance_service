@@ -72,10 +72,20 @@ class UpdateStatementResponse(BaseModel):
     )
 
 
-class GetStatementResponse(BaseModel):
-    quantity: int = Field(..., description="The total number of statement returned")
-    statement: list[InvestmentStatementSchema] | None = Field(
+class GetStatementByIdResponse(BaseModel):
+    """
+    Get only one statement
+    """
+
+    statement: InvestmentStatementSchema | None = Field(
         None, description="The investment statement"
+    )
+
+
+class GetStatementsResponse(BaseModel):
+    quantity: int = Field(..., description="The total number of statement returned")
+    statements: list[InvestmentStatementSchema] | None = Field(
+        None, description="The investment statements"
     )
 
 

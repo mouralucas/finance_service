@@ -283,7 +283,7 @@ class CreateBatchStatementRequest(BaseModel):
     statements: list[CreateStatementRequest] = Field(...)
 
 
-class GetStatementRequest(BaseModel):
+class GetStatementsRequest(BaseModel):
     model_config = ConfigDict(
         from_attributes=True, alias_generator=AliasGenerator(alias=to_camel)
     )
@@ -308,6 +308,10 @@ class GetStatementRequest(BaseModel):
             raise ValueError("start period must be before end period")
 
         return self
+
+
+class GetStatementByIdRequest(BaseModel):
+    statement_id: uuid.UUID
 
 
 class CreateObjectiveRequest(BaseModel):

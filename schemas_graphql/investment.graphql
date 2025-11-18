@@ -3,6 +3,7 @@
 
 extend type Query {
     getInvestmentPerformance(params: GetInvestmentPerformanceInput): GetInvestmentPerformanceResponse
+    getInvestmentStatementById(statement_id: String!): GetInvestmentStatementByIdResponde
     getStatementMetadata(params: GetStatementMetadataInput): GetStatementMetadataResponse
 }
 
@@ -46,6 +47,13 @@ type CreateInvestmentStatementResponse {
     statementId: String!
 }
 
+input GetInvestmentStatementByIdInput {
+    statementId: String!
+}
+
+type GetInvestmentStatementByIdResponde {
+    statement: Statement!
+}
 
 input UpdateInvestmentStatementInput {
     statementId: String!
@@ -68,4 +76,23 @@ input GetStatementMetadataInput {
 type GetStatementMetadataResponse {
     period: Int!
     referenceDate: Date!
+}
+
+type Statement {
+    investmentStatementId: String!
+    period: Int!
+    previousAmount: Float!
+    contribution: Float!
+    grossAmount: Float!
+    totalTax: Float!
+    # tax_detail: list[TaxFeeSchema] | None = Field(
+    #     ..., description="The detail of taxes"
+    # )
+    totalFee: Float!
+    # fee_detail: list[TaxFeeSchema] | None = Field(..., description="The detail of fees")
+    referenceDate: Date!
+    atMaturity: Boolean!
+    valueChange: Float!
+    percentageChange: Float!
+    netAmount: Float!
 }

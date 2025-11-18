@@ -223,9 +223,7 @@ class InvestmentManager(BaseDataManager):
     async def get_statement_by_id(
         self, statement_id: uuid.UUID
     ) -> InvestmentStatementModel | None:
-        statement = await self.get_by_id(
-            InvestmentStatementModel, object_id=statement_id
-        )
+        statement = await self.get_by_id(InvestmentStatementModel, statement_id)
 
         return cast(InvestmentStatementModel, statement)
 

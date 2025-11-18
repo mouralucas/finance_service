@@ -12,6 +12,7 @@ from managers.finance import FinanceManager
 from managers.investment import InvestmentManager
 from models.investment import InvestmentModel, InvestmentStatementModel
 from schemas.core import ChartSeriesSchemaV2
+from schemas.investment_deprecated import InvestmentStatementSchema
 from schemas.request.investment import (
     CreateStatementRequest,
     GetPerformanceRequest,
@@ -20,6 +21,7 @@ from schemas.request.investment import (
 from schemas.response.investment import (
     CreateStatementResponse,
     GetInvestmentPerformanceResponseV2,
+    GetStatementByIdResponse,
     GetStatementMetadataResponse,
     UpdateStatementResponse,
 )
@@ -133,6 +135,19 @@ class InvestmentService(BaseService):
         response = UpdateStatementResponse(
             updated=updated_statement is not None,
             statement_id=updated_statement.id if updated_statement else None,
+        )
+
+        return response
+
+    async def get_statement_by_id(
+        self, statement_id: uuid.UUID
+    ) -> GetStatementByIdResponse:
+        statement = await self.investment_manager.get_statement_by_id(
+            statement_id=statement_id
+        )
+
+        response = GetStatementByIdResponse(
+            statement=InvestmentStatementSchema.model_validate(statement)
         )
 
         return response
