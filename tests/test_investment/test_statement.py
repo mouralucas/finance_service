@@ -51,13 +51,13 @@ class TestStatement:
         new_gross_amount = statement.gross_amount + 1.25
 
         mutation = """
-        mutation UpdateStatement($statementId: String!, $grossAmount: Float!) {
-            updateInvestmentStatement(statement: { statementId: $statementId,
-                                        grossAmount: $grossAmount }) {
-                updated
-                statementId
+            mutation UpdateStatement($statementId: String!, $grossAmount: Float!) {
+                updateInvestmentStatement(statement: { statementId: $statementId,
+                                            grossAmount: $grossAmount }) {
+                    updated
+                    statementId
+                }
             }
-        }
         """
         variables = {"statementId": str(statement.id), "grossAmount": new_gross_amount}
 
@@ -74,7 +74,35 @@ class TestStatement:
         assert data["data"]["updateInvestmentStatement"]["statementId"] == str(
             statement.id
         )
+        
+        query = """
+            query GetInvestmentStatementById ($statementId: String!) {
+                getInvestmentStatementById(statement_id: $statementId) {
+                    statement {
+                        investmentStatementId
+                        grossAmount
+                    }
+                }
+            }
+        """
+        variables = {"statementId": str(statement.id)}
 
+        response = await client.post(
+            "/graphql/finance",
+            json={"query": query, "variables": variables},
+            headers={"Content-Type": "application/json"},
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        updated_statement = data["data"]["getInvestmentStatementById"]["statement"]
+        assert updated_statement["investmentStatementId"] == str(statement.id)
+        assert "grossAmount" in updated_statement
+        assert updated_statement["grossAmount"] == new_gross_amount
+        
+        
+        
+        
     @pytest.mark.asyncio
     async def test_get_investment_statement_by_id(
         self, client, create_investment_statement
@@ -121,9 +149,9 @@ class TestStatement:
             in data["data"]["getInvestmentStatementById"]["statement"]
         )
 
-        updated_statement = data["data"]["getInvestmentStatementById"]["statement"]
+        fetched_statement = data["data"]["getInvestmentStatementById"]["statement"]
         # The returned ID should be the same as the request
-        assert updated_statement["investmentStatementId"] == str(statement.id)
+        assert fetched_statement["investmentStatementId"] == str(statement.id)
 
 
 ## Old testing, should be in the test class
