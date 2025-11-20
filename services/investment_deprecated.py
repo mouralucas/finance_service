@@ -27,7 +27,6 @@ from schemas.request.investment import (
     GetObjectiveRequest,
     GetObjectiveSummaryRequest,
     GetStatementsRequest,
-    SettleInvestmentRequest,
     UpdateInvestmentRequest,
 )
 from schemas.request.investment_brazilian_fixed_income import (
@@ -43,7 +42,6 @@ from schemas.response.investment import (
     GetObjectiveResponse,
     GetObjectiveSummaryResponse,
     GetStatementsResponse,
-    SettleInvestmentResponse,
     UpdateInvestmentResponse,
 )
 

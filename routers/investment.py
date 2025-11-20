@@ -106,9 +106,9 @@ async def settle(
     session: AsyncSession = Depends(get_session),
     user: RequiredUser = Security(get_user),
 ) -> SettleInvestmentResponse:
-    response = await InvestmentService(
-        session=session, user=user
-    ).settle_investment(investment)
+    response = await InvestmentService(session=session, user=user).settle_investment(
+        investment
+    )
 
     return response
 
