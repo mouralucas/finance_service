@@ -8,6 +8,10 @@ extend type Query {
 }
 
 extend type Mutation {
+    # Investment
+    settleInvestment(input: SettleInvestmentInput): SettleInvestmentResponse!
+
+    # Statenebt
     createInvestmentStatement(statement: CreateInvestmentStatementInput): CreateInvestmentStatementResponse
     updateInvestmentStatement(statement: UpdateInvestmentStatementInput): UpdateInvestmentStatementResponse
 }
@@ -23,6 +27,21 @@ type GetInvestmentPerformanceResponse {
     data: [LineChartSeries!]!
 }
 
+
+# Investments schemas
+input SettleInvestmentInput {
+    investmentId: String!
+    gross_amount: Float!
+    net_amount: Float!
+    tax_detail: [TaxFeeDetail]
+    fee_detail: [TaxFeeDetail]
+    settlement_date: Date!
+    settlement_amount: Float!
+}
+
+type SettleInvestmentResponse {
+    settled: Boolean!
+}
 
 #  Statement Schemas
 input TaxFeeDetail {

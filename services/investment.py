@@ -12,10 +12,11 @@ from managers.finance import FinanceManager
 from managers.investment import InvestmentManager
 from models.investment import InvestmentModel, InvestmentStatementModel
 from schemas.core import ChartSeriesSchemaV2
-from schemas.investment_deprecated import InvestmentStatementSchema
+from schemas.investment_deprecated import InvestmentSchema, InvestmentStatementSchema
 from schemas.request.investment import (
     CreateStatementRequest,
     GetPerformanceRequest,
+    SettleInvestmentRequest,
     UpdateStatementRequest,
 )
 from schemas.response.investment import (
@@ -23,6 +24,7 @@ from schemas.response.investment import (
     GetInvestmentPerformanceResponseV2,
     GetStatementByIdResponse,
     GetStatementMetadataResponse,
+    SettleInvestmentResponse,
     UpdateStatementResponse,
 )
 from services.utils.datetime import (
@@ -37,6 +39,39 @@ class InvestmentService(BaseService):
         super().__init__(session=session)
         self.user = user.model_dump()
         self.investment_manager = InvestmentManager(session=self.session)
+
+    # Investment
+    async def settle_investment(
+        self, investment_settlement: SettleInvestmentRequest
+    ) -> SettleInvestmentResponse:
+        """
+        Created by: Lucas Penha de Moura - 14/08/2024
+
+            Update an investment with the values of a
+                settlement (date, amount and taxes)
+        :param investment_liquidate: The object of LiquidateInvestmentRequest
+        :return:
+        """
+        current_investment: InvestmentModel | None = await InvestmentManager(
+            self.session
+        ).get_investment_by_id(investment_settlement.id)
+        if not current_investment:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Investment not found"
+            )
+        investment_settlement_ = investment_settlement.model_dump()
+
+        current_investment.is_settled = True
+        current_investment.settlement_date = investment_settlement_["settlement_date"]
+        current_investment.settlement_amount = investment_settlement_[
+            "settlement_amount"
+        ]
+
+        response = SettleInvestmentResponse(
+            investment=InvestmentSchema.model_validate(current_investment),
+        )
+
+        return response
 
     # Statement
     async def create_statement(

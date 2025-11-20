@@ -146,38 +146,6 @@ class InvestmentServiceDeprecated(BaseService):
 
         return response
 
-    async def settle_investment(
-        self, investment_settlement: SettleInvestmentRequest
-    ) -> SettleInvestmentResponse:
-        """
-        Created by: Lucas Penha de Moura - 14/08/2024
-
-            Update an investment with the values of a
-                settlement (date, amount and taxes)
-        :param investment_liquidate: The object of LiquidateInvestmentRequest
-        :return:
-        """
-        current_investment: InvestmentModel | None = await InvestmentManager(
-            self.session
-        ).get_investment_by_id(investment_settlement.id)
-        if not current_investment:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Investment not found"
-            )
-        investment_settlement_ = investment_settlement.model_dump()
-
-        current_investment.is_settled = True
-        current_investment.settlement_date = investment_settlement_["settlement_date"]
-        current_investment.settlement_amount = investment_settlement_[
-            "settlement_amount"
-        ]
-
-        response = SettleInvestmentResponse(
-            investment=InvestmentSchema.model_validate(current_investment),
-        )
-
-        return response
-
     # Investment Types
     async def create_investment_type(self):
         pass
