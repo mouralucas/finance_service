@@ -26,6 +26,7 @@ class CurrencyFactory(SQLAlchemyFactory[CurrencyModel]):
 
 
 class CategoryFactory(SQLAlchemyFactory[CategoryModel]):
+    # TODO: how to create with self relation
     __check_model__ = False
     __set_relationships__ = False
 

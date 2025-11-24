@@ -52,6 +52,10 @@ class TestAccount:
         assert "currencyId" in data["account"]
         assert data["account"]["currencyId"] == str(currency_id)
 
+    @pytest.mark.asyncio
+    async def test_account_factory(self, client, create_account_type_beta):
+        print(create_account_type_beta)
+
 
 class TestAccountsStatement:
 

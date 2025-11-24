@@ -9,6 +9,7 @@ from data_mock.account import (
 )
 from models.account import AccountModel, AccountTransactionModel, AccountTypeModel
 from schemas.account import AccountSchema, AccountTransactionSchema, AccountTypeSchema
+from tests.factory.account import AccountTypeFactory
 
 
 @pytest_asyncio.fixture
@@ -77,3 +78,17 @@ async def create_account_transaction(
 
 
 # New mocks using Factory
+@pytest_asyncio.fixture
+async def create_account_type_beta(test_session):
+    AccountTypeFactory.__async_session__ = test_session
+    data_list = [
+        {"type": "checking", "description": "Conta corrente"},
+        {"type": "savings", "description": "Poupança"},
+        {"type": "broker", "description": "Corretora"},
+    ]
+
+    created_values = [
+        await AccountTypeFactory.create_async(**data) for data in data_list
+    ]
+
+    return created_values

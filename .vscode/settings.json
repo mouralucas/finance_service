@@ -15,5 +15,6 @@
     "ruff.linting.enabled": true,
     "ruff.linting.run": "onSave",
     // --- Automatic imports organization ---
-    "ruff.organizeImports": true
+    "ruff.organizeImports": true,
+    "python.REPL.enableREPLSmartSend": false
 }
