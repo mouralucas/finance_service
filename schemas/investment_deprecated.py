@@ -287,6 +287,7 @@ class InvestmentObjectiveSchema(BaseModel):
     currency_id: str = Field(..., description="The id of the currency")
     currency_symbol: str | None = Field(None, description="The currency symbol")
     amount: float = Field(..., description="The amount of the objective")
+    current_amount: float | None = Field(None)
     estimated_deadline: date | None = Field(
         None, description="The date that are expected to reach the objective"
     )

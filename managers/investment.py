@@ -279,22 +279,43 @@ class InvestmentManager(BaseDataManager):
 
     async def get_objectives(
         self, owner_id: str, objective_id: uuid.UUID | None = None
-    ) -> dict[Any, Any] | None:
+    ) -> list[dict[Any, Any]] | None:
+        stmt_alias = aliased(InvestmentStatementModel)
+
+        latest_stmt_subq = (
+            select(
+                stmt_alias.investment_id,
+                stmt_alias.gross_amount,
+            )
+            .distinct(stmt_alias.investment_id)
+            .order_by(stmt_alias.investment_id, stmt_alias.reference_date.desc())
+            .subquery()
+        )
+
         query = (
             select(
                 InvestmentObjectiveModel.id,
                 InvestmentObjectiveModel.owner_id,
                 InvestmentObjectiveModel.title,
-                InvestmentObjectiveModel.description,
+                InvestmentObjectiveModel.currency_id,
                 InvestmentObjectiveModel.amount,
                 InvestmentObjectiveModel.estimated_deadline,
-                InvestmentObjectiveModel.currency_id,
-                CurrencyModel.symbol.label("currency_symbol"),
+                func.coalesce(func.sum(latest_stmt_subq.c.gross_amount), 0).label(
+                    "current_amount"
+                ),
             )
-            .join(
-                CurrencyModel, CurrencyModel.id == InvestmentObjectiveModel.currency_id
+            .outerjoin(
+                InvestmentModel,
+                (InvestmentModel.objective_id == InvestmentObjectiveModel.id)
+                & (InvestmentModel.is_settled.is_(False)),
+            )
+            .outerjoin(
+                latest_stmt_subq,
+                latest_stmt_subq.c.investment_id == InvestmentModel.id,
             )
             .where(InvestmentObjectiveModel.owner_id == owner_id)
+            .group_by(InvestmentObjectiveModel.id)
+            .order_by(InvestmentObjectiveModel.estimated_deadline)
         )
 
         if objective_id:
@@ -524,7 +545,7 @@ class InvestmentManager(BaseDataManager):
 
     async def get_allocation_by_objectives(
         self, owner_id: uuid.UUID
-    ) -> list[RowMapping]:
+    ) -> list[RowMapping] | None:
         subquery_latest_period = (
             select(
                 InvestmentStatementModel.investment_id,
