@@ -297,6 +297,7 @@ class InvestmentManager(BaseDataManager):
                 InvestmentObjectiveModel.id,
                 InvestmentObjectiveModel.owner_id,
                 InvestmentObjectiveModel.title,
+                InvestmentObjectiveModel.description,
                 InvestmentObjectiveModel.currency_id,
                 InvestmentObjectiveModel.amount,
                 InvestmentObjectiveModel.estimated_deadline,
