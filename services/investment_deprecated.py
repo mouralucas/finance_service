@@ -173,31 +173,6 @@ class InvestmentServiceDeprecated(BaseService):
 
         return response
 
-    async def get_statement(
-        self, params: GetStatementsRequest
-    ) -> GetStatementsResponse:
-        """
-        Created by: Lucas Penha de Moura - 28/08/2024
-
-            Get investments statements based available params
-        :param params: The object of GetStatementRequest with available parameters
-        :return:
-        """
-        statement = await self.investment_manager.get_statements(
-            investment_id=params.investment_id
-        )
-
-        response = GetStatementsResponse(
-            quantity=len(statement) if statement else 0,
-            statements=(
-                [InvestmentStatementSchema.model_validate(data) for data in statement]
-                if statement
-                else []
-            ),
-        )
-
-        return response
-
     # Objectives
     async def create_objective(
         self, objective: CreateObjectiveRequest

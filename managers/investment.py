@@ -221,16 +221,23 @@ class InvestmentManager(BaseDataManager):
     async def get_statements(self, investment_id: uuid.UUID):
         m = InvestmentStatementModel
 
+        # Valor final do período anterior
         previous_gross = func.lag(m.gross_amount).over(
-            partition_by=m.investment_id, order_by=m.period
+            partition_by=m.investment_id,
+            order_by=m.period
         )
 
-        adjusted_previous = func.coalesce(previous_gross, 0) + func.coalesce(
-            m.contribution, 0
+        # Valor ajustado do período anterior (aporte - retirada)
+        adjusted_previous = (
+            func.coalesce(previous_gross, 0)
+            + func.coalesce(m.contribution, 0)
+            - func.coalesce(m.withdrawn, 0)
         )
 
+        # Variação absoluta
         variation_value = m.gross_amount - adjusted_previous
 
+        # Variação percentual
         variation_percent = case(
             (adjusted_previous != 0, (variation_value / adjusted_previous * 100)),
             else_=None,
@@ -258,6 +265,7 @@ class InvestmentManager(BaseDataManager):
             .where(m.investment_id == investment_id)
             .order_by(m.period.desc())
         )
+
 
         result: list[RowMapping] | None = await self.get_all(stmt)
         statements = [dict(statement) for statement in result] if result else None

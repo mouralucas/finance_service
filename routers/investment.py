@@ -149,7 +149,7 @@ async def get_statement(
     session: AsyncSession = Depends(get_session),
     user: RequiredUser = Security(get_user),
 ) -> GetStatementsResponse:
-    return await InvestmentServiceDeprecated(session=session, user=user).get_statement(
+    return await InvestmentService(session=session, user=user).get_statement(
         params=params
     )
 

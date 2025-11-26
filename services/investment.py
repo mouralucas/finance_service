@@ -16,6 +16,7 @@ from schemas.investment_deprecated import InvestmentSchema, InvestmentStatementS
 from schemas.request.investment import (
     CreateStatementRequest,
     GetPerformanceRequest,
+    GetStatementsRequest,
     SettleInvestmentRequest,
     UpdateStatementRequest,
 )
@@ -24,6 +25,7 @@ from schemas.response.investment import (
     GetInvestmentPerformanceResponseV2,
     GetStatementByIdResponse,
     GetStatementMetadataResponse,
+    GetStatementsResponse,
     SettleInvestmentResponse,
     UpdateStatementResponse,
 )
@@ -183,6 +185,34 @@ class InvestmentService(BaseService):
 
         response = GetStatementByIdResponse(
             statement=InvestmentStatementSchema.model_validate(statement)
+        )
+
+        return response
+
+    async def get_statement(
+        self, params: GetStatementsRequest
+    ) -> GetStatementsResponse:
+        """
+        Created by: Lucas Penha de Moura - 28/08/2024
+
+            Get investments statements based available params
+        :param params: The object of GetStatementRequest with available parameters
+        :return:
+        """
+        statement = await self.investment_manager.get_statements(
+            investment_id=params.investment_id
+        )
+
+        response = GetStatementsResponse(
+            quantity=len(statement) if statement else 0,
+            statements=(
+                [
+                    InvestmentStatementSchema.model_validate(data)
+                    for data in statement
+                ]
+                if statement
+                else []
+            ),
         )
 
         return response
