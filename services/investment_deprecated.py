@@ -17,7 +17,6 @@ from schemas.investment_deprecated import (
     InvestmentAllocationSchema,
     InvestmentObjectiveSchema,
     InvestmentSchema,
-    InvestmentStatementSchema,
     InvestmentTypeSchema,
 )
 from schemas.request.investment import (
@@ -26,7 +25,6 @@ from schemas.request.investment import (
     GetInvestmentRequest,
     GetObjectiveRequest,
     GetObjectiveSummaryRequest,
-    GetStatementsRequest,
     UpdateInvestmentRequest,
 )
 from schemas.request.investment_brazilian_fixed_income import (
@@ -41,7 +39,6 @@ from schemas.response.investment import (
     GetInvestmentWithoutObjectives,
     GetObjectiveResponse,
     GetObjectiveSummaryResponse,
-    GetStatementsResponse,
     UpdateInvestmentResponse,
 )
 

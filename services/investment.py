@@ -206,10 +206,7 @@ class InvestmentService(BaseService):
         response = GetStatementsResponse(
             quantity=len(statement) if statement else 0,
             statements=(
-                [
-                    InvestmentStatementSchema.model_validate(data)
-                    for data in statement
-                ]
+                [InvestmentStatementSchema.model_validate(data) for data in statement]
                 if statement
                 else []
             ),

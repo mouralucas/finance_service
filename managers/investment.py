@@ -223,8 +223,7 @@ class InvestmentManager(BaseDataManager):
 
         # Total amount of the previous period
         previous_gross = func.lag(m.gross_amount).over(
-            partition_by=m.investment_id,
-            order_by=m.period
+            partition_by=m.investment_id, order_by=m.period
         )
 
         # Adjusted value of the previous period (contribution - withdrawn)
@@ -265,7 +264,6 @@ class InvestmentManager(BaseDataManager):
             .where(m.investment_id == investment_id)
             .order_by(m.period.desc())
         )
-
 
         result: list[RowMapping] | None = await self.get_all(stmt)
         statements = [dict(statement) for statement in result] if result else None
@@ -685,17 +683,14 @@ class InvestmentManager(BaseDataManager):
         # 2) Subquery com window functions
         # ---------------------------
 
-        subq = (
-            select(
-                m.id.label("id"),
-                m.investment_id.label("investment_id"),
-                m.period.label("period"),
-                m.gross_amount.label("gross_amount"),
-                m.net_amount.label("net_amount"),
-                previous_adjusted.label("previous_adjusted"),
-            )
-            .subquery()
-        )
+        subq = select(
+            m.id.label("id"),
+            m.investment_id.label("investment_id"),
+            m.period.label("period"),
+            m.gross_amount.label("gross_amount"),
+            m.net_amount.label("net_amount"),
+            previous_adjusted.label("previous_adjusted"),
+        ).subquery()
 
         sq = subq  # alias curto
 
@@ -714,7 +709,10 @@ class InvestmentManager(BaseDataManager):
                     (
                         func.sum(sq.c.previous_adjusted) != 0,
                         (
-                            (func.sum(sq.c.gross_amount) - func.sum(sq.c.previous_adjusted))
+                            (
+                                func.sum(sq.c.gross_amount)
+                                - func.sum(sq.c.previous_adjusted)
+                            )
                             / func.sum(sq.c.previous_adjusted)
                         )
                         * 100,
