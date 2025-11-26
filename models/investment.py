@@ -69,7 +69,7 @@ class InvestmentStatementModel(InvestmentStatementBaseModel):
         server_default=text("0"),
         doc="The amount of money that went in the investment in the period",
     )
-    withdraw: Mapped[Decimal] = mapped_column(
+    withdrawn: Mapped[Decimal] = mapped_column(
         "outgoing",
         Numeric(precision=18, scale=8),
         server_default=text("0"),

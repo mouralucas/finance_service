@@ -54,7 +54,7 @@ input CreateInvestmentStatementInput {
     investmentId: String!
     period: Int!
     contribution: Float!
-    withdraw: Float!
+    withdrawn: Float!
     referenceDate: Date!
     grossAmount: Float!
     netAmount: Float!

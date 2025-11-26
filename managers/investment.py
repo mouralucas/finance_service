@@ -79,14 +79,14 @@ class InvestmentManager(BaseDataManager):
             .subquery()
         )
 
-        # Subquery: sums all statements contribution/withdraw per investment
+        # Subquery: sums all statements contribution/withdrawn per investment
         statement_sum_subq = (
             select(
                 InvestmentStatementModel.investment_id.label("investment_id"),
                 func.sum(InvestmentStatementModel.contribution).label(
                     "total_contribution"
                 ),
-                func.sum(InvestmentStatementModel.withdraw).label("total_withdraw"),
+                func.sum(InvestmentStatementModel.withdrawn).label("total_withdrawn"),
             )
             .group_by(InvestmentStatementModel.investment_id)
             .subquery()
@@ -95,7 +95,7 @@ class InvestmentManager(BaseDataManager):
         # Initial value of the investment considering all contributions/withdrawals
         initial_adjusted = func.coalesce(
             statement_sum_subq.c.total_contribution, 0
-        ) - func.coalesce(statement_sum_subq.c.total_withdraw, 0)
+        ) - func.coalesce(statement_sum_subq.c.total_withdrawn, 0)
 
         # Avoid division by zero
         initial_adjusted_safe = func.nullif(initial_adjusted, 0)
@@ -128,8 +128,8 @@ class InvestmentManager(BaseDataManager):
                 func.coalesce(statement_sum_subq.c.total_contribution, 0).label(
                     "total_contribution"
                 ),
-                func.coalesce(statement_sum_subq.c.total_withdraw, 0).label(
-                    "total_withdraw"
+                func.coalesce(statement_sum_subq.c.total_withdrawn, 0).label(
+                    "total_withdrawn"
                 ),
                 investment_alias.contracted_rate,
                 investment_alias.currency_id,
@@ -158,7 +158,7 @@ class InvestmentManager(BaseDataManager):
             .join(currency_alias, investment_alias.currency_id == currency_alias.id)
             .join(type_alias, investment_alias.type_id == type_alias.id)
             .join(bank_alias, investment_alias.custodian_id == bank_alias.id)
-            # Subquery sum contribution/withdraw
+            # Subquery sum contribution/withdrawn
             .outerjoin(
                 statement_sum_subq,
                 statement_sum_subq.c.investment_id == investment_alias.id,
@@ -244,7 +244,7 @@ class InvestmentManager(BaseDataManager):
                 func.coalesce(previous_gross, 0).label("previous_amount"),
                 m.gross_amount,
                 m.contribution,
-                m.withdraw,
+                m.withdrawn,
                 m.total_tax,
                 m.tax_detail,
                 m.total_fee,
