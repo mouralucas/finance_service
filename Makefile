@@ -11,9 +11,12 @@ COMMAND_UPGRADE = upgrade head
 all: insert-data
 
 # Run the Alembic upgrade command
-upgrade-database:
-	source venv/bin/activate && $(PYTHON) -m $(ALEMBIC) $(COMMAND_UPGRADE)
+apply-migrations:
+	$(PYTHON) -m $(ALEMBIC) $(COMMAND_UPGRADE)
 
+create-db-migration:
+	@read -p "Type the migration message: " msg; \
+	python3 -m alembic.config revision --autogenerate -m "$$msg"
 
 # Create basic data in docker database
 insert-data:
