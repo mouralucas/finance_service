@@ -221,26 +221,26 @@ class InvestmentManager(BaseDataManager):
     async def get_statements(self, investment_id: uuid.UUID):
         m = InvestmentStatementModel
 
-        # Valor final do período anterior
+        # Total amount of the previous period
         previous_gross = func.lag(m.gross_amount).over(
             partition_by=m.investment_id,
             order_by=m.period
         )
 
-        # Valor ajustado do período anterior (aporte - retirada)
+        # Adjusted value of the previous period (contribution - withdrawn)
         adjusted_previous = (
             func.coalesce(previous_gross, 0)
             + func.coalesce(m.contribution, 0)
             - func.coalesce(m.withdrawn, 0)
         )
 
-        # Variação absoluta
+        # Absolute variation
         variation_value = m.gross_amount - adjusted_previous
 
-        # Variação percentual
+        # Percentage variation
         variation_percent = case(
             (adjusted_previous != 0, (variation_value / adjusted_previous * 100)),
-            else_=None,
+            else_=0,
         )
 
         stmt = (
@@ -664,38 +664,72 @@ class InvestmentManager(BaseDataManager):
 
         :return: RowMapping with period and total gross, net and previous amount
         """
+        m = InvestmentStatementModel
+
+        # ---------------------------
+        # 1) Window functions (permitido aqui)
+        # ---------------------------
+
+        previous_gross = func.lag(m.gross_amount).over(
+            partition_by=m.investment_id,
+            order_by=m.period,
+        )
+
+        previous_adjusted = (
+            func.coalesce(previous_gross, 0)
+            + func.coalesce(m.contribution, 0)
+            - func.coalesce(m.withdrawn, 0)
+        )
+
+        # ---------------------------
+        # 2) Subquery com window functions
+        # ---------------------------
+
+        subq = (
+            select(
+                m.id.label("id"),
+                m.investment_id.label("investment_id"),
+                m.period.label("period"),
+                m.gross_amount.label("gross_amount"),
+                m.net_amount.label("net_amount"),
+                previous_adjusted.label("previous_adjusted"),
+            )
+            .subquery()
+        )
+
+        sq = subq  # alias curto
+
+        # ---------------------------
+        # 3) Query final agregada por período
+        # ---------------------------
+
         query = (
             select(
-                InvestmentStatementModel.period,
-                func.sum(InvestmentStatementModel.previous_amount).label(
-                    "total_previous"
-                ),
-                func.sum(InvestmentStatementModel.gross_amount).label("total_gross"),
-                func.sum(InvestmentStatementModel.net_amount).label("total_net"),
+                sq.c.period,
+                func.sum(sq.c.previous_adjusted).label("total_previous_adjusted"),
+                func.sum(sq.c.gross_amount).label("total_gross"),
+                func.sum(sq.c.net_amount).label("total_net"),
                 IndexerSeriesModel.value.label("indexer_variation"),
                 case(
                     (
-                        func.sum(InvestmentStatementModel.previous_amount) != 0,
+                        func.sum(sq.c.previous_adjusted) != 0,
                         (
-                            (
-                                func.sum(InvestmentStatementModel.gross_amount)
-                                - func.sum(InvestmentStatementModel.previous_amount)
-                            )
-                            / func.sum(InvestmentStatementModel.previous_amount)
+                            (func.sum(sq.c.gross_amount) - func.sum(sq.c.previous_adjusted))
+                            / func.sum(sq.c.previous_adjusted)
                         )
                         * 100,
                     ),
                     else_=0,
                 ).label("variation"),
             )
-            .select_from(InvestmentStatementModel)
+            .select_from(sq)
             .join(
                 InvestmentModel,
-                InvestmentModel.id == InvestmentStatementModel.investment_id,
+                InvestmentModel.id == sq.c.investment_id,
             )
             .outerjoin(
                 IndexerSeriesModel,
-                (IndexerSeriesModel.period == InvestmentStatementModel.period)
+                (IndexerSeriesModel.period == sq.c.period)
                 & (IndexerSeriesModel.indexer_id == indexer_id)
                 & (
                     IndexerSeriesModel.periodicity_id
@@ -703,16 +737,16 @@ class InvestmentManager(BaseDataManager):
                 ),
             )
             .where(InvestmentModel.owner_id == owner_id)
-            .group_by(InvestmentStatementModel.period, IndexerSeriesModel.value)
-            .order_by(InvestmentStatementModel.period)
+            .group_by(sq.c.period, IndexerSeriesModel.value)
+            .order_by(sq.c.period)
         )
 
         if period_range > 0:
             start_period = get_previous_period(offset=period_range)
-            query = query.where(InvestmentStatementModel.period >= start_period)
+            query = query.where(sq.c.period >= start_period)
 
         if investment_id:
-            query = query.where(InvestmentStatementModel.investment_id == investment_id)
+            query = query.where(sq.c.investment_id == investment_id)
 
         result = await self.get_all(query)
 
