@@ -114,7 +114,7 @@ class TestStatement:
                         investmentStatementId
                         period
                         previousAmount
-                        contribution
+                        incoming
                         grossAmount
                         totalTax
                         totalFee
@@ -163,7 +163,7 @@ class TestStatement:
                 ) {
                     period
                     referenceDate
-                    contribution
+                    incoming
                 }
             }
         """
@@ -179,8 +179,8 @@ class TestStatement:
         assert "data" in data
         assert "getStatementMetadata" in data["data"]
         assert "period" in data["data"]["getStatementMetadata"]
-        assert "contribution" in data["data"]["getStatementMetadata"]
-        assert data["data"]["getStatementMetadata"]["contribution"] == amount
+        assert "incoming" in data["data"]["getStatementMetadata"]
+        assert data["data"]["getStatementMetadata"]["incoming"] == amount
         # TODO: add validation to the period and reference date
 
 
@@ -252,8 +252,8 @@ async def test_create_first_investment_statement(
         assert "investmentId" in statement
         assert statement["investmentId"] == investment_id
 
-        assert "contribution" in statement
-        assert statement["contribution"] == investments[0].amount
+        assert "incoming" in statement
+        assert statement["incoming"] == investments[0].amount
 
         assert "taxDetail" in statement
         assert type(statement["taxDetail"]) is list

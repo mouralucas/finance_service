@@ -120,9 +120,9 @@ class InvestmentService(BaseService):
             **input_statement.model_dump(exclude={"tax_details", "fee_details"})
         )
 
-        # The fist statement have the total invested as contribution
+        # The fist statement have the total invested as incoming
         if not last_statement:
-            new_statement.contribution = investment.amount
+            new_statement.incoming = investment.amount
 
         # Serialize the tax/fee information
         new_statement.tax_detail = (
@@ -204,14 +204,14 @@ class InvestmentService(BaseService):
             return GetStatementMetadataResponse(
                 period=get_period(investment.transaction_date),
                 reference_date=get_last_business_day(investment.transaction_date),
-                contribution=float(investment.amount),
+                incoming=float(investment.amount),
             )
 
         next_month = last_statement["reference_date"] + relativedelta(months=1)
         return GetStatementMetadataResponse(
             period=get_period(next_month),
             reference_date=get_last_business_day(next_month),
-            contribution=0,
+            incoming=0,
         )
 
     # Dashboard

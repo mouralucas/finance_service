@@ -184,7 +184,7 @@ class InvestmentManager(BaseDataManager):
         )
 
         adjusted_previous = func.coalesce(previous_gross, 0) + func.coalesce(
-            m.contribution, 0
+            m.incoming, 0
         )
 
         variation_value = m.gross_amount - adjusted_previous
@@ -201,7 +201,7 @@ class InvestmentManager(BaseDataManager):
                 m.period,
                 func.coalesce(previous_gross, 0).label("previous_amount"),
                 m.gross_amount,
-                m.contribution,
+                m.incoming,
                 m.total_tax,
                 m.tax_detail,
                 m.total_fee,

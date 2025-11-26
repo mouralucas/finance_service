@@ -63,9 +63,15 @@ class InvestmentStatementModel(InvestmentStatementBaseModel):
     #     nullable=True,
     #     doc="How much the index changed in the period",
     # )
-    contribution: Mapped[Decimal] = mapped_column(
-        "contribution",
+    incoming: Mapped[Decimal] = mapped_column(
+        "incoming",
         Numeric(precision=18, scale=8),
         server_default=text("0"),
-        doc="The amount of money that went in or out of the investment in the period",
+        doc="The amount of money that went in the investment in the period",
+    )
+    outgoing: Mapped[Decimal] = mapped_column(
+        "outgoing",
+        Numeric(precision=18, scale=8),
+        server_default=text("0"),
+        doc="The amount of money that went out of the investment in the period",
     )

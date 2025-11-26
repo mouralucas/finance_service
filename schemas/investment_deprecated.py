@@ -202,8 +202,8 @@ class InvestmentStatementSchema(BaseModel):
     previous_amount: float = Field(
         ..., description="The previous amount for the investment"
     )
-    contribution: float = Field(
-        ..., description="The contribution amount for the investment in the period"
+    incoming: float = Field(
+        ..., description="The incoming amount for the investment in the period"
     )
     gross_amount: float = Field(
         ..., description="The gross amount of the investment in the period"
