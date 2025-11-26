@@ -99,7 +99,7 @@ class GetStatementMetadataResponse(BaseModel):
     reference_date: date = Field(
         ..., description="The last business day of the month - ignores holidays"
     )
-    incoming: float = Field(0)
+    contribution: float = Field(0)
 
 
 # Objectives Schemas

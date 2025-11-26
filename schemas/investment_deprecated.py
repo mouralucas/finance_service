@@ -81,6 +81,12 @@ class InvestmentSchema(BaseModel):
     quantity: float = Field(..., description="The quantity of the investment bought")
     price: float = Field(..., description="The unit price for the investment")
     amount: float = Field(..., description="The total bought. Quantity * price")
+    total_contribution: float = Field(
+        0, description="The total contribution amount for the investment"
+    )
+    total_withdraw: float = Field(
+        0, description="The total withdraw amount for the investment"
+    )
     contracted_rate: str | None = Field(None, description="The rate of the investment")
     currency_id: str = Field(..., description="The id of the currency")
     currency_symbol: str | None = Field(None, description="The currency symbol")
@@ -202,9 +208,10 @@ class InvestmentStatementSchema(BaseModel):
     previous_amount: float = Field(
         ..., description="The previous amount for the investment"
     )
-    incoming: float = Field(
-        ..., description="The incoming amount for the investment in the period"
+    contribution: float = Field(
+        ..., description="The contribution amount for the investment in the period"
     )
+    withdraw: float = Field(..., description="Total withdraw amount in the period")
     gross_amount: float = Field(
         ..., description="The gross amount of the investment in the period"
     )

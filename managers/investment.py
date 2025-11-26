@@ -69,14 +69,49 @@ class InvestmentManager(BaseDataManager):
         bank_alias = aliased(BankModel)
         statement_alias = aliased(InvestmentStatementModel)
 
-        subquery = (
+        # Subquery for last statement period
+        latest_statement_subq = (
             select(
-                statement_alias.investment_id.label("investment_id"),
-                func.max(statement_alias.period).label("latest_period"),
+                InvestmentStatementModel.investment_id.label("investment_id"),
+                func.max(InvestmentStatementModel.period).label("latest_period"),
             )
-            .group_by(statement_alias.investment_id)
+            .group_by(InvestmentStatementModel.investment_id)
             .subquery()
         )
+
+        # Subquery: sums all statements contribution/withdraw per investment
+        statement_sum_subq = (
+            select(
+                InvestmentStatementModel.investment_id.label("investment_id"),
+                func.sum(InvestmentStatementModel.contribution).label(
+                    "total_contribution"
+                ),
+                func.sum(InvestmentStatementModel.withdraw).label("total_withdraw"),
+            )
+            .group_by(InvestmentStatementModel.investment_id)
+            .subquery()
+        )
+
+        # Initial value of the investment considering all contributions/withdrawals
+        initial_adjusted = func.coalesce(
+            statement_sum_subq.c.total_contribution, 0
+        ) - func.coalesce(statement_sum_subq.c.total_withdraw, 0)
+
+        # Avoid division by zero
+        initial_adjusted_safe = func.nullif(initial_adjusted, 0)
+
+        # Percentage change using the final value (gross from last period)
+        percentage_change = case(
+            (
+                statement_alias.gross_amount.is_not(None),
+                (
+                    (statement_alias.gross_amount - initial_adjusted_safe)
+                    / initial_adjusted_safe
+                )
+                * 100,
+            ),
+            else_=0,
+        ).label("percentage_change")
 
         query = (
             select(
@@ -90,6 +125,12 @@ class InvestmentManager(BaseDataManager):
                 investment_alias.price,
                 investment_alias.quantity,
                 investment_alias.amount,
+                func.coalesce(statement_sum_subq.c.total_contribution, 0).label(
+                    "total_contribution"
+                ),
+                func.coalesce(statement_sum_subq.c.total_withdraw, 0).label(
+                    "total_withdraw"
+                ),
                 investment_alias.contracted_rate,
                 investment_alias.currency_id,
                 currency_alias.symbol.label("currency_symbol"),
@@ -102,6 +143,7 @@ class InvestmentManager(BaseDataManager):
                 investment_alias.is_settled,
                 investment_alias.settlement_date,
                 investment_alias.settlement_amount,
+                # Final amount = gross_amount from last statement OR initial amount
                 case(
                     (
                         statement_alias.gross_amount.is_(None),
@@ -109,28 +151,28 @@ class InvestmentManager(BaseDataManager):
                     ),
                     else_=statement_alias.gross_amount,
                 ).label("gross_amount"),
-                case(
-                    (
-                        statement_alias.gross_amount.is_not(None),
-                        (
-                            (statement_alias.gross_amount - investment_alias.amount)
-                            / investment_alias.amount
-                        )
-                        * 100,
-                    ),
-                    else_=0,
-                ).label("percentage_change"),
+                percentage_change,
                 statement_alias.period,
                 investment_alias.objective_id,
             )
             .join(currency_alias, investment_alias.currency_id == currency_alias.id)
             .join(type_alias, investment_alias.type_id == type_alias.id)
             .join(bank_alias, investment_alias.custodian_id == bank_alias.id)
-            .outerjoin(subquery, investment_alias.id == subquery.c.investment_id)
+            # Subquery sum contribution/withdraw
+            .outerjoin(
+                statement_sum_subq,
+                statement_sum_subq.c.investment_id == investment_alias.id,
+            )
+            # Subquery for last statement period
+            .outerjoin(
+                latest_statement_subq,
+                latest_statement_subq.c.investment_id == investment_alias.id,
+            )
+            # Join on statement of the last period
             .outerjoin(
                 statement_alias,
                 (statement_alias.investment_id == investment_alias.id)
-                & (statement_alias.period == subquery.c.latest_period),
+                & (statement_alias.period == latest_statement_subq.c.latest_period),
             )
             .where(
                 investment_alias.owner_id == owner_id,
@@ -184,7 +226,7 @@ class InvestmentManager(BaseDataManager):
         )
 
         adjusted_previous = func.coalesce(previous_gross, 0) + func.coalesce(
-            m.incoming, 0
+            m.contribution, 0
         )
 
         variation_value = m.gross_amount - adjusted_previous
@@ -201,7 +243,8 @@ class InvestmentManager(BaseDataManager):
                 m.period,
                 func.coalesce(previous_gross, 0).label("previous_amount"),
                 m.gross_amount,
-                m.incoming,
+                m.contribution,
+                m.withdraw,
                 m.total_tax,
                 m.tax_detail,
                 m.total_fee,

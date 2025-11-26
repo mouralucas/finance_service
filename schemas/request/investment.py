@@ -182,7 +182,8 @@ class UpdateStatementRequest(BaseModel):
     )
 
     id: uuid.UUID = Field(..., alias="statementId")
-    incoming: Decimal | None = Field(None)
+    contribution: Decimal | None = Field(None)
+    withdraw: Decimal | None = Field(None)
     gross_amount: Decimal | None = Field(None)
     net_amount: Decimal | None = Field(None)
     tax_detail: list[TaxFeeRequest] | None = Field(None)
@@ -263,7 +264,8 @@ class CreateStatementRequest(BaseModel):
         description="The period of the statement",
         examples=["202408"],
     )
-    incoming: float = Field(0, description="The incoming amount for the period")
+    contribution: float = Field(0, description="The contribution amount for the period")
+    withdraw: float = Field(0, description="The withdraw amount for the period")
     reference_date: datetime.date = Field(
         ...,
         description="The date when the statement was calculated, \

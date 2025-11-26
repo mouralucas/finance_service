@@ -53,7 +53,8 @@ input TaxFeeDetail {
 input CreateInvestmentStatementInput {
     investmentId: String!
     period: Int!
-    incoming: Float!
+    contribution: Float!
+    withdraw: Float!
     referenceDate: Date!
     grossAmount: Float!
     netAmount: Float!
@@ -76,7 +77,7 @@ type GetInvestmentStatementByIdResponde {
 
 input UpdateInvestmentStatementInput {
     statementId: String!
-    incoming: Float
+    contribution: Float
     grossAmount: Float
     netAmount: Float
     taxDetail: [TaxFeeDetail]
@@ -95,14 +96,15 @@ input GetStatementMetadataInput {
 type GetStatementMetadataResponse {
     period: Int!
     referenceDate: Date!
-    incoming: Float!
+    contribution: Float!
 }
 
 type Statement {
     investmentStatementId: String!
     period: Int!
     previousAmount: Float!
-    incoming: Float!
+    contribution: Float!
+    withdraw: Float!
     grossAmount: Float!
     totalTax: Float!
     # tax_detail: list[TaxFeeSchema] | None = Field(
