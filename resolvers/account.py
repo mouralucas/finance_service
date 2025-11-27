@@ -52,7 +52,7 @@ async def update_account_transactions_resolver(
         session=info.context["session"], user=info.context["user"]
     ).update_transaction(transaction=transaction_)
 
-    return new_transaction.model_dump(by_alias=True)
+    return new_transaction
 
 
 async def get_account_balance_resolver(_, info: GraphQLResolveInfo, params):
@@ -62,7 +62,7 @@ async def get_account_balance_resolver(_, info: GraphQLResolveInfo, params):
         session=info.context["session"], user=info.context["user"]
     ).get_balance(params=params_)
 
-    return balance.model_dump(by_alias=True)
+    return balance
 
 
 def bind_account_resolvers(query: QueryType, mutation: MutationType):

@@ -2,7 +2,6 @@ from pydantic import AliasGenerator, BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
 
 from schemas.account import (
-    AccountBalanceSchema,
     AccountSchema,
     AccountTransactionSchema,
 )
@@ -44,19 +43,3 @@ class CreateBalanceResponse(BaseModel):
 
     account_nickname: str = Field(..., description="The account nickname")
     periods_saved: int = Field(..., description="The number of periods saved")
-
-
-class GetBalanceResponse(BaseModel):
-    quantity: int = Field(
-        ...,
-        serialization_alias="quantity",
-        description="The number of periods fetched for the account",
-    )
-    account_name: str = Field(
-        ..., serialization_alias="accountName", description="The account name"
-    )
-    balance: list[AccountBalanceSchema] = Field(
-        ...,
-        serialization_alias="balance",
-        description="The balance for the account in selected period range",
-    )
