@@ -124,19 +124,43 @@ async def test_close_account_with_credit_card(client, create_valid_credit_card):
 
 @pytest.mark.asyncio
 async def test_get_account(client, create_open_account):
-    response = await client.get("/account")
+    query = """
+        query GetAccounts {
+            getAccounts (params: { accountId: null, currencyId: null, active: false }){
+                quantity
+                accounts {
+                    accountId
+                    active
+                    bankId
+                    nickname
+                    description
+                    branch
+                    number
+                    openDate
+                    closeDate
+                    typeId
+                    currencyId
+                    currencySymbol
+                }
+            }
+        }
+    """
+
+    response = await client.post("/graphql/finance", json={"query": query})
 
     assert response.status_code == status.HTTP_200_OK
 
     data = response.json()
 
-    assert "accounts" in data
-    assert type(data["accounts"]) is list
-    assert "quantity" in data
-    assert data["quantity"] > 0
+    assert "data" in data
+    assert "getAccounts" in data["data"]
+    assert "accounts" in data["data"]["getAccounts"]
+    assert type(data["data"]["getAccounts"]["accounts"]) is list
+    assert "quantity" in data["data"]["getAccounts"]
+    assert data["data"]["getAccounts"]["quantity"] > 0
 
-    assert "accountId" in data["accounts"][0]
-    assert "bankId" in data["accounts"][0]
+    assert "accountId" in data["data"]["getAccounts"]["accounts"][0]
+    assert "bankId" in data["data"]["getAccounts"]["accounts"][0]
 
 
 @pytest.mark.asyncio
