@@ -9,7 +9,7 @@ async def get_categories_resolver(_, info: GraphQLResolveInfo):
         session=info.context["session"], user=info.context["user"]
     ).get_categories()
 
-    return categories.model_dump(by_alias=True)
+    return categories
 
 
 def bind_core_resolvers(query: QueryType, mutation: MutationType):

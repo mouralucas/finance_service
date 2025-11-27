@@ -1,10 +1,12 @@
+from typing import Any
+
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import BaseService
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from managers.core import CoreManager
-from schemas.core import CategorySchema, CountrySchema
-from schemas.response.core import GetCategoryResponse, GetCountryResponse
+from schemas.core import CountrySchema
+from schemas.response.core import GetCountryResponse
 
 
 class CoreService(BaseService):
@@ -13,17 +15,13 @@ class CoreService(BaseService):
         self.user = user.model_dump()
         self.core_manager = CoreManager(session=self.session)
 
-    async def get_categories(self) -> GetCategoryResponse:
+    async def get_categories(self) -> dict[str, Any]:
         categories = await self.core_manager.get_categories()
 
-        response = GetCategoryResponse(
-            quantity=len(categories) if categories else 0,
-            categories=(
-                [CategorySchema.model_validate(category) for category in categories]
-                if categories
-                else []
-            ),
-        )
+        response = {
+            "quantity": len(categories) if categories else 0,
+            "categories": categories,
+        }
 
         return response
 
