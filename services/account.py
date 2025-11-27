@@ -1,4 +1,4 @@
-from typing import cast
+from typing import Any, cast
 
 from fastapi import HTTPException
 from rolf_common.schemas.auth import RequiredUser
@@ -29,10 +29,7 @@ from schemas.request.account import (
 from schemas.response.account import (
     CloseAccountResponse,
     CreateAccountResponse,
-    CreateAccountTransactionResponse,
     CreateBalanceResponse,
-    GetAccountResponse,
-    GetAccountTransactionResponse,
     GetBalanceResponse,
     UpdateTransactionResponse,
 )
@@ -91,27 +88,20 @@ class AccountService(BaseService):
 
         return response
 
-    async def get_accounts(self, params: GetAccountRequest) -> GetAccountResponse:
+    async def get_accounts(self, params: GetAccountRequest):
         params_ = params.model_dump()
         params_["owner_id"] = self.user["user_id"]
 
         accounts = await self.account_manager.get_accounts(params=params_)
 
-        response = GetAccountResponse(
-            quantity=len(accounts) if accounts else 0,
-            accounts=(
-                [AccountSchema.model_validate(data) for data in accounts]
-                if accounts
-                else []
-            ),
-        )
+        response = {"quantity": len(accounts) if accounts else 0, "accounts": accounts}
 
         return response
 
     # Transactions
     async def create_transaction(
         self, transaction: CreateAccountTransactionRequest
-    ) -> CreateAccountTransactionResponse:
+    ) -> dict[str, Any]:
         account: AccountModel | None = await self.account_manager.get_account_by_id(
             transaction.account_id
         )
@@ -135,9 +125,7 @@ class AccountService(BaseService):
             statement=new_statement
         )
 
-        response = CreateAccountTransactionResponse(
-            transaction=AccountTransactionSchema.model_validate(new_statement),
-        )
+        response = {"success": True, "transaction_id": str(new_statement.id)}
 
         return response
 
@@ -161,24 +149,29 @@ class AccountService(BaseService):
 
     async def get_transactions(
         self, params: GetAccountTransactionRequest
-    ) -> GetAccountTransactionResponse:
+    ) -> dict[str, Any]:
         transactions = await self.account_manager.get_transactions(
             owner_id=self.user["user_id"],
             start_period=params.start_period,
             end_period=params.end_period,
         )
 
-        response = GetAccountTransactionResponse(
-            quantity=len(transactions) if transactions else 0,
-            transactions=(
-                [
-                    AccountTransactionSchema(**transaction)
-                    for transaction in transactions
-                ]
-                if transactions
-                else []
-            ),
-        )
+        response = {
+            "quantity": len(transactions) if transactions else 0,
+            "transactions": transactions,
+        }
+
+        # response = GetAccountTransactionResponse(
+        #     quantity=len(transactions) if transactions else 0,
+        #     transactions=(
+        #         [
+        #             AccountTransactionSchema(**transaction)
+        #             for transaction in transactions
+        #         ]
+        #         if transactions
+        #         else []
+        #     ),
+        # )
 
         return response
 

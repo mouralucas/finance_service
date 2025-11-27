@@ -10,19 +10,13 @@ from backend.database import get_session
 from schemas.request.account import (
     CloseAccountRequest,
     CreateAccountRequest,
-    CreateAccountTransactionRequest,
     CreateBalanceRequest,
-    GetAccountRequest,
-    GetAccountTransactionRequest,
     GetBalanceRequest,
     UpdateAccountTransactionRequest,
 )
 from schemas.response.account import (
     CloseAccountResponse,
     CreateAccountResponse,
-    CreateAccountTransactionResponse,
-    GetAccountResponse,
-    GetAccountTransactionResponse,
     GetBalanceResponse,
 )
 from services.account import AccountService
@@ -46,19 +40,6 @@ async def create_account(
     )
 
 
-@router.get(
-    "",
-    summary="List all accounts",
-    description="Get user accounts base on filters chosen",
-)
-async def get_account(
-    params: GetAccountRequest = Depends(),
-    session: AsyncSession = Depends(get_session),
-    user: RequiredUser = Security(get_user),
-) -> GetAccountResponse:
-    return await AccountService(session=session, user=user).get_accounts(params=params)
-
-
 @router.patch(
     "/close",
     summary="Close an account",
@@ -74,22 +55,6 @@ async def close_account(
     )
 
 
-@router.post(
-    "/transaction",
-    status_code=status.HTTP_201_CREATED,
-    summary="Create a transaction",
-    description="Create a transaction for an account",
-)
-async def create_transaction(
-    transaction: CreateAccountTransactionRequest,
-    session: AsyncSession = Depends(get_session),
-    user: RequiredUser = Security(get_user),
-) -> CreateAccountTransactionResponse:
-    return await AccountService(session=session, user=user).create_transaction(
-        transaction=transaction
-    )
-
-
 @router.patch("/transaction")
 async def update_transaction(
     transaction: UpdateAccountTransactionRequest,
@@ -98,17 +63,6 @@ async def update_transaction(
 ):
     return await AccountService(session=session, user=user).update_transaction(
         transaction=transaction
-    )
-
-
-@router.get("/transaction", summary="Get account transactions")
-async def get_transactions(
-    params: GetAccountTransactionRequest = Depends(),
-    session: AsyncSession = Depends(get_session),
-    user: RequiredUser = Security(get_user),
-) -> GetAccountTransactionResponse:
-    return await AccountService(session=session, user=user).get_transactions(
-        params=params
     )
 
 

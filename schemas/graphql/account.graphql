@@ -18,7 +18,7 @@ input GetAccountsInput {
 
 type GetAccountResponse {
     quantity: Int!
-    accounts: [Account]!
+    accounts: [Account!]!
 }
 
 type Account {
@@ -130,7 +130,8 @@ input UpdateAccountTransactionInput {
 }
 
 type CreateUpdateAccountTransactionResponse {
-    transaction: AccountTransaction
+    success: Boolean!
+    transactionId: String!
 }
 
 type AccountTransaction {

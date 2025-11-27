@@ -37,7 +37,7 @@ class AccountManager(BaseDataManager):
 
     async def get_accounts(self, params: dict[str, Any]) -> list[dict[Any, Any]] | None:
         stmt = select(
-            AccountModel.id,
+            AccountModel.id.label("account_id"),
             AccountModel.active,
             AccountModel.bank_id,
             AccountModel.nickname,
@@ -122,7 +122,7 @@ class AccountManager(BaseDataManager):
         query = (
             select(
                 transaction_alias.owner_id,
-                transaction_alias.id,
+                transaction_alias.id.label("transaction_id"),
                 transaction_alias.account_id,
                 account_alias.nickname.label("account_nickname"),
                 transaction_alias.currency_id,

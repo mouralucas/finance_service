@@ -4,6 +4,7 @@ from ariadne import (
     graphql,
     load_schema_from_path,
     make_executable_schema,
+    snake_case_fallback_resolvers,
 )
 from ariadne.explorer import ExplorerGraphiQL
 from fastapi import APIRouter, Depends, Request, Security
@@ -40,7 +41,12 @@ bind_investment_resovlers(query, mutation)
 bind_investment_brazilian_funds_resolvers(query, mutation)
 
 schema = make_executable_schema(
-    type_defs, query, mutation, date_scalar, datetime_scalar
+    type_defs,
+    query,
+    mutation,
+    date_scalar,
+    datetime_scalar,
+    snake_case_fallback_resolvers,
 )
 
 
