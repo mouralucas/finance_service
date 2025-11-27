@@ -20,7 +20,7 @@ async def get_currencies_resolver(_, info: GraphQLResolveInfo):
         session=info.context["session"], user=info.context["user"]
     ).get_currencies()
 
-    return currencies.model_dump(by_alias=True)
+    return currencies
 
 
 def bind_finance_dashboard_resolvers(query: QueryType, mutation: MutationType):

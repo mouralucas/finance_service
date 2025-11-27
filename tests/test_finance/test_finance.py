@@ -7,13 +7,29 @@ async def test_get_currency(client, create_currency):
     currencies = create_currency
     currencies_len = len(currencies)
 
-    response = await client.get("/finance/currency")
+    query = """
+        query GetCurrencies {
+            getCurrencies {
+                quantity
+                currencies {
+                    currencyId
+                    name
+                    symbol
+                }
+            }
+        }
+    """
+
+    response = await client.post("/graphql/finance", json={"query": query})
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
 
-    assert "currencies" in data
-    assert type(data["currencies"]) is list
-    assert len(data["currencies"]) == currencies_len
+    assert "data" in data
+    assert "getCurrencies" in data["data"]
+
+    assert "currencies" in data["data"]["getCurrencies"]
+    assert type(data["data"]["getCurrencies"]["currencies"]) is list
+    assert len(data["data"]["getCurrencies"]["currencies"]) == currencies_len
 
 
 @pytest.mark.asyncio

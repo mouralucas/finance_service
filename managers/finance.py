@@ -4,7 +4,7 @@ from typing import cast
 from fastapi import HTTPException
 from rolf_common.managers import BaseDataManager
 from rolf_common.models import SQLModel
-from sqlalchemy import func, select
+from sqlalchemy import RowMapping, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
@@ -47,16 +47,16 @@ class FinanceManager(BaseDataManager):
 
         return cast(FundsBrModel, fund)
 
-    async def get_currencies(self) -> list[CurrencyModel] | None:
-        query = select(CurrencyModel)
+    async def get_currencies(self) -> list[RowMapping] | None:
+        query = select(
+            CurrencyModel.id.label("currency_id"),
+            CurrencyModel.name,
+            CurrencyModel.symbol,
+        )
 
         currencies = await self.get_all(query)
 
-        return (
-            [currency["CurrencyModel"] for currency in currencies]
-            if currencies
-            else None
-        )
+        return currencies
 
     async def get_tax_fee(
         self, country_id: str, tax_fee_type: str

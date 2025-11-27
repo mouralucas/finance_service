@@ -1,3 +1,5 @@
+from typing import Any
+
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import BaseService
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -8,7 +10,6 @@ from managers.finance import FinanceManager
 from models.investment_deprecated import FundsBrModel
 from schemas.core import (
     BankSchema,
-    CurrencySchema,
     ExpensesByCategory,
     IndexerSchema,
     IndexerTypeSchema,
@@ -26,7 +27,6 @@ from schemas.response.finance import (
     CreateBrazilianFundResponse,
     GetBankResponse,
     GetBrazilianFundsResponse,
-    GetCurrencyResponse,
     GetExpensesByCategoryResponse,
     GetIndexerResponse,
     GetIndexerSeriesResponse,
@@ -49,17 +49,22 @@ class FinanceService(BaseService):
 
         print(balance)
 
-    async def get_currencies(self) -> GetCurrencyResponse:
+    async def get_currencies(self) -> dict[str, Any]:
         currencies = await self.finance_manager.get_currencies()
 
-        response = GetCurrencyResponse(
-            quantity=len(currencies) if currencies else 0,
-            currencies=(
-                [CurrencySchema.model_validate(currency) for currency in currencies]
-                if currencies
-                else []
-            ),
-        )
+        # response = GetCurrencyResponse(
+        #     quantity=len(currencies) if currencies else 0,
+        #     currencies=(
+        #         [CurrencySchema.model_validate(currency) for currency in currencies]
+        #         if currencies
+        #         else []
+        #     ),
+        # )
+
+        response = {
+            "quantity": len(currencies) if currencies else 0,
+            "currencies": currencies,
+        }
 
         return response
 

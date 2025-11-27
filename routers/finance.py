@@ -15,7 +15,6 @@ from schemas.response.finance import (
     CreateBrazilianFundResponse,
     GetBankResponse,
     GetBrazilianFundsResponse,
-    GetCurrencyResponse,
     GetExpensesByCategoryResponse,
     GetIndexerResponse,
     GetIndexerTypeResponse,
@@ -25,14 +24,6 @@ from schemas.response.finance import (
 from services.finance import FinanceService
 
 router = APIRouter(prefix="/finance", tags=["Finance"])
-
-
-@router.get("/currency", summary="Get currencies")
-async def get_currencies(
-    session: AsyncSession = Depends(get_session),
-    user: RequiredUser = Security(get_user),
-) -> GetCurrencyResponse:
-    return await FinanceService(session=session, user=user).get_currencies()
 
 
 @router.get("/currency/average-price")
