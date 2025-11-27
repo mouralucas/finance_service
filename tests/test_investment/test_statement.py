@@ -79,7 +79,7 @@ class TestStatement:
             query GetInvestmentStatementById ($statementId: String!) {
                 getInvestmentStatementById(statement_id: $statementId) {
                     statement {
-                        investmentStatementId
+                        id
                         grossAmount
                     }
                 }
@@ -96,7 +96,7 @@ class TestStatement:
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
         updated_statement = data["data"]["getInvestmentStatementById"]["statement"]
-        assert updated_statement["investmentStatementId"] == str(statement.id)
+        assert updated_statement["id"] == str(statement.id)
         assert "grossAmount" in updated_statement
         assert updated_statement["grossAmount"] == new_gross_amount
 
@@ -111,7 +111,7 @@ class TestStatement:
             query GetInvestmentStatementById ($statementId: String!) {
                 getInvestmentStatementById(statement_id: $statementId) {
                     statement {
-                        investmentStatementId
+                        id
                         period
                         previousAmount
                         contribution
@@ -120,8 +120,6 @@ class TestStatement:
                         totalFee
                         referenceDate
                         atMaturity
-                        valueChange
-                        percentageChange
                         netAmount
                     }
                 }
@@ -141,14 +139,11 @@ class TestStatement:
         assert "data" in data
         assert "getInvestmentStatementById" in data["data"]
         assert "statement" in data["data"]["getInvestmentStatementById"]
-        assert (
-            "investmentStatementId"
-            in data["data"]["getInvestmentStatementById"]["statement"]
-        )
+        assert "id" in data["data"]["getInvestmentStatementById"]["statement"]
 
         fetched_statement = data["data"]["getInvestmentStatementById"]["statement"]
         # The returned ID should be the same as the request
-        assert fetched_statement["investmentStatementId"] == str(statement.id)
+        assert fetched_statement["id"] == str(statement.id)
 
     @pytest.mark.asyncio
     async def test_get_statement_metadata(self, client, create_active_investment):

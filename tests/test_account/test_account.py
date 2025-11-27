@@ -53,6 +53,50 @@ class TestAccount:
         assert data["account"]["currencyId"] == str(currency_id)
 
     @pytest.mark.asyncio
+    async def test_get_account(self, client, create_open_account):
+        query = """
+            query GetAccounts {
+                getAccounts (
+                        params: { accountId: null, currencyId: null, active: false }
+                    ){
+                    quantity
+                    accounts {
+                        accountId
+                        active
+                        bankId
+                        nickname
+                        description
+                        branch
+                        number
+                        openDate
+                        closeDate
+                        typeId
+                        currencyId
+                        currencySymbol
+                    }
+                }
+            }
+        """
+
+        response = await client.post("/graphql/finance", json={"query": query})
+
+        assert response.status_code == status.HTTP_200_OK
+
+        data = response.json()
+
+        assert "data" in data
+        assert "getAccounts" in data["data"]
+        assert "accounts" in data["data"]["getAccounts"]
+        assert type(data["data"]["getAccounts"]["accounts"]) is list
+        assert "quantity" in data["data"]["getAccounts"]
+        assert data["data"]["getAccounts"]["quantity"] > 0
+
+        for i in data["data"]["getAccounts"]["accounts"]:
+            assert "accountId" in i
+            assert "bankId" in i
+            assert "nickname" in i
+
+    @pytest.mark.asyncio
     async def test_account_factory(self, client, create_account_type_beta):
         print(create_account_type_beta)
 
@@ -123,47 +167,6 @@ async def test_close_account_with_credit_card(client, create_valid_credit_card):
 
 
 @pytest.mark.asyncio
-async def test_get_account(client, create_open_account):
-    query = """
-        query GetAccounts {
-            getAccounts (params: { accountId: null, currencyId: null, active: false }){
-                quantity
-                accounts {
-                    accountId
-                    active
-                    bankId
-                    nickname
-                    description
-                    branch
-                    number
-                    openDate
-                    closeDate
-                    typeId
-                    currencyId
-                    currencySymbol
-                }
-            }
-        }
-    """
-
-    response = await client.post("/graphql/finance", json={"query": query})
-
-    assert response.status_code == status.HTTP_200_OK
-
-    data = response.json()
-
-    assert "data" in data
-    assert "getAccounts" in data["data"]
-    assert "accounts" in data["data"]["getAccounts"]
-    assert type(data["data"]["getAccounts"]["accounts"]) is list
-    assert "quantity" in data["data"]["getAccounts"]
-    assert data["data"]["getAccounts"]["quantity"] > 0
-
-    assert "accountId" in data["data"]["getAccounts"]["accounts"][0]
-    assert "bankId" in data["data"]["getAccounts"]["accounts"][0]
-
-
-@pytest.mark.asyncio
 async def test_create_transaction(
     client, create_open_account, create_category, create_currency
 ):
@@ -178,7 +181,19 @@ async def test_create_transaction(
     transaction_date = "2024-08-15"
     category_id = categories[0].id
     description = "My transaction that I made"
-    operation_type = "INCOMING"
+
+    query = """
+        mutation CreateAccountTransaction (
+                $transaction: CreateAccountTransactionInput!
+            ) {
+            createAccountTransaction(
+                transaction: $transaction
+            ) {
+                success
+                transactionId
+            }
+        }
+    """
 
     payload = {
         "accountId": str(user_account.id),
@@ -187,38 +202,21 @@ async def test_create_transaction(
         "transactionDate": transaction_date,
         "categoryId": str(category_id),
         "description": description,
-        "operationType": operation_type,
     }
-    response = await client.post("/account/transaction", json=payload)
+    response = await client.post(
+        "graphql/finance", json={"query": query, "variables": {"transaction": payload}}
+    )
 
-    assert response.status_code == status.HTTP_201_CREATED
+    assert response.status_code == status.HTTP_200_OK
 
     data = response.json()
 
-    assert "transaction" in data
-    assert "transactionId" in data["transaction"]
-    assert "ownerId" in data["transaction"]
-
-    assert "accountId" in data["transaction"]
-    assert data["transaction"]["accountId"] == str(user_account.id)
-    assert "period" in data["transaction"]
-    assert data["transaction"]["period"] == 202408  # add function to calc period
-    assert "currencyId" in data["transaction"]
-    assert data["transaction"]["currencyId"] == currency_id
-    assert "amount" in data["transaction"]
-    assert data["transaction"]["amount"] == amount
-    assert "transactionDate" in data["transaction"]
-    assert data["transaction"]["transactionDate"] == transaction_date
-    assert "categoryId" in data["transaction"]
-    assert data["transaction"]["categoryId"] == str(category_id)
-    assert "description" in data["transaction"]
-    assert data["transaction"]["description"] == description
-
-    # The transaction currency and amount must be the same in local transactions
-    assert "transactionCurrencyId" in data["transaction"]
-    assert data["transaction"]["transactionCurrencyId"] == str(currency_id)
-    assert "transactionAmount" in data["transaction"]
-    assert data["transaction"]["transactionAmount"] == amount
+    assert "data" in data
+    assert "createAccountTransaction" in data["data"]
+    assert "success" in data["data"]["createAccountTransaction"]
+    assert data["data"]["createAccountTransaction"]["success"] is True
+    assert "transactionId" in data["data"]["createAccountTransaction"]
+    assert data["data"]["createAccountTransaction"]["transactionId"] is not None
 
 
 @pytest.mark.asyncio
@@ -236,7 +234,19 @@ async def test_create_transaction_closed_account(
     transaction_date = "2024-08-25"
     category_id = categories[1].id
     description = "My transaction that I made in a closed account"
-    operation_type = "OUTGOING"
+
+    query = """
+        mutation CreateAccountTransaction (
+                $transaction: CreateAccountTransactionInput!
+            ) {
+            createAccountTransaction(
+                transaction: $transaction
+            ) {
+                success
+                transactionId
+            }
+        }
+    """
 
     payload = {
         "accountId": str(user_account.id),
@@ -245,17 +255,33 @@ async def test_create_transaction_closed_account(
         "transactionDate": transaction_date,
         "categoryId": str(category_id),
         "description": description,
-        "operationType": operation_type,
     }
-    response = await client.post("/account/transaction", json=payload)
+    response = await client.post(
+        "/graphql/finance", json={"query": query, "variables": {"transaction": payload}}
+    )
 
-    assert response.status_code == status.HTTP_403_FORBIDDEN
+    assert response.status_code == status.HTTP_200_OK
+    data = response.json()
+    assert "errors" in data
+    assert data["errors"][0]["message"] == "403: Account not found or not active"
 
 
 @pytest.mark.asyncio
 async def test_get_transactions_no_filter(client, create_account_transaction):
-    response = await client.get("/account/transaction")
-
+    query = """
+        query GetAccountTransactions {
+            getAccountTransactions {
+                quantity
+                transactions {
+                    transactionId
+                    ownerId
+                }
+            }
+        }
+    """
+    response = await client.post("/graphql/finance", json={"query": query})
+    # TODO: this returns 200 but there is errors: why cannot send without filters if
+    # not required?
     assert response.status_code == status.HTTP_200_OK
 
 

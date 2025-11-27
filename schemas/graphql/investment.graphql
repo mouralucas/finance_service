@@ -11,7 +11,7 @@ extend type Mutation {
     # Investment
     settleInvestment(input: SettleInvestmentInput): SettleInvestmentResponse!
 
-    # Statenebt
+    # Statement
     createInvestmentStatement(statement: CreateInvestmentStatementInput): CreateInvestmentStatementResponse
     updateInvestmentStatement(statement: UpdateInvestmentStatementInput): UpdateInvestmentStatementResponse
 }
@@ -100,7 +100,7 @@ type GetStatementMetadataResponse {
 }
 
 type Statement {
-    investmentStatementId: String!
+    id: String!
     period: Int!
     previousAmount: Float!
     contribution: Float!

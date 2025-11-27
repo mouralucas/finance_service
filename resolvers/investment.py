@@ -30,7 +30,7 @@ async def update_statement_resolver(_, info: GraphQLResolveInfo, statement) -> d
         session=info.context["session"], user=info.context["user"]
     ).update_statement(input_statement=statement_)
 
-    return result.model_dump(by_alias=True)
+    return result
 
 
 async def get_statement_by_id(_, info: GraphQLResolveInfo, statement_id: uuid.UUID):
@@ -40,7 +40,7 @@ async def get_statement_by_id(_, info: GraphQLResolveInfo, statement_id: uuid.UU
         session=info.context["session"], user=info.context["user"]
     ).get_statement_by_id(statement_id=input.statement_id)
 
-    return statement.model_dump(by_alias=True)
+    return statement
 
 
 async def get_investment_performance_resolver(_, info: GraphQLResolveInfo, params):
@@ -60,7 +60,7 @@ async def get_statement_metadata_resolver(_, info: GraphQLResolveInfo, params: d
         session=info.context["session"], user=info.context["user"]
     ).get_statement_metadata(investment_id=params_.investment_id)
 
-    return metadata.model_dump(by_alias=True)
+    return metadata.model_dump()
 
 
 def bind_investment_resovlers(query: QueryType, mutation: MutationType):

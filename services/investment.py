@@ -1,5 +1,6 @@
 import uuid
 from decimal import Decimal
+from typing import Any
 
 from dateutil.relativedelta import relativedelta
 from fastapi import HTTPException
@@ -23,11 +24,9 @@ from schemas.request.investment import (
 from schemas.response.investment import (
     CreateStatementResponse,
     GetInvestmentPerformanceResponseV2,
-    GetStatementByIdResponse,
     GetStatementMetadataResponse,
     GetStatementsResponse,
     SettleInvestmentResponse,
-    UpdateStatementResponse,
 )
 from services.utils.datetime import (
     get_last_business_day,
@@ -162,30 +161,31 @@ class InvestmentService(BaseService):
 
     async def update_statement(
         self, input_statement: UpdateStatementRequest
-    ) -> UpdateStatementResponse:
+    ) -> dict[str, Any]:
         changed_fields = input_statement.model_dump(exclude_unset=True, exclude={"id"})
 
         updated_statement = await self.investment_manager.update_statement(
             statement_id=input_statement.id, fields=changed_fields
         )
 
-        response = UpdateStatementResponse(
-            updated=updated_statement is not None,
-            statement_id=updated_statement.id if updated_statement else None,
-        )
+        # response = UpdateStatementResponse(
+        #     updated=updated_statement is not None,
+        #     statement_id=updated_statement.id if updated_statement else None,
+        # )
+
+        response = {
+            "updated": updated_statement is not None,
+            "statement_id": str(updated_statement.id) if updated_statement else None,
+        }
 
         return response
 
-    async def get_statement_by_id(
-        self, statement_id: uuid.UUID
-    ) -> GetStatementByIdResponse:
+    async def get_statement_by_id(self, statement_id: uuid.UUID) -> dict[str, Any]:
         statement = await self.investment_manager.get_statement_by_id(
             statement_id=statement_id
         )
 
-        response = GetStatementByIdResponse(
-            statement=InvestmentStatementSchema.model_validate(statement)
-        )
+        response = {"statement": statement.to_dict() if statement else None}
 
         return response
 
