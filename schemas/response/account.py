@@ -20,17 +20,6 @@ class CloseAccountResponse(CreateAccountResponse):
     pass
 
 
-class GetAccountResponse(BaseModel):
-    quantity: int = Field(
-        ...,
-        serialization_alias="quantity",
-        description="The number of accounts fetched",
-    )
-    accounts: list[AccountSchema] = Field(
-        ..., serialization_alias="accounts", description="The accounts of the user"
-    )
-
-
 class CreateAccountTransactionResponse(BaseModel):
     model_config = ConfigDict(
         from_attributes=True,
@@ -45,13 +34,6 @@ class CreateAccountTransactionResponse(BaseModel):
 
 class UpdateTransactionResponse(CreateAccountTransactionResponse):
     pass
-
-
-class GetAccountTransactionResponse(BaseModel):
-    quantity: int = Field(..., description="The number of transactions")
-    transactions: list[AccountTransactionSchema] = Field(
-        ..., description="The account transactions"
-    )
 
 
 class CreateBalanceResponse(BaseModel):

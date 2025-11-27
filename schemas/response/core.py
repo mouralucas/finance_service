@@ -1,15 +1,6 @@
 from pydantic import BaseModel, Field
 
-from schemas.core import CategorySchema, CountrySchema
-
-
-class GetCategoryResponse(BaseModel):
-    quantity: int = Field(
-        ..., description="How many categories are available in request"
-    )
-    categories: list[CategorySchema] = Field(
-        ..., description="The list of available categories"
-    )
+from schemas.core import CountrySchema
 
 
 class GetCountryResponse(BaseModel):

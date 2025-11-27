@@ -4,7 +4,6 @@ from rolf_common.schemas import SuccessResponseBase
 
 from schemas.core import (
     BankSchema,
-    CurrencySchema,
     ExpensesByCategory,
     IndexerSchema,
     IndexerTypeSchema,
@@ -31,13 +30,6 @@ class GetSummaryResponse(SuccessResponseBase):
     incoming: float = Field(..., description="The total amount incoming in the period")
     outgoing: float = Field(..., description="The total amount outgoing in the period")
     balance: float = Field(..., description="The total amount in the period")
-
-
-class GetCurrencyResponse(BaseModel):
-    quantity: int = Field(..., description="The total of currencies available")
-    currencies: list[CurrencySchema] = Field(
-        ..., description="The list of currencies available"
-    )
 
 
 class GetBankResponse(BaseModel):
