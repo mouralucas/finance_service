@@ -15,7 +15,6 @@ from schemas.credit_card import (
     CreditCardBillSchema,
     CreditCardSchema,
     CreditCardTransactionSchema,
-    InstallmentsDueDates,
 )
 from schemas.request.credit_card import (
     CancelCreditCardRequest,
@@ -33,7 +32,6 @@ from schemas.response.credit_card import (
     GetCreditCardBillConsolidatedResponse,
     GetCreditCardBillHistoryResponse,
     GetCreditCardTransactionResponse,
-    GetInstallmentsDueDatesResponse,
 )
 from services.utils.datetime import get_installments_due_dates, get_period
 
@@ -308,7 +306,7 @@ class CreditCardService(BaseService):
 
     async def get_installments_due_date(
         self, params: GetInstallmentsDueDatesRequest
-    ) -> GetInstallmentsDueDatesResponse:
+    ) -> dict[str, Any]:
         credit_card = await CreditCardManager(
             session=self.session
         ).get_credit_card_by_id(params.credit_card_id)
@@ -325,12 +323,15 @@ class CreditCardService(BaseService):
             tot_installments=params.tot_installments,
         )
 
-        response = GetInstallmentsDueDatesResponse(
-            due_dates=[
-                InstallmentsDueDates.model_validate(due_date)
-                for due_date in installments_due_dates
-            ],
-        )
+        # response = GetInstallmentsDueDatesResponse(
+        #     due_dates=[
+        #         InstallmentsDueDates.model_validate(due_date)
+        #         for due_date in installments_due_dates
+        #     ],
+        # )
+        response = {
+            "due_dates": installments_due_dates,
+        }
 
         return response
 

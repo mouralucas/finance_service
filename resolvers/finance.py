@@ -3,16 +3,18 @@ from graphql import GraphQLResolveInfo
 
 from schemas.request.finance import GetIndexerSeriesRequest
 from services.finance import FinanceService
+from utils.graphql_input_validation import validate_graphql_input
 
 
-async def get_indexer_series_resolver(_, info: GraphQLResolveInfo, params):
-    params = GetIndexerSeriesRequest.model_validate(params)
-
+@validate_graphql_input(GetIndexerSeriesRequest)
+async def get_indexer_series_resolver(
+    _, info: GraphQLResolveInfo, params: GetIndexerSeriesRequest
+):
     indexer_series = await FinanceService(
         session=info.context["session"], user=info.context["user"]
     ).get_indexer_series(params=params)
 
-    return indexer_series.model_dump(by_alias=True)
+    return indexer_series
 
 
 async def get_currencies_resolver(_, info: GraphQLResolveInfo):

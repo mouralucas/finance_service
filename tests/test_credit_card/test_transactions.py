@@ -7,6 +7,36 @@ from services.credit_card import CreditCardService
 from services.utils.datetime import get_installments_due_dates, get_period
 
 
+class TestCreditCardTransactions:
+    @pytest.mark.asyncio
+    async def test_get_installments_due_dates(self, client, create_valid_credit_card):
+        credit_cards = create_valid_credit_card
+
+        query = """
+            query GetCreditCardInstallmentDueDates (
+                $params: GetInstallmentsDueDatesInput!
+            ) {
+                getCreditCardInstallmentDueDates(
+                    params: $params
+                ) {
+                    dueDates {
+                        currentInstallment
+                        dueDate
+                    }
+                }
+            }
+        """
+        payload = {
+            "transactionDate": "2024-11-11",
+            "creditCardId": str(credit_cards[0].id),
+            "totInstallments": 3,
+        }
+        response = await client.post(
+            "/graphql/finance", json={"query": query, "variables": {"params": payload}}
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+
 @pytest.mark.asyncio
 async def test_create_transaction_no_installment(
     client, create_valid_credit_card, create_category, create_currency
@@ -228,18 +258,3 @@ async def test_create_transaction_cancelled_card(
     response = await client.post("/creditcard/transaction", json=payload)
 
     assert response.status_code == status.HTTP_404_NOT_FOUND
-
-
-@pytest.mark.asyncio
-async def test_get_installments_due_dates(client, create_valid_credit_card):
-    credit_cards = create_valid_credit_card
-
-    payload = {
-        "transactionDate": "2024-11-11",
-        "creditCardId": credit_cards[0].id,
-        "totInstallments": 3,
-    }
-    response = await client.get(
-        "creditcard/transaction/installment/due-date", params=payload
-    )
-    assert response.status_code == status.HTTP_200_OK

@@ -5,7 +5,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from backend.database import get_session
-from schemas.request.investment import GetBrazilianFundInvestmentsRequest
 from schemas.request.investment_brazilian_funds import (
     CreateBrazilianFundInvestmentRequest,
     CreateBrazilianFundInvestmentStatementRequest,
@@ -14,7 +13,6 @@ from schemas.request.investment_brazilian_funds import (
 from schemas.response.investment_brazilian_funds import (
     CreateBrazilianFundInvestmentResponse,
     CreateBrazilianFundInvestmentStatementResponse,
-    GetBrazilianFundInvestmentsResponse,
     GetBrazilianFundInvestmentStatementResponse,
 )
 from services.investment_brazilian_fund import InvestmentBrazilianFundService
@@ -35,17 +33,6 @@ async def create_funds_br_investment(
     return await InvestmentBrazilianFundService(
         session=session, user=user
     ).create_brazilian_fund_investment(investment=investment)
-
-
-@router.get("")
-async def get_funds_br_investments(
-    params: GetBrazilianFundInvestmentsRequest = Depends(),
-    session: AsyncSession = Depends(get_session),
-    user: RequiredUser = Security(get_user),
-) -> GetBrazilianFundInvestmentsResponse:
-    return await InvestmentBrazilianFundService(
-        session=session, user=user
-    ).get_brazilian_fund_investments(params=params)
 
 
 @router.post(

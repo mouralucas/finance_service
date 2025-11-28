@@ -9,6 +9,7 @@ from services.credit_card import CreditCardService
 from utils.graphql_input_validation import validate_graphql_input
 
 
+# Credit Card Resolvers
 @validate_graphql_input(GetCreditCardRequest)
 async def get_credit_cards_resolver(
     _, info: GraphQLResolveInfo, params: GetCreditCardRequest
@@ -20,14 +21,16 @@ async def get_credit_cards_resolver(
     return credit_cards
 
 
-async def get_installments_due_dates_resolver(_, info: GraphQLResolveInfo, params):
-    params_ = GetInstallmentsDueDatesRequest.model_validate(params)
-
+# Helper to get credit card installment due dates
+@validate_graphql_input(GetInstallmentsDueDatesRequest)
+async def get_installments_due_dates_resolver(
+    _, info: GraphQLResolveInfo, params: GetInstallmentsDueDatesRequest
+):
     credit_cards = await CreditCardService(
         session=info.context["session"], user=info.context["user"]
-    ).get_installments_due_date(params=params_)
+    ).get_installments_due_date(params=params)
 
-    return credit_cards.model_dump(by_alias=True)
+    return credit_cards
 
 
 def bind_credit_card_resolvers(query: QueryType, mutation: MutationType):

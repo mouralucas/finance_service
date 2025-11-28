@@ -11,7 +11,6 @@ from schemas.request.credit_card import (
     CreateCreditCardTransactionRequest,
     GetCreditCardBillRequest,
     GetCreditCardTransactionsRequest,
-    GetInstallmentsDueDatesRequest,
 )
 from schemas.response.credit_card import (
     CreateCreditCardResponse,
@@ -19,7 +18,6 @@ from schemas.response.credit_card import (
     GetCreditCardBillConsolidatedResponse,
     GetCreditCardBillHistoryResponse,
     GetCreditCardTransactionResponse,
-    GetInstallmentsDueDatesResponse,
 )
 from services.credit_card import CreditCardService
 
@@ -71,15 +69,6 @@ async def create_transaction(
     )
 
 
-@router.patch("/transaction")
-async def update_transaction(
-    transaction: CreateCreditCardTransactionRequest,
-    session: AsyncSession = Depends(get_session),
-    user: RequiredUser = Security(get_user),
-) -> CreateCreditCardTransactionResponse:
-    pass
-
-
 @router.get(
     "/transaction",
     summary="Get credit card transactions",
@@ -91,21 +80,6 @@ async def get_transactions(
     user: RequiredUser = Security(get_user),
 ) -> GetCreditCardTransactionResponse:
     return await CreditCardService(session=session, user=user).get_transactions(params)
-
-
-@router.get(
-    "/transaction/installment/due-date",
-    summary="Get due date",
-    description="Get due date for every installment",
-)
-async def get_installments_due_dates(
-    params: GetInstallmentsDueDatesRequest = Depends(),
-    session: AsyncSession = Depends(get_session),
-    user: RequiredUser = Security(get_user),
-) -> GetInstallmentsDueDatesResponse:
-    return await CreditCardService(
-        session=session, user=user
-    ).get_installments_due_date(params=params)
 
 
 @router.get(

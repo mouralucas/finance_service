@@ -16,7 +16,7 @@ from schemas.core import (
     LiquiditySchema,
     TaxFeeSchema,
 )
-from schemas.finance import FundsBrSchema, IndexerSeries
+from schemas.finance import FundsBrSchema
 from schemas.request.finance import (
     CreateBrazilianFundRequest,
     GetIndexerSeriesRequest,
@@ -29,7 +29,6 @@ from schemas.response.finance import (
     GetBrazilianFundsResponse,
     GetExpensesByCategoryResponse,
     GetIndexerResponse,
-    GetIndexerSeriesResponse,
     GetIndexerTypeResponse,
     GetLiquidityResponse,
     GetTaxFeeResponse,
@@ -51,15 +50,6 @@ class FinanceService(BaseService):
 
     async def get_currencies(self) -> dict[str, Any]:
         currencies = await self.finance_manager.get_currencies()
-
-        # response = GetCurrencyResponse(
-        #     quantity=len(currencies) if currencies else 0,
-        #     currencies=(
-        #         [CurrencySchema.model_validate(currency) for currency in currencies]
-        #         if currencies
-        #         else []
-        #     ),
-        # )
 
         response = {
             "quantity": len(currencies) if currencies else 0,
@@ -203,17 +193,13 @@ class FinanceService(BaseService):
     # Indexer series data
     async def get_indexer_series(
         self, params: GetIndexerSeriesRequest
-    ) -> GetIndexerSeriesResponse:
+    ) -> dict[str, Any]:
         series = await self.finance_manager.get_indexer_series()
 
-        response = GetIndexerSeriesResponse(
-            quantity=len(series) if series else 0,
-            series=(
-                [IndexerSeries.model_validate(serie) for serie in series]
-                if series
-                else []
-            ),
-        )
+        response = {
+            "quantity": len(series) if series else 0,
+            "series": series,
+        }
 
         return response
 

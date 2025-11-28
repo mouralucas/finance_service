@@ -6,6 +6,7 @@ from sqlalchemy import RowMapping, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from managers.investment import InvestmentManager
+from models.core import CurrencyModel
 from models.investment_brazilian_fund import (
     InvestmentBrazilianFundsModel,
     InvestmentBrazilianFundsStatementModel,
@@ -25,10 +26,42 @@ class InvestmentBrazilianFundManager(InvestmentManager):
 
     async def get_brazilian_fund_investment(
         self, owner_id: uuid.UUID, investment_id: uuid.UUID | None, is_settled: bool
-    ) -> list[InvestmentBrazilianFundsModel]:
-        query = select(InvestmentBrazilianFundsModel).where(
-            InvestmentBrazilianFundsModel.owner_id == owner_id,
-            InvestmentBrazilianFundsModel.is_settled == is_settled,
+    ) -> list[RowMapping] | None:
+        query = (
+            select(
+                InvestmentBrazilianFundsModel.id.label("investment_id"),
+                InvestmentBrazilianFundsModel.owner_id,
+                InvestmentBrazilianFundsModel.name,
+                InvestmentBrazilianFundsModel.custodian_id,
+                InvestmentBrazilianFundsModel.account_id,
+                InvestmentBrazilianFundsModel.price,
+                InvestmentBrazilianFundsModel.quantity,
+                InvestmentBrazilianFundsModel.amount,
+                InvestmentBrazilianFundsModel.type_id,
+                InvestmentBrazilianFundsModel.currency_id,
+                CurrencyModel.symbol.label("currency_symbol"),
+                InvestmentBrazilianFundsModel.country_id,
+                InvestmentBrazilianFundsModel.objective_id,
+                InvestmentBrazilianFundsModel.is_settled,
+                InvestmentBrazilianFundsModel.fund_id,
+                InvestmentBrazilianFundsModel.transaction_date,
+                InvestmentBrazilianFundsModel.investment_quotation_date,
+                InvestmentBrazilianFundsModel.investment_settlement_date,
+                InvestmentBrazilianFundsModel.redemption_quotation_date,
+                InvestmentBrazilianFundsModel.redemption_settlement_date,
+                InvestmentBrazilianFundsModel.settlement_amount,
+                InvestmentBrazilianFundsModel.tax,
+                InvestmentBrazilianFundsModel.fee,
+            )
+            .select_from(InvestmentBrazilianFundsModel)
+            .join(
+                CurrencyModel,
+                CurrencyModel.id == InvestmentBrazilianFundsModel.currency_id,
+            )
+            .where(
+                InvestmentBrazilianFundsModel.owner_id == owner_id,
+                InvestmentBrazilianFundsModel.is_settled == is_settled,
+            )
         )
 
         if investment_id:
@@ -39,11 +72,7 @@ class InvestmentBrazilianFundManager(InvestmentManager):
 
         result = await self.get_all(query)
 
-        return (
-            [investment["InvestmentBrazilianFundsModel"] for investment in result]
-            if result
-            else []
-        )
+        return result
 
     async def get_brazilian_fund_investment_consolidated(self, fund_id: uuid.UUID):
         pass

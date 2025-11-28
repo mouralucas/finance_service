@@ -1,3 +1,5 @@
+from typing import Any
+
 from fastapi import HTTPException
 from rolf_common.schemas.auth import RequiredUser
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -22,7 +24,6 @@ from schemas.request.investment_brazilian_funds import (
 from schemas.response.investment_brazilian_funds import (
     CreateBrazilianFundInvestmentResponse,
     CreateBrazilianFundInvestmentStatementResponse,
-    GetBrazilianFundInvestmentsResponse,
     GetBrazilianFundInvestmentStatementResponse,
 )
 from services.investment_deprecated import InvestmentServiceDeprecated
@@ -58,8 +59,8 @@ class InvestmentBrazilianFundService(InvestmentServiceDeprecated):
 
     async def get_brazilian_fund_investments(
         self, params: GetBrazilianFundInvestmentsRequest
-    ) -> GetBrazilianFundInvestmentsResponse:
-        statements = (
+    ) -> dict[str, Any]:
+        investment = (
             await self.investment_brazilian_fund_manager.get_brazilian_fund_investment(
                 owner_id=self.user["user_id"],
                 investment_id=params.id,
@@ -67,17 +68,10 @@ class InvestmentBrazilianFundService(InvestmentServiceDeprecated):
             )
         )
 
-        response = GetBrazilianFundInvestmentsResponse(
-            quantity=len(statements) if statements else 0,
-            investments=(
-                [
-                    InvestmentBrazilianFundSchema.model_validate(statement).transform()
-                    for statement in statements
-                ]
-                if statements
-                else []
-            ),
-        )
+        response = {
+            "quantity": len(investment) if investment else 0,
+            "investments": investment,
+        }
 
         return response
 
