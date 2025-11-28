@@ -56,9 +56,7 @@ class TestAccount:
     async def test_get_account(self, client, create_open_account):
         query = """
             query GetAccounts {
-                getAccounts (
-                        params: { accountId: null, currencyId: null, active: false }
-                    ){
+                getAccounts {
                     quantity
                     accounts {
                         accountId

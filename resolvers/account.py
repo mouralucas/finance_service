@@ -9,14 +9,13 @@ from schemas.request.account import (
     UpdateAccountTransactionRequest,
 )
 from services.account import AccountService
+from utils.graphql_input_validation import validate_graphql_input
 
-
-async def get_accounts_resolver(_, info: GraphQLResolveInfo, params):
-    params_ = GetAccountRequest.model_validate(params)
-
+@validate_graphql_input(GetAccountRequest)
+async def get_accounts_resolver(_, info: GraphQLResolveInfo, params: GetAccountRequest):
     accounts = await AccountService(
         session=info.context["session"], user=info.context["user"]
-    ).get_accounts(params=params_)
+    ).get_accounts(params=params)
 
     return accounts
 
