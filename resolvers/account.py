@@ -9,48 +9,46 @@ from schemas.request.account import (
     UpdateAccountTransactionRequest,
 )
 from services.account import AccountService
+from utils.graphql_input_validation import validate_graphql_input
 
 
-async def get_accounts_resolver(_, info: GraphQLResolveInfo, params):
-    params_ = GetAccountRequest.model_validate(params)
-
+@validate_graphql_input(GetAccountRequest)
+async def get_accounts_resolver(_, info: GraphQLResolveInfo, params: GetAccountRequest):
     accounts = await AccountService(
         session=info.context["session"], user=info.context["user"]
-    ).get_accounts(params=params_)
+    ).get_accounts(params=params)
 
     return accounts
 
 
-async def get_account_transactions_resolver(_, info: GraphQLResolveInfo, params):
-    params = GetAccountTransactionRequest.model_validate(params)
-
+@validate_graphql_input(GetAccountTransactionRequest)
+async def get_account_transactions_resolver(
+    _, info: GraphQLResolveInfo, params: GetAccountTransactionRequest
+):
     transactions = await AccountService(
         session=info.context["session"], user=info.context["user"]
     ).get_transactions(params=params)
 
     return transactions
 
-
+@validate_graphql_input(CreateAccountTransactionRequest)
 async def create_account_transactions_resolver(
-    _, info: GraphQLResolveInfo, transaction
+    _, info: GraphQLResolveInfo, transaction: CreateAccountTransactionRequest   
 ):
-    transaction_ = CreateAccountTransactionRequest.model_validate(transaction)
-
     new_transaction = await AccountService(
         session=info.context["session"], user=info.context["user"]
-    ).create_transaction(transaction=transaction_)
+    ).create_transaction(transaction=transaction)
 
     return new_transaction
 
 
+@validate_graphql_input(UpdateAccountTransactionRequest)
 async def update_account_transactions_resolver(
-    _, info: GraphQLResolveInfo, transaction
+    _, info: GraphQLResolveInfo, transaction: UpdateAccountTransactionRequest
 ):
-    transaction_ = UpdateAccountTransactionRequest.model_validate(transaction)
-
     new_transaction = await AccountService(
         session=info.context["session"], user=info.context["user"]
-    ).update_transaction(transaction=transaction_)
+    ).update_transaction(transaction=transaction)
 
     return new_transaction
 
