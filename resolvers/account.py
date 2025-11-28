@@ -31,9 +31,10 @@ async def get_account_transactions_resolver(
 
     return transactions
 
+
 @validate_graphql_input(CreateAccountTransactionRequest)
 async def create_account_transactions_resolver(
-    _, info: GraphQLResolveInfo, transaction: CreateAccountTransactionRequest   
+    _, info: GraphQLResolveInfo, transaction: CreateAccountTransactionRequest
 ):
     new_transaction = await AccountService(
         session=info.context["session"], user=info.context["user"]
