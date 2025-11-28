@@ -4,8 +4,8 @@ from starlette import status
 
 class TestBank:
     @pytest.mark.asyncio
-    async def test_get_banks(self, client, create_bank_beta):
-        total_banks = len(create_bank_beta)
+    async def test_get_banks(self, client, create_bank_factory):
+        total_banks = len(create_bank_factory)
 
         response = await client.get("/finance/bank")
 

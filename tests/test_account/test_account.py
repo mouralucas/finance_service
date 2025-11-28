@@ -7,11 +7,11 @@ from schemas.account import AccountTransactionSchema
 class TestAccount:
     @pytest.mark.asyncio
     async def test_create_account(
-        self, client, create_bank, create_account_type, create_currency
+        self, client, create_bank, create_account_type_beta, create_currency_factory
     ):
-        account_types = create_account_type
+        account_types = create_account_type_beta
         banks = create_bank
-        currencies = create_currency
+        currencies = create_currency_factory
 
         bank_id = banks[0].id
         nickname = "Minha conta 1"
