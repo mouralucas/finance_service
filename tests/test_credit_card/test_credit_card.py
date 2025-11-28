@@ -2,6 +2,61 @@ import pytest
 from starlette import status
 
 
+class TestCreditCards:
+    @pytest.mark.asyncio
+    async def test_get_valid_credit_card(self, client, create_valid_credit_card):
+        credit_cards = create_valid_credit_card
+
+        query = """
+            query GetCreditCards {
+                getCreditCards {
+                    quantity
+                    creditCards {
+                        ownerId
+                        nickname
+                        accountId
+                        currencyId
+                        issueDate
+                        cancellationDate
+                        dueDay
+                        closeDay
+                        creditCardId
+                        active
+                    }
+                }
+            }
+        """
+        response = await client.post("/graphql/finance", json={"query": query})
+        assert response.status_code == status.HTTP_200_OK
+
+        data = response.json()
+        assert "data" in data
+        assert "getCreditCards" in data["data"]
+        data = data["data"]["getCreditCards"]
+
+        assert "creditCards" in data
+        credit_card_1 = data["creditCards"][0]
+
+        assert "creditCardId" in credit_card_1
+        assert credit_card_1["creditCardId"] == str(credit_cards[0].id)
+        assert "nickname" in credit_card_1
+        assert credit_card_1["nickname"] == credit_cards[0].nickname
+        assert "accountId" in credit_card_1
+        assert credit_card_1["accountId"] == str(credit_cards[0].account_id)
+        assert "currencyId" in credit_card_1
+        assert credit_card_1["currencyId"] == str(credit_cards[0].currency_id)
+        assert "issueDate" in credit_card_1
+        assert credit_card_1["issueDate"] == credit_cards[0].issue_date.strftime(
+            "%Y-%m-%d"
+        )
+        assert "cancellationDate" in credit_card_1
+        assert credit_card_1["cancellationDate"] is None
+        assert "dueDay" in credit_card_1
+        assert credit_card_1["dueDay"] == credit_cards[0].due_day
+        assert "closeDay" in credit_card_1
+        assert credit_card_1["closeDay"] == credit_cards[0].close_day
+
+
 @pytest.mark.asyncio
 async def test_create_credit_card(client, create_open_account, create_currency):
     accounts = create_open_account
@@ -40,36 +95,6 @@ async def test_create_credit_card(client, create_open_account, create_currency):
     assert data["creditCard"]["dueDay"] == due_day
     assert "closeDay" in data["creditCard"]
     assert data["creditCard"]["closeDay"] == close_day
-
-
-@pytest.mark.asyncio
-async def test_get_valid_credit_card(client, create_valid_credit_card):
-    credit_cards = create_valid_credit_card
-    response = await client.get("/creditcard")
-
-    assert response.status_code == status.HTTP_200_OK
-
-    data = response.json()
-
-    assert "creditCards" in data
-    credit_card_1 = data["creditCards"][0]
-
-    assert "creditCardId" in credit_card_1
-    assert credit_card_1["creditCardId"] == str(credit_cards[0].id)
-    assert "nickname" in credit_card_1
-    assert credit_card_1["nickname"] == credit_cards[0].nickname
-    assert "accountId" in credit_card_1
-    assert credit_card_1["accountId"] == str(credit_cards[0].account_id)
-    assert "currencyId" in credit_card_1
-    assert credit_card_1["currencyId"] == str(credit_cards[0].currency_id)
-    assert "issueDate" in credit_card_1
-    assert credit_card_1["issueDate"] == credit_cards[0].issue_date.strftime("%Y-%m-%d")
-    assert "cancellationDate" in credit_card_1
-    assert credit_card_1["cancellationDate"] is None
-    assert "dueDay" in credit_card_1
-    assert credit_card_1["dueDay"] == credit_cards[0].due_day
-    assert "closeDay" in credit_card_1
-    assert credit_card_1["closeDay"] == credit_cards[0].close_day
 
 
 @pytest.mark.asyncio

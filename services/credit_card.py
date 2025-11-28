@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from typing import Any
 
 from dateutil.relativedelta import relativedelta
 from fastapi import HTTPException
@@ -31,7 +32,6 @@ from schemas.response.credit_card import (
     CreateCreditCardTransactionResponse,
     GetCreditCardBillConsolidatedResponse,
     GetCreditCardBillHistoryResponse,
-    GetCreditCardResponse,
     GetCreditCardTransactionResponse,
     GetInstallmentsDueDatesResponse,
 )
@@ -89,23 +89,17 @@ class CreditCardService(BaseService):
 
         return response
 
-    async def get_credit_cards(
-        self, params: GetCreditCardRequest
-    ) -> GetCreditCardResponse:
+    async def get_credit_cards(self, params: GetCreditCardRequest) -> dict[str, Any]:
         credit_cards = await CreditCardManager(session=self.session).get_credit_cards(
             owner_id=self.user["user_id"],
             credit_card_id=params.id,
             is_active=params.active,
         )
 
-        response = GetCreditCardResponse(
-            quantity=len(credit_cards) if credit_cards else 0,
-            credit_cards=(
-                [CreditCardSchema.model_validate(data) for data in credit_cards]
-                if credit_cards
-                else []
-            ),
-        )
+        response = {
+            "quantity": len(credit_cards) if credit_cards else 0,
+            "credit_cards": credit_cards if credit_cards else [],
+        }
 
         return response
 

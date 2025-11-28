@@ -10,7 +10,6 @@ from schemas.request.credit_card import (
     CreateCreditCardRequest,
     CreateCreditCardTransactionRequest,
     GetCreditCardBillRequest,
-    GetCreditCardRequest,
     GetCreditCardTransactionsRequest,
     GetInstallmentsDueDatesRequest,
 )
@@ -54,19 +53,6 @@ async def cancel_credit_card(
     return await CreditCardService(session=session, user=user).cancel_credit_card(
         credit_card
     )
-
-
-@router.get(
-    "",
-    summary="Get credit cards",
-    description="Get all credit cards for a user filter by params",
-)
-async def get_credit_cards(
-    params: GetCreditCardRequest = Depends(),
-    session: AsyncSession = Depends(get_session),
-    user: RequiredUser = Security(get_user),
-):
-    return await CreditCardService(session=session, user=user).get_credit_cards(params)
 
 
 @router.post(

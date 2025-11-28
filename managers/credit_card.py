@@ -44,9 +44,20 @@ class CreditCardManager(BaseDataManager):
 
     async def get_credit_cards(
         self, owner_id, credit_card_id=None, is_active=None
-    ) -> list[CreditCardModel] | None:
+    ) -> list[RowMapping] | None:
         query = (
-            select(CreditCardModel)
+            select(
+                CreditCardModel.id.label("credit_card_id"),
+                CreditCardModel.owner_id,
+                CreditCardModel.nickname,
+                CreditCardModel.account_id,
+                CreditCardModel.issue_date,
+                CreditCardModel.cancellation_date,
+                CreditCardModel.currency_id,
+                CreditCardModel.due_day,
+                CreditCardModel.close_day,
+                CreditCardModel.active,
+            )
             .where(CreditCardModel.owner_id == owner_id)
             .order_by(CreditCardModel.nickname)
         )
@@ -57,13 +68,9 @@ class CreditCardManager(BaseDataManager):
         if is_active is not None:
             query = query.where(CreditCardModel.active == is_active)
 
-        credit_cards: list[RowMapping] = await self.get_all(query)
+        credit_cards: list[RowMapping] | None = await self.get_all(query)
 
-        return (
-            [credit_card["CreditCardModel"] for credit_card in credit_cards]
-            if credit_cards
-            else None
-        )
+        return credit_cards
 
     # Transactions
     async def create_credit_card_transaction(

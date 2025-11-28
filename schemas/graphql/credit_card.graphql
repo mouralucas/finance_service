@@ -23,7 +23,7 @@ type CreditCard {
     currencyId: String!
     issueDate: Date
     cancellationDate: String
-    dueDate: Int
+    dueDay: Int
     closeDay: Int
 }
 

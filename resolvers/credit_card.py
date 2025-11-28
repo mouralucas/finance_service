@@ -6,16 +6,18 @@ from schemas.request.credit_card import (
     GetInstallmentsDueDatesRequest,
 )
 from services.credit_card import CreditCardService
+from utils.graphql_input_validation import validate_graphql_input
 
 
-async def get_credit_cards_resolver(_, info: GraphQLResolveInfo, params):
-    params_ = GetCreditCardRequest.model_validate(params)
-
+@validate_graphql_input(GetCreditCardRequest)
+async def get_credit_cards_resolver(
+    _, info: GraphQLResolveInfo, params: GetCreditCardRequest
+):
     credit_cards = await CreditCardService(
         session=info.context["session"], user=info.context["user"]
-    ).get_credit_cards(params=params_)
+    ).get_credit_cards(params=params)
 
-    return credit_cards.model_dump(by_alias=True)
+    return credit_cards
 
 
 async def get_installments_due_dates_resolver(_, info: GraphQLResolveInfo, params):
