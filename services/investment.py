@@ -22,7 +22,6 @@ from schemas.request.investment import (
     UpdateStatementRequest,
 )
 from schemas.response.investment import (
-    CreateStatementResponse,
     GetInvestmentPerformanceResponseV2,
     GetStatementMetadataResponse,
     GetStatementsResponse,
@@ -77,7 +76,7 @@ class InvestmentService(BaseService):
     # Statement
     async def create_statement(
         self, input_statement: CreateStatementRequest
-    ) -> CreateStatementResponse:
+    ) -> dict[str, Any]:
         # Get the investment
         investment: InvestmentModel = (
             await self.investment_manager.get_investment_by_id(
@@ -152,10 +151,10 @@ class InvestmentService(BaseService):
         # Persist data
         new_statement = await self.investment_manager.create_statement(new_statement)
 
-        response = CreateStatementResponse(
-            created=True,
-            statement_id=new_statement.id,
-        )
+        response = {
+            "created": True,
+            "statement_id": str(new_statement.id),
+        }
 
         return response
 

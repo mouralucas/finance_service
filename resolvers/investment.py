@@ -1,5 +1,3 @@
-import uuid
-
 from ariadne import MutationType, QueryType
 from graphql import GraphQLResolveInfo
 
@@ -11,31 +9,35 @@ from schemas.request.investment import (
     UpdateStatementRequest,
 )
 from services.investment import InvestmentService
+from utils.graphql_input_validation import validate_graphql_input
 
 
-async def create_statement_resolver(_, info: GraphQLResolveInfo, statement):
-    statement_ = CreateStatementRequest.model_validate(statement)
-
+@validate_graphql_input(CreateStatementRequest)
+async def create_statement_resolver(
+    _, info: GraphQLResolveInfo, statement: CreateStatementRequest
+):
     result = await InvestmentService(
         session=info.context["session"], user=info.context["user"]
-    ).create_statement(input_statement=statement_)
-
-    return result.model_dump(by_alias=True)
-
-
-async def update_statement_resolver(_, info: GraphQLResolveInfo, statement) -> dict:
-    statement_ = UpdateStatementRequest.model_validate(statement)
-
-    result = await InvestmentService(
-        session=info.context["session"], user=info.context["user"]
-    ).update_statement(input_statement=statement_)
+    ).create_statement(input_statement=statement)
 
     return result
 
 
-async def get_statement_by_id(_, info: GraphQLResolveInfo, statement_id: uuid.UUID):
-    input = GetStatementByIdRequest(statement_id=statement_id)
+@validate_graphql_input(UpdateStatementRequest)
+async def update_statement_resolver(
+    _, info: GraphQLResolveInfo, statement: UpdateStatementRequest
+) -> dict:
+    result = await InvestmentService(
+        session=info.context["session"], user=info.context["user"]
+    ).update_statement(input_statement=statement)
 
+    return result
+
+
+@validate_graphql_input(GetStatementByIdRequest)
+async def get_statement_by_id(
+    _, info: GraphQLResolveInfo, input: GetStatementByIdRequest
+):
     statement = await InvestmentService(
         session=info.context["session"], user=info.context["user"]
     ).get_statement_by_id(statement_id=input.statement_id)

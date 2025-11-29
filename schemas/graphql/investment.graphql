@@ -3,7 +3,7 @@
 
 extend type Query {
     getInvestmentPerformance(params: GetInvestmentPerformanceInput): GetInvestmentPerformanceResponse
-    getInvestmentStatementById(statement_id: String!): GetInvestmentStatementByIdResponde
+    getInvestmentStatementById(input: GetInvestmentStatementByIdInput!): GetInvestmentStatementByIdResponde
     getStatementMetadata(params: GetStatementMetadataInput): GetStatementMetadataResponse
 }
 
@@ -26,7 +26,6 @@ type GetInvestmentPerformanceResponse {
     xLabel: [String]! 
     data: [LineChartSeries!]!
 }
-
 
 # Investments schemas
 input SettleInvestmentInput {
