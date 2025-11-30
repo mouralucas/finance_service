@@ -5,6 +5,8 @@ extend type Query {
     getInvestmentPerformance(params: GetInvestmentPerformanceInput): GetInvestmentPerformanceResponse
     getInvestmentStatementById(input: GetInvestmentStatementByIdInput!): GetInvestmentStatementByIdResponde
     getStatementMetadata(params: GetStatementMetadataInput): GetStatementMetadataResponse
+
+    getInvestmentObjectives(params: GetInvestmentObjectivesInput): GetInvestmentObjectivesResponse
 }
 
 extend type Mutation {
@@ -116,4 +118,26 @@ type Statement {
     valueChange: Float!
     percentageChange: Float!
     netAmount: Float!
+}
+
+input GetInvestmentObjectivesInput {
+    id: String
+}
+
+
+type GetInvestmentObjectivesResponse {
+    quantity: Int!
+    objectives: [InvestmentObjective]!
+}
+
+type InvestmentObjective {
+    id: String!
+    ownerId: String!
+    title: String!
+    description: String
+    currencyId: String!
+    currencySymbol: String
+    amount: Float!
+    currentAmount: Float
+    estimateDeadline: Date
 }

@@ -3,12 +3,14 @@ from graphql import GraphQLResolveInfo
 
 from schemas.request.investment import (
     CreateStatementRequest,
+    GetObjectiveRequest,
     GetPerformanceRequest,
     GetStatementByIdRequest,
     GetStatementMetadata,
     UpdateStatementRequest,
 )
 from services.investment import InvestmentService
+from services.investment_deprecated import InvestmentServiceDeprecated
 from utils.graphql_input_validation import validate_graphql_input
 
 
@@ -65,12 +67,22 @@ async def get_statement_metadata_resolver(_, info: GraphQLResolveInfo, params: d
     return metadata.model_dump()
 
 
+@validate_graphql_input(GetObjectiveRequest)
+async def get_investment_objectives(
+    _, info: GraphQLResolveInfo, params: GetObjectiveRequest
+):
+    return await InvestmentServiceDeprecated(
+        session=info.context["session"], user=info.context["user"]
+    ).get_objectives(params=params)
+
+
 def bind_investment_resovlers(query: QueryType, mutation: MutationType):
     query.set_field(
         "getInvestmentPerformance", resolver=get_investment_performance_resolver
     )
     query.set_field("getStatementMetadata", resolver=get_statement_metadata_resolver)
     query.set_field("getInvestmentStatementById", resolver=get_statement_by_id)
+    query.set_field("getInvestmentObjectives", resolver=get_investment_objectives)
 
     mutation.set_field("createInvestmentStatement", resolver=create_statement_resolver)
     mutation.set_field("updateInvestmentStatement", resolver=update_statement_resolver)

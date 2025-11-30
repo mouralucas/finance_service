@@ -121,22 +121,6 @@ async def get_investment_types(
     ).get_investment_types()
 
 
-# @router.post(
-#     "/statement",
-#     status_code=status.HTTP_201_CREATED,
-#     summary="Create a statement for an investment",
-#     description="Create a statement for an investment",
-# )
-# async def create_statement(
-#     statement: CreateStatementRequest,
-#     session: AsyncSession = Depends(get_session),
-#     user: RequiredUser = Security(get_user),
-# ) -> CreateStatementResponse:
-#     return await InvestmentService(session=session, user=user).create_statement(
-#         input_statement=statement
-#     )
-
-
 @router.get(
     "/statement",
     summary="Get statement for an investment",

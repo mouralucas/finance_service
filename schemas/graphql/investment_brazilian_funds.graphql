@@ -1,8 +1,8 @@
 extend type Query {
-    getInvestmentsBrazilianFunds(params: GetInvestmentBrazilianFundsRequest): GetInvestmentBrazilianFundsResponse
+    getInvestmentsBrazilianFunds(params: GetInvestmentBrazilianFundsInput): GetInvestmentBrazilianFundsResponse
 }
 
-input GetInvestmentBrazilianFundsRequest {
+input GetInvestmentBrazilianFundsInput {
     investmentId: String
     isSettled: Boolean = false
 }
@@ -36,5 +36,5 @@ type InvestmentBrazilianFund {
     investmentQuotationDate: String
     investmentSettlementDate: String
     redemptionQuotationDate: String
-    reemptionSettlementDate: String
+    redemptionSettlementDate: String
 }
