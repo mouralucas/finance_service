@@ -13,7 +13,7 @@ async def get_investments_resolver(_, info: GraphQLResolveInfo, params):
         session=info.context["session"], user=info.context["user"]
     ).get_investments(params=params_)
 
-    return investments.model_dump(by_alias=True)
+    return investments
 
 
 async def get_investment_statements_resolver(_, info: GraphQLResolveInfo, params):

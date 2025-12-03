@@ -115,7 +115,7 @@ class InvestmentManager(BaseDataManager):
 
         query = (
             select(
-                investment_alias.id,
+                investment_alias.id.label("investment_id"),
                 investment_alias.custodian_id,
                 investment_alias.account_id,
                 bank_alias.name.label("custodian_name"),

@@ -1,4 +1,5 @@
 import datetime
+from typing import Any
 
 from fastapi import HTTPException
 from rolf_common.schemas.auth import RequiredUser
@@ -34,7 +35,6 @@ from schemas.response.investment import (
     CreateInvestmentResponse,
     CreateObjectiveResponse,
     GetInvestmentAllocationResponse,
-    GetInvestmentResponse,
     GetInvestmentTypeResponse,
     GetInvestmentWithoutObjectives,
     GetObjectiveResponse,
@@ -113,9 +113,7 @@ class InvestmentServiceDeprecated(BaseService):
 
         return response
 
-    async def get_investments(
-        self, params: GetInvestmentRequest
-    ) -> GetInvestmentResponse:
+    async def get_investments(self, params: GetInvestmentRequest) -> dict[str, Any]:
         """
         Created by: Lucas Penha de Moura - 12/08/2024
 
@@ -127,17 +125,10 @@ class InvestmentServiceDeprecated(BaseService):
             owner_id=self.user["user_id"], is_settled=params.is_settled
         )
 
-        response = GetInvestmentResponse(
-            quantity=len(investments) if investments else 0,
-            investments=(
-                [
-                    InvestmentSchema.model_validate(investment)
-                    for investment in investments
-                ]
-                if investments
-                else []
-            ),
-        )
+        response = {
+            "quantity": len(investments) if investments else 0,
+            "investments": investments,
+        }
 
         return response
 

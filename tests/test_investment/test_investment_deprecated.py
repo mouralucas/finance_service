@@ -59,11 +59,29 @@ async def test_get_active_investments(
     len_settled_investments = len(create_settled_investment)
     len_all_investments = len_active_investments + len_settled_investments
 
-    payload = {"isSettled": False}
-    response = await client.get("/investment", params=payload)
+    query = """
+        query GetInvestments($params: GetInvestmentsInput) {
+            getInvestments(params: $params) {
+                quantity
+                investments {
+                    investmentId
+                    isSettled
+                    settlementDate
+                    settlementAmount
+                }
+            }
+        }
+    """
+    payload = {"params": {"isSettled": False}}
+    response = await client.post(
+        "/graphql/finance", json={"query": query, "variables": payload}
+    )
     assert response.status_code == status.HTTP_200_OK
 
     data = response.json()
+    assert "data" in data
+    assert "getInvestments" in data["data"]
+    data = data["data"]["getInvestments"]
     assert "investments" in data
 
     assert len(data["investments"]) <= len_all_investments
@@ -87,11 +105,29 @@ async def test_get_settled_investments(
     len_settled_investments = len(create_settled_investment)
     len_all_investments = len_active_investments + len_settled_investments
 
-    payload = {"isSettled": True}
-    response = await client.get("/investment", params=payload)
+    query = """
+        query GetInvestments($params: GetInvestmentsInput) {
+            getInvestments(params: $params) {
+                quantity
+                investments {
+                    investmentId
+                    isSettled
+                    settlementDate
+                    settlementAmount
+                }
+            }
+        }
+    """
+    payload = {"params": {"isSettled": True}}
+    response = await client.post(
+        "/graphql/finance", json={"query": query, "variables": payload}
+    )
     assert response.status_code == status.HTTP_200_OK
 
     data = response.json()
+    assert "data" in data
+    assert "getInvestments" in data["data"]
+    data = data["data"]["getInvestments"]
     assert "investments" in data
 
     assert len(data["investments"]) <= len_all_investments

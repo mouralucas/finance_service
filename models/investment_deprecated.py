@@ -56,6 +56,7 @@ class InvestmentObjectiveModel(SQLModel):
     title: Mapped[str] = mapped_column("title", String(100))
     description: Mapped[str] = mapped_column("description", String(500), nullable=True)
     amount: Mapped[Decimal] = mapped_column("amount", Numeric(precision=15, scale=5))
+    # TODO: change name to target_date
     estimated_deadline: Mapped[date] = mapped_column(
         "estimated_deadline", nullable=True
     )

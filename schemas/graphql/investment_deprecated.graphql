@@ -1,9 +1,9 @@
 extend type Query {
-    getInvestments(params: GetInvestmentsRequest): GetInvestmentsResponse
+    getInvestments(params: GetInvestmentsInput): GetInvestmentsResponse
     getInvestmentStatements(params: GetInvestmentStatementRequest): GetInvestmentStatementResponse
 }
 
-input GetInvestmentsRequest {
+input GetInvestmentsInput {
     investmentId: String
     startDate: String
     endDate: String

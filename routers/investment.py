@@ -8,7 +8,6 @@ from backend.database import get_session
 from schemas.request.investment import (
     CreateInvestmentRequest,
     CreateObjectiveRequest,
-    GetInvestmentRequest,
     GetObjectiveRequest,
     GetObjectiveSummaryRequest,
     GetPerformanceRequest,
@@ -24,7 +23,6 @@ from schemas.response.investment import (
     CreateObjectiveResponse,
     GetInvestmentAllocationResponse,
     GetInvestmentPerformanceResponseV2,
-    GetInvestmentResponse,
     GetInvestmentTypeResponse,
     GetInvestmentWithoutObjectives,
     GetObjectiveResponse,
@@ -83,17 +81,6 @@ async def update_investment(
     return await InvestmentServiceDeprecated(
         session=session, user=user
     ).update_investment(investment=investment)
-
-
-@router.get("", summary="Get investments", description="Get investment base on filters")
-async def get_investments(
-    params: GetInvestmentRequest = Depends(),
-    session: AsyncSession = Depends(get_session),
-    user: RequiredUser = Security(get_user),
-) -> GetInvestmentResponse:
-    return await InvestmentServiceDeprecated(
-        session=session, user=user
-    ).get_investments(params=params)
 
 
 @router.post(
