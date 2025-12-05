@@ -3,10 +3,12 @@ from graphql import GraphQLResolveInfo
 
 from schemas.request.investment import (
     CreateStatementRequest,
+    GetInvestmentRequest,
     GetObjectiveRequest,
     GetPerformanceRequest,
     GetStatementByIdRequest,
     GetStatementMetadata,
+    GetStatementsRequest,
     UpdateStatementRequest,
 )
 from services.investment import InvestmentService
@@ -14,6 +16,19 @@ from services.investment_deprecated import InvestmentServiceDeprecated
 from utils.graphql_input_validation import validate_graphql_input
 
 
+# Investment resolvers
+@validate_graphql_input(GetInvestmentRequest)
+async def get_investments_resolver(
+    _, info: GraphQLResolveInfo, params: GetInvestmentRequest
+):
+    investments = await InvestmentServiceDeprecated(
+        session=info.context["session"], user=info.context["user"]
+    ).get_investments(params=params)
+
+    return investments
+
+
+# Statement resolvers
 @validate_graphql_input(CreateStatementRequest)
 async def create_statement_resolver(
     _, info: GraphQLResolveInfo, statement: CreateStatementRequest
@@ -36,6 +51,17 @@ async def update_statement_resolver(
     return result
 
 
+@validate_graphql_input(GetStatementsRequest)
+async def get_investment_statements_resolver(
+    _, info: GraphQLResolveInfo, params: GetStatementsRequest
+):
+    statements = await InvestmentService(
+        session=info.context["session"], user=info.context["user"]
+    ).get_statement(params=params)
+
+    return statements
+
+
 @validate_graphql_input(GetStatementByIdRequest)
 async def get_statement_by_id(
     _, info: GraphQLResolveInfo, input: GetStatementByIdRequest
@@ -45,16 +71,6 @@ async def get_statement_by_id(
     ).get_statement_by_id(statement_id=input.statement_id)
 
     return statement
-
-
-async def get_investment_performance_resolver(_, info: GraphQLResolveInfo, params):
-    params_ = GetPerformanceRequest.model_validate(params)
-
-    performance = await InvestmentService(
-        session=info.context["session"], user=info.context["user"]
-    ).get_performance(params=params_)
-
-    return performance.model_dump(by_alias=True)
 
 
 async def get_statement_metadata_resolver(_, info: GraphQLResolveInfo, params: dict):
@@ -67,6 +83,17 @@ async def get_statement_metadata_resolver(_, info: GraphQLResolveInfo, params: d
     return metadata.model_dump()
 
 
+# Outro resolvers
+async def get_investment_performance_resolver(_, info: GraphQLResolveInfo, params):
+    params_ = GetPerformanceRequest.model_validate(params)
+
+    performance = await InvestmentService(
+        session=info.context["session"], user=info.context["user"]
+    ).get_performance(params=params_)
+
+    return performance.model_dump(by_alias=True)
+
+
 @validate_graphql_input(GetObjectiveRequest)
 async def get_investment_objectives(
     _, info: GraphQLResolveInfo, params: GetObjectiveRequest
@@ -77,10 +104,14 @@ async def get_investment_objectives(
 
 
 def bind_investment_resovlers(query: QueryType, mutation: MutationType):
+    query.set_field("getInvestments", resolver=get_investments_resolver)
     query.set_field(
         "getInvestmentPerformance", resolver=get_investment_performance_resolver
     )
     query.set_field("getStatementMetadata", resolver=get_statement_metadata_resolver)
+    query.set_field(
+        "getInvestmentStatements", resolver=get_investment_statements_resolver
+    )
     query.set_field("getInvestmentStatementById", resolver=get_statement_by_id)
     query.set_field("getInvestmentObjectives", resolver=get_investment_objectives)
 

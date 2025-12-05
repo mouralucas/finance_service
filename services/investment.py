@@ -13,7 +13,7 @@ from managers.finance import FinanceManager
 from managers.investment import InvestmentManager
 from models.investment import InvestmentModel, InvestmentStatementModel
 from schemas.core import ChartSeriesSchemaV2
-from schemas.investment_deprecated import InvestmentSchema, InvestmentStatementSchema
+from schemas.investment_deprecated import InvestmentSchema
 from schemas.request.investment import (
     CreateStatementRequest,
     GetPerformanceRequest,
@@ -24,7 +24,6 @@ from schemas.request.investment import (
 from schemas.response.investment import (
     GetInvestmentPerformanceResponseV2,
     GetStatementMetadataResponse,
-    GetStatementsResponse,
     SettleInvestmentResponse,
 )
 from services.utils.datetime import (
@@ -188,9 +187,7 @@ class InvestmentService(BaseService):
 
         return response
 
-    async def get_statement(
-        self, params: GetStatementsRequest
-    ) -> GetStatementsResponse:
+    async def get_statement(self, params: GetStatementsRequest) -> dict[str, Any]:
         """
         Created by: Lucas Penha de Moura - 28/08/2024
 
@@ -198,18 +195,22 @@ class InvestmentService(BaseService):
         :param params: The object of GetStatementRequest with available parameters
         :return:
         """
-        statement = await self.investment_manager.get_statements(
+        statements = await self.investment_manager.get_statements(
             investment_id=params.investment_id
         )
 
-        response = GetStatementsResponse(
-            quantity=len(statement) if statement else 0,
-            statements=(
-                [InvestmentStatementSchema.model_validate(data) for data in statement]
-                if statement
-                else []
-            ),
-        )
+        # response = GetStatementsResponse(
+        #     quantity=len(statement) if statement else 0,
+        #     statements=(
+        #         [InvestmentStatementSchema.model_validate(data) for data in statement]
+        #         if statement
+        #         else []
+        #     ),
+        # )
+        response = {
+            "quantity": len(statements) if statements else 0,
+            "statements": statements,
+        }
 
         return response
 

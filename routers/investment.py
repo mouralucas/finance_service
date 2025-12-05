@@ -11,7 +11,6 @@ from schemas.request.investment import (
     GetObjectiveRequest,
     GetObjectiveSummaryRequest,
     GetPerformanceRequest,
-    GetStatementsRequest,
     SettleInvestmentRequest,
     UpdateInvestmentRequest,
 )
@@ -27,7 +26,6 @@ from schemas.response.investment import (
     GetInvestmentWithoutObjectives,
     GetObjectiveResponse,
     GetObjectiveSummaryResponse,
-    GetStatementsResponse,
     SettleInvestmentResponse,
     UpdateInvestmentResponse,
 )
@@ -108,19 +106,19 @@ async def get_investment_types(
     ).get_investment_types()
 
 
-@router.get(
-    "/statement",
-    summary="Get statement for an investment",
-    description="Get statement base on filters",
-)
-async def get_statement(
-    params: GetStatementsRequest = Depends(),
-    session: AsyncSession = Depends(get_session),
-    user: RequiredUser = Security(get_user),
-) -> GetStatementsResponse:
-    return await InvestmentService(session=session, user=user).get_statement(
-        params=params
-    )
+# @router.get(
+#     "/statement",
+#     summary="Get statement for an investment",
+#     description="Get statement base on filters",
+# )
+# async def get_statement(
+#     params: GetStatementsRequest = Depends(),
+#     session: AsyncSession = Depends(get_session),
+#     user: RequiredUser = Security(get_user),
+# ) -> GetStatementsResponse:
+#     return await InvestmentService(session=session, user=user).get_statement(
+#         params=params
+#     )
 
 
 @router.post(

@@ -2,7 +2,10 @@
 #   investment types
 
 extend type Query {
+    getInvestments(params: GetInvestmentsInput): GetInvestmentsResponse
+    
     getInvestmentPerformance(params: GetInvestmentPerformanceInput): GetInvestmentPerformanceResponse
+    getInvestmentStatements(params: GetInvestmentStatementsInput): GetInvestmentStatementsResponse
     getInvestmentStatementById(input: GetInvestmentStatementByIdInput!): GetInvestmentStatementByIdResponde
     getStatementMetadata(params: GetStatementMetadataInput): GetStatementMetadataResponse
 
@@ -30,6 +33,48 @@ type GetInvestmentPerformanceResponse {
 }
 
 # Investments schemas
+input GetInvestmentsInput {
+    investmentId: String
+    startDate: String
+    endDate: String
+    isSettled: Boolean
+}
+
+type GetInvestmentsResponse {
+    quantity: Int!
+    investments: [Investment]!
+}
+
+type Investment {
+    investmentId: String!
+    custodianId: String!
+    accountId: String
+    name: String!
+    typeId: String!
+    transactionDate: Date!
+    maturityDate: String
+    quantity: Float!
+    price: Float!
+    amount: Float!
+    contractedRate: String
+    currencyId: String!
+    currencySymbol: String
+    indexerTypeId: String!
+    indexerTypeName: String
+    indexerId: String!
+    indexerName: String!
+    liquidityId: String!
+    liquidityName: String!
+    isSettled: Boolean!
+    settlementDate: String
+    settlementAmount: Float
+    countryId: String!
+    countryName: String
+    observation: String
+    objectiveId: String
+}
+
+
 input SettleInvestmentInput {
     investmentId: String!
     gross_amount: Float!
@@ -68,6 +113,18 @@ type CreateInvestmentStatementResponse {
     statementId: String!
 }
 
+input GetInvestmentStatementsInput {
+    investmentId: String!
+    startDate: String
+    endDate: String
+    period: Int
+}
+
+type GetInvestmentStatementsResponse {
+    quantity: Int!
+    statements: [Statement]!
+}
+
 input GetInvestmentStatementByIdInput {
     statementId: String!
 }
@@ -102,6 +159,7 @@ type GetStatementMetadataResponse {
 
 type Statement {
     id: String!
+    investmentId: String!
     period: Int!
     previousAmount: Float!
     contribution: Float!
@@ -123,7 +181,6 @@ type Statement {
 input GetInvestmentObjectivesInput {
     id: String
 }
-
 
 type GetInvestmentObjectivesResponse {
     quantity: Int!

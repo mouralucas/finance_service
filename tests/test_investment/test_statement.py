@@ -69,14 +69,46 @@ class TestStatement:
         assert "created" in data
         assert data["created"] is True
 
-        payload = {"investmentId": investment_id}
-        response = await client.get("/investment/statement", params=payload)
-
+        query = """
+            query GetInvestmentStatements($params: GetInvestmentStatementsInput){
+                getInvestmentStatements(params: $params) {
+                    quantity
+                    statements {
+                        id
+                        investmentId
+                        period
+                        contribution
+                        previousAmount
+                        grossAmount
+                        totalTax
+                        totalFee
+                        referenceDate
+                        atMaturity
+                        valueChange
+                        percentageChange
+                        netAmount
+                    }
+                }
+            }
+        """
+        params = {"params": {"investmentId": investment_id}}
+        response = await client.post(
+            "/graphql/finance", json={"query": query, "variables": params}
+        )
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
 
-        assert "statements" in data
+        assert "data" in data
+        assert "getInvestmentStatements" in data["data"]
+        assert "quantity" in data["data"]["getInvestmentStatements"]
+        assert "statements" in data["data"]["getInvestmentStatements"]
+
+        data = data["data"]["getInvestmentStatements"]
+
+        # Should only have one, since it is the first statement
+        assert data["quantity"] == 1
         assert len(data["statements"]) == 1
+
         for statement in data["statements"]:
             assert "investmentId" in statement
             assert statement["investmentId"] == investment_id
@@ -292,19 +324,3 @@ class TestStatement:
 
         for investment_type in data["investmentTypes"]:
             assert "investmentTypeName" in investment_type
-
-
-@pytest.mark.asyncio
-async def test_get_statement_rest(client, create_investment_statement):
-    statements = create_investment_statement
-
-    investment = statements[0].investment
-    period = get_period(investment.transaction_date)
-
-    payload = {"investmentId": investment.id, "period": period}
-    response = await client.get("/investment/statement", params=payload)
-
-    assert response.status_code == status.HTTP_200_OK
-    data = response.json()
-
-    assert "statements" in data

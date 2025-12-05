@@ -23,7 +23,6 @@ from resolvers.investment import bind_investment_resovlers
 from resolvers.investment_brazilian_funds import (
     bind_investment_brazilian_funds_resolvers,
 )
-from resolvers.investment_deprecated import bind_investment_deprecated_resovlers
 
 router = APIRouter(tags=["GraphQL"], prefix="/graphql/finance")
 
@@ -36,7 +35,6 @@ bind_finance_dashboard_resolvers(query, mutation)
 bind_core_resolvers(query, mutation)
 bind_account_resolvers(query, mutation)
 bind_credit_card_resolvers(query, mutation)
-bind_investment_deprecated_resovlers(query, mutation)
 bind_investment_resovlers(query, mutation)
 bind_investment_brazilian_funds_resolvers(query, mutation)
 
