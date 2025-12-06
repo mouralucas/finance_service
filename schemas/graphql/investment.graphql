@@ -28,8 +28,14 @@ input GetInvestmentPerformanceInput {
 }
 
 type GetInvestmentPerformanceResponse {
-    xLabel: [String]! 
-    data: [LineChartSeries!]!
+    indexer_name: String!
+    xLabel: [Int]!
+    data: [ChartSeries]!
+}
+
+type ChartSeries {
+    data: [Float]!
+    label: String!
 }
 
 # Investments schemas

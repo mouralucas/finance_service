@@ -28,13 +28,33 @@ async def test_create_objective(client, create_currency):
 
 @pytest.mark.asyncio
 async def test_get_open_objectives(client, create_open_investment_objectives):
-    # TODO: add tests
-    response = await client.get("/investment/objective")
+    query = """
+        query GetInvestmentObjectives {
+            getInvestmentObjectives {
+                quantity
+                objectives {
+                    id
+                    ownerId
+                    title
+                    description
+                    currencyId
+                    currencySymbol
+                    amount
+                    currentAmount
+                    estimateDeadline
+                }
+            }
+        }
+    """
+    response = await client.post("/graphql/finance", json={"query": query})
 
     assert response.status_code == status.HTTP_200_OK
 
     data = response.json()
 
+    assert "data" in data
+    assert "getInvestmentObjectives" in data["data"]
+    data = data["data"]["getInvestmentObjectives"]
     assert "objectives" in data
 
 

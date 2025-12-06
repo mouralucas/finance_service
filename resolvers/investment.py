@@ -80,27 +80,30 @@ async def get_statement_metadata_resolver(_, info: GraphQLResolveInfo, params: d
         session=info.context["session"], user=info.context["user"]
     ).get_statement_metadata(investment_id=params_.investment_id)
 
-    return metadata.model_dump()
+    return metadata
 
 
 # Outro resolvers
-async def get_investment_performance_resolver(_, info: GraphQLResolveInfo, params):
-    params_ = GetPerformanceRequest.model_validate(params)
-
+@validate_graphql_input(GetPerformanceRequest)
+async def get_investment_performance_resolver(
+    _, info: GraphQLResolveInfo, params: GetPerformanceRequest
+):
     performance = await InvestmentService(
         session=info.context["session"], user=info.context["user"]
-    ).get_performance(params=params_)
+    ).get_performance(params=params)
 
-    return performance.model_dump(by_alias=True)
+    return performance
 
 
 @validate_graphql_input(GetObjectiveRequest)
 async def get_investment_objectives(
     _, info: GraphQLResolveInfo, params: GetObjectiveRequest
 ):
-    return await InvestmentServiceDeprecated(
+    objectives = await InvestmentService(
         session=info.context["session"], user=info.context["user"]
     ).get_objectives(params=params)
+
+    return objectives
 
 
 def bind_investment_resovlers(query: QueryType, mutation: MutationType):

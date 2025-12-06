@@ -12,18 +12,16 @@ from starlette import status
 from managers.finance import FinanceManager
 from managers.investment import InvestmentManager
 from models.investment import InvestmentModel, InvestmentStatementModel
-from schemas.core import ChartSeriesSchemaV2
 from schemas.investment_deprecated import InvestmentSchema
 from schemas.request.investment import (
     CreateStatementRequest,
+    GetObjectiveRequest,
     GetPerformanceRequest,
     GetStatementsRequest,
     SettleInvestmentRequest,
     UpdateStatementRequest,
 )
 from schemas.response.investment import (
-    GetInvestmentPerformanceResponseV2,
-    GetStatementMetadataResponse,
     SettleInvestmentResponse,
 )
 from services.utils.datetime import (
@@ -199,14 +197,6 @@ class InvestmentService(BaseService):
             investment_id=params.investment_id
         )
 
-        # response = GetStatementsResponse(
-        #     quantity=len(statement) if statement else 0,
-        #     statements=(
-        #         [InvestmentStatementSchema.model_validate(data) for data in statement]
-        #         if statement
-        #         else []
-        #     ),
-        # )
         response = {
             "quantity": len(statements) if statements else 0,
             "statements": statements,
@@ -214,9 +204,7 @@ class InvestmentService(BaseService):
 
         return response
 
-    async def get_statement_metadata(
-        self, investment_id: uuid.UUID
-    ) -> GetStatementMetadataResponse:
+    async def get_statement_metadata(self, investment_id: uuid.UUID) -> dict[str, Any]:
         investment: InvestmentModel = (
             await self.investment_manager.get_investment_by_id(
                 investment_id=investment_id
@@ -228,23 +216,22 @@ class InvestmentService(BaseService):
         last_statement = previous_statements[0] if previous_statements else None
 
         if not last_statement:
-            return GetStatementMetadataResponse(
-                period=get_period(investment.transaction_date),
-                reference_date=get_last_business_day(investment.transaction_date),
-                contribution=float(investment.amount),
-            )
+            return {
+                "period": get_period(investment.transaction_date),
+                "reference_date": get_last_business_day(investment.transaction_date),
+                "contribution": float(investment.amount),
+            }
 
         next_month = last_statement["reference_date"] + relativedelta(months=1)
-        return GetStatementMetadataResponse(
-            period=get_period(next_month),
-            reference_date=get_last_business_day(next_month),
-            contribution=0,
-        )
 
-    # Dashboard
-    async def get_performance(
-        self, params: GetPerformanceRequest
-    ) -> GetInvestmentPerformanceResponseV2:
+        return {
+            "period": get_period(next_month),
+            "reference_date": get_last_business_day(next_month),
+            "contribution": 0,
+        }
+
+    # Outro
+    async def get_performance(self, params: GetPerformanceRequest) -> dict[str, Any]:
         """
         Created by: Lucas Penha de Moura - 22/09/2025
 
@@ -260,11 +247,11 @@ class InvestmentService(BaseService):
         )
 
         if not performance_portfolio:
-            return GetInvestmentPerformanceResponseV2(
-                x_label=[],
-                data=[],
-                indexer_name="",
-            )
+            return {
+                "x_label": [],
+                "data": [],
+                "indexer_name": "",
+            }
 
         indexer = await FinanceManager(session=self.session).get_indexer_by_id(
             indexer_id=params.indexer_id, raise_exception=True
@@ -310,8 +297,31 @@ class InvestmentService(BaseService):
             {"data": variation_data, "label": "Variação"},
         ]
 
-        return GetInvestmentPerformanceResponseV2(
-            x_label=x_value,
-            data=[ChartSeriesSchemaV2.model_validate(item) for item in series],
-            indexer_name=indexer.name,
+        # return GetInvestmentPerformanceResponseV2(
+        #     x_label=x_value,
+        #     data=[ChartSeriesSchemaV2.model_validate(item) for item in series],
+        #     indexer_name=indexer.name,
+        # )
+
+        response = {"x_label": x_value, "data": series, "indexer_name": indexer.name}
+
+        return response
+
+    async def get_objectives(self, params: GetObjectiveRequest):
+        """
+        Created by: Lucas Penha de Moura - 02/09/2024
+
+            Get investment objectives
+        :param params: The object of GetObjectiveRequest with available parameters
+        :return:
+        """
+        objectives = await InvestmentManager(self.session).get_objectives(
+            owner_id=self.user["user_id"], objective_id=params.id
         )
+
+        response = {
+            "quantity": len(objectives) if objectives else 0,
+            "objectives": objectives,
+        }
+
+        return response

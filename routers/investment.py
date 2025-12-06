@@ -8,9 +8,7 @@ from backend.database import get_session
 from schemas.request.investment import (
     CreateInvestmentRequest,
     CreateObjectiveRequest,
-    GetObjectiveRequest,
     GetObjectiveSummaryRequest,
-    GetPerformanceRequest,
     SettleInvestmentRequest,
     UpdateInvestmentRequest,
 )
@@ -21,10 +19,8 @@ from schemas.response.investment import (
     CreateInvestmentResponse,
     CreateObjectiveResponse,
     GetInvestmentAllocationResponse,
-    GetInvestmentPerformanceResponseV2,
     GetInvestmentTypeResponse,
     GetInvestmentWithoutObjectives,
-    GetObjectiveResponse,
     GetObjectiveSummaryResponse,
     SettleInvestmentResponse,
     UpdateInvestmentResponse,
@@ -106,21 +102,6 @@ async def get_investment_types(
     ).get_investment_types()
 
 
-# @router.get(
-#     "/statement",
-#     summary="Get statement for an investment",
-#     description="Get statement base on filters",
-# )
-# async def get_statement(
-#     params: GetStatementsRequest = Depends(),
-#     session: AsyncSession = Depends(get_session),
-#     user: RequiredUser = Security(get_user),
-# ) -> GetStatementsResponse:
-#     return await InvestmentService(session=session, user=user).get_statement(
-#         params=params
-#     )
-
-
 @router.post(
     "/objective",
     status_code=status.HTTP_201_CREATED,
@@ -133,21 +114,6 @@ async def create_objective(
     user: RequiredUser = Security(get_user),
 ) -> CreateObjectiveResponse:
     return await InvestmentServiceDeprecated(session, user).create_objective(objective)
-
-
-@router.get(
-    "/objective",
-    summary="Get all user objectives",
-    description="Get all active user objectives",
-)
-async def get_objective(
-    params: GetObjectiveRequest = Depends(),
-    session: AsyncSession = Depends(get_session),
-    user: RequiredUser = Security(get_user),
-) -> GetObjectiveResponse:
-    return await InvestmentServiceDeprecated(session, user).get_objectives(
-        params=params
-    )
 
 
 @router.get(
@@ -191,16 +157,16 @@ async def get_allocation(
     ).get_investment_allocation()
 
 
-@router.get(
-    "/performance",
-    summary="Get investment performance",
-    description="Get investment performance",
-)
-async def get_performance(
-    params: GetPerformanceRequest = Depends(),
-    session: AsyncSession = Depends(get_session),
-    user: RequiredUser = Security(get_user),
-) -> GetInvestmentPerformanceResponseV2:
-    return await InvestmentService(session=session, user=user).get_performance(
-        params=params
-    )
+# @router.get(
+#     "/performance",
+#     summary="Get investment performance",
+#     description="Get investment performance",
+# )
+# async def get_performance(
+#     params: GetPerformanceRequest = Depends(),
+#     session: AsyncSession = Depends(get_session),
+#     user: RequiredUser = Security(get_user),
+# ) -> GetInvestmentPerformanceResponseV2:
+#     return await InvestmentService(session=session, user=user).get_performance(
+#         params=params
+#     )

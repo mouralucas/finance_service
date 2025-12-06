@@ -3,7 +3,6 @@ import uuid
 from datetime import date
 from decimal import Decimal
 
-from fastapi import Query
 from pydantic import AliasGenerator, BaseModel, ConfigDict, Field, model_validator
 from pydantic.alias_generators import to_camel
 
@@ -337,12 +336,14 @@ class CreateObjectiveRequest(BaseModel):
 
 
 class GetObjectiveRequest(BaseModel):
+    model_config = ConfigDict(
+        from_attributes=True, alias_generator=AliasGenerator(alias=to_camel)
+    )
+
     id: uuid.UUID | None = Field(
-        Query(
-            None,
-            alias="objectiveId",
-            description="The unique identifier of the investment objective",
-        )
+        None,
+        alias="objectiveId",
+        description="The unique identifier of the investment objective",
     )
 
 

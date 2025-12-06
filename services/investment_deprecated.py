@@ -16,7 +16,6 @@ from models.investment_deprecated import (
 )
 from schemas.investment_deprecated import (
     InvestmentAllocationSchema,
-    InvestmentObjectiveSchema,
     InvestmentSchema,
     InvestmentTypeSchema,
 )
@@ -24,7 +23,6 @@ from schemas.request.investment import (
     CreateInvestmentRequest,
     CreateObjectiveRequest,
     GetInvestmentRequest,
-    GetObjectiveRequest,
     GetObjectiveSummaryRequest,
     UpdateInvestmentRequest,
 )
@@ -37,7 +35,6 @@ from schemas.response.investment import (
     GetInvestmentAllocationResponse,
     GetInvestmentTypeResponse,
     GetInvestmentWithoutObjectives,
-    GetObjectiveResponse,
     GetObjectiveSummaryResponse,
     UpdateInvestmentResponse,
 )
@@ -179,29 +176,6 @@ class InvestmentServiceDeprecated(BaseService):
 
         response = CreateObjectiveResponse(
             objective_created=True,
-        )
-
-        return response
-
-    async def get_objectives(self, params: GetObjectiveRequest):
-        """
-        Created by: Lucas Penha de Moura - 02/09/2024
-
-            Get investment objectives
-        :param params: The object of GetObjectiveRequest with available parameters
-        :return:
-        """
-        objectives = await InvestmentManager(self.session).get_objectives(
-            owner_id=self.user["user_id"], objective_id=params.id
-        )
-
-        response = GetObjectiveResponse(
-            quantity=len(objectives) if objectives else 0,
-            objectives=(
-                [InvestmentObjectiveSchema.model_validate(data) for data in objectives]
-                if objectives
-                else []
-            ),
         )
 
         return response
