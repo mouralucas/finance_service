@@ -68,9 +68,9 @@ type Investment {
     indexerTypeId: String!
     indexerTypeName: String
     indexerId: String!
-    indexerName: String!
+    indexerName: String
     liquidityId: String!
-    liquidityName: String!
+    liquidityName: String
     isSettled: Boolean!
     settlementDate: String
     settlementAmount: Float
@@ -78,6 +78,9 @@ type Investment {
     countryName: String
     observation: String
     objectiveId: String
+    grossAmount: Float!
+    totalContribution: Float!
+    totalWithdrawn: Float!
 }
 
 
