@@ -349,7 +349,7 @@ class InvestmentManager(BaseDataManager):
                 InvestmentObjectiveModel.description,
                 InvestmentObjectiveModel.currency_id,
                 InvestmentObjectiveModel.amount,
-                InvestmentObjectiveModel.estimated_deadline,
+                InvestmentObjectiveModel.estimated_deadline.label("estimate_deadline"),
                 func.coalesce(func.sum(latest_stmt_subq.c.gross_amount), 0).label(
                     "current_amount"
                 ),
