@@ -25,6 +25,8 @@ extend type Mutation {
 # Performance Schemas
 input GetInvestmentPerformanceInput {
     investmentId: String
+    indexerId: String
+    periodRange: Int
 }
 
 type GetInvestmentPerformanceResponse {
