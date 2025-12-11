@@ -14,7 +14,7 @@ async def get_investments_brazilian_funds(
         session=info.context["session"], user=info.context["user"]
     ).get_brazilian_fund_investments(params=params)
 
-    return investments
+    return investments if investments else []
 
 
 def bind_investment_brazilian_funds_resolvers(query: QueryType, mutation: MutationType):

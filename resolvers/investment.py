@@ -103,7 +103,7 @@ async def get_investment_objectives(
         session=info.context["session"], user=info.context["user"]
     ).get_objectives(params=params)
 
-    return objectives
+    return objectives if objectives else []
 
 
 def bind_investment_resovlers(query: QueryType, mutation: MutationType):

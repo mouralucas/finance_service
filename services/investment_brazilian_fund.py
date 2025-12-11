@@ -70,7 +70,7 @@ class InvestmentBrazilianFundService(InvestmentServiceDeprecated):
 
         response = {
             "quantity": len(investment) if investment else 0,
-            "investments": investment,
+            "investments": investment if investment else [],
         }
 
         return response

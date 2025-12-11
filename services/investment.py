@@ -321,7 +321,7 @@ class InvestmentService(BaseService):
 
         response = {
             "quantity": len(objectives) if objectives else 0,
-            "objectives": objectives,
+            "objectives": objectives if objectives else [],
         }
 
         return response
