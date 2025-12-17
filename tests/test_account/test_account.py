@@ -281,25 +281,3 @@ async def test_get_transactions_no_filter(client, create_account_transaction):
     # TODO: this returns 200 but there is errors: why cannot send without filters if
     # not required?
     assert response.status_code == status.HTTP_200_OK
-
-
-@pytest.mark.asyncio
-async def test_create_balance(client, create_open_account, create_account_transaction):
-    transactions = create_account_transaction
-
-    payload = {
-        "accountId": str(transactions[0].account_id),
-    }
-    response = await client.post("/account/balance", json=payload)
-
-    assert response.status_code == status.HTTP_201_CREATED
-    data = response.json()
-
-    assert "periodsSaved" in data
-    assert data["periodsSaved"] >= 3
-    # The mock inserts data from 3 months ago to today,
-    #   so at least 3 periods are saved
-    assert "accountNickname" in data
-    # This follow the rules on insertion, open_account[0] is used in create_transaction
-    #   so it is the same as transactions[0].account.nickname
-    assert data["accountNickname"] == str(create_open_account[0].nickname)

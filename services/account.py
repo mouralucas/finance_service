@@ -156,107 +156,12 @@ class AccountService(BaseService):
 
         response = {
             "quantity": len(transactions) if transactions else 0,
-            "transactions": transactions,
+            "transactions": transactions if transactions else [],
         }
-
-        # response = GetAccountTransactionResponse(
-        #     quantity=len(transactions) if transactions else 0,
-        #     transactions=(
-        #         [
-        #             AccountTransactionSchema(**transaction)
-        #             for transaction in transactions
-        #         ]
-        #         if transactions
-        #         else []
-        #     ),
-        # )
 
         return response
 
     # Balance
-    async def create_balance(self, params: CreateBalanceRequest):
-        account: AccountModel = await self.account_manager.get_account_by_id(
-            params.account_id
-        )
-        if not account:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Account not exists"
-            )
-
-        # Get balance from the last period with registered transactions until the
-        #   account is closed or current period
-        min_period: int = await self.account_manager.get_only_one(
-            select(func.min(AccountTransactionModel.period)).where(
-                AccountTransactionModel.account_id == params.account_id
-            )
-        )
-        max_period: int = (
-            get_period(account.close_date)
-            if account.close_date
-            else get_current_period()
-        )
-
-        # TODO: create better validation
-        if not min_period:
-            raise HTTPException(
-                status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail="Provavelmente não existem transações nessa conta",
-            )
-
-        # Get all periods between min and max periods, so even without transactions,
-        #   all periods in this range have its own balance
-        period_range: list[int] = get_period_range(min_period, max_period)
-
-        # Fetch all transactions grouped by period
-        transactions_by_period = (
-            await self.account_manager.get_consolidated_transactions_by_period(
-                account_id=params.account_id, period_range=period_range
-            )
-        )
-
-        # The first balance available always starts with 'previous_balance' at zero,
-        #   even if in actual account have more transactions
-        # The user should add the previous amount as a transaction, so the
-        #   calculation is correct at the end
-        previous_balance = 0.0
-
-        balance_entries = []
-        for period_data in transactions_by_period:
-            period = period_data.period
-            earnings = period_data.earnings
-            incoming = period_data.incoming - earnings
-            outgoing = period_data.outgoing
-            transactions = incoming - abs(outgoing)
-            balance = previous_balance + float(transactions) + float(earnings)
-
-            account_balance = AccountBalanceModel(
-                account_id=params.account_id,
-                period=period,
-                previous_balance=previous_balance,
-                incoming=incoming,
-                outgoing=abs(outgoing),
-                transactions=transactions,
-                earnings=earnings,
-                balance=balance,
-            )
-
-            balance_entries.append(account_balance)
-            # Update the previous balance with the current balance
-            previous_balance = balance
-
-        # Remove previous balance data for the account
-        await self.account_manager.delete_balance(account_id=params.account_id)
-
-        # Add the calculated balance for the account
-        self.session.add_all(balance_entries)
-
-        response = CreateBalanceResponse(
-            account_nickname=account.nickname,
-            periods_saved=len(balance_entries),
-        )
-
-        return response
-
     async def get_balance(self, params: GetBalanceRequest) -> dict[str, Any]:
         balance = await self.account_manager.get_balance_beta(
             account_id=params.account_id, period=params.period

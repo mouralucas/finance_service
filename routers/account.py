@@ -62,18 +62,3 @@ async def update_transaction(
     return await AccountService(session=session, user=user).update_transaction(
         transaction=transaction
     )
-
-
-@router.post(
-    "/balance",
-    summary="Generate the balance for the account",
-    status_code=status.HTTP_201_CREATED,
-)
-async def create_balance(
-    params: CreateBalanceRequest,
-    session: AsyncSession = Depends(get_session),
-    user: RequiredUser = Security(get_user),
-):
-    return await AccountService(session=session, user=user).create_balance(
-        params=params
-    )
