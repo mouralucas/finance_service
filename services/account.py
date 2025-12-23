@@ -3,13 +3,12 @@ from typing import Any, cast
 from fastapi import HTTPException
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import BaseService
-from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from managers.account import AccountManager
 from managers.credit_card import CreditCardManager
-from models.account import AccountBalanceModel, AccountModel, AccountTransactionModel
+from models.account import AccountModel, AccountTransactionModel
 from models.credit_card import CreditCardModel
 from schemas.account import (
     AccountSchema,
@@ -19,7 +18,6 @@ from schemas.request.account import (
     CloseAccountRequest,
     CreateAccountRequest,
     CreateAccountTransactionRequest,
-    CreateBalanceRequest,
     GetAccountRequest,
     GetAccountTransactionRequest,
     GetBalanceRequest,
@@ -28,10 +26,9 @@ from schemas.request.account import (
 from schemas.response.account import (
     CloseAccountResponse,
     CreateAccountResponse,
-    CreateBalanceResponse,
     UpdateTransactionResponse,
 )
-from services.utils.datetime import get_current_period, get_period, get_period_range
+from services.utils.datetime import get_period
 
 
 class AccountService(BaseService):

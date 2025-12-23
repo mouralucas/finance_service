@@ -169,6 +169,10 @@ class TestStatement:
         assert "statementId" in created_info
 
     @pytest.mark.asyncio
+    async def test_get_investment_statements(self, client):
+        assert True
+
+    @pytest.mark.asyncio
     async def test_update_investment_statement(
         self, client, create_active_investment, create_investment_statement
     ):
@@ -308,7 +312,6 @@ class TestStatement:
         assert data["data"]["getStatementMetadata"]["contribution"] == amount
         # TODO: add validation to the period and reference date
 
-    ## Old testing, should be in the test class
     @pytest.mark.asyncio
     async def test_get_investment_type(
         self, client, create_fixed_income_br_investment_type

@@ -10,7 +10,6 @@ from backend.database import get_session
 from schemas.request.account import (
     CloseAccountRequest,
     CreateAccountRequest,
-    CreateBalanceRequest,
     UpdateAccountTransactionRequest,
 )
 from schemas.response.account import (

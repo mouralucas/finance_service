@@ -50,19 +50,6 @@ class InvestmentStatementModel(InvestmentStatementBaseModel):
         foreign_keys=[investment_id], lazy="subquery"
     )
     at_maturity: Mapped[bool] = mapped_column("at_maturity", default=False)
-    # TODO: remove this fields after 01/01/2026
-    # value_change: Mapped[Decimal] = mapped_column(
-    #     "value_change", Numeric(precision=15, scale=5), nullable=True
-    # )
-    # percentage_change: Mapped[Decimal] = mapped_column(
-    #     "percentage_change", Numeric(precision=9, scale=3), nullable=True
-    # )
-    # index_percent_change: Mapped[Decimal] = mapped_column(
-    #     "index_change",
-    #     Numeric(precision=9, scale=3),
-    #     nullable=True,
-    #     doc="How much the index changed in the period",
-    # )
     contribution: Mapped[Decimal] = mapped_column(
         "incoming",
         Numeric(precision=18, scale=8),

@@ -199,7 +199,7 @@ conda remove -n <env_name> --all
 
 ### GraphQL lint
 
-This project includes GraphQL schema files in `schemas_graphql/`. To lint them you can use the provided npm script or the Makefile target.
+This project includes GraphQL schema files in `schemas/graphql/`. To lint them you can use the provided npm script or the Makefile target.
 
 - Install dev dependencies (once):
 
