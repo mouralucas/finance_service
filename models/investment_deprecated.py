@@ -190,14 +190,3 @@ class InvestmentStatementBaseModel(SQLModel):
     tax_detail: Mapped[list[dict]] = mapped_column("tax_detail", JSON, nullable=True)
     fee_detail: Mapped[list[dict]] = mapped_column("fee_detail", JSON, nullable=True)
     reference_date: Mapped[date] = mapped_column("reference_date")
-
-
-"""
-Criar a tabela FundsBr que conterá as informações básica do fundo
-(ver canal oficial para essas informações)
-Ao adicionar um extrato, verificar na tabela InvestmentFundsBr se
-houve um investimento naquele mes, se sim, incluir no "aporte do mes"
-na tabela
-    do extrato, assim ao calcular a evolução essa valor é somado ao valor
-    inicial do mês e não distorce o cálculo da performance
-"""
