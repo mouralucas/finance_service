@@ -17,6 +17,14 @@ async def get_indexer_series_resolver(
     return indexer_series
 
 
+async def get_periodicity_resolver(_, info: GraphQLResolveInfo):
+    periodicity = await FinanceService(
+        session=info.context["session"], user=info.context["user"]
+    ).get_periodicity()
+
+    return periodicity
+
+
 async def get_currencies_resolver(_, info: GraphQLResolveInfo):
     currencies = await FinanceService(
         session=info.context["session"], user=info.context["user"]
@@ -28,3 +36,4 @@ async def get_currencies_resolver(_, info: GraphQLResolveInfo):
 def bind_finance_dashboard_resolvers(query: QueryType, mutation: MutationType):
     query.set_field("getIndexerSeries", resolver=get_indexer_series_resolver)
     query.set_field("getCurrencies", resolver=get_currencies_resolver)
+    query.set_field("getPeriodicity", resolver=get_periodicity_resolver)

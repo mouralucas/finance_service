@@ -128,6 +128,16 @@ class FinanceService(BaseService):
 
         return response
 
+    async def get_periodicity(self) -> dict[str, Any]:
+        periodicity = await self.finance_manager.get_periodicity()
+
+        response = {
+            "quantity": len(periodicity) if periodicity else 0,
+            "periodicities": periodicity,
+        }
+
+        return response
+
     # Dashboards services
     async def get_expenses_by_category(self) -> GetExpensesByCategoryResponse:
         # TODO: How to solve the problem with different currencies?

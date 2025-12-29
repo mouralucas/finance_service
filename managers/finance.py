@@ -1,5 +1,5 @@
 import uuid
-from typing import cast
+from typing import Any, cast
 
 from fastapi import HTTPException
 from rolf_common.managers import BaseDataManager
@@ -114,6 +114,18 @@ class FinanceManager(BaseDataManager):
         liquidity = await self.get_all(query)
 
         return [i["LiquidityModel"] for i in liquidity] if liquidity else None
+
+    async def get_periodicity(self) -> list[dict[str, Any]] | None:
+        query = select(
+            PeriodicityModel.id,
+            PeriodicityModel.name,
+            PeriodicityModel.description,
+            PeriodicityModel.order,
+        ).order_by(PeriodicityModel.order)
+
+        periodicity = await self.get_all(query)
+
+        return [dict(i) for i in periodicity] if periodicity else None
 
     async def get_periodicity_by_id(
         self, periodicity_id: uuid.UUID, raise_exception=False

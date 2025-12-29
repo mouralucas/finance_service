@@ -2,6 +2,7 @@ extend type Query {
     getHelloWorld: String
     getIndexerSeries(params: GetIndexerSeriesInput! ): GetIndexerSeriesResponse
     getCurrencies: GetCurrenciesResponse
+    getPeriodicity: GetPeriodicityResponse
 }
 
 extend type Mutation {
@@ -31,6 +32,19 @@ type IndexerSeries {
     periodicityId: String!
     periodicityName: String
     unit: String
+}
+
+# Periodicity schemas
+type GetPeriodicityResponse {
+    quantity: Int!
+    periodicities: [Periodicity]!
+}
+
+type Periodicity {
+    id: String!
+    name: String!
+    description: String
+    order: Int
 }
 
 # Currency schemas
