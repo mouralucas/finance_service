@@ -146,11 +146,23 @@ class FinanceManager(BaseDataManager):
 
         return cast(int, latest_period) if latest_period else None
 
-    async def get_indexer_series(self) -> list[IndexerSeriesModel] | None:
+    async def get_indexer_series(
+        self,
+        indexer_id: uuid.UUID,
+        periodicity_id: uuid.UUID,
+        start_period: int | None = None,
+        end_period: int | None = None,
+    ) -> list[IndexerSeriesModel] | None:
         query = select(IndexerSeriesModel).where(
-            IndexerSeriesModel.indexer_id == "2a2b100f-17d9-4c61-b3b4-f06662113953",
-            IndexerSeriesModel.period > 202401,
-        )
+            IndexerSeriesModel.indexer_id == indexer_id,
+            IndexerSeriesModel.periodicity_id == periodicity_id,
+        ).order_by(IndexerSeriesModel.period.desc())
+
+        if start_period is not None:
+            query = query.where(IndexerSeriesModel.period >= start_period)
+
+        if end_period is not None:
+            query = query.where(IndexerSeriesModel.period <= end_period)
 
         indexer_series = await self.get_all(query)
 

@@ -194,7 +194,12 @@ class FinanceService(BaseService):
     async def get_indexer_series(
         self, params: GetIndexerSeriesRequest
     ) -> dict[str, Any]:
-        series = await self.finance_manager.get_indexer_series()
+        series = await self.finance_manager.get_indexer_series(
+            indexer_id=params.indexer_id,
+            periodicity_id=params.periodicity_id,
+            start_period=params.start_period,
+            end_period=params.end_period,
+        )
 
         response = {
             "quantity": len(series) if series else 0,
