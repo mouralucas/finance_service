@@ -153,10 +153,14 @@ class FinanceManager(BaseDataManager):
         start_period: int | None = None,
         end_period: int | None = None,
     ) -> list[IndexerSeriesModel] | None:
-        query = select(IndexerSeriesModel).where(
-            IndexerSeriesModel.indexer_id == indexer_id,
-            IndexerSeriesModel.periodicity_id == periodicity_id,
-        ).order_by(IndexerSeriesModel.period.desc())
+        query = (
+            select(IndexerSeriesModel)
+            .where(
+                IndexerSeriesModel.indexer_id == indexer_id,
+                IndexerSeriesModel.periodicity_id == periodicity_id,
+            )
+            .order_by(IndexerSeriesModel.period.desc())
+        )
 
         if start_period is not None:
             query = query.where(IndexerSeriesModel.period >= start_period)

@@ -1,9 +1,9 @@
 from ariadne import MutationType, QueryType
 from graphql import GraphQLResolveInfo
+from rolf_common.util.graphql_input_validation import validate_graphql_input
 
 from schemas.request.finance import GetIndexerSeriesRequest
 from services.finance import FinanceService
-from utils.graphql_input_validation import validate_graphql_input
 
 
 @validate_graphql_input(GetIndexerSeriesRequest)

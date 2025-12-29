@@ -1,5 +1,6 @@
 from ariadne import MutationType, QueryType
 from graphql import GraphQLResolveInfo
+from rolf_common.util.graphql_input_validation import validate_graphql_input
 
 from schemas.request.account import (
     CreateAccountTransactionRequest,
@@ -9,7 +10,6 @@ from schemas.request.account import (
     UpdateAccountTransactionRequest,
 )
 from services.account import AccountService
-from utils.graphql_input_validation import validate_graphql_input
 
 
 @validate_graphql_input(GetAccountRequest)

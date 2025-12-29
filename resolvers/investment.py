@@ -1,5 +1,6 @@
 from ariadne import MutationType, QueryType
 from graphql import GraphQLResolveInfo
+from rolf_common.util.graphql_input_validation import validate_graphql_input
 
 from schemas.request.investment import (
     CreateStatementRequest,
@@ -13,7 +14,6 @@ from schemas.request.investment import (
 )
 from services.investment import InvestmentService
 from services.investment_deprecated import InvestmentServiceDeprecated
-from utils.graphql_input_validation import validate_graphql_input
 
 
 # Investment resolvers

@@ -1,9 +1,9 @@
 from ariadne import MutationType, QueryType
 from graphql import GraphQLResolveInfo
+from rolf_common.util.graphql_input_validation import validate_graphql_input
 
 from schemas.request.investment import GetBrazilianFundInvestmentsRequest
 from services.investment_brazilian_fund import InvestmentBrazilianFundService
-from utils.graphql_input_validation import validate_graphql_input
 
 
 @validate_graphql_input(GetBrazilianFundInvestmentsRequest)

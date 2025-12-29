@@ -1,12 +1,12 @@
 from ariadne import MutationType, QueryType
 from graphql import GraphQLResolveInfo
+from rolf_common.util.graphql_input_validation import validate_graphql_input
 
 from schemas.request.credit_card import (
     GetCreditCardRequest,
     GetInstallmentsDueDatesRequest,
 )
 from services.credit_card import CreditCardService
-from utils.graphql_input_validation import validate_graphql_input
 
 
 # Credit Card Resolvers
