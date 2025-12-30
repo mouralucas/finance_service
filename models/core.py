@@ -136,8 +136,6 @@ class IndexerSeriesModel(SQLModel):
     periodicity_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("periodicity.id"))
     periodicity_name: Mapped[str] = mapped_column("periodicity_name", String(100))
     unit: Mapped[str] = mapped_column("unit", String(10))
-    # bcb_code: Mapped[str] = mapped_column('bcb_code', String(10),
-    #   doc='The code in sgs')
 
 
 class LiquidityModel(SQLModel):
@@ -159,6 +157,16 @@ class PeriodicityModel(SQLModel):
     name: Mapped[str] = mapped_column("name", String(100))
     description: Mapped[str] = mapped_column("description", String(250), nullable=True)
     order: Mapped[int] = mapped_column("order", SmallInteger, nullable=True)
+
+
+class IndexerPeriodicityInformationModel(SQLModel):
+    __tablename__ = "indexer_periodicity_information"
+
+    indexer_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("indexer.id"))
+    periodicity_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("periodicity.id"))
+    sgs_code: Mapped[str] = mapped_column("sgs_code", String(10), nullable=True)
+    unit: Mapped[str] = mapped_column("unit", String(10), nullable=True)
+    source: Mapped[str] = mapped_column("source", String(100), nullable=True)
 
 
 class TaxFeeModel(SQLModel):

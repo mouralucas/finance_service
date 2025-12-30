@@ -12,6 +12,7 @@ from models.core import (
     BankModel,
     CurrencyModel,
     IndexerModel,
+    IndexerPeriodicityInformationModel,
     IndexerSeriesModel,
     IndexerTypeModel,
     LiquidityModel,
@@ -187,3 +188,19 @@ class FinanceManager(BaseDataManager):
             if indexer_series
             else None
         )
+
+    async def get_indexer_periodicity_info(
+        self, indexer_id: uuid.UUID, periodicity_id: uuid.UUID
+    ) -> dict[str, Any] | None:
+        query = select(
+            IndexerPeriodicityInformationModel.sgs_code,
+            IndexerPeriodicityInformationModel.unit,
+        ).where(
+            IndexerPeriodicityInformationModel.indexer_id == indexer_id,
+            IndexerPeriodicityInformationModel.periodicity_id == periodicity_id,
+        )
+
+        info = await self.session.execute(query)
+        info = info.mappings().one_or_none()
+
+        return dict(info) if info else None

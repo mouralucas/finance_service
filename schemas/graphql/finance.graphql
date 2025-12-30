@@ -6,7 +6,7 @@ extend type Query {
 }
 
 extend type Mutation {
-    _empty: String
+    syncIndexerSeries(params: SyncIndexerSeriesRequest! ): SyncIndexerSeriesResponse
 }
 
 # Indexer series schemas
@@ -28,7 +28,7 @@ type IndexerSeries {
     indexerName: String
     date: String
     period: Int
-    value: Float
+    value: Float!
     periodicityId: String!
     periodicityName: String
     unit: String
@@ -72,4 +72,15 @@ type GetCurrencyAveragePriceResponse {
     currencySymbol: String!
     averagePrice: Float!
 
+}
+
+# Integration schemas
+input SyncIndexerSeriesRequest {
+    indexerId: String!
+    periodicityId: String!
+}
+
+type SyncIndexerSeriesResponse {
+    quantity: Int!
+    indexer_series: [IndexerSeries]!
 }

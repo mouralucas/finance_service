@@ -3,10 +3,7 @@ import uuid
 from pydantic import BaseModel, Field
 
 
-class CreateIndexerSeriesRequest(BaseModel):
-    indexer_code: int = Field(
-        ..., alias="indexerCode", description="The code of the indexer in SGS system"
-    )
+class SyncIndexerSeriesRequest(BaseModel):
     indexer_id: uuid.UUID = Field(
         ..., alias="indexerId", description="The unique identifier for the indexer"
     )

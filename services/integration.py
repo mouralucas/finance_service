@@ -1,14 +1,22 @@
 import datetime
+import uuid
+from typing import Any
 
 from dateutil.relativedelta import relativedelta
+from fastapi import HTTPException
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from managers.core import CoreManager
 from managers.finance import FinanceManager
 from models.core import IndexerSeriesModel
-from schemas.request.integration import CreateIndexerSeriesRequest
-from services.utils.datetime import get_period, get_period_dates
+from schemas.request.integration import SyncIndexerSeriesRequest
+from services.utils.datetime import (
+    get_current_period,
+    get_period,
+    get_period_dates,
+    get_previous_period,
+)
 
 
 class BcbIntegrationService:
@@ -20,8 +28,10 @@ class BcbIntegrationService:
         self.core_manager = CoreManager(self.session)
         self.finance_manager = FinanceManager(self.session)
 
-    async def create_indexer_data(self, params: CreateIndexerSeriesRequest):
-        # TODO: refactor this method to be more clean
+    async def sync_indexer_data(
+        self, params: SyncIndexerSeriesRequest
+    ) -> dict[str, Any]:
+        # Get indexer and periodicity objects
         indexer = await self.finance_manager.get_indexer_by_id(
             indexer_id=params.indexer_id, raise_exception=True
         )
@@ -29,48 +39,98 @@ class BcbIntegrationService:
             periodicity_id=params.periodicity_id, raise_exception=True
         )
 
-        latest_period = await self.finance_manager.get_latest_finance_series_period(
-            indexer_id=params.indexer_id, periodicity_id=params.periodicity_id
+        # Fetch information about indexer and periodicity
+        indexer_periodicity_info = (
+            await self.finance_manager.get_indexer_periodicity_info(
+                indexer_id=params.indexer_id, periodicity_id=params.periodicity_id
+            )
         )
 
-        # current_period = get_current_period()
-        # previous_period = get_previous_period()
-        if latest_period:
-            last_date_available = (
-                get_period_dates(latest_period) if latest_period else None
+        if not indexer_periodicity_info:
+            raise HTTPException(
+                status_code=404, detail="Indexer periodicity information not found."
             )
-            next_date = last_date_available[0] + relativedelta(months=1)
 
-            sgs_param = "dataInicial=" + next_date.strftime("%d/%m/%Y")
-        else:
-            sgs_param = ""
-
-        if str(periodicity.id) == "b9f83ad5-7701-4098-bdaf-ee092f3247eb":
-            next_date = datetime.datetime.now() - relativedelta(years=5)
-            sgs_param = "dataInicial=" + next_date.strftime("%d/%m/%Y")
-
-        async with AsyncClient() as client:
-            response = await client.get(
-                self.url_bcb.format(resource_code=params.indexer_code, params=sgs_param)
+        # Fetch last available period in database for this indexer and periodicity
+        last_available_period = (
+            await self.finance_manager.get_latest_finance_series_period(
+                indexer_id=params.indexer_id, periodicity_id=params.periodicity_id
             )
-            data = response.json()
+        )
 
-            data_list = []
-            for i in data:
-                date = datetime.datetime.strptime(i["data"], "%d/%m/%Y")
+        # Build SGS parameters
+        params_sgs = await self._build_sgs_params(
+            periodicity_id=params.periodicity_id, latest_period=last_available_period
+        )
 
-                new_input = IndexerSeriesModel(
+        # Fetch data from SGS
+        data = await self._get_from_sgs(
+            resource_code=indexer_periodicity_info["sgs_code"], parameters=params_sgs
+        )
+
+        data_list = []
+        for record in data:
+            date = datetime.datetime.strptime(record["data"], "%d/%m/%Y")
+            period = get_period(date)
+
+            if last_available_period is None or period > last_available_period:
+                new_series = IndexerSeriesModel(
                     indexer_id=params.indexer_id,
                     indexer_name=indexer.name,
                     date=date,
-                    period=get_period(date),
-                    value=float(i["valor"]),
+                    period=period,
+                    value=float(record["valor"]),
                     periodicity_id=params.periodicity_id,
                     periodicity_name=periodicity.name,
-                    unit="in dev",
+                    unit=indexer_periodicity_info["unit"],
                 )
+                data_list.append(new_series)
 
-                data_list.append(new_input)
+        self.session.add_all(data_list)
+        await self.session.flush()
 
-            self.session.add_all(data_list)
-            await self.session.flush()
+        response = {
+            "quantity": len(data_list),
+            "indexer_series": data_list,
+        }
+
+        return response
+
+    async def _get_from_sgs(self, resource_code: int, parameters: str):
+        async with AsyncClient() as client:
+            response = await client.get(
+                self.url_bcb.format(resource_code=resource_code, params=parameters)
+            )
+            data = response.json()
+            return data
+
+    async def _build_sgs_params(
+        self, periodicity_id: uuid.UUID, latest_period: int | None
+    ) -> str:
+        sgs_param = ""
+
+        if latest_period == get_previous_period():
+            # TODO: should not raise exception, just return empty data
+            raise HTTPException(status_code=400, detail="Data is already up to date.")
+
+        if latest_period:
+            last_date_available = get_period_dates(latest_period)
+            start_date = last_date_available[0] + relativedelta(months=1)
+
+            sgs_param = "dataInicial=" + start_date.strftime("%d/%m/%Y")
+
+        if str(periodicity_id) == "b9f83ad5-7701-4098-bdaf-ee092f3247eb":
+            start_date = datetime.datetime.now() - relativedelta(years=5)
+            sgs_param = "dataInicial=" + start_date.strftime("%d/%m/%Y")
+
+        end_date = get_period_dates(get_previous_period(get_current_period()))[1]
+
+        connector = ""
+        if sgs_param:
+            connector = "&"
+
+        sgs_param = (
+            sgs_param + "{connector}dataFinal=" + end_date.strftime("%d/%m/%Y")
+        ).format(connector=connector)
+
+        return sgs_param

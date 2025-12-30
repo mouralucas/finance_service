@@ -13,7 +13,6 @@ from routers import (
     credit_card,
     finance,
     graphql,
-    integration,
     investment,
     investment_brazilian_funds,
 )
@@ -59,7 +58,6 @@ app.include_router(account.router)
 app.include_router(credit_card.router)
 app.include_router(investment.router)
 app.include_router(investment_brazilian_funds.router)
-app.include_router(integration.router)
 app.include_router(finance.router)
 app.include_router(core.router)
 

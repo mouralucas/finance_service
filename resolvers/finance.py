@@ -3,7 +3,9 @@ from graphql import GraphQLResolveInfo
 from rolf_common.util.graphql_input_validation import validate_graphql_input
 
 from schemas.request.finance import GetIndexerSeriesRequest
+from schemas.request.integration import SyncIndexerSeriesRequest
 from services.finance import FinanceService
+from services.integration import BcbIntegrationService
 
 
 @validate_graphql_input(GetIndexerSeriesRequest)
@@ -13,6 +15,17 @@ async def get_indexer_series_resolver(
     indexer_series = await FinanceService(
         session=info.context["session"], user=info.context["user"]
     ).get_indexer_series(params=params)
+
+    return indexer_series
+
+
+@validate_graphql_input(SyncIndexerSeriesRequest)
+async def sync_indexer_series_resolver(
+    _, info: GraphQLResolveInfo, params: SyncIndexerSeriesRequest
+):
+    indexer_series = await BcbIntegrationService(
+        session=info.context["session"]
+    ).sync_indexer_data(params=params)
 
     return indexer_series
 
@@ -37,3 +50,4 @@ def bind_finance_dashboard_resolvers(query: QueryType, mutation: MutationType):
     query.set_field("getIndexerSeries", resolver=get_indexer_series_resolver)
     query.set_field("getCurrencies", resolver=get_currencies_resolver)
     query.set_field("getPeriodicity", resolver=get_periodicity_resolver)
+    mutation.set_field("syncIndexerSeries", resolver=sync_indexer_series_resolver)
