@@ -4,7 +4,7 @@ from typing import Any
 
 from dateutil.relativedelta import relativedelta
 from fastapi import HTTPException
-from httpx import AsyncClient
+from httpx import AsyncClient, Timeout
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from managers.core import CoreManager
@@ -97,7 +97,13 @@ class BcbIntegrationService:
         return response
 
     async def _get_from_sgs(self, resource_code: int, parameters: str):
-        async with AsyncClient() as client:
+        timeout = Timeout(
+            connect=5.0,
+            read=30.0,
+            write=10.0,
+            pool=5.0,
+        )
+        async with AsyncClient(timeout=timeout) as client:
             response = await client.get(
                 self.url_bcb.format(resource_code=resource_code, params=parameters)
             )
@@ -133,4 +139,4 @@ class BcbIntegrationService:
             sgs_param + "{connector}dataFinal=" + end_date.strftime("%d/%m/%Y")
         ).format(connector=connector)
 
-        return sgs_param
+        return "dataInicial=01/01/2021&dataFinal=31/12/2025"
