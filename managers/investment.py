@@ -329,15 +329,33 @@ class InvestmentManager(BaseDataManager):
     async def get_objectives(
         self, owner_id: str, objective_id: uuid.UUID | None = None
     ) -> list[dict[Any, Any]] | None:
-        stmt_alias = aliased(InvestmentStatementModel)
+        latest_date_subq = (
+            select(
+                InvestmentStatementModel.investment_id,
+                func.max(InvestmentStatementModel.reference_date).label(
+                    "max_reference_date"
+                ),
+            )
+            .group_by(InvestmentStatementModel.investment_id)
+            .subquery()
+        )
 
         latest_stmt_subq = (
             select(
-                stmt_alias.investment_id,
-                stmt_alias.gross_amount,
+                InvestmentStatementModel.investment_id,
+                InvestmentStatementModel.gross_amount,
             )
-            .distinct(stmt_alias.investment_id)
-            .order_by(stmt_alias.investment_id, stmt_alias.reference_date.desc())
+            .join(
+                latest_date_subq,
+                (
+                    InvestmentStatementModel.investment_id
+                    == latest_date_subq.c.investment_id
+                )
+                & (
+                    InvestmentStatementModel.reference_date
+                    == latest_date_subq.c.max_reference_date
+                ),
+            )
             .subquery()
         )
 
