@@ -58,7 +58,7 @@ type Investment {
     custodianId: String!
     accountId: String
     name: String!
-    typeId: String!
+    investmentTypeId: String!
     transactionDate: Date!
     maturityDate: String
     quantity: Float!

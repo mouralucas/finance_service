@@ -4,7 +4,7 @@ from typing import Any, cast
 from fastapi import HTTPException
 from rolf_common.managers import BaseDataManager
 from rolf_common.models import SQLModel
-from sqlalchemy import Executable, RowMapping, case, func, literal, select, update
+from sqlalchemy import Executable, RowMapping, and_, case, func, literal, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 from starlette import status
@@ -103,7 +103,10 @@ class InvestmentManager(BaseDataManager):
         # Percentage change using the final value (gross from last period)
         percentage_change = case(
             (
-                statement_alias.gross_amount.is_not(None),
+                and_(
+                    statement_alias.gross_amount.is_not(None),
+                    initial_adjusted_safe.is_not(None),
+                ),
                 (
                     (statement_alias.gross_amount - initial_adjusted_safe)
                     / initial_adjusted_safe
@@ -134,7 +137,7 @@ class InvestmentManager(BaseDataManager):
                 investment_alias.contracted_rate,
                 investment_alias.currency_id,
                 currency_alias.symbol.label("currency_symbol"),
-                investment_alias.type_id,
+                investment_alias.type_id.label("investment_type_id"),
                 type_alias.name.label("investment_type_name"),
                 investment_alias.liquidity_id,
                 investment_alias.indexer_id,
