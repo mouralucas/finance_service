@@ -19,6 +19,8 @@ input GetIndexerSeriesInput {
 
 type GetIndexerSeriesResponse {
     quantity: Int!,
+    indexer: String!
+    periodicity: String!
     series: [IndexerSeries]
 }
 

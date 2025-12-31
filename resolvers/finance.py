@@ -47,7 +47,10 @@ async def get_currencies_resolver(_, info: GraphQLResolveInfo):
 
 
 def bind_finance_dashboard_resolvers(query: QueryType, mutation: MutationType):
+    # Queries
     query.set_field("getIndexerSeries", resolver=get_indexer_series_resolver)
     query.set_field("getCurrencies", resolver=get_currencies_resolver)
     query.set_field("getPeriodicity", resolver=get_periodicity_resolver)
+
+    # Mutations
     mutation.set_field("syncIndexerSeries", resolver=sync_indexer_series_resolver)

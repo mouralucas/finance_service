@@ -107,6 +107,7 @@ class BcbIntegrationService:
             response = await client.get(
                 self.url_bcb.format(resource_code=resource_code, params=parameters)
             )
+            response.raise_for_status()
             data = response.json()
             return data
 
@@ -139,4 +140,4 @@ class BcbIntegrationService:
             sgs_param + "{connector}dataFinal=" + end_date.strftime("%d/%m/%Y")
         ).format(connector=connector)
 
-        return "dataInicial=01/01/2021&dataFinal=31/12/2025"
+        return "dataInicial=01/01/2020&dataFinal=31/12/2029"

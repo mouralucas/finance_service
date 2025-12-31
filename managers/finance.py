@@ -165,14 +165,24 @@ class FinanceManager(BaseDataManager):
         periodicity_id: uuid.UUID,
         start_period: int | None = None,
         end_period: int | None = None,
-    ) -> list[IndexerSeriesModel] | None:
+    ) -> list[dict[str, Any]] | None:
         query = (
-            select(IndexerSeriesModel)
+            select(
+                IndexerSeriesModel.id,
+                IndexerSeriesModel.indexer_id,
+                IndexerSeriesModel.indexer_name,
+                IndexerSeriesModel.date,
+                IndexerSeriesModel.period,
+                IndexerSeriesModel.periodicity_id,
+                IndexerSeriesModel.periodicity_name,
+                IndexerSeriesModel.value,
+                IndexerSeriesModel.unit,
+            )
             .where(
                 IndexerSeriesModel.indexer_id == indexer_id,
                 IndexerSeriesModel.periodicity_id == periodicity_id,
             )
-            .order_by(IndexerSeriesModel.period.desc())
+            .order_by(IndexerSeriesModel.period.desc(), IndexerSeriesModel.date.desc())
         )
 
         if start_period is not None:
@@ -183,11 +193,7 @@ class FinanceManager(BaseDataManager):
 
         indexer_series = await self.get_all(query)
 
-        return (
-            [i["IndexerSeriesModel"] for i in indexer_series]
-            if indexer_series
-            else None
-        )
+        return [dict(i) for i in indexer_series] if indexer_series else None
 
     async def get_indexer_periodicity_info(
         self, indexer_id: uuid.UUID, periodicity_id: uuid.UUID
