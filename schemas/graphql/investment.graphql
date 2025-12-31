@@ -108,15 +108,21 @@ input TaxFeeDetail {
 }
 
 input CreateInvestmentStatementInput {
+    investmentStatementId: String
     investmentId: String!
+    name: String
+    transactionDate: Date
+    maturityDate: Date
+    referenceDate: Date!
     period: Int!
     contribution: Float!
     withdrawn: Float!
-    referenceDate: Date!
     grossAmount: Float!
     netAmount: Float!
-    taxDetail: [TaxFeeDetail]
-    feeDedtail: [TaxFeeDetail]
+    valueChange: Float
+    percentageChange: Float
+    taxDetails: [TaxFeeDetail]
+    feeDetails: [TaxFeeDetail]
 }
 
 type CreateInvestmentStatementResponse {
