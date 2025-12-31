@@ -83,6 +83,7 @@ type Investment {
     grossAmount: Float!
     totalContribution: Float!
     totalWithdrawn: Float!
+    percentageChange: Float!
 }
 
 
