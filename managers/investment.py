@@ -69,18 +69,7 @@ class InvestmentManager(BaseDataManager):
         bank_alias = aliased(BankModel)
         statement_alias = aliased(InvestmentStatementModel)
 
-        # Subquery for last statement period
-        latest_statement_subq = (
-            select(
-                InvestmentStatementModel.investment_id.label("investment_id"),
-                func.max(InvestmentStatementModel.period).label("latest_period"),
-            )
-            .group_by(InvestmentStatementModel.investment_id)
-            .subquery()
-        )
-
-        # Subquery: sums all statements contribution/withdrawn per investment
-        statement_sum_subq = (
+        statement_sum_cte = (
             select(
                 InvestmentStatementModel.investment_id.label("investment_id"),
                 func.sum(InvestmentStatementModel.contribution).label(
@@ -89,18 +78,24 @@ class InvestmentManager(BaseDataManager):
                 func.sum(InvestmentStatementModel.withdrawn).label("total_withdrawn"),
             )
             .group_by(InvestmentStatementModel.investment_id)
-            .subquery()
+            .cte("statement_sum")
         )
 
-        # Initial value of the investment considering all contributions/withdrawals
-        initial_adjusted = func.coalesce(
-            statement_sum_subq.c.total_contribution, 0
-        ) - func.coalesce(statement_sum_subq.c.total_withdrawn, 0)
+        latest_statement_cte = (
+            select(
+                InvestmentStatementModel.investment_id.label("investment_id"),
+                func.max(InvestmentStatementModel.period).label("latest_period"),
+            )
+            .group_by(InvestmentStatementModel.investment_id)
+            .cte("latest_statement")
+        )
 
-        # Avoid division by zero
+        initial_adjusted = func.coalesce(
+            statement_sum_cte.c.total_contribution, 0
+        ) - func.coalesce(statement_sum_cte.c.total_withdrawn, 0)
+
         initial_adjusted_safe = func.nullif(initial_adjusted, 0)
 
-        # Percentage change using the final value (gross from last period)
         percentage_change = case(
             (
                 and_(
@@ -125,19 +120,18 @@ class InvestmentManager(BaseDataManager):
                 investment_alias.name,
                 investment_alias.transaction_date,
                 investment_alias.maturity_date,
-                investment_alias.price,
                 investment_alias.quantity,
+                investment_alias.price,
                 investment_alias.amount,
-                func.coalesce(statement_sum_subq.c.total_contribution, 0).label(
+                func.coalesce(statement_sum_cte.c.total_contribution, 0).label(
                     "total_contribution"
                 ),
-                func.coalesce(statement_sum_subq.c.total_withdrawn, 0).label(
+                func.coalesce(statement_sum_cte.c.total_withdrawn, 0).label(
                     "total_withdrawn"
                 ),
-                investment_alias.contracted_rate,
-                investment_alias.currency_id,
+                currency_alias.id.label("currency_id"),
                 currency_alias.symbol.label("currency_symbol"),
-                investment_alias.type_id.label("investment_type_id"),
+                type_alias.id.label("investment_type_id"),
                 type_alias.name.label("investment_type_name"),
                 investment_alias.liquidity_id,
                 investment_alias.indexer_id,
@@ -146,7 +140,6 @@ class InvestmentManager(BaseDataManager):
                 investment_alias.is_settled,
                 investment_alias.settlement_date,
                 investment_alias.settlement_amount,
-                # Final amount = gross_amount from last statement OR initial amount
                 case(
                     (
                         statement_alias.gross_amount.is_(None),
@@ -156,38 +149,31 @@ class InvestmentManager(BaseDataManager):
                 ).label("gross_amount"),
                 percentage_change,
                 statement_alias.period,
-                investment_alias.objective_id,
             )
             .join(currency_alias, investment_alias.currency_id == currency_alias.id)
             .join(type_alias, investment_alias.type_id == type_alias.id)
             .join(bank_alias, investment_alias.custodian_id == bank_alias.id)
-            # Subquery sum contribution/withdrawn
             .outerjoin(
-                statement_sum_subq,
-                statement_sum_subq.c.investment_id == investment_alias.id,
+                statement_sum_cte,
+                statement_sum_cte.c.investment_id == investment_alias.id,
             )
-            # Subquery for last statement period
             .outerjoin(
-                latest_statement_subq,
-                latest_statement_subq.c.investment_id == investment_alias.id,
+                latest_statement_cte,
+                latest_statement_cte.c.investment_id == investment_alias.id,
             )
-            # Join on statement of the last period
             .outerjoin(
                 statement_alias,
-                (statement_alias.investment_id == investment_alias.id)
-                & (statement_alias.period == latest_statement_subq.c.latest_period),
+                and_(
+                    statement_alias.investment_id == investment_alias.id,
+                    statement_alias.period == latest_statement_cte.c.latest_period,
+                ),
             )
-            .where(
-                investment_alias.owner_id == owner_id,
-            )
+            .where(investment_alias.owner_id == owner_id)
             .order_by(investment_alias.transaction_date)
         )
 
-        if is_settled is not None and is_settled:
-            query = query.where(investment_alias.is_settled)
-
-        if is_settled is not None and not is_settled:
-            query = query.where(~investment_alias.is_settled)
+        if is_settled is not None:
+            query = query.where(investment_alias.is_settled.is_(is_settled))
 
         investments: list[RowMapping] | None = await self.get_all(query)
 
