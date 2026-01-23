@@ -2,7 +2,7 @@ import datetime
 import uuid
 from decimal import Decimal
 
-from rolf_common.models import SQLModel
+from rolf_common.models.base import SQLModel
 from sqlalchemy import JSON, ForeignKey, Integer, Numeric, SmallInteger, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 

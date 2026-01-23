@@ -2,7 +2,7 @@ import uuid
 from typing import Any, cast
 
 from rolf_common.managers import BaseDataManager
-from rolf_common.models import SQLModel
+from rolf_common.models.base import SQLModel
 from sqlalchemy import RowMapping, case, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased

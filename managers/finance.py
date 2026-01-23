@@ -3,7 +3,7 @@ from typing import Any, cast
 
 from fastapi import HTTPException
 from rolf_common.managers import BaseDataManager
-from rolf_common.models import SQLModel
+from rolf_common.models.base import SQLModel
 from sqlalchemy import RowMapping, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status

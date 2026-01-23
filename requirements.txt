@@ -1,3 +1,4 @@
+# Base requirements
 fastapi==0.116.1
 pydantic==2.11.7
 pydantic-settings==2.10.1
@@ -5,8 +6,9 @@ uvicorn==0.35.0
 sqlalchemy[asyncio]==2.0.41
 starlette==0.47.1
 httpx==0.28.1
-python-dateutil~=2.9.0.post0
 git+https://github.com/mouralucas/rolf_common.git@main#egg=rolf_common
+python-dateutil~=2.9.0.post0
+
 
 # GraphQL support
 ariadne==0.26.2

@@ -1,7 +1,7 @@
 import uuid
 from typing import cast
 
-from rolf_common.models import SQLModel
+from rolf_common.models.base import SQLModel
 from sqlalchemy import RowMapping, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
