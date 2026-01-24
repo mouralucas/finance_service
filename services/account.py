@@ -149,6 +149,7 @@ class AccountService(BaseService):
             owner_id=self.user["user_id"],
             start_period=params.start_period,
             end_period=params.end_period,
+            account_id=params.account_id,
         )
 
         response = {

@@ -111,7 +111,11 @@ class AccountManager(BaseDataManager):
         return cast(AccountTransactionModel, updated_transaction)
 
     async def get_transactions(
-        self, owner_id: uuid.UUID, start_period: int | None, end_period: int | None
+        self,
+        owner_id: uuid.UUID,
+        start_period: int | None,
+        end_period: int | None,
+        account_id: uuid.UUID | None,
     ) -> list[dict[Any, Any]] | None:
         transaction_alias = aliased(AccountTransactionModel)
         account_alias = aliased(AccountModel)
@@ -166,6 +170,9 @@ class AccountManager(BaseDataManager):
 
         if end_period:
             query = query.where(transaction_alias.period <= end_period)
+
+        if account_id:
+            query = query.where(transaction_alias.account_id == account_id)
 
         transactions: list[RowMapping] | None = await self.get_all(query)
 
