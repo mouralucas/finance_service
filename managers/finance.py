@@ -196,7 +196,7 @@ class FinanceManager(BaseDataManager):
         return [dict(i) for i in indexer_series] if indexer_series else None
 
     async def get_indexer_periodicity_info(
-        self, indexer_id: uuid.UUID, periodicity_id: uuid.UUID
+        self, indexer_id: uuid.UUID, periodicity_id: str
     ) -> dict[str, Any] | None:
         query = select(
             IndexerPeriodicityInformationModel.sgs_code,

@@ -4,6 +4,7 @@ from rolf_common.util.graphql_input_validation import validate_graphql_input
 
 from schemas.request.credit_card import (
     GetCreditCardRequest,
+    GetCreditCardTransactionsRequest,
     GetInstallmentsDueDatesRequest,
 )
 from services.credit_card import CreditCardService
@@ -21,6 +22,15 @@ async def get_credit_cards_resolver(
     return credit_cards
 
 
+@validate_graphql_input(GetCreditCardTransactionsRequest)
+async def get_credit_card_transaction_resolver(
+    _, info: GraphQLResolveInfo, params: GetCreditCardTransactionsRequest
+):
+    return await CreditCardService(
+        session=info.context["session"], user=info.context["user"]
+    ).get_transactions(params)
+
+
 # Helper to get credit card installment due dates
 @validate_graphql_input(GetInstallmentsDueDatesRequest)
 async def get_installments_due_dates_resolver(
@@ -35,6 +45,9 @@ async def get_installments_due_dates_resolver(
 
 def bind_credit_card_resolvers(query: QueryType, mutation: MutationType):
     query.set_field("getCreditCards", resolver=get_credit_cards_resolver)
+    query.set_field(
+        "getCreditCardTransactions", resolver=get_credit_card_transaction_resolver
+    )
     query.set_field(
         "getCreditCardInstallmentDueDates", resolver=get_installments_due_dates_resolver
     )

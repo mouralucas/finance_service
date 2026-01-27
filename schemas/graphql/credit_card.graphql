@@ -1,5 +1,6 @@
 extend type Query {
     getCreditCards(params: GetCreditCardsInput): GetCreditCardsResponse
+    getCreditCardTransactions(params: GetCreditCardTransactionsInput): GetCreditCardTransactionsResponse
     getCreditCardInstallmentDueDates(params: GetInstallmentsDueDatesInput): GetInstallmentsDueDatesResponse
 }
 
@@ -26,6 +27,44 @@ type CreditCard {
     dueDay: Int
     closeDay: Int
 }
+
+# Credit card transactions
+input GetCreditCardTransactionsInput {
+    creditCardId: String
+    startPeriod: Int
+    endPeriod: Int
+    parentId: Int
+}
+
+type GetCreditCardTransactionsResponse {
+    quantity: Int!
+    transactions: [CreditCardTransactions]!
+}
+
+type CreditCardTransactions {
+    id: String!
+    creditCardNickname: String
+    creditCardId: String!
+    period: Int!
+    due_date: Date!
+    transaction_date: Date!
+    amount: Float!
+    category_id: String!
+    category_name: String
+    currency_id: String!
+    currency_symbol: String
+    transaction_currency_id: String
+    transaction_currency_symbol: String
+    transaction_amount: Float!
+    is_installment: Boolean!
+    current_installment: Int!
+    installments: Int!
+    total_amount: Float
+    description: String
+    created_at: DateTime!
+    edited_at: DateTime
+}
+
 
 # Credit card installments
 input GetInstallmentsDueDatesInput {

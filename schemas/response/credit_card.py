@@ -20,19 +20,6 @@ class CancelCreditCardResponse(CreateCreditCardResponse):
     pass
 
 
-# class GetCreditCardResponse(BaseModel):
-#     quantity: int = Field(
-#         ...,
-#         serialization_alias="quantity",
-#         description="The number of credit cards fetched",
-#     )
-#     credit_cards: list[CreditCardSchema] = Field(
-#         ...,
-#         serialization_alias="creditCards",
-#         description="The list of the credit cards of the user",
-#     )
-
-
 class CreateCreditCardTransactionResponse(BaseModel):
     transaction: list[CreditCardTransactionSchema] = Field(
         ...,

@@ -87,6 +87,7 @@ class CreditCardManager(BaseDataManager):
     async def get_credit_card_transactions(
         self,
         owner_id: uuid.UUID,
+        credit_card_id: uuid.UUID,
         start_period: int | None = None,
         end_period: int | None = None,
         parent_id: int | None = None,
@@ -146,6 +147,9 @@ class CreditCardManager(BaseDataManager):
 
         if parent_id is not None:
             query = query.where(transaction_alias.parent_id == parent_id)
+
+        if credit_card_id:
+            query = query.where(transaction_alias.credit_card_id == credit_card_id)
 
         transactions = await self.get_all(query)
 

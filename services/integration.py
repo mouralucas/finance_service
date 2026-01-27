@@ -96,6 +96,26 @@ class BcbIntegrationService:
 
         return response
 
+    async def sync_daily_data(self, indexer_id: uuid.UUID):
+        indexer = await self.finance_manager.get_indexer_by_id(
+            indexer_id=indexer_id, raise_exception=True
+        )
+
+        # Get info for daily periodicity
+        indexer_periodicity_info = (
+            await self.finance_manager.get_indexer_periodicity_info(
+                indexer_id=indexer_id,
+                periodicity_id="b9f83ad5-7701-4098-bdaf-ee092f3247eb",
+            )
+        )
+
+        if not indexer_periodicity_info:
+            raise HTTPException(
+                status_code=404, detail="Indexer periodicity information not found."
+            )
+
+        print(indexer)
+
     async def _get_from_sgs(self, resource_code: int, parameters: str):
         timeout = Timeout(
             connect=5.0,
