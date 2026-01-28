@@ -10,14 +10,12 @@ from schemas.request.credit_card import (
     CreateCreditCardRequest,
     CreateCreditCardTransactionRequest,
     GetCreditCardBillRequest,
-    GetCreditCardTransactionsRequest,
 )
 from schemas.response.credit_card import (
     CreateCreditCardResponse,
     CreateCreditCardTransactionResponse,
     GetCreditCardBillConsolidatedResponse,
     GetCreditCardBillHistoryResponse,
-    GetCreditCardTransactionResponse,
 )
 from services.credit_card import CreditCardService
 
@@ -67,19 +65,6 @@ async def create_transaction(
     return await CreditCardService(session=session, user=user).create_transaction(
         transaction
     )
-
-
-@router.get(
-    "/transaction",
-    summary="Get credit card transactions",
-    description="Get all credit card transactions for a user filter by params",
-)
-async def get_transactions(
-    params: GetCreditCardTransactionsRequest = Depends(),
-    session: AsyncSession = Depends(get_session),
-    user: RequiredUser = Security(get_user),
-) -> GetCreditCardTransactionResponse:
-    return await CreditCardService(session=session, user=user).get_transactions(params)
 
 
 @router.get(
