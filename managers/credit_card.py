@@ -87,7 +87,7 @@ class CreditCardManager(BaseDataManager):
     async def get_credit_card_transactions(
         self,
         owner_id: uuid.UUID,
-        credit_card_id: uuid.UUID,
+        credit_card_id: uuid.UUID | None = None,
         start_period: int | None = None,
         end_period: int | None = None,
         parent_id: int | None = None,

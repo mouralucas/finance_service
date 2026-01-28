@@ -174,6 +174,7 @@ class CreditCardService(BaseService):
             session=self.session
         ).get_credit_card_transactions(
             owner_id=self.user["user_id"],
+            credit_card_id=params.credit_card_id,
             start_period=params.start_period,
             end_period=params.end_period,
             parent_id=params.parent_id,

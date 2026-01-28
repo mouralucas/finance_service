@@ -46,23 +46,23 @@ type CreditCardTransactions {
     creditCardNickname: String
     creditCardId: String!
     period: Int!
-    due_date: Date!
-    transaction_date: Date!
+    dueDate: Date!
+    transactionDate: Date!
     amount: Float!
-    category_id: String!
-    category_name: String
-    currency_id: String!
-    currency_symbol: String
-    transaction_currency_id: String
-    transaction_currency_symbol: String
-    transaction_amount: Float!
-    is_installment: Boolean!
-    current_installment: Int!
+    categoryId: String!
+    categoryName: String
+    currencyId: String!
+    currencySymbol: String
+    transactionCurrencyId: String
+    transactionCurrencySymbol: String
+    transactionAmount: Float!
+    isInstallment: Boolean!
+    currentInstallment: Int!
     installments: Int!
-    total_amount: Float
+    totalAmount: Float
     description: String
-    created_at: DateTime!
-    edited_at: DateTime
+    createdAt: DateTime!
+    editedAt: DateTime
 }
 
 
