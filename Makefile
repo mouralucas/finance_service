@@ -14,7 +14,7 @@ all: insert-data
 apply-migrations:
 	$(PYTHON) -m $(ALEMBIC) $(COMMAND_UPGRADE)
 
-create-db-migration:
+create-migration:
 	@read -p "Type the migration message: " msg; \
 	python3 -m alembic.config revision --autogenerate -m "$$msg"
 
