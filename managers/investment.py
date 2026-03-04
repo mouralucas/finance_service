@@ -657,6 +657,7 @@ class InvestmentManager(BaseDataManager):
         investment_id: uuid.UUID | None,
         indexer_id: uuid.UUID,
         period_range: int,
+        is_settled: bool = False,
     ) -> list[dict] | None:
         """
         Created by: Lucas Penha de Moura - 17/10/2024
@@ -746,7 +747,8 @@ class InvestmentManager(BaseDataManager):
             .order_by(sq.c.period)
         )
 
-        if period_range > 0:
+        # For settled investments, show everything
+        if period_range > 0 and not is_settled:
             start_period = get_previous_period(offset=period_range)
             query = query.where(sq.c.period >= start_period)
 

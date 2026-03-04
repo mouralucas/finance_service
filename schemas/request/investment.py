@@ -372,3 +372,4 @@ class GetPerformanceRequest(BaseModel):
         description="The period range of the objective, \
             how many months will be displayed",
     )
+    is_settled: bool = Field(False)

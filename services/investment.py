@@ -244,6 +244,7 @@ class InvestmentService(BaseService):
             investment_id=params.investment_id,
             period_range=params.period_range,
             indexer_id=params.indexer_id,
+            is_settled=params.is_settled,
         )
 
         if not performance_portfolio:
@@ -256,11 +257,6 @@ class InvestmentService(BaseService):
         indexer = await FinanceManager(session=self.session).get_indexer_by_id(
             indexer_id=params.indexer_id, raise_exception=True
         )
-        # investment = None
-        # if params.investment_id:
-        #     investment = await self.investment_manager.get_investment_by_id(
-        #         investment_id=params.investment_id
-        #     )
 
         accumulated_indexer = 1.0
         accumulated_variation = 1.0
@@ -296,12 +292,6 @@ class InvestmentService(BaseService):
             {"data": indexer_variation_data, "label": "Variação do indexer"},
             {"data": variation_data, "label": "Variação"},
         ]
-
-        # return GetInvestmentPerformanceResponseV2(
-        #     x_label=x_value,
-        #     data=[ChartSeriesSchemaV2.model_validate(item) for item in series],
-        #     indexer_name=indexer.name,
-        # )
 
         response = {"x_label": x_value, "data": series, "indexer_name": indexer.name}
 

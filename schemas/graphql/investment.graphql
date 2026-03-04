@@ -27,6 +27,7 @@ input GetInvestmentPerformanceInput {
     investmentId: String
     indexerId: String
     periodRange: Int
+    isSettled: Boolean
 }
 
 type GetInvestmentPerformanceResponse {
@@ -184,11 +185,7 @@ type Statement {
     withdrawn: Float!
     grossAmount: Float!
     totalTax: Float!
-    # tax_detail: list[TaxFeeSchema] | None = Field(
-    #     ..., description="The detail of taxes"
-    # )
     totalFee: Float!
-    # fee_detail: list[TaxFeeSchema] | None = Field(..., description="The detail of fees")
     referenceDate: Date!
     atMaturity: Boolean!
     valueChange: Float!
