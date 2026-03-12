@@ -9,6 +9,8 @@ httpx==0.28.1
 git+https://github.com/mouralucas/rolf_common.git@main#egg=rolf_common
 python-dateutil~=2.9.0.post0
 
+# Cron jobs
+fastapi-crons==2.2.0
 
 # GraphQL support
 ariadne==0.26.2

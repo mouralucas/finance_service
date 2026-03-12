@@ -5,6 +5,8 @@ from fastapi import FastAPI
 from rolf_common.base_middleware import LogsMiddleware
 from starlette.middleware.cors import CORSMiddleware
 
+# Any cron jobs need to be registered and should be imported here
+import scripts.cron_jobs.financial_integrations  # noqa: F401
 from backend.settings import settings
 from lifespan import shutdown_log_service, start_log_service
 from routers import (
@@ -16,6 +18,7 @@ from routers import (
     investment,
     investment_brazilian_funds,
 )
+from scripts.crons import crons
 
 
 @asynccontextmanager
@@ -43,6 +46,7 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
+# Set up CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.allowed_origins.split(","),
@@ -52,6 +56,8 @@ app.add_middleware(
 )
 app.add_middleware(LogsMiddleware)
 
+# Start the cron scheduler
+crons.init_app(app)
 
 # Include all routers
 app.include_router(account.router)
