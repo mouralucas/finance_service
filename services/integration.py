@@ -105,7 +105,7 @@ class BcbIntegrationService:
         indexer_periodicity_info = (
             await self.finance_manager.get_indexer_periodicity_info(
                 indexer_id=indexer_id,
-                periodicity_id="b9f83ad5-7701-4098-bdaf-ee092f3247eb",
+                periodicity_id=uuid.UUID("b9f83ad5-7701-4098-bdaf-ee092f3247eb"),
             )
         )
 
@@ -114,7 +114,47 @@ class BcbIntegrationService:
                 status_code=404, detail="Indexer periodicity information not found."
             )
 
-        print(indexer)
+        # Fetch last available period in database for this indexer and periodicity
+        last_available_date = await self.finance_manager.get_latest_finance_series_date(
+            indexer_id=indexer_id,
+            periodicity_id=uuid.UUID("b9f83ad5-7701-4098-bdaf-ee092f3247eb"),
+        )
+
+        # Build params for daily periodicity
+        params_sgs = await self._build_daily_sgs_params(
+            latest_saved_date=last_available_date
+        )
+
+        data = await self._get_from_sgs(
+            resource_code=indexer_periodicity_info["sgs_code"], parameters=params_sgs
+        )
+        data_list = []
+        for record in data:
+            date = datetime.datetime.strptime(record["data"], "%d/%m/%Y")
+            period = get_period(date)
+
+            if last_available_date is None or date.date() > last_available_date:
+                new_series = IndexerSeriesModel(
+                    indexer_id=indexer_id,
+                    indexer_name=indexer.name,
+                    date=date,
+                    period=period,
+                    value=float(record["valor"]),
+                    periodicity_id=uuid.UUID("b9f83ad5-7701-4098-bdaf-ee092f3247eb"),
+                    periodicity_name="daily",
+                    unit=indexer_periodicity_info["unit"],
+                )
+                data_list.append(new_series)
+
+        self.session.add_all(data_list)
+        await self.session.flush()
+
+        response = {
+            "quantity": len(data_list),
+            "indexer_series": data_list,
+        }
+
+        return response
 
     async def _get_from_sgs(self, resource_code: int, parameters: str):
         timeout = Timeout(
@@ -130,6 +170,29 @@ class BcbIntegrationService:
             response.raise_for_status()
             data = response.json()
             return data
+
+    async def _build_daily_sgs_params(
+        self, latest_saved_date: datetime.date | None
+    ) -> str:
+        """Build SGS query params to fetch missing daily data."""
+
+        yesterday = datetime.date.today() - datetime.timedelta(days=1)
+
+        if latest_saved_date:
+            start_date = latest_saved_date + relativedelta(days=1)
+        else:
+            start_date = datetime.date.today() - relativedelta(years=10)
+
+        # Nothing new to fetch
+        if start_date > yesterday:
+            return ""
+
+        params = [
+            f"dataInicial={start_date.strftime('%d/%m/%Y')}",
+            f"dataFinal={yesterday.strftime('%d/%m/%Y')}",
+        ]
+
+        return "&".join(params)
 
     async def _build_sgs_params(
         self, periodicity_id: uuid.UUID, latest_period: int | None
@@ -150,7 +213,7 @@ class BcbIntegrationService:
             start_date = datetime.datetime.now() - relativedelta(years=5)
             sgs_param = "dataInicial=" + start_date.strftime("%d/%m/%Y")
 
-        end_date = get_period_dates(get_previous_period(get_current_period()))[1]
+        _, end_date = get_period_dates(get_previous_period(get_current_period()))
 
         connector = ""
         if sgs_param:
@@ -160,4 +223,4 @@ class BcbIntegrationService:
             sgs_param + "{connector}dataFinal=" + end_date.strftime("%d/%m/%Y")
         ).format(connector=connector)
 
-        return "dataInicial=01/01/2020&dataFinal=31/12/2029"
+        return "dataInicial=01/01/2080&dataFinal=31/12/1989"

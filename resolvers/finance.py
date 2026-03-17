@@ -1,3 +1,5 @@
+import uuid
+
 from ariadne import MutationType, QueryType
 from graphql import GraphQLResolveInfo
 from rolf_common.util.graphql_input_validation import validate_graphql_input
@@ -25,7 +27,7 @@ async def sync_indexer_series_resolver(
 ):
     indexer_series = await BcbIntegrationService(
         session=info.context["session"]
-    ).sync_indexer_data(params=params)
+    ).sync_daily_data(indexer_id=uuid.UUID("2a2b100f-17d9-4c61-b3b4-f06662113953"))
 
     return indexer_series
 

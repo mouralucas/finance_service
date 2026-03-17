@@ -1,4 +1,5 @@
 import uuid
+from datetime import date
 from typing import Any, cast
 
 from fastapi import HTTPException
@@ -159,6 +160,27 @@ class FinanceManager(BaseDataManager):
 
         return cast(int, latest_period) if latest_period else None
 
+    async def get_latest_finance_series_date(
+        self, indexer_id: uuid.UUID, periodicity_id: uuid.UUID
+    ) -> date | None:
+        """
+        Created by: Lucas Penha de Moura - 14/03/2026
+            Get the latest series date for an indexer at daily basis
+
+        :param: indexer_id: the id of the indexer
+        :param: periodicity_id: the id of the periodicity
+        """
+        sql_statement = select(
+            func.max(IndexerSeriesModel.date),
+        ).where(
+            IndexerSeriesModel.indexer_id == indexer_id,
+            IndexerSeriesModel.periodicity_id == periodicity_id,
+        )
+
+        latest_date = await self.get_only_one(select_statement=sql_statement)
+
+        return cast(date, latest_date) if latest_date else None
+
     async def get_indexer_series(
         self,
         indexer_id: uuid.UUID,
@@ -196,9 +218,10 @@ class FinanceManager(BaseDataManager):
         return [dict(i) for i in indexer_series] if indexer_series else None
 
     async def get_indexer_periodicity_info(
-        self, indexer_id: uuid.UUID, periodicity_id: str
+        self, indexer_id: uuid.UUID, periodicity_id: uuid.UUID
     ) -> dict[str, Any] | None:
         query = select(
+            IndexerPeriodicityInformationModel.indexer_id,
             IndexerPeriodicityInformationModel.sgs_code,
             IndexerPeriodicityInformationModel.unit,
         ).where(
