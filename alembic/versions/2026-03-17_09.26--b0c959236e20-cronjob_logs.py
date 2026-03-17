@@ -1,8 +1,8 @@
 """Cronjob logs
 
-Revision ID: 09ed548445e9
+Revision ID: b0c959236e20
 Revises: c9c1838cf3d6
-Create Date: 2026-03-16 22:51:21.372531
+Create Date: 2026-03-17 09:26:15.998594
 
 """
 
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "09ed548445e9"
+revision: str = "b0c959236e20"
 down_revision: Union[str, None] = "c9c1838cf3d6"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -33,6 +33,7 @@ def upgrade() -> None:
         ),
         sa.Column("successful_run", sa.Boolean(), nullable=False),
         sa.Column("entries_saved", sa.Integer(), nullable=True),
+        sa.Column("execution_time", sa.Interval(), nullable=False),
         sa.Column("exception", sa.TEXT(), nullable=True),
         sa.Column("active", sa.Boolean(), nullable=False),
         sa.Column(

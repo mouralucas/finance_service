@@ -86,9 +86,15 @@ class BcbIntegrationService:
             self.session.add_all(data_list)
             await self.session.flush()
         except Exception as e:
-            return {"successful": False, "exception": e}
+            return {
+                "successful": False,
+                "exception": e,
+            }
 
-        response = {"successful": True, "quantity": len(data_list)}
+        response = {
+            "successful": True,
+            "quantity": len(data_list),
+        }
 
         return response
 
@@ -151,6 +157,7 @@ class BcbIntegrationService:
             self.session.add_all(data_list)
             await self.session.flush()
         except Exception as e:
+            print("")
             return {"sucessful": False, "exception": e}
 
         response = {
@@ -187,9 +194,8 @@ class BcbIntegrationService:
         else:
             start_date = datetime.date.today() - relativedelta(years=10)
 
-        # Nothing new to fetch
-        if start_date > yesterday:
-            return ""
+        if start_date >= yesterday:
+            raise ValueError("Latest date is already up-to-date or in the future")
 
         params = [
             f"dataInicial={start_date.strftime('%d/%m/%Y')}",
@@ -209,19 +215,25 @@ class BcbIntegrationService:
         # Último dia do mês passado
         last_month_end = current_month_start - datetime.timedelta(days=1)
 
+        # Período do mês passado (yyyymm)
+        last_month_period = last_month_end.year * 100 + last_month_end.month
+
         start_date = None
 
         if latest_period:
+            if latest_period >= last_month_period:
+                raise ValueError("Latest period is already up-to-date or in the future")
+
             year = latest_period // 100
             month = latest_period % 100
 
+            if not 1 <= month <= 12:
+                raise ValueError("Invalid period format")
+
             latest_period_date = datetime.date(year, month, 1)
 
-            # primeiro dia do mês seguinte
+            # Primeiro dia do mês seguinte
             start_date = latest_period_date + relativedelta(months=1)
-
-            if start_date > last_month_end:
-                return ""
 
         params = []
 

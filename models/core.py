@@ -8,6 +8,7 @@ from sqlalchemy import (
     TIMESTAMP,
     ForeignKey,
     Identity,
+    Interval,
     Numeric,
     SmallInteger,
     String,
@@ -210,4 +211,5 @@ class CronJobLogs(SQLModel):
     entries_saved: Mapped[int] = mapped_column(
         nullable=True, doc="Indicate how many new entries were created, if applicable"
     )
+    execution_time: Mapped[datetime.timedelta] = mapped_column(type_=Interval)
     exception: Mapped[str | None] = mapped_column(type_=TEXT, nullable=True)
