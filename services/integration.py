@@ -158,7 +158,7 @@ class BcbIntegrationService:
             await self.session.flush()
         except Exception as e:
             print("")
-            return {"sucessful": False, "exception": e}
+            return {"successful": False, "exception": e}
 
         response = {
             "successful": True,
