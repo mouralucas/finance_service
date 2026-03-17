@@ -120,6 +120,7 @@ class InvestmentManager(BaseDataManager):
                 investment_alias.name,
                 investment_alias.transaction_date,
                 investment_alias.maturity_date,
+                investment_alias.contracted_rate,
                 investment_alias.quantity,
                 investment_alias.price,
                 investment_alias.amount,
@@ -140,6 +141,7 @@ class InvestmentManager(BaseDataManager):
                 investment_alias.is_settled,
                 investment_alias.settlement_date,
                 investment_alias.settlement_amount,
+                investment_alias.observation,
                 case(
                     (
                         statement_alias.gross_amount.is_(None),
