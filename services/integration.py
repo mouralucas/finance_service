@@ -25,126 +25,137 @@ class BcbIntegrationService:
         self.finance_manager = FinanceManager(self.session)
 
     async def sync_monthly_data(self, indexer_id: uuid.UUID) -> dict[str, Any]:
-        # Get indexer and periodicity objects
-        indexer = await self.finance_manager.get_indexer_by_id(
-            indexer_id=indexer_id, raise_exception=True
-        )
-
-        # Fetch information about indexer monthly
-        indexer_periodicity_info = (
-            await self.finance_manager.get_indexer_periodicity_info(
-                indexer_id=indexer_id,
-                periodicity_id=uuid.UUID("dc5b3bf8-2b84-423a-9a90-e7e194e355fa"),
-            )
-        )
-
-        if not indexer_periodicity_info:
-            raise HTTPException(
-                status_code=404, detail="Indexer periodicity information not found."
+        try:
+            # Get indexer and periodicity objects
+            indexer = await self.finance_manager.get_indexer_by_id(
+                indexer_id=indexer_id, raise_exception=True
             )
 
-        # Fetch last available period in database for this indexer and periodicity
-        last_available_period = (
-            await self.finance_manager.get_latest_finance_series_period(
-                indexer_id=indexer_id,
-                periodicity_id=uuid.UUID("dc5b3bf8-2b84-423a-9a90-e7e194e355fa"),
-            )
-        )
-
-        # Build SGS parameters
-        params_sgs = await self._build_monthly_sgs_params(
-            latest_period=last_available_period
-        )
-
-        # Fetch data from SGS
-        data = await self._get_from_sgs(
-            resource_code=indexer_periodicity_info["sgs_code"], parameters=params_sgs
-        )
-
-        data_list = []
-        for record in data:
-            date = datetime.datetime.strptime(record["data"], "%d/%m/%Y")
-            period = get_period(date)
-
-            if last_available_period is None or period > last_available_period:
-                new_series = IndexerSeriesModel(
+            # Fetch information about indexer monthly
+            indexer_periodicity_info = (
+                await self.finance_manager.get_indexer_periodicity_info(
                     indexer_id=indexer_id,
-                    indexer_name=indexer.name,
-                    date=date,
-                    period=period,
-                    value=float(record["valor"]),
                     periodicity_id=uuid.UUID("dc5b3bf8-2b84-423a-9a90-e7e194e355fa"),
-                    periodicity_name="monthly",
-                    unit=indexer_periodicity_info["unit"],
                 )
-                data_list.append(new_series)
+            )
 
-        self.session.add_all(data_list)
-        await self.session.flush()
+            if not indexer_periodicity_info:
+                raise HTTPException(
+                    status_code=404, detail="Indexer periodicity information not found."
+                )
 
-        response = {
-            "quantity": len(data_list),
-            "indexer_series": data_list,
-        }
+            # Fetch last available period in database for this indexer and periodicity
+            last_available_period = (
+                await self.finance_manager.get_latest_finance_series_period(
+                    indexer_id=indexer_id,
+                    periodicity_id=uuid.UUID("dc5b3bf8-2b84-423a-9a90-e7e194e355fa"),
+                )
+            )
+
+            # Build SGS parameters
+            params_sgs = await self._build_monthly_sgs_params(
+                latest_period=last_available_period
+            )
+
+            # Fetch data from SGS
+            data = await self._get_from_sgs(
+                resource_code=indexer_periodicity_info["sgs_code"],
+                parameters=params_sgs,
+            )
+
+            data_list = []
+            for record in data:
+                date = datetime.datetime.strptime(record["data"], "%d/%m/%Y")
+                period = get_period(date)
+
+                if last_available_period is None or period > last_available_period:
+                    new_series = IndexerSeriesModel(
+                        indexer_id=indexer_id,
+                        indexer_name=indexer.name,
+                        date=date,
+                        period=period,
+                        value=float(record["valor"]),
+                        periodicity_id=uuid.UUID(
+                            "dc5b3bf8-2b84-423a-9a90-e7e194e355fa"
+                        ),
+                        periodicity_name="monthly",
+                        unit=indexer_periodicity_info["unit"],
+                    )
+                    data_list.append(new_series)
+
+            self.session.add_all(data_list)
+            await self.session.flush()
+        except Exception as e:
+            return {"successful": False, "exception": e}
+
+        response = {"successful": True, "quantity": len(data_list)}
 
         return response
 
     async def sync_daily_data(self, indexer_id: uuid.UUID):
-        indexer = await self.finance_manager.get_indexer_by_id(
-            indexer_id=indexer_id, raise_exception=True
-        )
-
-        # Get info for daily periodicity
-        indexer_periodicity_info = (
-            await self.finance_manager.get_indexer_periodicity_info(
-                indexer_id=indexer_id,
-                periodicity_id=uuid.UUID("b9f83ad5-7701-4098-bdaf-ee092f3247eb"),
-            )
-        )
-
-        if not indexer_periodicity_info:
-            raise HTTPException(
-                status_code=404, detail="Indexer periodicity information not found."
+        try:
+            indexer = await self.finance_manager.get_indexer_by_id(
+                indexer_id=indexer_id, raise_exception=True
             )
 
-        # Fetch last available period in database for this indexer and periodicity
-        last_available_date = await self.finance_manager.get_latest_finance_series_date(
-            indexer_id=indexer_id,
-            periodicity_id=uuid.UUID("b9f83ad5-7701-4098-bdaf-ee092f3247eb"),
-        )
-
-        # Build params for daily periodicity
-        params_sgs = await self._build_daily_sgs_params(
-            latest_saved_date=last_available_date
-        )
-
-        data = await self._get_from_sgs(
-            resource_code=indexer_periodicity_info["sgs_code"], parameters=params_sgs
-        )
-        data_list = []
-        for record in data:
-            date = datetime.datetime.strptime(record["data"], "%d/%m/%Y")
-            period = get_period(date)
-
-            if last_available_date is None or date.date() > last_available_date:
-                new_series = IndexerSeriesModel(
+            # Get info for daily periodicity
+            indexer_periodicity_info = (
+                await self.finance_manager.get_indexer_periodicity_info(
                     indexer_id=indexer_id,
-                    indexer_name=indexer.name,
-                    date=date,
-                    period=period,
-                    value=float(record["valor"]),
                     periodicity_id=uuid.UUID("b9f83ad5-7701-4098-bdaf-ee092f3247eb"),
-                    periodicity_name="daily",
-                    unit=indexer_periodicity_info["unit"],
                 )
-                data_list.append(new_series)
+            )
 
-        self.session.add_all(data_list)
-        await self.session.flush()
+            if not indexer_periodicity_info:
+                raise HTTPException(
+                    status_code=404, detail="Indexer periodicity information not found."
+                )
+
+            # Fetch last available period in database for this indexer and periodicity
+            last_available_date = (
+                await self.finance_manager.get_latest_finance_series_date(
+                    indexer_id=indexer_id,
+                    periodicity_id=uuid.UUID("b9f83ad5-7701-4098-bdaf-ee092f3247eb"),
+                )
+            )
+
+            # Build params for daily periodicity
+            params_sgs = await self._build_daily_sgs_params(
+                latest_saved_date=last_available_date
+            )
+
+            data = await self._get_from_sgs(
+                resource_code=indexer_periodicity_info["sgs_code"],
+                parameters=params_sgs,
+            )
+            data_list = []
+            for record in data:
+                date = datetime.datetime.strptime(record["data"], "%d/%m/%Y")
+                period = get_period(date)
+
+                if last_available_date is None or date.date() > last_available_date:
+                    new_series = IndexerSeriesModel(
+                        indexer_id=indexer_id,
+                        indexer_name=indexer.name,
+                        date=date,
+                        period=period,
+                        value=float(record["valor"]),
+                        periodicity_id=uuid.UUID(
+                            "b9f83ad5-7701-4098-bdaf-ee092f3247eb"
+                        ),
+                        periodicity_name="daily",
+                        unit=indexer_periodicity_info["unit"],
+                    )
+                    data_list.append(new_series)
+
+            self.session.add_all(data_list)
+            await self.session.flush()
+        except Exception as e:
+            return {"sucessful": False, "exception": e}
 
         response = {
+            "successful": True,
             "quantity": len(data_list),
-            "indexer_series": data_list,
         }
 
         return response

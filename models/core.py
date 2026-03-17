@@ -3,7 +3,16 @@ import uuid
 from decimal import Decimal
 
 from rolf_common.models.base import SQLModel
-from sqlalchemy import ForeignKey, Numeric, SmallInteger, String
+from sqlalchemy import (
+    TEXT,
+    TIMESTAMP,
+    ForeignKey,
+    Identity,
+    Numeric,
+    SmallInteger,
+    String,
+    text,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
@@ -187,3 +196,18 @@ class TaxFeeModel(SQLModel):
         foreign_keys=[country_id], lazy="subquery"
     )
     type: Mapped[str] = mapped_column("type", String(3))  # Can be 'tax' or 'fee'
+
+
+class CronJobLogs(SQLModel):
+    __tablename__ = "cronjob_logs"
+
+    id: Mapped[int] = mapped_column("id", Identity(), primary_key=True)
+    job_name: Mapped[str] = mapped_column(doc="The name of the cronjob")
+    run_at: Mapped[datetime.datetime] = mapped_column(
+        type_=TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP")
+    )
+    successful_run: Mapped[bool] = mapped_column(default=False)
+    entries_saved: Mapped[int] = mapped_column(
+        nullable=True, doc="Indicate how many new entries were created, if applicable"
+    )
+    exception: Mapped[str | None] = mapped_column(type_=TEXT, nullable=True)
