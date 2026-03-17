@@ -10,12 +10,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from managers.core import CoreManager
 from managers.finance import FinanceManager
 from models.core import IndexerSeriesModel
-from schemas.request.integration import SyncIndexerSeriesRequest
 from services.utils.datetime import (
-    get_current_period,
     get_period,
-    get_period_dates,
-    get_previous_period,
 )
 
 
@@ -28,21 +24,17 @@ class BcbIntegrationService:
         self.core_manager = CoreManager(self.session)
         self.finance_manager = FinanceManager(self.session)
 
-    async def sync_indexer_data(
-        self, params: SyncIndexerSeriesRequest
-    ) -> dict[str, Any]:
+    async def sync_monthly_data(self, indexer_id: uuid.UUID) -> dict[str, Any]:
         # Get indexer and periodicity objects
         indexer = await self.finance_manager.get_indexer_by_id(
-            indexer_id=params.indexer_id, raise_exception=True
-        )
-        periodicity = await self.finance_manager.get_periodicity_by_id(
-            periodicity_id=params.periodicity_id, raise_exception=True
+            indexer_id=indexer_id, raise_exception=True
         )
 
-        # Fetch information about indexer and periodicity
+        # Fetch information about indexer monthly
         indexer_periodicity_info = (
             await self.finance_manager.get_indexer_periodicity_info(
-                indexer_id=params.indexer_id, periodicity_id=params.periodicity_id
+                indexer_id=indexer_id,
+                periodicity_id=uuid.UUID("dc5b3bf8-2b84-423a-9a90-e7e194e355fa"),
             )
         )
 
@@ -54,13 +46,14 @@ class BcbIntegrationService:
         # Fetch last available period in database for this indexer and periodicity
         last_available_period = (
             await self.finance_manager.get_latest_finance_series_period(
-                indexer_id=params.indexer_id, periodicity_id=params.periodicity_id
+                indexer_id=indexer_id,
+                periodicity_id=uuid.UUID("dc5b3bf8-2b84-423a-9a90-e7e194e355fa"),
             )
         )
 
         # Build SGS parameters
-        params_sgs = await self._build_sgs_params(
-            periodicity_id=params.periodicity_id, latest_period=last_available_period
+        params_sgs = await self._build_monthly_sgs_params(
+            latest_period=last_available_period
         )
 
         # Fetch data from SGS
@@ -75,13 +68,13 @@ class BcbIntegrationService:
 
             if last_available_period is None or period > last_available_period:
                 new_series = IndexerSeriesModel(
-                    indexer_id=params.indexer_id,
+                    indexer_id=indexer_id,
                     indexer_name=indexer.name,
                     date=date,
                     period=period,
                     value=float(record["valor"]),
-                    periodicity_id=params.periodicity_id,
-                    periodicity_name=periodicity.name,
+                    periodicity_id=uuid.UUID("dc5b3bf8-2b84-423a-9a90-e7e194e355fa"),
+                    periodicity_name="monthly",
                     unit=indexer_periodicity_info["unit"],
                 )
                 data_list.append(new_series)
@@ -194,33 +187,36 @@ class BcbIntegrationService:
 
         return "&".join(params)
 
-    async def _build_sgs_params(
-        self, periodicity_id: uuid.UUID, latest_period: int | None
-    ) -> str:
-        sgs_param = ""
+    async def _build_monthly_sgs_params(self, latest_period: int | None) -> str:
+        """Build SGS query params to fetch missing monthly data."""
 
-        if latest_period == get_previous_period():
-            # TODO: should not raise exception, just return empty data
-            raise HTTPException(status_code=400, detail="Data is already up to date.")
+        today = datetime.date.today()
+
+        # Primeiro dia do mês atual
+        current_month_start = today.replace(day=1)
+
+        # Último dia do mês passado
+        last_month_end = current_month_start - datetime.timedelta(days=1)
+
+        start_date = None
 
         if latest_period:
-            last_date_available = get_period_dates(latest_period)
-            start_date = last_date_available[0] + relativedelta(months=1)
+            year = latest_period // 100
+            month = latest_period % 100
 
-            sgs_param = "dataInicial=" + start_date.strftime("%d/%m/%Y")
+            latest_period_date = datetime.date(year, month, 1)
 
-        if str(periodicity_id) == "b9f83ad5-7701-4098-bdaf-ee092f3247eb":
-            start_date = datetime.datetime.now() - relativedelta(years=5)
-            sgs_param = "dataInicial=" + start_date.strftime("%d/%m/%Y")
+            # primeiro dia do mês seguinte
+            start_date = latest_period_date + relativedelta(months=1)
 
-        _, end_date = get_period_dates(get_previous_period(get_current_period()))
+            if start_date > last_month_end:
+                return ""
 
-        connector = ""
-        if sgs_param:
-            connector = "&"
+        params = []
 
-        sgs_param = (
-            sgs_param + "{connector}dataFinal=" + end_date.strftime("%d/%m/%Y")
-        ).format(connector=connector)
+        if start_date:
+            params.append(f"dataInicial={start_date.strftime('%d/%m/%Y')}")
 
-        return "dataInicial=01/01/2080&dataFinal=31/12/1989"
+        params.append(f"dataFinal={last_month_end.strftime('%d/%m/%Y')}")
+
+        return "&".join(params)
