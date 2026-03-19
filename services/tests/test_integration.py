@@ -41,9 +41,7 @@ class TestBcbIntegrationService:
         assert "&" in params
 
     @pytest.mark.asyncio
-    async def test_build_daily_sgs_params_with_latest_date(
-        self, integration_service
-    ):
+    async def test_build_daily_sgs_params_with_latest_date(self, integration_service):
         """Test building daily SGS params with existing latest date."""
         latest_date = datetime.date(2024, 1, 15)
 
@@ -65,13 +63,9 @@ class TestBcbIntegrationService:
             )
 
     @pytest.mark.asyncio
-    async def test_build_monthly_sgs_params_no_latest_period(
-        self, integration_service
-    ):
+    async def test_build_monthly_sgs_params_no_latest_period(self, integration_service):
         """Test building monthly SGS params when no latest period exists."""
-        params = await integration_service._build_monthly_sgs_params(
-            latest_period=None
-        )
+        params = await integration_service._build_monthly_sgs_params(latest_period=None)
 
         assert "dataInicial=" not in params
         assert "dataFinal=" in params
@@ -124,9 +118,7 @@ class TestBcbIntegrationService:
             {"data": "02/01/2024", "valor": "101.20"},
         ]
 
-        with patch(
-            "services.integration.AsyncClient"
-        ) as mock_client_class:
+        with patch("services.integration.AsyncClient") as mock_client_class:
             mock_response = MagicMock()
             mock_response.json.return_value = mock_data
             mock_response.raise_for_status = MagicMock()
@@ -225,8 +217,8 @@ class TestBcbIntegrationService:
         integration_service.finance_manager.get_indexer_periodicity_info = AsyncMock(
             return_value=mock_periodicity_info
         )
-        integration_service.finance_manager.get_latest_finance_series_date = (
-            AsyncMock(return_value=datetime.date(2024, 2, 14))
+        integration_service.finance_manager.get_latest_finance_series_date = AsyncMock(
+            return_value=datetime.date(2024, 2, 14)
         )
         integration_service._build_daily_sgs_params = AsyncMock(
             return_value="dataInicial=15/02/2024&dataFinal=16/02/2024"

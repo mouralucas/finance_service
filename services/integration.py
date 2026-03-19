@@ -157,7 +157,6 @@ class BcbIntegrationService:
             self.session.add_all(data_list)
             await self.session.flush()
         except Exception as e:
-            print("")
             return {"successful": False, "exception": e}
 
         response = {
