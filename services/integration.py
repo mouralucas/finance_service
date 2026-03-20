@@ -189,12 +189,13 @@ class BcbIntegrationService:
         yesterday = datetime.date.today() - datetime.timedelta(days=1)
 
         if latest_saved_date:
+            # If the latest day available is already yesterday the sync is up to date
+            if latest_saved_date >= yesterday:
+                raise ValueError("Latest date is already up-to-date or in the future")
+
             start_date = latest_saved_date + relativedelta(days=1)
         else:
             start_date = datetime.date.today() - relativedelta(years=10)
-
-        if start_date >= yesterday:
-            raise ValueError("Latest date is already up-to-date or in the future")
 
         params = [
             f"dataInicial={start_date.strftime('%d/%m/%Y')}",
