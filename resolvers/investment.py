@@ -57,18 +57,16 @@ async def get_investment_statements_resolver(
 ):
     statements = await InvestmentService(
         session=info.context["session"], user=info.context["user"]
-    ).get_statement(params=params)
+    ).get_statements(params=params)
 
     return statements
 
 
 @validate_graphql_input(GetStatementByIdRequest)
-async def get_statement_by_id(
-    _, info: GraphQLResolveInfo, input: GetStatementByIdRequest
-):
+async def get_statement(_, info: GraphQLResolveInfo, input: GetStatementByIdRequest):
     statement = await InvestmentService(
         session=info.context["session"], user=info.context["user"]
-    ).get_statement_by_id(statement_id=input.statement_id)
+    ).get_statement(id=input.id)
 
     return statement
 
@@ -115,7 +113,7 @@ def bind_investment_resovlers(query: QueryType, mutation: MutationType):
     query.set_field(
         "getInvestmentStatements", resolver=get_investment_statements_resolver
     )
-    query.set_field("getInvestmentStatementById", resolver=get_statement_by_id)
+    query.set_field("getInvestmentStatement", resolver=get_statement)
     query.set_field("getInvestmentObjectives", resolver=get_investment_objectives)
 
     mutation.set_field("createInvestmentStatement", resolver=create_statement_resolver)

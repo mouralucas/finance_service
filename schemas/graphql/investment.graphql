@@ -6,7 +6,7 @@ extend type Query {
     
     getInvestmentPerformance(params: GetInvestmentPerformanceInput): GetInvestmentPerformanceResponse
     getInvestmentStatements(params: GetInvestmentStatementsInput): GetInvestmentStatementsResponse
-    getInvestmentStatementById(input: GetInvestmentStatementByIdInput!): GetInvestmentStatementByIdResponde
+    getInvestmentStatement(params: GetInvestmentStatementInput!): GetInvestmentStatementResponde
     getStatementMetadata(params: GetStatementMetadataInput): GetStatementMetadataResponse
 
     getInvestmentObjectives(params: GetInvestmentObjectivesInput): GetInvestmentObjectivesResponse
@@ -132,6 +132,9 @@ type CreateInvestmentStatementResponse {
     statementId: String!
 }
 
+"""
+Get a list of statements based on filters for a investment
+"""
 input GetInvestmentStatementsInput {
     investmentId: String!
     startDate: String
@@ -144,12 +147,15 @@ type GetInvestmentStatementsResponse {
     statements: [Statement]!
 }
 
-input GetInvestmentStatementByIdInput {
-    statementId: String!
+"""
+Get a single statement by statement ID
+"""
+input GetInvestmentStatementInput {
+    id: String!
 }
 
-type GetInvestmentStatementByIdResponde {
-    statement: Statement!
+type GetInvestmentStatementResponde {
+    statement: Statement
 }
 
 input UpdateInvestmentStatementInput {
@@ -174,6 +180,9 @@ type GetStatementMetadataResponse {
     period: Int!
     referenceDate: Date!
     contribution: Float!
+    investmentName: String
+    investmentTransactionDate: Date
+    investmentMaturityDate: Date
 }
 
 type Statement {
@@ -188,8 +197,8 @@ type Statement {
     totalFee: Float!
     referenceDate: Date!
     atMaturity: Boolean!
-    valueChange: Float!
-    percentageChange: Float!
+    valueChange: Float
+    percentageChange: Float
     netAmount: Float!
 }
 

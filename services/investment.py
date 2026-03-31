@@ -176,16 +176,16 @@ class InvestmentService(BaseService):
 
         return response
 
-    async def get_statement_by_id(self, statement_id: uuid.UUID) -> dict[str, Any]:
+    async def get_statement(self, id: uuid.UUID) -> dict[str, Any]:
         statement = await self.investment_manager.get_statement_by_id(
-            statement_id=statement_id
+            statement_id=id
         )
 
         response = {"statement": statement.to_dict() if statement else None}
 
         return response
 
-    async def get_statement(self, params: GetStatementsRequest) -> dict[str, Any]:
+    async def get_statements(self, params: GetStatementsRequest) -> dict[str, Any]:
         """
         Created by: Lucas Penha de Moura - 28/08/2024
 
@@ -199,7 +199,7 @@ class InvestmentService(BaseService):
 
         response = {
             "quantity": len(statements) if statements else 0,
-            "statements": statements,
+            "statements": statements if statements else [],
         }
 
         return response
@@ -220,6 +220,9 @@ class InvestmentService(BaseService):
                 "period": get_period(investment.transaction_date),
                 "reference_date": get_last_business_day(investment.transaction_date),
                 "contribution": float(investment.amount),
+                "investment_name": investment.name,
+                "investment_transaction_date": investment.transaction_date,
+                "investment_maturity_date": investment.maturity_date,
             }
 
         next_month = last_statement["reference_date"] + relativedelta(months=1)
@@ -228,6 +231,9 @@ class InvestmentService(BaseService):
             "period": get_period(next_month),
             "reference_date": get_last_business_day(next_month),
             "contribution": 0,
+            "investment_name": investment.name,
+            "investment_transaction_date": investment.transaction_date,
+            "investment_maturity_date": investment.maturity_date,
         }
 
     # Outro

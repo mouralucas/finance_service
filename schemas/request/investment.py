@@ -315,7 +315,7 @@ class GetStatementByIdRequest(BaseModel):
     model_config = ConfigDict(
         from_attributes=True, alias_generator=AliasGenerator(alias=to_camel)
     )
-    statement_id: uuid.UUID
+    id: uuid.UUID
 
 
 class CreateObjectiveRequest(BaseModel):
