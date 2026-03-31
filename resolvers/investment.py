@@ -63,10 +63,10 @@ async def get_investment_statements_resolver(
 
 
 @validate_graphql_input(GetStatementByIdRequest)
-async def get_statement(_, info: GraphQLResolveInfo, input: GetStatementByIdRequest):
+async def get_statement(_, info: GraphQLResolveInfo, params: GetStatementByIdRequest):
     statement = await InvestmentService(
         session=info.context["session"], user=info.context["user"]
-    ).get_statement(id=input.id)
+    ).get_statement(id=params.id)
 
     return statement
 

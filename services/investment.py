@@ -177,9 +177,7 @@ class InvestmentService(BaseService):
         return response
 
     async def get_statement(self, id: uuid.UUID) -> dict[str, Any]:
-        statement = await self.investment_manager.get_statement_by_id(
-            statement_id=id
-        )
+        statement = await self.investment_manager.get_statement_by_id(statement_id=id)
 
         response = {"statement": statement.to_dict() if statement else None}
 

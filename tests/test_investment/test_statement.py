@@ -206,10 +206,10 @@ class TestStatement:
         )
 
         query = """
-            query GetInvestmentStatementById(
-                $input: GetInvestmentStatementByIdInput!
+            query GetInvestmentStatement(
+                $params: GetInvestmentStatementInput!
             ) {
-                getInvestmentStatementById(input: $input) {
+                getInvestmentStatement(params: $params) {
                     statement {
                         id
                         grossAmount
@@ -217,7 +217,7 @@ class TestStatement:
                 }
             }
         """
-        p = {"input": {"statementId": str(statement.id)}}
+        p = {"params": {"id": str(statement.id)}}
 
         response = await client.post(
             "/graphql/finance",
@@ -227,7 +227,7 @@ class TestStatement:
 
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
-        updated_statement = data["data"]["getInvestmentStatementById"]["statement"]
+        updated_statement = data["data"]["getInvestmentStatement"]["statement"]
         assert updated_statement["id"] == str(statement.id)
         assert "grossAmount" in updated_statement
         assert updated_statement["grossAmount"] == new_gross_amount
@@ -240,10 +240,10 @@ class TestStatement:
         statement = statements[0]
 
         query = """
-            query GetInvestmentStatementById (
-                $input: GetInvestmentStatementByIdInput!
+            query GetInvestmentStatement (
+                $params: GetInvestmentStatementInput!
             ) {
-                getInvestmentStatementById(input: $input) {
+                getInvestmentStatement(params: $params) {
                     statement {
                         id
                         period
@@ -259,7 +259,7 @@ class TestStatement:
                 }
             }
         """
-        variables = {"input": {"statementId": str(statement.id)}}
+        variables = {"params": {"id": str(statement.id)}}
 
         response = await client.post(
             "/graphql/finance",
@@ -271,11 +271,11 @@ class TestStatement:
         data = response.json()
 
         assert "data" in data
-        assert "getInvestmentStatementById" in data["data"]
-        assert "statement" in data["data"]["getInvestmentStatementById"]
-        assert "id" in data["data"]["getInvestmentStatementById"]["statement"]
+        assert "getInvestmentStatement" in data["data"]
+        assert "statement" in data["data"]["getInvestmentStatement"]
+        assert "id" in data["data"]["getInvestmentStatement"]["statement"]
 
-        fetched_statement = data["data"]["getInvestmentStatementById"]["statement"]
+        fetched_statement = data["data"]["getInvestmentStatement"]["statement"]
         # The returned ID should be the same as the request
         assert fetched_statement["id"] == str(statement.id)
 
