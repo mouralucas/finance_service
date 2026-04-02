@@ -180,16 +180,19 @@ class TestStatement:
 
         new_gross_amount = statement.gross_amount + 1.25
 
+        payload = {
+            "id": str(statement.id),
+            "grossAmount": new_gross_amount,
+        }
         mutation = """
-            mutation UpdateStatement($statementId: String!, $grossAmount: Float!) {
-                updateInvestmentStatement(statement: { statementId: $statementId,
-                                            grossAmount: $grossAmount }) {
+            mutation UpdateStatement($statement: UpdateInvestmentStatementInput) {
+                updateInvestmentStatement(statement: $statement) {
                     updated
                     statementId
                 }
             }
         """
-        variables = {"statementId": str(statement.id), "grossAmount": new_gross_amount}
+        variables = {"statement": payload}
 
         response = await client.post(
             "/graphql/finance",

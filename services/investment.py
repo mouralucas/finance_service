@@ -38,6 +38,13 @@ class InvestmentService(BaseService):
         self.investment_manager = InvestmentManager(session=self.session)
 
     # Investment
+    async def get_investment_by_id(self, id: uuid.UUID) -> dict[str, Any]:
+        investment = await self.investment_manager.get_investment_by_id(id=id)
+
+        response = {"investment": investment.to_dict() if investment else None}
+
+        return response
+
     async def settle_investment(
         self, investment_settlement: SettleInvestmentRequest
     ) -> SettleInvestmentResponse:
@@ -204,9 +211,7 @@ class InvestmentService(BaseService):
 
     async def get_statement_metadata(self, investment_id: uuid.UUID) -> dict[str, Any]:
         investment: InvestmentModel = (
-            await self.investment_manager.get_investment_by_id(
-                investment_id=investment_id
-            )
+            await self.investment_manager.get_investment_by_id(id=investment_id)
         )
         previous_statements = await self.investment_manager.get_statements(
             investment_id=investment_id

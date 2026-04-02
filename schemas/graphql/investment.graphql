@@ -3,6 +3,7 @@
 
 extend type Query {
     getInvestments(params: GetInvestmentsInput): GetInvestmentsResponse
+    getInvestmentById(params: GetInvestmentByIdInput!): GetInvestmentByIdResponse
     
     getInvestmentPerformance(params: GetInvestmentPerformanceInput): GetInvestmentPerformanceResponse
     getInvestmentStatements(params: GetInvestmentStatementsInput): GetInvestmentStatementsResponse
@@ -42,6 +43,14 @@ type ChartSeries {
 }
 
 # Investments schemas
+input GetInvestmentByIdInput {
+    id: String!
+}
+
+type GetInvestmentByIdResponse {
+    investment: Investment
+}
+
 input GetInvestmentsInput {
     investmentId: String
     startDate: String
@@ -55,11 +64,11 @@ type GetInvestmentsResponse {
 }
 
 type Investment {
-    investmentId: String!
+    id: String!
     custodianId: String!
     accountId: String
     name: String!
-    investmentTypeId: String!
+    typeId: String!
     transactionDate: Date!
     maturityDate: String
     quantity: Float!
@@ -81,12 +90,11 @@ type Investment {
     countryName: String
     observation: String
     objectiveId: String
-    grossAmount: Float!
-    totalContribution: Float!
-    totalWithdrawn: Float!
-    percentageChange: Float!
+    grossAmount: Float
+    totalContribution: Float
+    totalWithdrawn: Float
+    percentageChange: Float
 }
-
 
 input SettleInvestmentInput {
     investmentId: String!
@@ -110,7 +118,7 @@ input TaxFeeDetail {
 }
 
 input CreateInvestmentStatementInput {
-    investmentStatementId: String
+    id: String
     investmentId: String!
     name: String
     transactionDate: Date
@@ -159,7 +167,7 @@ type GetInvestmentStatementResponde {
 }
 
 input UpdateInvestmentStatementInput {
-    statementId: String!
+    id: String!
     contribution: Float
     grossAmount: Float
     netAmount: Float

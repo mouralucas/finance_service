@@ -4,6 +4,7 @@ from rolf_common.util.graphql_input_validation import validate_graphql_input
 
 from schemas.request.investment import (
     CreateStatementRequest,
+    GetInvestmentByIdRequest,
     GetInvestmentRequest,
     GetObjectiveRequest,
     GetPerformanceRequest,
@@ -26,6 +27,15 @@ async def get_investments_resolver(
     ).get_investments(params=params)
 
     return investments
+
+
+@validate_graphql_input(GetInvestmentByIdRequest)
+async def get_investment_by_id_resolver(_, info, params: GetInvestmentByIdRequest):
+    investment = await InvestmentService(
+        session=info.context["session"], user=info.context["user"]
+    ).get_investment_by_id(id=params.id)
+
+    return investment
 
 
 # Statement resolvers
@@ -106,6 +116,7 @@ async def get_investment_objectives(
 
 def bind_investment_resovlers(query: QueryType, mutation: MutationType):
     query.set_field("getInvestments", resolver=get_investments_resolver)
+    query.set_field("getInvestmentById", resolver=get_investment_by_id_resolver)
     query.set_field(
         "getInvestmentPerformance", resolver=get_investment_performance_resolver
     )

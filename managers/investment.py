@@ -40,25 +40,21 @@ class InvestmentManager(BaseDataManager):
         await self.session.execute(query)
         await self.session.flush()
 
-        updated_investment = await self.get_investment_by_id(
-            investment_id=investment_id
-        )
+        updated_investment = await self.get_investment_by_id(id=investment_id)
 
         return cast(InvestmentModel, updated_investment)
 
     async def get_investment_by_id(
-        self, investment_id: uuid.UUID, raise_exception: bool = False
-    ) -> InvestmentModel:
-        investment = await self.get_by_id(InvestmentModel, investment_id)
+        self, id: uuid.UUID, raise_exception: bool = False
+    ) -> InvestmentModel | None:
+        investment = await self.get_by_id(InvestmentModel, id)
 
         if not investment and raise_exception:
             raise HTTPException(
                 status.HTTP_404_NOT_FOUND, detail="Investment not found"
             )
 
-        investment = cast(InvestmentModel, investment)
-
-        return investment
+        return cast(InvestmentModel, investment) if investment else None
 
     async def get_investments(
         self, owner_id: uuid.UUID, is_settled: bool | None
@@ -113,7 +109,7 @@ class InvestmentManager(BaseDataManager):
 
         query = (
             select(
-                investment_alias.id.label("investment_id"),
+                investment_alias.id,
                 investment_alias.custodian_id,
                 investment_alias.account_id,
                 bank_alias.name.label("custodian_name"),
@@ -132,7 +128,7 @@ class InvestmentManager(BaseDataManager):
                 ),
                 currency_alias.id.label("currency_id"),
                 currency_alias.symbol.label("currency_symbol"),
-                type_alias.id.label("investment_type_id"),
+                type_alias.id.label("type_id"),
                 type_alias.name.label("investment_type_name"),
                 investment_alias.liquidity_id,
                 investment_alias.indexer_id,

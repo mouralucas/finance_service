@@ -63,6 +63,14 @@ class CreateInvestmentStatementBaseRequest(BaseModel):
 
 
 # Investment Schemas
+class GetInvestmentByIdRequest(BaseModel):
+    model_config = ConfigDict(
+        from_attributes=True, alias_generator=AliasGenerator(alias=to_camel)
+    )
+
+    id: uuid.UUID = Field(...)
+
+
 class CreateInvestmentRequest(BaseModel):
     model_config = ConfigDict(
         from_attributes=True,
@@ -137,9 +145,7 @@ class UpdateInvestmentRequest(CreateInvestmentRequest):
         from_attributes=True, alias_generator=AliasGenerator(alias=to_camel)
     )
 
-    id: uuid.UUID = Field(
-        ..., alias="investmentId", description="The unique identifier of the investment"
-    )
+    id: uuid.UUID = Field(..., description="The unique identifier of the investment")
     name: str | None = Field(None, description="The name of the investment")
     account_id: uuid.UUID | None = Field(None, description="The id of the account")
     type_id: uuid.UUID | None = Field(None, description="The id of the investment type")
@@ -180,7 +186,7 @@ class UpdateStatementRequest(BaseModel):
         from_attributes=True, alias_generator=AliasGenerator(alias=to_camel)
     )
 
-    id: uuid.UUID = Field(..., alias="statementId")
+    id: uuid.UUID = Field(...)
     contribution: Decimal | None = Field(None)
     withdrawn: Decimal | None = Field(None)
     gross_amount: Decimal | None = Field(None)
@@ -249,7 +255,6 @@ class SettleInvestmentRequest(BaseModel):
 
 
 class CreateStatementRequest(BaseModel):
-    # TODO: use CreateInvestmentStatementBaseRequest
     model_config = ConfigDict(
         from_attributes=True, alias_generator=AliasGenerator(alias=to_camel)
     )

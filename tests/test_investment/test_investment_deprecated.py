@@ -64,7 +64,7 @@ async def test_get_active_investments(
             getInvestments(params: $params) {
                 quantity
                 investments {
-                    investmentId
+                    id
                     isSettled
                     settlementDate
                     settlementAmount
@@ -110,7 +110,7 @@ async def test_get_settled_investments(
             getInvestments(params: $params) {
                 quantity
                 investments {
-                    investmentId
+                    id
                     isSettled
                     settlementDate
                     settlementAmount
