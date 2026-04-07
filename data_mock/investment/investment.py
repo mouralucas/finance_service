@@ -222,6 +222,7 @@ def get_investment_statement_mock() -> list[dict[str, Any]]:
             "total_fee": 0,
             "net_amount": (investments[0]["amount"] + investments[0]["amount"] * 0.01)
             - 0.25,
+            "currency_id": investments[0]["currency_id"],
         }
     ]
 

@@ -78,7 +78,7 @@ async def create_fixed_income_br_investment_type(
 @pytest_asyncio.fixture
 async def create_funds_br_investment_type(
     test_session, create_investment_category
-) -> list[InvestmentStatementSchema]:
+) -> list[InvestmentTypeSchema]:
     data_ = await BaseDataManager(test_session).add_or_ignore_all(
         InvestmentTypeModel, get_funds_br_investment_type_mock()
     )

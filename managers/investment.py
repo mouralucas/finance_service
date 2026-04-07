@@ -244,6 +244,7 @@ class InvestmentManager(BaseDataManager):
                 m.fee_detail,
                 m.reference_date,
                 m.at_maturity,
+                m.currency_id,
                 variation_value.label("value_change"),
                 variation_percent.label("percentage_change"),
                 m.net_amount,

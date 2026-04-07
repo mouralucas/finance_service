@@ -62,3 +62,5 @@ class InvestmentStatementModel(InvestmentStatementBaseModel):
         server_default=text("0"),
         doc="The amount of money that went out of the investment in the period",
     )
+    # Denormalized fields for easier querying
+    currency_id: Mapped[str] = mapped_column(ForeignKey("currency.id"))

@@ -82,11 +82,15 @@ class InvestmentService(BaseService):
         self, input_statement: CreateStatementRequest
     ) -> dict[str, Any]:
         # Get the investment
-        investment: InvestmentModel = (
+        investment: InvestmentModel | None = (
             await self.investment_manager.get_investment_by_id(
                 input_statement.investment_id, raise_exception=True
             )
         )
+        if not investment:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Investment not found"
+            )
 
         # Get previous statement
         previous_statements = await self.investment_manager.get_statements(
@@ -123,6 +127,8 @@ class InvestmentService(BaseService):
         new_statement = InvestmentStatementModel(
             **input_statement.model_dump(exclude={"tax_details", "fee_details"})
         )
+        # Denormilize currency_id
+        new_statement.currency_id = investment.currency_id
 
         # The fist statement have the total invested as contribution
         if not last_statement:
@@ -210,9 +216,14 @@ class InvestmentService(BaseService):
         return response
 
     async def get_statement_metadata(self, investment_id: uuid.UUID) -> dict[str, Any]:
-        investment: InvestmentModel = (
+        investment: InvestmentModel | None = (
             await self.investment_manager.get_investment_by_id(id=investment_id)
         )
+        if not investment:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Investment not found"
+            )
+
         previous_statements = await self.investment_manager.get_statements(
             investment_id=investment_id
         )
