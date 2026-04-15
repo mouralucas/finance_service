@@ -8,7 +8,7 @@ from scripts.crons import crons
 from services.integration import BcbIntegrationService
 
 
-@crons.cron("0 * * * *", name="CDI daily sync")  # Runs every hour
+@crons.cron("0 6 * * *", name="CDI daily sync")  # Runs daily at 6
 async def sync_daily_data():
     async with sessionmanager.session() as session:
         t0 = time.time()
