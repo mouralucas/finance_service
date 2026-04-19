@@ -81,7 +81,7 @@ class CreateInvestmentRequest(BaseModel):
     account_id: uuid.UUID = Field(..., description="The id of the account")
 
     type_id: uuid.UUID = Field(
-        ..., alias="investmentTypeId", description="The id of the investment type"
+        ..., description="The id of the investment type"
     )
     transaction_date: datetime.date = Field(
         ..., description="The date of the investment"
@@ -112,10 +112,6 @@ class CreateInvestmentRequest(BaseModel):
     settlement_amount: Decimal | None = Field(
         None, description="The amount liquidated, after tax"
     )
-    # tax_detail: TaxFeeRequest | None = Field(None,
-    # description='The tax detail of the investment')
-    # fee_detail: TaxFeeRequest | None= Field(None,
-    # description='The fee detail of the investment')
     country_id: str = Field(..., description="The id of the country")
 
     observation: str | None = Field(None, description="Observations for the investment")
@@ -162,7 +158,7 @@ class UpdateInvestmentRequest(CreateInvestmentRequest):
     indexer_id: uuid.UUID | None = Field(
         None, description="The id of the investment index"
     )
-    liquidity_id: None = Field(None, description="The id of investment liquidity")
+    liquidity_id: uuid.UUID | None = Field(None, description="The id of investment liquidity")
     country_id: str | None = Field(None, description="The id of the country")
 
 
