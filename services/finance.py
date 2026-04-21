@@ -1,4 +1,5 @@
 from typing import Any
+import uuid
 
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import BaseService
@@ -7,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from managers.account import AccountManager
 from managers.credit_card import CreditCardManager
 from managers.finance import FinanceManager
+from managers.investment import InvestmentManager
 from models.investment_deprecated import FundsBrModel
 from schemas.core import (
     BankSchema,
@@ -41,6 +43,7 @@ class FinanceService(BaseService):
 
         self.account_manager = AccountManager(self.session)
         self.finance_manager = FinanceManager(self.session)
+        self.investment_manager = InvestmentManager(self.session)
         self.user = user.model_dump()
 
     async def get_summary(self, params: GetSummaryRequest):
@@ -170,7 +173,50 @@ class FinanceService(BaseService):
 
         return response
 
-    # Funds service
+    async def get_finance_summary(self):
+        
+        investment = self._get_investiment_summary()
+        
+        return {
+            "investment": investment,
+        }
+
+    async def _get_investiment_summary(self) -> dict[str, Any]:
+        total_gross = await self.investment_manager.get_total_active_gross(
+            owner_id=self.user["user_id"],
+        )
+        total_last_month = await self.investment_manager.get_performance_portfolio(
+            owner_id=self.user["user_id"],
+            investment_id=None,
+            indexer_id=uuid.UUID("2a2b100f-17d9-4c61-b3b4-f06662113953"),
+            period_range=0,
+        )
+        total_last_month = total_last_month[-1] if total_last_month else []
+        total_invested = await self.investment_manager.get_total_invested(
+            owner_id=self.user["user_id"], is_settled=False
+        )
+        investments = await self.investment_manager.get_investments(
+            owner_id=self.user["user_id"], is_settled=False
+        )   
+        
+        investment = {
+            "total_invested": total_invested if total_invested else 0,
+            "total_gross": total_gross if total_gross else 0,
+            "total_growth": total_gross - total_invested if total_invested else 0,
+            "active_investments_count": len(investments) if investments else 0,
+            "total_growth_percentage": (
+                ((total_gross - total_invested) / total_invested) * 100
+                if total_invested
+                else 0
+            ),
+            "last_month_growth_percentage": 0,
+        }
+        
+        return investment
+        
+        
+
+    # Funds service -> Will be deprecated
     async def create_br_fund(
         self, fund: CreateBrazilianFundRequest
     ) -> CreateBrazilianFundResponse:

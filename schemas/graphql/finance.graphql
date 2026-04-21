@@ -3,6 +3,8 @@ extend type Query {
     getIndexerSeries(params: GetIndexerSeriesInput! ): GetIndexerSeriesResponse
     getCurrencies: GetCurrenciesResponse
     getPeriodicity: GetPeriodicityResponse
+
+    getFinanceSummary: FinanceSummary
 }
 
 extend type Mutation {
@@ -62,7 +64,7 @@ type Currency {
 }
 
 
-# Currency dashboard schemas
+# Dashboard schemas
 input GetCurrencyAveragePriceInput {
     currencyId: String!
     startDate: String!
@@ -73,7 +75,27 @@ type GetCurrencyAveragePriceResponse {
     currencyId: String!
     currencySymbol: String!
     averagePrice: Float!
+}
 
+type FinanceSummary {
+    investment: InvestmentSummary!
+    creditCard: String
+}
+
+type InvestmentSummary {
+    totalInvested: Float!
+    totalGross: Float!
+    totalGrowth: Float!
+    totalGrowthPercentage: Float!
+    activeInvestmentsCount: Int!
+    lastMonthGrowthPercentage: Float!
+}
+
+type InvestmentPerformance {
+    grossAmount: Float!
+    contribution: Float!
+    withdrawn: Float!
+    percentage: Float!
 }
 
 # Integration schemas

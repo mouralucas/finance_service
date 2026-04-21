@@ -274,10 +274,12 @@ class InvestmentService(BaseService):
                 "indexer_name": "",
             }
 
+        # Get indexer information
         indexer = await FinanceManager(session=self.session).get_indexer_by_id(
             indexer_id=params.indexer_id, raise_exception=True
         )
 
+        # accumulated variation calculation
         accumulated_indexer = 1.0
         accumulated_variation = 1.0
 

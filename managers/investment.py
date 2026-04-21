@@ -424,11 +424,19 @@ class InvestmentManager(BaseDataManager):
 
     # Dashboard
     async def get_total_invested(
-        self, owner_id: uuid.UUID, investment_id: uuid.UUID = None
+        self,
+        owner_id: uuid.UUID,
+        is_settled: bool | None = None,
+        investment_id: uuid.UUID | None = None,
     ) -> float:
         query = select(func.sum(InvestmentModel.amount)).where(
-            InvestmentModel.owner_id == owner_id, ~InvestmentModel.is_settled
+            InvestmentModel.owner_id == owner_id,
         )
+
+        if is_settled is not None and is_settled:
+            query = query.where(InvestmentModel.is_settled.is_(True))
+        elif is_settled is not None and not is_settled:
+            query = query.where(InvestmentModel.is_settled.is_(False))
 
         if investment_id:
             query = query.where(InvestmentModel.id == investment_id)
@@ -436,7 +444,7 @@ class InvestmentManager(BaseDataManager):
         total_invested = await self.session.execute(query)
         total_invested = total_invested.scalar() or 0.0
 
-        return total_invested
+        return float(total_invested)
 
     async def get_allocation_by_investment_type(
         self, owner_id: uuid.UUID
@@ -672,7 +680,7 @@ class InvestmentManager(BaseDataManager):
         m = InvestmentStatementModel
 
         # ---------------------------
-        # 1) Window functions (permitido aqui)
+        # 1) Window functions
         # ---------------------------
 
         previous_gross = func.lag(m.gross_amount).over(
@@ -687,7 +695,7 @@ class InvestmentManager(BaseDataManager):
         )
 
         # ---------------------------
-        # 2) Subquery com window functions
+        # 2) Subquery with window functions
         # ---------------------------
 
         subq = select(
@@ -702,7 +710,7 @@ class InvestmentManager(BaseDataManager):
         sq = subq  # alias curto
 
         # ---------------------------
-        # 3) Query final agregada por período
+        # 3) Final  query with joins and filters
         # ---------------------------
 
         query = (
@@ -757,3 +765,211 @@ class InvestmentManager(BaseDataManager):
         result = await self.get_all(query)
 
         return [dict(i.items()) for i in result] if result else None
+
+    async def get_total_active_gross(
+        self,
+        owner_id: uuid.UUID,
+    ) -> float:
+        m = InvestmentStatementModel
+
+        latest_stmt = (
+            select(
+                m.investment_id,
+                m.gross_amount,
+            )
+            .distinct(m.investment_id)
+            .order_by(m.investment_id, m.period.desc())
+            .subquery()
+        )
+
+        ls = latest_stmt
+
+        query = (
+            select(func.sum(ls.c.gross_amount))
+            .select_from(ls)
+            .join(
+                InvestmentModel,
+                InvestmentModel.id == ls.c.investment_id,
+            )
+            .where(
+                InvestmentModel.owner_id == owner_id,
+                InvestmentModel.is_settled.is_(False),
+            )
+        )
+
+        result = await self.session.execute(query)
+        total = result.scalar()
+
+        return float(total) if total else 0.0
+
+    async def get_total_last_month_active_gross(
+        self,
+        owner_id: uuid.UUID,
+    ) -> dict:
+        m = InvestmentStatementModel
+
+        last_period = get_previous_period(offset=1)
+
+        # ---------------------------
+        # 1) Total gross do mês passado
+        # ---------------------------
+        total_query = (
+            select(
+                func.sum(m.gross_amount).label("total_gross"),
+                func.count(func.distinct(m.investment_id)).label("stmt_count"),
+            )
+            .join(
+                InvestmentModel,
+                InvestmentModel.id == m.investment_id,
+            )
+            .where(
+                InvestmentModel.owner_id == owner_id,
+                InvestmentModel.is_settled.is_(False),
+                m.period == last_period,
+            )
+        )
+
+        # ---------------------------
+        # 2) Total de investimentos ativos
+        # ---------------------------
+        active_query = select(func.count(InvestmentModel.id)).where(
+            InvestmentModel.owner_id == owner_id,
+            InvestmentModel.is_settled.is_(False),
+        )
+
+        total_result = await self.session.execute(total_query)
+        active_result = await self.session.execute(active_query)
+
+        total_row = total_result.one()
+        active_count = active_result.scalar() or 0
+
+        total_gross = total_row.total_gross or 0
+        stmt_count = total_row.stmt_count or 0
+
+        return {
+            "total_gross_last_month": float(total_gross),
+            "all_have_statement_last_month": stmt_count == active_count,
+            "missing_count": active_count - stmt_count,
+        }
+
+    async def get_financial_dashboard_total_evolution(
+        self,
+        owner_id: uuid.UUID,
+        investment_id: uuid.UUID | None,
+        indexer_id: uuid.UUID,
+        period_range: int,
+        is_settled: bool = False,
+    ):
+        m = InvestmentStatementModel
+
+        # ---------------------------
+        # 1) Window base (lag)
+        # ---------------------------
+
+        previous_gross = func.lag(m.gross_amount).over(
+            partition_by=m.investment_id,
+            order_by=m.period,
+        )
+
+        previous_adjusted = (
+            func.coalesce(previous_gross, 0)
+            + func.coalesce(m.contribution, 0)
+            - func.coalesce(m.withdrawn, 0)
+        )
+
+        base_subq = select(
+            m.id.label("id"),
+            m.investment_id.label("investment_id"),
+            m.period.label("period"),
+            m.gross_amount.label("gross_amount"),
+            previous_adjusted.label("previous_adjusted"),
+        ).subquery()
+
+        sq = base_subq
+
+        # ---------------------------
+        # 2) Apply filters BEFORE ranking
+        # ---------------------------
+
+        filtered_sq = (
+            select(sq)
+            .join(InvestmentModel, InvestmentModel.id == sq.c.investment_id)
+            .where(InvestmentModel.owner_id == owner_id)
+        )
+
+        if investment_id:
+            filtered_sq = filtered_sq.where(sq.c.investment_id == investment_id)
+
+        if period_range > 0 and not is_settled:
+            start_period = get_previous_period(offset=period_range)
+            filtered_sq = filtered_sq.where(sq.c.period >= start_period)
+
+        filtered_sq = filtered_sq.subquery()
+
+        # ---------------------------
+        # 3) Row number (first / last)
+        # ---------------------------
+
+        first_rn = func.row_number().over(
+            partition_by=filtered_sq.c.investment_id,
+            order_by=filtered_sq.c.period.asc(),
+        )
+
+        last_rn = func.row_number().over(
+            partition_by=filtered_sq.c.investment_id,
+            order_by=filtered_sq.c.period.desc(),
+        )
+
+        ranked_sq = select(
+            filtered_sq.c.investment_id,
+            filtered_sq.c.period,
+            filtered_sq.c.previous_adjusted,
+            filtered_sq.c.gross_amount,
+            first_rn.label("rn_first"),
+            last_rn.label("rn_last"),
+        ).subquery()
+
+        # ---------------------------
+        # 4) Aggregation (dashboard)
+        # ---------------------------
+
+        initial_amount = func.sum(
+            case(
+                (ranked_sq.c.rn_first == 1, ranked_sq.c.previous_adjusted),
+                else_=0,
+            )
+        )
+
+        final_amount = func.sum(
+            case(
+                (ranked_sq.c.rn_last == 1, ranked_sq.c.gross_amount),
+                else_=0,
+            )
+        )
+
+        variation = case(
+            (
+                initial_amount != 0,
+                ((final_amount - initial_amount) / initial_amount) * 100,
+            ),
+            else_=0,
+        )
+
+        # ---------------------------
+        # 5) Final query
+        # ---------------------------
+
+        query = select(
+            initial_amount.label("initial_amount"),
+            final_amount.label("final_amount"),
+            variation.label("total_variation"),
+        )
+
+        result = await self.session.execute(query)
+        row = result.one()
+
+        return {
+            "initial_amount": row.initial_amount or 0,
+            "final_amount": row.final_amount or 0,
+            "total_variation": row.total_variation or 0,
+        }

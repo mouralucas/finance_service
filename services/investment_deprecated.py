@@ -60,6 +60,10 @@ class InvestmentServiceDeprecated(BaseService):
         account = await AccountManager(session=self.session).get_account_by_id(
             account_id=investment.account_id
         )
+        if not account:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Account not found"
+            )
         custodian_id = account.bank_id
 
         new_investment = InvestmentModel(**investment.model_dump())
@@ -80,11 +84,6 @@ class InvestmentServiceDeprecated(BaseService):
         )
 
         return response
-
-    async def create_fixed_incoming_br_investment(
-        self, investment: CreateFixedIncomeInvestmentBrazilRequest
-    ):
-        pass
 
     async def update_investment(
         self, investment: UpdateInvestmentRequest

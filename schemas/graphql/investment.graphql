@@ -169,6 +169,7 @@ type GetInvestmentStatementResponde {
 input UpdateInvestmentStatementInput {
     id: String!
     contribution: Float
+    withdrawn: Float
     grossAmount: Float
     netAmount: Float
     taxDetail: [TaxFeeDetail]
