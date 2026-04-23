@@ -26,9 +26,6 @@ from schemas.request.investment import (
     GetObjectiveSummaryRequest,
     UpdateInvestmentRequest,
 )
-from schemas.request.investment_brazilian_fixed_income import (
-    CreateFixedIncomeInvestmentBrazilRequest,
-)
 from schemas.response.investment import (
     CreateInvestmentResponse,
     CreateObjectiveResponse,

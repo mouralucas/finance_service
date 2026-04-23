@@ -80,9 +80,7 @@ class CreateInvestmentRequest(BaseModel):
     name: str = Field(..., description="The name of the investment")
     account_id: uuid.UUID = Field(..., description="The id of the account")
 
-    type_id: uuid.UUID = Field(
-        ..., description="The id of the investment type"
-    )
+    type_id: uuid.UUID = Field(..., description="The id of the investment type")
     transaction_date: datetime.date = Field(
         ..., description="The date of the investment"
     )
@@ -158,7 +156,9 @@ class UpdateInvestmentRequest(CreateInvestmentRequest):
     indexer_id: uuid.UUID | None = Field(
         None, description="The id of the investment index"
     )
-    liquidity_id: uuid.UUID | None = Field(None, description="The id of investment liquidity")
+    liquidity_id: uuid.UUID | None = Field(
+        None, description="The id of investment liquidity"
+    )
     country_id: str | None = Field(None, description="The id of the country")
 
 

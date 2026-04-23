@@ -47,12 +47,14 @@ async def get_currencies_resolver(_, info: GraphQLResolveInfo):
 
     return currencies
 
+
 async def get_finance_summary_resolver(_, info: GraphQLResolveInfo):
     finance_summary = await FinanceService(
         session=info.context["session"], user=info.context["user"]
     ).get_finance_summary()
-    
+
     return finance_summary
+
 
 def bind_finance_dashboard_resolvers(query: QueryType, mutation: MutationType):
     # Queries

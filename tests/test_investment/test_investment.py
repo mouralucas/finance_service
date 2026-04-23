@@ -40,7 +40,7 @@ class TestInvestments:
         payload = {
             "accountId": str(account.id),
             "name": name,
-            "investmentTypeId": str(type_id),
+            "typeId": str(type_id),
             "transactionDate": transaction_date,
             "maturityDate": maturity_date,
             "quantity": quantity,
@@ -69,6 +69,7 @@ class TestInvestments:
         assert "name" in data["investment"]
         assert data["investment"]["name"] == name
 
+        # Todo: refactor to return typeId
         assert "investmentTypeId" in data["investment"]
         assert data["investment"]["investmentTypeId"] == str(type_id)
 
@@ -125,19 +126,6 @@ class TestInvestments:
         price = 112.47
         amount = quantity * price
         contracted_rate = "115% do CDI"
-        # TODO: add tax and fee details to the payload
-        # tax_detail = [{
-        #     'currencyId': 'BRL',
-        #     'id': 'a6c45a5a-f75f-475c-afa1-1cf02cd3fd04',
-        #     'amount': amount * 0.15
-        # }]
-        # fee_detail = [
-        #     {
-        #         'currencyId': 'BRL',
-        #         'id': 'a187d754-73c9-46d3-ac57-7cc78ea01e6f',
-        #         'amount': amount * 0.01
-        #     }
-        # ]
         indexer_type_id = create_indexer_type[0].id
         indexer_id = create_indexer[0].id
         liquidity_id = create_liquidity[0].id
@@ -150,7 +138,7 @@ class TestInvestments:
             "custodianId": str(custodian_id),
             "accountId": str(accounts[0].id),
             "name": name,
-            "investmentTypeId": str(type_id),
+            "typeId": str(type_id),
             "transactionDate": transaction_date,
             "maturityDate": maturity_date,
             "quantity": quantity,

@@ -1,5 +1,5 @@
-from typing import Any
 import uuid
+from typing import Any
 
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import BaseService
@@ -174,9 +174,9 @@ class FinanceService(BaseService):
         return response
 
     async def get_finance_summary(self):
-        
+
         investment = self._get_investiment_summary()
-        
+
         return {
             "investment": investment,
         }
@@ -197,8 +197,8 @@ class FinanceService(BaseService):
         )
         investments = await self.investment_manager.get_investments(
             owner_id=self.user["user_id"], is_settled=False
-        )   
-        
+        )
+
         investment = {
             "total_invested": total_invested if total_invested else 0,
             "total_gross": total_gross if total_gross else 0,
@@ -211,10 +211,8 @@ class FinanceService(BaseService):
             ),
             "last_month_growth_percentage": 0,
         }
-        
+
         return investment
-        
-        
 
     # Funds service -> Will be deprecated
     async def create_br_fund(
