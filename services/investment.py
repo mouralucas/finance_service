@@ -309,9 +309,9 @@ class InvestmentService(BaseService):
         ]
         variation_data = [item["variation"] for item in period_performance]
 
-        # montar series
+        indexer_name = indexer.name if indexer else ""
         series = [
-            {"data": indexer_variation_data, "label": "Variação do indexer"},
+            {"data": indexer_variation_data, "label": f"Variação do {indexer_name}"},
             {"data": variation_data, "label": "Variação"},
         ]
 
