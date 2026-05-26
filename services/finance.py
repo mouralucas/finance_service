@@ -35,6 +35,7 @@ from schemas.response.finance import (
     GetLiquidityResponse,
     GetTaxFeeResponse,
 )
+from services.utils.datetime import get_previous_period
 
 
 class FinanceService(BaseService):
@@ -176,6 +177,7 @@ class FinanceService(BaseService):
     async def get_finance_summary(self):
 
         investment = self._get_investiment_summary()
+        transactions = await self._get_monthly_incoming_and_outgoing()
 
         return {
             "investment": investment,
@@ -213,6 +215,24 @@ class FinanceService(BaseService):
         }
 
         return investment
+
+    async def _get_monthly_incoming_and_outgoing(self):
+        transactions = await self.account_manager.get_transactions(
+            owner_id=self.user["user_id"],
+            start_period=get_previous_period(),
+            end_period=get_previous_period(),
+        )
+        if not transactions:
+            return {"total_incoming": 0, "total_outgoing": 0}
+        
+        total_incoming = sum(
+            transaction["amount"] for transaction in transactions if transaction["amount"] > 0
+        )
+        total_outgoing = sum(
+            transaction["amount"] for transaction in transactions if transaction["amount"] < 0
+        )
+        
+        return {"total_incoming": total_incoming, "total_outgoing": total_outgoing}
 
     # Funds service -> Will be deprecated
     async def create_br_fund(

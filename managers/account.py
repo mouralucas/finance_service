@@ -113,9 +113,9 @@ class AccountManager(BaseDataManager):
     async def get_transactions(
         self,
         owner_id: uuid.UUID,
-        start_period: int | None,
-        end_period: int | None,
-        account_id: uuid.UUID | None,
+        start_period: int | None = None,
+        end_period: int | None = None,
+        account_id: uuid.UUID | None = None,
     ) -> list[dict[Any, Any]] | None:
         transaction_alias = aliased(AccountTransactionModel)
         account_alias = aliased(AccountModel)
