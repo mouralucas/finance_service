@@ -178,7 +178,7 @@ class FinanceService(BaseService):
 
         investment = self._get_investiment_summary()
         transactions = await self._get_monthly_incoming_and_outgoing()
-
+        print(transactions)
         return {
             "investment": investment,
         }
@@ -224,14 +224,18 @@ class FinanceService(BaseService):
         )
         if not transactions:
             return {"total_incoming": 0, "total_outgoing": 0}
-        
+
         total_incoming = sum(
-            transaction["amount"] for transaction in transactions if transaction["amount"] > 0
+            transaction["amount"]
+            for transaction in transactions
+            if transaction["amount"] > 0
         )
         total_outgoing = sum(
-            transaction["amount"] for transaction in transactions if transaction["amount"] < 0
+            transaction["amount"]
+            for transaction in transactions
+            if transaction["amount"] < 0
         )
-        
+
         return {"total_incoming": total_incoming, "total_outgoing": total_outgoing}
 
     # Funds service -> Will be deprecated
