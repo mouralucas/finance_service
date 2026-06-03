@@ -51,6 +51,9 @@ class BillEntryInstallment(BaseModel):
         from_attributes=True, alias_generator=AliasGenerator(alias=to_camel)
     )
 
+    transaction_id: int | None = Field(
+        None, description="The id of the transaction, used for update operations"
+    )
     current_installment: int = Field(..., description="The current installment")
     amount: Decimal = Field(..., description="The amount of the installment")
     due_date: date = Field(..., description="The due date of the installments")

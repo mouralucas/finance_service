@@ -130,8 +130,8 @@ input UpdateAccountTransactionInput {
 }
 
 type CreateUpdateAccountTransactionResponse {
-    success: Boolean!
-    transactionId: String!
+    success: Boolean! 
+    transactionId: String! # TODO: why it is string here? - Change to "id"
 }
 
 type AccountTransaction {

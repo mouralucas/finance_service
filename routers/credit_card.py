@@ -51,22 +51,6 @@ async def cancel_credit_card(
     )
 
 
-@router.post(
-    "/transaction",
-    summary="Create a transaction",
-    description="Create a transaction for the selected credit card",
-    status_code=status.HTTP_201_CREATED,
-)
-async def create_transaction(
-    transaction: CreateCreditCardTransactionRequest,
-    session: AsyncSession = Depends(get_session),
-    user: RequiredUser = Security(get_user),
-) -> CreateCreditCardTransactionResponse:
-    return await CreditCardService(session=session, user=user).create_transaction(
-        transaction
-    )
-
-
 @router.get(
     "/bill/evolution",
     summary="Get credit card bill evolution",

@@ -98,7 +98,7 @@ class CreditCardTransactionModel(SQLModel):
     total_amount: Mapped[Decimal] = mapped_column(
         "total_amount", Numeric(precision=15, scale=5)
     )  # The total amount of transaction
-    parent_id: Mapped[uuid.UUID] = mapped_column(
+    parent_id: Mapped[int] = mapped_column(
         ForeignKey("credit_card_transaction.id"), nullable=True
     )
     parent: Mapped["CreditCardTransactionModel"] = relationship(

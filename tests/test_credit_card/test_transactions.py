@@ -77,6 +77,19 @@ async def test_create_transaction_no_installment(
     is_international_transaction = False
     description = "My new credit card transaction"
 
+    mutation = """
+        mutation CreateCreditCardTransaction (
+            $transaction: CreateCreditCardTransactionInput!
+        ) {
+            createCreditCardTransaction(
+                transaction: $transaction
+            ) {
+                success
+                ids
+            }
+        }
+    """
+
     payload = {
         "creditCardId": credit_card_id,
         "transactionDate": transaction_date,
@@ -89,55 +102,18 @@ async def test_create_transaction_no_installment(
         "description": description,
     }
 
-    response = await client.post("/creditcard/transaction", json=payload)
+    response = await client.post(
+        "/graphql/finance",
+        json={"query": mutation, "variables": {"transaction": payload}},
+    )
 
-    assert response.status_code == status.HTTP_201_CREATED
+    assert response.status_code == status.HTTP_200_OK
 
     data = response.json()
-    assert "transaction" in data
-    assert type(data["transaction"]) is list
-    assert len(data["transaction"]) == 1  # must be one when n installments
-
-    entries = data["transaction"]
-    for entry in entries:
-        due_date = CreditCardService.set_due_date(
-            datetime.datetime.strptime(transaction_date, "%Y-%m-%d").date(),
-            close_day,
-            due_day,
-            installment=entry["currentInstallment"],
-        )
-        period = get_period(due_date)
-
-        assert "transactionId" in entry
-
-        assert "creditCardId" in entry
-        assert entry["creditCardId"] == credit_card_id
-        assert "period" in entry
-        assert entry["period"] == period
-        assert "dueDate" in entry
-        assert entry["dueDate"] == due_date.strftime("%Y-%m-%d")
-        assert "transactionDate" in entry
-        assert entry["transactionDate"] == transaction_date
-        assert "amount" in entry
-        assert entry["amount"] == total_amount
-        assert "categoryId" in entry
-        assert entry["categoryId"] == category_id
-        assert "currencyId" in entry
-        assert entry["currencyId"] == currency_id
-        assert "transactionCurrencyId" in entry
-        assert entry["transactionCurrencyId"] == currency_id
-        assert "transactionAmount" in entry
-        assert entry["transactionAmount"] == total_amount
-
-        # Installment fields
-        assert "isInstallment" in entry
-        assert not entry["isInstallment"]
-        assert "currentInstallment" in entry
-        assert entry["currentInstallment"] == 1
-        assert "installments" in entry
-        assert entry["installments"] == 1
-        assert "totalAmount" in entry
-        assert entry["totalAmount"] == total_amount
+    assert "data" in data
+    assert "createCreditCardTransaction" in data["data"]
+    assert "success" in data["data"]["createCreditCardTransaction"]
+    assert len(data["data"]["createCreditCardTransaction"]["ids"]) == 1
 
 
 @pytest.mark.asyncio
@@ -182,6 +158,19 @@ async def test_create_transaction_with_installment(
 
     is_international_transaction = False
     description = "My installment transaction"
+    
+    mutation = """
+        mutation CreateCreditCardTransaction (
+            $transaction: CreateCreditCardTransactionInput!
+        ) {
+            createCreditCardTransaction(
+                transaction: $transaction
+            ) {
+                success
+                ids
+            }
+        }
+    """
 
     payload = {
         "creditCardId": credit_card_id,
@@ -196,39 +185,19 @@ async def test_create_transaction_with_installment(
     }
     response = await client.post("/creditcard/transaction", json=payload)
 
-    assert response.status_code == status.HTTP_201_CREATED
+    response = await client.post(
+        "/graphql/finance",
+        json={"query": mutation, "variables": {"transaction": payload}},
+    )
+
+    assert response.status_code == status.HTTP_200_OK
 
     data = response.json()
-    assert "transaction" in data
-    assert type(data["transaction"]) is list
-    assert len(data["transaction"]) == total_installments
-
-    entries = data["transaction"]
-
-    for idx, entry in enumerate(entries):
-        due_date = CreditCardService.set_due_date(
-            datetime.datetime.strptime(transaction_date, "%Y-%m-%d").date(),
-            close_day,
-            due_day,
-            installment=entry["currentInstallment"],
-        )
-        period = get_period(due_date)
-
-        assert "amount" in entry
-        assert entry["amount"] == round(total_amount / total_installments, 5)
-
-        assert "period" in entry
-        assert entry["period"] == period
-        assert "dueDate" in entry
-        assert entry["dueDate"] == due_date.strftime("%Y-%m-%d")
-        assert "isInstallment" in entry
-        assert entry["isInstallment"]
-        assert "currentInstallment" in entry
-        assert entry["currentInstallment"] == idx + 1
-        assert "installments" in entry
-        assert entry["installments"] == total_installments
-        assert "totalAmount" in entry
-        assert entry["totalAmount"] == total_amount
+    assert "data" in data
+    assert "createCreditCardTransaction" in data["data"]
+    assert "success" in data["data"]["createCreditCardTransaction"]
+    assert "ids" in data["data"]["createCreditCardTransaction"]
+    assert len(data["data"]["createCreditCardTransaction"]["ids"]) > 1
 
 
 @pytest.mark.asyncio

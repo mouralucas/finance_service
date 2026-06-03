@@ -104,7 +104,7 @@ class CreditCardService(BaseService):
     # Credit card transactions
     async def create_transaction(
         self, transaction: CreateCreditCardTransactionRequest, entry=None
-    ) -> CreateCreditCardTransactionResponse:
+    ) -> dict[str, Any]:
         credit_card = await CreditCardManager(
             session=self.session
         ).get_credit_card_by_id(transaction.credit_card_id)
@@ -152,18 +152,24 @@ class CreditCardService(BaseService):
         created_entries = await CreditCardManager(
             session=self.session
         ).create_credit_card_transaction(entry_list)
+        if not created_entries:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error creating credit card transaction",
+            )
+            
+        # Add the parent Id after the creation of the entries, 
+        #   because the parent Id is the id of the first entry created
         if len(transaction.installments) > 1:
             [
                 setattr(entry, "parent_id", created_entries[0].id)
                 for entry in created_entries
             ]
-
-        response = CreateCreditCardTransactionResponse(
-            transaction=[
-                CreditCardTransactionSchema.model_validate(entry)
-                for entry in created_entries
-            ]
-        )
+            
+        response = {
+            "success": True,
+            "ids": [entry.id for entry in created_entries] if created_entries else None,
+        }
 
         return response
 
@@ -193,6 +199,29 @@ class CreditCardService(BaseService):
         )
 
         return response
+
+    async def get_transaction_by_id(self, id: int) -> dict[str, Any]:
+        transaction: CreditCardTransactionModel | None = (
+            await self.credit_card_manager.get_credit_card_transaction_by_id(id=id)
+        )
+        if not transaction:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Transaction not found"
+            )
+
+        if transaction.is_installment:
+            transactions = await self.credit_card_manager.get_sibling_transactions(
+                parent_id=transaction.parent_id
+            )
+            if not transactions:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Sibling transactions not found",
+                )
+        else:
+            transactions = [transaction]
+            
+        
 
     async def get_credit_card_bill_evolution(
         self, params: GetCreditCardBillRequest

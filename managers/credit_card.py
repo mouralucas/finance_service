@@ -159,6 +159,31 @@ class CreditCardManager(BaseDataManager):
             else None
         )
 
+    async def get_credit_card_transaction_by_id(
+        self, id: int
+    ) -> CreditCardTransactionModel | None:
+        transaction = await self.get_by_id(CreditCardTransactionModel, id)
+
+        return cast(CreditCardTransactionModel, transaction) if transaction else None
+
+    async def get_sibling_transactions(self, parent_id: int) -> list[CreditCardTransactionModel] | None:
+        query = (
+            select(CreditCardTransactionModel)
+            .where(CreditCardTransactionModel.parent_id == parent_id)
+            .order_by(CreditCardTransactionModel.current_installment)
+        )
+
+        transactions = await self.get_all(query)
+
+        return (
+            [
+                cast(CreditCardTransactionModel, transaction)
+                for transaction in transactions
+            ]
+            if transactions
+            else None
+        )
+
     # Bill
     async def get_bill_history_aggregated(
         self, owner_id: uuid.UUID, start_period: int, end_period: int

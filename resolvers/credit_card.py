@@ -3,6 +3,7 @@ from graphql import GraphQLResolveInfo
 from rolf_common.util.graphql_input_validation import validate_graphql_input
 
 from schemas.request.credit_card import (
+    CreateCreditCardTransactionRequest,
     GetCreditCardRequest,
     GetCreditCardTransactionsRequest,
     GetInstallmentsDueDatesRequest,
@@ -20,6 +21,17 @@ async def get_credit_cards_resolver(
     ).get_credit_cards(params=params)
 
     return credit_cards
+
+
+@validate_graphql_input(CreateCreditCardTransactionRequest)
+async def create_credit_card_transaction_resolver(
+    _, info: GraphQLResolveInfo, transaction: CreateCreditCardTransactionRequest
+):
+    new_transaction =  await CreditCardService(
+        session=info.context["session"], user=info.context["user"]
+    ).create_transaction(transaction)
+    
+    return new_transaction
 
 
 @validate_graphql_input(GetCreditCardTransactionsRequest)
@@ -43,6 +55,14 @@ async def get_installments_due_dates_resolver(
     return credit_cards
 
 
+async def get_credit_card_transaction_by_id(_, info: GraphQLResolveInfo, id: int):
+    transaction = await CreditCardService(
+        session=info.context["session"], user=info.context["user"]
+    ).get_transaction_by_id(id=id)
+    
+    return transaction
+
+
 def bind_credit_card_resolvers(query: QueryType, mutation: MutationType):
     query.set_field("getCreditCards", resolver=get_credit_cards_resolver)
     query.set_field(
@@ -50,4 +70,14 @@ def bind_credit_card_resolvers(query: QueryType, mutation: MutationType):
     )
     query.set_field(
         "getCreditCardInstallmentDueDates", resolver=get_installments_due_dates_resolver
+    )
+
+    query.set_field(
+        "getCreditCardTransactionById",
+        resolver=get_credit_card_transaction_by_id,
+    )
+    
+    mutation.set_field(
+        "createCreditCardTransaction",
+        resolver=create_credit_card_transaction_resolver,
     )
