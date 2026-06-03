@@ -8,12 +8,10 @@ from backend.database import get_session
 from schemas.request.credit_card import (
     CancelCreditCardRequest,
     CreateCreditCardRequest,
-    CreateCreditCardTransactionRequest,
     GetCreditCardBillRequest,
 )
 from schemas.response.credit_card import (
     CreateCreditCardResponse,
-    CreateCreditCardTransactionResponse,
     GetCreditCardBillConsolidatedResponse,
     GetCreditCardBillHistoryResponse,
 )

@@ -28,7 +28,6 @@ from schemas.request.credit_card import (
 from schemas.response.credit_card import (
     CancelCreditCardResponse,
     CreateCreditCardResponse,
-    CreateCreditCardTransactionResponse,
     GetCreditCardBillConsolidatedResponse,
     GetCreditCardBillHistoryResponse,
     GetCreditCardTransactionResponse,
@@ -157,15 +156,15 @@ class CreditCardService(BaseService):
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Error creating credit card transaction",
             )
-            
-        # Add the parent Id after the creation of the entries, 
+
+        # Add the parent Id after the creation of the entries,
         #   because the parent Id is the id of the first entry created
         if len(transaction.installments) > 1:
             [
                 setattr(entry, "parent_id", created_entries[0].id)
                 for entry in created_entries
             ]
-            
+
         response = {
             "success": True,
             "ids": [entry.id for entry in created_entries] if created_entries else None,
@@ -220,8 +219,6 @@ class CreditCardService(BaseService):
                 )
         else:
             transactions = [transaction]
-            
-        
 
     async def get_credit_card_bill_evolution(
         self, params: GetCreditCardBillRequest

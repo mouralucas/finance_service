@@ -166,7 +166,9 @@ class CreditCardManager(BaseDataManager):
 
         return cast(CreditCardTransactionModel, transaction) if transaction else None
 
-    async def get_sibling_transactions(self, parent_id: int) -> list[CreditCardTransactionModel] | None:
+    async def get_sibling_transactions(
+        self, parent_id: int
+    ) -> list[CreditCardTransactionModel] | None:
         query = (
             select(CreditCardTransactionModel)
             .where(CreditCardTransactionModel.parent_id == parent_id)

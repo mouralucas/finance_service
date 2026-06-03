@@ -3,8 +3,7 @@ import datetime
 import pytest
 from starlette import status
 
-from services.credit_card import CreditCardService
-from services.utils.datetime import get_installments_due_dates, get_period
+from services.utils.datetime import get_installments_due_dates
 
 
 class TestCreditCardTransactions:
@@ -128,7 +127,6 @@ async def test_create_transaction_with_installment(
     #   must be greater than the amount value
     # "amount" its basically total amount / installments
     #   (it could vary a few cents due to different forms to calculate installments)
-    total_installments = 3
     credit_card_id = str(credit_cards[0].id)
     due_day = credit_cards[0].due_day
     close_day = credit_cards[0].close_day
@@ -158,7 +156,7 @@ async def test_create_transaction_with_installment(
 
     is_international_transaction = False
     description = "My installment transaction"
-    
+
     mutation = """
         mutation CreateCreditCardTransaction (
             $transaction: CreateCreditCardTransactionInput!
