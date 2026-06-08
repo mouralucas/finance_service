@@ -114,7 +114,7 @@ class CreditCardService(BaseService):
 
         owner_id = self.user["user_id"]
         currency_id = credit_card.currency_id
-        tot_installments = transaction.tot_installments
+        tot_installments = transaction.total_installments
 
         entry_list = []
         for i in transaction.installments:
@@ -124,7 +124,7 @@ class CreditCardService(BaseService):
                         "installment",
                         "is_international_transaction",
                         "tax_detail",
-                        "tot_installments",
+                        "total_installments",
                     }
                 )
             )
@@ -219,6 +219,17 @@ class CreditCardService(BaseService):
                 )
         else:
             transactions = [transaction]
+            
+        response = {
+            "credit_card_id": transaction.credit_card_id,
+            "transaction_date": transaction.transaction_date,
+            "total_amount": transaction.total_amount,
+            "tot_installments": transaction.installments,
+            "installments": [],
+            "category_id": transaction.category_id,
+            "currency_id": transaction.currency_id,
+            "is_international_transaction": None
+        }                
 
     async def get_credit_card_bill_evolution(
         self, params: GetCreditCardBillRequest

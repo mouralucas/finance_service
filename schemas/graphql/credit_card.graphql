@@ -52,8 +52,9 @@ type GetCreditCardTransactionByIdResponse {
 
 type CreditCardTransaction {
     id: String!
-    creditCardNickname: String
+    ownerId: String!
     creditCardId: String!
+    creditCardNickname: String
     period: Int!
     dueDate: Date!
     transactionDate: Date!
@@ -65,11 +66,18 @@ type CreditCardTransaction {
     transactionCurrencyId: String
     transactionCurrencySymbol: String
     transactionAmount: Float!
+    dollarExchangeRate: Float
+    currencyDollarExchangeRate: Float
+    totalTax: Float
     isInstallment: Boolean!
     currentInstallment: Int!
     installments: Int!
     totalAmount: Float
+    parentId: Int
     description: String
+    origin: String!
+    isValidated: Boolean!
+    operationType: String
     createdAt: DateTime!
     editedAt: DateTime
 }
@@ -93,10 +101,12 @@ type InstallmentsDueDates {
 
 # Create credit card transaction
 input CreateCreditCardTransactionInput {
+    id: Int
     creditCardId: String!
     transactionDate: Date
     totalAmount: Float!
-    totInstallments: Int!
+    isInstallment: Boolean!
+    totalInstallments: Int!
     installments: [BillEntryInstallmentInput!]!
     categoryId: String!
     currencyId: String!
@@ -105,10 +115,7 @@ input CreateCreditCardTransactionInput {
     transactionAmount: Float
     dollarExchangeRate: Float
     currencyDollarExchangeRate: Float
-    totalTax: Float
-    taxDetail: TaxFeeRequestInput
     description: String
-    origin: String
 }
 
 input BillEntryInstallmentInput {

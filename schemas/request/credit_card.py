@@ -71,7 +71,7 @@ class CreateCreditCardTransactionRequest(BaseModel):
     total_amount: Decimal = Field(
         ..., description="The total amount of the transaction"
     )
-    tot_installments: int = Field(..., description="The total number of installments")
+    total_installments: int = Field(..., description="The total number of installments")
     installments: list[BillEntryInstallment] = Field(...)
     category_id: uuid.UUID = Field(
         ..., description="The id of the category of transaction"
@@ -95,12 +95,6 @@ class CreateCreditCardTransactionRequest(BaseModel):
     )
     currency_dollar_exchange_rate: float | None = Field(
         None, description="The dollar exchange rate with the transaction currency"
-    )
-    total_tax: Decimal | None = Field(
-        None, description="The tax amount of the transaction"
-    )
-    tax_detail: TaxFeeRequest | None = Field(
-        None, description="The tax detail of the transaction"
     )
 
     description: str | None = Field(
