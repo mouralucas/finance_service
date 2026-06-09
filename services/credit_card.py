@@ -219,7 +219,7 @@ class CreditCardService(BaseService):
                 )
         else:
             transactions = [transaction]
-            
+
         response = {
             "credit_card_id": transaction.credit_card_id,
             "transaction_date": transaction.transaction_date,
@@ -228,8 +228,10 @@ class CreditCardService(BaseService):
             "installments": [],
             "category_id": transaction.category_id,
             "currency_id": transaction.currency_id,
-            "is_international_transaction": None
-        }                
+            "is_international_transaction": None,
+        }
+
+        return response
 
     async def get_credit_card_bill_evolution(
         self, params: GetCreditCardBillRequest

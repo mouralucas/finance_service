@@ -5,8 +5,6 @@ from decimal import Decimal
 from pydantic import AliasGenerator, BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
 
-from schemas.request.finance import TaxFeeRequest
-
 
 class CreateCreditCardRequest(BaseModel):
     nickname: str = Field(..., alias="nickname", description="A nickname for the card")
