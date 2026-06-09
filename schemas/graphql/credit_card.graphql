@@ -105,7 +105,6 @@ input CreateCreditCardTransactionInput {
     creditCardId: String!
     transactionDate: Date
     totalAmount: Float!
-    isInstallment: Boolean!
     totalInstallments: Int!
     installments: [BillEntryInstallmentInput!]!
     categoryId: String!
