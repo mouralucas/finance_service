@@ -1,7 +1,7 @@
 extend type Query {
     getCreditCards(params: GetCreditCardsInput): GetCreditCardsResponse
     getCreditCardTransactions(params: GetCreditCardTransactionsInput): GetCreditCardTransactionsResponse
-    getCreditCardTransactionById(id: Int!): Int
+    getCreditCardTransactionMetadataById(id: Int!): GetTransactionMetadataById
     getCreditCardInstallmentDueDates(params: GetInstallmentsDueDatesInput): GetInstallmentsDueDatesResponse
 }
 
@@ -115,6 +115,34 @@ input CreateCreditCardTransactionInput {
     dollarExchangeRate: Float
     currencyDollarExchangeRate: Float
     description: String
+}
+
+type GetTransactionMetadataById {
+    transactionMetadata: TransactionMetadata!
+}
+
+type TransactionMetadata {
+    id: Int!
+    creditCardId: String!
+    transactionDate: Date
+    totalAmount: Float!
+    totalInstallments: Int!
+    installments: [BillEntryInstallment!]!
+    categoryId: String!
+    currencyId: String!
+    isInternationalTransaction: Boolean!
+    transactionCurrencyId: String
+    transactionAmount: Float
+    dollarExchangeRate: Float
+    currencyDollarExchangeRate: Float
+    description: String
+}
+
+type BillEntryInstallment {
+    transactionId: Int
+    currentInstallment: Int!
+    dueDate: Date!
+    amount: Float!
 }
 
 input BillEntryInstallmentInput {

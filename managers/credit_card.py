@@ -170,7 +170,27 @@ class CreditCardManager(BaseDataManager):
         self, parent_id: int
     ) -> list[CreditCardTransactionModel] | None:
         query = (
-            select(CreditCardTransactionModel)
+            select(
+                CreditCardTransactionModel.id,
+                CreditCardTransactionModel.owner_id,
+                CreditCardTransactionModel.credit_card_id,
+                CreditCardTransactionModel.period,
+                CreditCardTransactionModel.due_date,
+                CreditCardTransactionModel.transaction_date,
+                CreditCardTransactionModel.amount,
+                CreditCardTransactionModel.category_id,
+                CreditCardTransactionModel.currency_id,
+                CreditCardTransactionModel.transaction_currency_id,
+                CreditCardTransactionModel.transaction_amount,
+                CreditCardTransactionModel.dollar_exchange_rate,
+                CreditCardTransactionModel.currency_dollar_exchange_rate,
+                CreditCardTransactionModel.is_installment,
+                CreditCardTransactionModel.current_installment,
+                CreditCardTransactionModel.installments,
+                CreditCardTransactionModel.total_amount,
+                CreditCardTransactionModel.parent_id,
+                CreditCardTransactionModel.description,
+            )
             .where(CreditCardTransactionModel.parent_id == parent_id)
             .order_by(CreditCardTransactionModel.current_installment)
         )

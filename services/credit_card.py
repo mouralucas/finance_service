@@ -199,7 +199,7 @@ class CreditCardService(BaseService):
 
         return response
 
-    async def get_transaction_by_id(self, id: int) -> dict[str, Any]:
+    async def get_transaction_metadata_by_id(self, id: int) -> dict[str, Any]:
         transaction: CreditCardTransactionModel | None = (
             await self.credit_card_manager.get_credit_card_transaction_by_id(id=id)
         )
@@ -220,15 +220,40 @@ class CreditCardService(BaseService):
         else:
             transactions = [transaction]
 
+        installment_list = []
+        for t in transactions:
+            installment = {
+                "transaction_id": t.id,
+                "current_installment": t.current_installment,
+                "amount": t.amount,
+                "due_date": t.due_date,
+            }
+            installment_list.append(installment)
+
+        is_international = (
+            True
+            if transaction.currency_id != transaction.transaction_currency_id
+            else False
+        )
+
         response = {
-            "credit_card_id": transaction.credit_card_id,
-            "transaction_date": transaction.transaction_date,
-            "total_amount": transaction.total_amount,
-            "tot_installments": transaction.installments,
-            "installments": [],
-            "category_id": transaction.category_id,
-            "currency_id": transaction.currency_id,
-            "is_international_transaction": None,
+            "transaction_metadata": {
+                "id": transaction.id,
+                "credit_card_id": transaction.credit_card_id,
+                "transaction_date": transaction.transaction_date,
+                "total_amount": transaction.total_amount,
+                "total_installments": transaction.installments,
+                "installments": installment_list,
+                "category_id": transaction.category_id,
+                "currency_id": transaction.currency_id,
+                "is_international_transaction": is_international,
+                "transaction_currency_id": transaction.transaction_currency_id,
+                "transaction_amount": transaction.transaction_amount,
+                "dollar_exchange_rate": transaction.dollar_exchange_rate,
+                "currency_dollar_exchange_rate":
+                    transaction.currency_dollar_exchange_rate,
+                "description": transaction.description,
+            }
         }
 
         return response

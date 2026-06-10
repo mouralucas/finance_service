@@ -55,10 +55,12 @@ async def get_installments_due_dates_resolver(
     return credit_cards
 
 
-async def get_credit_card_transaction_by_id(_, info: GraphQLResolveInfo, id: int):
+async def get_credit_card_transaction_metadata_by_id(
+    _, info: GraphQLResolveInfo, id: int
+):
     transaction = await CreditCardService(
         session=info.context["session"], user=info.context["user"]
-    ).get_transaction_by_id(id=id)
+    ).get_transaction_metadata_by_id(id=id)
 
     return transaction
 
@@ -73,8 +75,8 @@ def bind_credit_card_resolvers(query: QueryType, mutation: MutationType):
     )
 
     query.set_field(
-        "getCreditCardTransactionById",
-        resolver=get_credit_card_transaction_by_id,
+        "getCreditCardTransactionMetadataById",
+        resolver=get_credit_card_transaction_metadata_by_id,
     )
 
     mutation.set_field(
