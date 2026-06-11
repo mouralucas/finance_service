@@ -117,6 +117,13 @@ input CreateCreditCardTransactionInput {
     description: String
 }
 
+input BillEntryInstallmentInput {
+    transactionId: Int
+    currentInstallment: Int!
+    dueDate: Date!
+    amount: Float!
+}
+
 type GetTransactionMetadataById {
     transactionMetadata: TransactionMetadata!
 }
@@ -145,21 +152,8 @@ type BillEntryInstallment {
     amount: Float!
 }
 
-input BillEntryInstallmentInput {
-    transactionId: Int
-    currentInstallment: Int!
-    dueDate: Date!
-    amount: Float!
-}
-
-input TaxFeeRequestInput {
-    feeType: String!
-    feeValue: Float!
-    feeCurrencyId: String
-}
-
 # Create credit card transaction response
 type CreateCreditCardTransactionResponse {
     success: Boolean!
-    ids: [Int]
+    ids: [Int]!
 }
