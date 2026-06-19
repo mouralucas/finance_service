@@ -1,5 +1,4 @@
 extend type Query {
-    getHelloWorld: String
     getIndexerSeries(params: GetIndexerSeriesInput! ): GetIndexerSeriesResponse
     getCurrencies: GetCurrenciesResponse
     getPeriodicity: GetPeriodicityResponse
