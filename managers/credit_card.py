@@ -91,6 +91,7 @@ class CreditCardManager(BaseDataManager):
         start_period: int | None = None,
         end_period: int | None = None,
         parent_id: int | None = None,
+        transaction_ids: list[int] | None = None,
     ) -> list[dict[Any, Any]] | None:
         transaction_alias = aliased(CreditCardTransactionModel)
         category_alias = aliased(CategoryModel)
@@ -135,6 +136,7 @@ class CreditCardManager(BaseDataManager):
             )
             .order_by(
                 transaction_alias.transaction_date.desc(),
+                transaction_alias.due_date.desc(),
                 transaction_alias.created_at.desc(),
             )
         )
@@ -151,6 +153,9 @@ class CreditCardManager(BaseDataManager):
         if credit_card_id:
             query = query.where(transaction_alias.credit_card_id == credit_card_id)
 
+        if transaction_ids:
+            query = query.where(transaction_alias.id.in_(transaction_ids))
+
         transactions = await self.get_all(query)
 
         return (
@@ -158,6 +163,20 @@ class CreditCardManager(BaseDataManager):
             if transactions
             else None
         )
+
+    async def get_credit_card_transactions_objects(
+        self, owner_id: uuid.UUID, transaction_ids: list[int]
+    ):
+        query = select(CreditCardTransactionModel).where(
+            CreditCardTransactionModel.owner_id == owner_id
+        )
+
+        if transaction_ids:
+            query = query.where(CreditCardTransactionModel.id.in_(transaction_ids))
+
+        transactions = await self.session.execute(query)
+        transactions = transactions.scalars().all()
+        return transactions
 
     async def get_credit_card_transaction_by_id(
         self, id: int
@@ -183,6 +202,7 @@ class CreditCardManager(BaseDataManager):
                 CreditCardTransactionModel.transaction_currency_id,
                 CreditCardTransactionModel.transaction_amount,
                 CreditCardTransactionModel.dollar_exchange_rate,
+                CreditCardTransactionModel.total_tax,
                 CreditCardTransactionModel.currency_dollar_exchange_rate,
                 CreditCardTransactionModel.is_installment,
                 CreditCardTransactionModel.current_installment,

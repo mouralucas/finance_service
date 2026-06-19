@@ -172,6 +172,72 @@ class CreditCardService(BaseService):
 
         return response
 
+    async def update_transaction(self, transaction: CreateCreditCardTransactionRequest):
+        transactions_ids: list = [
+            t.transaction_id for t in transaction.installments if t.transaction_id
+        ]
+
+        transactions = (
+            await self.credit_card_manager.get_credit_card_transactions_objects(
+                owner_id=self.user["user_id"], transaction_ids=transactions_ids
+            )
+        )
+        if not transactions:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Transactions not found"
+            )
+
+        for t in transactions or []:
+            due_date = next(
+                (
+                    i.due_date
+                    for i in transaction.installments
+                    if i.transaction_id == t.id
+                ),
+                None,
+            )
+            amount = next(
+                (
+                    i.amount
+                    for i in transaction.installments
+                    if i.transaction_id == t.id
+                ),
+                None,
+            )
+
+            if not due_date or not amount:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Due date and amount are required for all installments",
+                )
+
+            # t.owner_id = self.user["user_id"]
+            t.credit_card_id = transaction.credit_card_id
+            t.period = get_period(due_date)
+            t.due_date = due_date
+            t.transaction_date = transaction.transaction_date
+            t.amount = amount
+            t.category_id = transaction.category_id
+            t.currency_id = transaction.currency_id
+
+            t.transaction_currency_id = transaction.transaction_currency_id
+            t.transaction_amount = transaction.transaction_amount
+            t.dollar_exchange_rate = transaction.dollar_exchange_rate
+            t.currency_dollar_exchange_rate = transaction.currency_dollar_exchange_rate
+            t.total_tax = transaction.total_tax
+            t.is_installment = True if len(transaction.installments) > 1 else False
+            t.installments = transaction.total_installments
+            t.total_amount = transaction.total_amount
+            t.description = transaction.description
+
+        updated_transactions = transactions
+        response = {
+            "success": True,
+            "ids": [t.id for t in updated_transactions] if updated_transactions else None,
+        }
+
+        return response
+
     async def get_transactions(
         self, params: GetCreditCardTransactionsRequest
     ) -> GetCreditCardTransactionResponse:
@@ -241,6 +307,7 @@ class CreditCardService(BaseService):
                 "id": transaction.id,
                 "credit_card_id": transaction.credit_card_id,
                 "transaction_date": transaction.transaction_date,
+                "is_installment": transaction.is_installment,
                 "total_amount": transaction.total_amount,
                 "total_installments": transaction.installments,
                 "installments": installment_list,
@@ -248,10 +315,10 @@ class CreditCardService(BaseService):
                 "currency_id": transaction.currency_id,
                 "is_international_transaction": is_international,
                 "transaction_currency_id": transaction.transaction_currency_id,
+                "total_tax": transaction.total_tax,
                 "transaction_amount": transaction.transaction_amount,
                 "dollar_exchange_rate": transaction.dollar_exchange_rate,
-                "currency_dollar_exchange_rate":
-                    transaction.currency_dollar_exchange_rate,
+                "currency_dollar_exchange_rate": transaction.currency_dollar_exchange_rate,
                 "description": transaction.description,
             }
         }

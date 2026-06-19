@@ -27,12 +27,22 @@ async def get_credit_cards_resolver(
 async def create_credit_card_transaction_resolver(
     _, info: GraphQLResolveInfo, transaction: CreateCreditCardTransactionRequest
 ):
-    new_transaction = await CreditCardService(
+    response = await CreditCardService(
         session=info.context["session"], user=info.context["user"]
     ).create_transaction(transaction)
 
-    return new_transaction
+    return response
 
+
+@validate_graphql_input(CreateCreditCardTransactionRequest)
+async def update_credit_card_transaction_resolver(
+    _, info: GraphQLResolveInfo, transaction: CreateCreditCardTransactionRequest
+):
+    response = await CreditCardService(
+        session=info.context["session"], user=info.context["user"]
+    ).update_transaction(transaction)
+
+    return response
 
 @validate_graphql_input(GetCreditCardTransactionsRequest)
 async def get_credit_card_transaction_resolver(
@@ -82,4 +92,8 @@ def bind_credit_card_resolvers(query: QueryType, mutation: MutationType):
     mutation.set_field(
         "createCreditCardTransaction",
         resolver=create_credit_card_transaction_resolver,
+    )
+    mutation.set_field(
+        "updateCreditCardTransaction",
+        resolver=update_credit_card_transaction_resolver,
     )

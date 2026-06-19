@@ -6,7 +6,8 @@ extend type Query {
 }
 
 extend type Mutation {
-    createCreditCardTransaction(transaction: CreateCreditCardTransactionInput!): CreateCreditCardTransactionResponse!
+    createCreditCardTransaction(transaction: CreditCardTransactionInput!): CreditCardTransactionResponse!
+    updateCreditCardTransaction(transaction: CreditCardTransactionInput!): CreditCardTransactionResponse!
 }
 
 # Get credit cards
@@ -82,7 +83,6 @@ type CreditCardTransaction {
     editedAt: DateTime
 }
 
-
 # Credit card installments
 input GetInstallmentsDueDatesInput {
     creditCardId: String!
@@ -100,18 +100,20 @@ type InstallmentsDueDates {
 }
 
 # Create credit card transaction
-input CreateCreditCardTransactionInput {
+input CreditCardTransactionInput {
     id: Int
     creditCardId: String!
     transactionDate: Date
     totalAmount: Float!
     totalInstallments: Int!
     installments: [BillEntryInstallmentInput!]!
+    isInstallment: Boolean!
     categoryId: String!
     currencyId: String!
     isInternationalTransaction: Boolean!
     transactionCurrencyId: String
     transactionAmount: Float
+    totalTax: Float
     dollarExchangeRate: Float
     currencyDollarExchangeRate: Float
     description: String
@@ -133,6 +135,7 @@ type TransactionMetadata {
     creditCardId: String!
     transactionDate: Date
     totalAmount: Float!
+    isInstallment: Boolean!
     totalInstallments: Int!
     installments: [BillEntryInstallment!]!
     categoryId: String!
@@ -140,6 +143,7 @@ type TransactionMetadata {
     isInternationalTransaction: Boolean!
     transactionCurrencyId: String
     transactionAmount: Float
+    totalTax: Float
     dollarExchangeRate: Float
     currencyDollarExchangeRate: Float
     description: String
@@ -153,7 +157,7 @@ type BillEntryInstallment {
 }
 
 # Create credit card transaction response
-type CreateCreditCardTransactionResponse {
+type CreditCardTransactionResponse {
     success: Boolean!
     ids: [Int]!
 }

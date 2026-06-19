@@ -63,11 +63,14 @@ class CreateCreditCardTransactionRequest(BaseModel):
     )
 
     credit_card_id: uuid.UUID = Field(..., description="The credit card id")
-    transaction_date: date | None = Field(
-        None, description="The transaction date of the card"
+    transaction_date: date = Field(
+        ..., description="The transaction date of the card"
     )
     total_amount: Decimal = Field(
         ..., description="The total amount of the transaction"
+    )
+    is_installment: bool = Field(
+        False, description="Whether the transaction is an installment or not"
     )
     total_installments: int = Field(..., description="The total number of installments")
     installments: list[BillEntryInstallment] = Field(...)
@@ -80,19 +83,22 @@ class CreateCreditCardTransactionRequest(BaseModel):
     is_international_transaction: bool = Field(
         ..., description="Whether the transaction is international"
     )
-    transaction_currency_id: str | None = Field(
-        None, description="The currency of the transaction"
+    transaction_currency_id: str = Field(
+        'BRL', description="The currency of the transaction"
     )
-    transaction_amount: float | None = Field(
-        None, description="The amount of the transaction in international currency"
+    transaction_amount: Decimal | None = Field(
+        Decimal("0"), description="The amount of the transaction in international currency"
+    )
+    total_tax: Decimal = Field(
+        Decimal("0"), description="The tax amount of the transaction"
     )
 
     # This fields represents the values used in the convertion to default card currency
-    dollar_exchange_rate: float | None = Field(
-        None, description="The dollar exchange rate with the default card currency"
+    dollar_exchange_rate: Decimal = Field(
+        Decimal("0"), description="The dollar exchange rate with the default card currency"
     )
-    currency_dollar_exchange_rate: float | None = Field(
-        None, description="The dollar exchange rate with the transaction currency"
+    currency_dollar_exchange_rate: Decimal = Field(
+        Decimal("0"), description="The dollar exchange rate with the transaction currency"
     )
 
     description: str | None = Field(

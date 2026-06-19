@@ -78,7 +78,7 @@ async def test_create_transaction_no_installment(
 
     mutation = """
         mutation CreateCreditCardTransaction (
-            $transaction: CreateCreditCardTransactionInput!
+            $transaction: CreditCardTransactionInput!
         ) {
             createCreditCardTransaction(
                 transaction: $transaction
@@ -94,6 +94,7 @@ async def test_create_transaction_no_installment(
         "transactionDate": transaction_date,
         "totalAmount": total_amount,
         "totalInstallments": tot_installments,
+        "isInstallment": False,
         "installments": installments,
         "categoryId": category_id,
         "currencyId": currency_id,
@@ -159,7 +160,7 @@ async def test_create_transaction_with_installment(
 
     mutation = """
         mutation CreateCreditCardTransaction (
-            $transaction: CreateCreditCardTransactionInput!
+            $transaction: CreditCardTransactionInput!
         ) {
             createCreditCardTransaction(
                 transaction: $transaction
@@ -176,6 +177,7 @@ async def test_create_transaction_with_installment(
         "totalAmount": total_amount,
         "totalInstallments": tot_installments,
         "installments": installments,
+        "isInstallment": True,
         "categoryId": category_id,
         "currencyId": currency_id,
         "isInternationalTransaction": is_international_transaction,
