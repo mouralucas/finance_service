@@ -63,9 +63,7 @@ class CreateCreditCardTransactionRequest(BaseModel):
     )
 
     credit_card_id: uuid.UUID = Field(..., description="The credit card id")
-    transaction_date: date = Field(
-        ..., description="The transaction date of the card"
-    )
+    transaction_date: date = Field(..., description="The transaction date of the card")
     total_amount: Decimal = Field(
         ..., description="The total amount of the transaction"
     )
@@ -84,10 +82,11 @@ class CreateCreditCardTransactionRequest(BaseModel):
         ..., description="Whether the transaction is international"
     )
     transaction_currency_id: str = Field(
-        'BRL', description="The currency of the transaction"
+        "BRL", description="The currency of the transaction"
     )
     transaction_amount: Decimal | None = Field(
-        Decimal("0"), description="The amount of the transaction in international currency"
+        Decimal("0"),
+        description="The amount of the transaction in international currency",
     )
     total_tax: Decimal = Field(
         Decimal("0"), description="The tax amount of the transaction"
@@ -95,10 +94,12 @@ class CreateCreditCardTransactionRequest(BaseModel):
 
     # This fields represents the values used in the convertion to default card currency
     dollar_exchange_rate: Decimal = Field(
-        Decimal("0"), description="The dollar exchange rate with the default card currency"
+        Decimal("0"),
+        description="The dollar exchange rate with the default card currency",
     )
     currency_dollar_exchange_rate: Decimal = Field(
-        Decimal("0"), description="The dollar exchange rate with the transaction currency"
+        Decimal("0"),
+        description="The dollar exchange rate with the transaction currency",
     )
 
     description: str | None = Field(

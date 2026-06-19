@@ -44,6 +44,7 @@ async def update_credit_card_transaction_resolver(
 
     return response
 
+
 @validate_graphql_input(GetCreditCardTransactionsRequest)
 async def get_credit_card_transaction_resolver(
     _, info: GraphQLResolveInfo, params: GetCreditCardTransactionsRequest

@@ -233,7 +233,9 @@ class CreditCardService(BaseService):
         updated_transactions = transactions
         response = {
             "success": True,
-            "ids": [t.id for t in updated_transactions] if updated_transactions else None,
+            "ids": (
+                [t.id for t in updated_transactions] if updated_transactions else None
+            ),
         }
 
         return response
@@ -318,7 +320,7 @@ class CreditCardService(BaseService):
                 "total_tax": transaction.total_tax,
                 "transaction_amount": transaction.transaction_amount,
                 "dollar_exchange_rate": transaction.dollar_exchange_rate,
-                "currency_dollar_exchange_rate": transaction.currency_dollar_exchange_rate,
+                "currency_dollar_exchange_rate": transaction.currency_dollar_exchange_rate,  # noqa: E501
                 "description": transaction.description,
             }
         }
