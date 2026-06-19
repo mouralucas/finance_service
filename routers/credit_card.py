@@ -54,7 +54,7 @@ async def cancel_credit_card(
     summary="Get credit card bill evolution",
     description="Get creditcard bill evolution in the period range.",
 )
-async def get_bill(
+async def get_bill_evolution(
     params: GetCreditCardBillRequest = Depends(),
     session: AsyncSession = Depends(get_session),
     user: RequiredUser = Security(get_user),
