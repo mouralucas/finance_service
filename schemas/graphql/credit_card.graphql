@@ -76,47 +76,11 @@ type CreditCardTransaction {
     totalAmount: Float
     parentId: Int
     description: String
-    origin: String!
-    isValidated: Boolean!
+    origin: String 
+    isValidated: Boolean
     operationType: String
-    createdAt: DateTime!
+    createdAt: DateTime
     editedAt: DateTime
-}
-
-# Credit card installments
-input GetInstallmentsDueDatesInput {
-    creditCardId: String!
-    totInstallments: Int!
-    transactionDate: Date!
-}
-
-type GetInstallmentsDueDatesResponse {
-    dueDates: [InstallmentsDueDates]!
-}
-
-type InstallmentsDueDates {
-    currentInstallment: Int!
-    dueDate: Date!
-}
-
-# Create credit card transaction
-input CreditCardTransactionInput {
-    id: Int
-    creditCardId: String!
-    transactionDate: Date
-    totalAmount: Float!
-    totalInstallments: Int!
-    installments: [BillEntryInstallmentInput!]!
-    isInstallment: Boolean!
-    categoryId: String!
-    currencyId: String!
-    isInternationalTransaction: Boolean!
-    transactionCurrencyId: String
-    transactionAmount: Float
-    totalTax: Float
-    dollarExchangeRate: Float
-    currencyDollarExchangeRate: Float
-    description: String
 }
 
 input BillEntryInstallmentInput {
@@ -156,8 +120,42 @@ type BillEntryInstallment {
     amount: Float!
 }
 
-# Create credit card transaction response
+input CreditCardTransactionInput {
+    id: Int
+    creditCardId: String!
+    transactionDate: Date
+    totalAmount: Float!
+    totalInstallments: Int!
+    installments: [BillEntryInstallmentInput!]!
+    isInstallment: Boolean!
+    categoryId: String!
+    currencyId: String!
+    isInternationalTransaction: Boolean!
+    transactionCurrencyId: String
+    transactionAmount: Float
+    totalTax: Float
+    dollarExchangeRate: Float
+    currencyDollarExchangeRate: Float
+    description: String
+}
+
 type CreditCardTransactionResponse {
     success: Boolean!
     ids: [Int]!
+}
+
+# Credit card installments
+input GetInstallmentsDueDatesInput {
+    creditCardId: String!
+    totInstallments: Int!
+    transactionDate: Date!
+}
+
+type GetInstallmentsDueDatesResponse {
+    dueDates: [InstallmentsDueDates]!
+}
+
+type InstallmentsDueDates {
+    currentInstallment: Int!
+    dueDate: Date!
 }

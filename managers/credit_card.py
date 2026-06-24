@@ -102,6 +102,7 @@ class CreditCardManager(BaseDataManager):
         query = (
             select(
                 transaction_alias.id,
+                transaction_alias.owner_id,
                 transaction_alias.period,
                 transaction_alias.transaction_date,
                 func.round_(transaction_alias.amount, 2).label("amount"),
