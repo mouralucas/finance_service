@@ -3,7 +3,7 @@ from typing import Any, cast
 
 from rolf_common.managers import BaseDataManager
 from rolf_common.models.base import SQLModel
-from sqlalchemy import RowMapping, case, func, select, update
+from sqlalchemy import CursorResult, RowMapping, case, delete, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 
@@ -226,6 +226,14 @@ class CreditCardManager(BaseDataManager):
             if transactions
             else None
         )
+
+    async def delete_credit_card_transactions(self, transaction_ids: list[int]) -> int:
+        query = delete(CreditCardTransactionModel).where(
+            CreditCardTransactionModel.id.in_(transaction_ids)
+        )
+
+        deleted: CursorResult = await self.session.execute(query)
+        return deleted.rowcount
 
     # Bill
     async def get_bill_history_aggregated(

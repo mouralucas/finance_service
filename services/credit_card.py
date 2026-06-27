@@ -240,6 +240,42 @@ class CreditCardService(BaseService):
 
         return response
 
+    async def delete_transactions(self, id: int):
+        transaction: CreditCardTransactionModel | None = (
+            await self.credit_card_manager.get_credit_card_transaction_by_id(id=id)
+        )
+        if not transaction:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Transaction not found"
+            )
+
+        if transaction.is_installment:
+            transactions = await self.credit_card_manager.get_sibling_transactions(
+                parent_id=transaction.parent_id
+            )
+            if not transactions:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Sibling transactions not found",
+                )
+        else:
+            transactions = [transaction]
+
+        transaction_ids = [t.id for t in transactions]
+
+        deleted_transactions = (
+            await self.credit_card_manager.delete_credit_card_transactions(
+                transaction_ids=transaction_ids
+            )
+        )
+
+        response = {
+            "success": True,
+            "transaction_count": deleted_transactions,
+        }
+
+        return response
+
     async def get_transactions(
         self, params: GetCreditCardTransactionsRequest
     ) -> GetCreditCardTransactionResponse:

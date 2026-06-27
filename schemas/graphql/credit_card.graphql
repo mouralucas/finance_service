@@ -8,6 +8,8 @@ extend type Query {
 extend type Mutation {
     createCreditCardTransaction(transaction: CreditCardTransactionInput!): CreditCardTransactionResponse!
     updateCreditCardTransaction(transaction: CreditCardTransactionInput!): CreditCardTransactionResponse!
+
+    deleteCreditCardTransaction(id: Int!): DeleteCreditCardTransactionResponse!
 }
 
 # Get credit cards
@@ -142,6 +144,17 @@ input CreditCardTransactionInput {
 type CreditCardTransactionResponse {
     success: Boolean!
     ids: [Int]!
+}
+
+type DeleteCreditCardTransactionResponse {
+    """
+        Whether the delete was successfull
+    """
+    success: Boolean!
+    """
+        Amount of transactions deleted, usefull in installments transactions
+    """
+    transactionCount: Int!
 }
 
 # Credit card installments

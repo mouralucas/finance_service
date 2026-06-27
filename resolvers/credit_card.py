@@ -45,6 +45,12 @@ async def update_credit_card_transaction_resolver(
     return response
 
 
+async def delete_credit_card_transaction_resolver(_, info: GraphQLResolveInfo, id: int):
+    return await CreditCardService(
+        session=info.context["session"], user=info.context["user"]
+    ).delete_transactions(id=id)
+
+
 @validate_graphql_input(GetCreditCardTransactionsRequest)
 async def get_credit_card_transaction_resolver(
     _, info: GraphQLResolveInfo, params: GetCreditCardTransactionsRequest
@@ -66,7 +72,7 @@ async def get_installments_due_dates_resolver(
     return credit_cards
 
 
-async def get_credit_card_transaction_metadata_by_id(
+async def get_credit_card_transaction_metadata_by_id_resolver(
     _, info: GraphQLResolveInfo, id: int
 ):
     transaction = await CreditCardService(
@@ -87,7 +93,7 @@ def bind_credit_card_resolvers(query: QueryType, mutation: MutationType):
 
     query.set_field(
         "getCreditCardTransactionMetadataById",
-        resolver=get_credit_card_transaction_metadata_by_id,
+        resolver=get_credit_card_transaction_metadata_by_id_resolver,
     )
 
     mutation.set_field(
@@ -97,4 +103,7 @@ def bind_credit_card_resolvers(query: QueryType, mutation: MutationType):
     mutation.set_field(
         "updateCreditCardTransaction",
         resolver=update_credit_card_transaction_resolver,
+    )
+    mutation.set_field(
+        "deleteCreditCardTransaction", resolver=delete_credit_card_transaction_resolver
     )
