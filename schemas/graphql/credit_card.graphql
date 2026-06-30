@@ -1,6 +1,7 @@
 extend type Query {
     getCreditCards(params: GetCreditCardsInput): GetCreditCardsResponse
     getCreditCardTransactions(params: GetCreditCardTransactionsInput): GetCreditCardTransactionsResponse
+    getCreditCardMonthlyBill(period: Int!): GetCreditCardMonthlyBillResponse
     getCreditCardTransactionMetadataById(id: Int!): GetTransactionMetadataById
     getCreditCardInstallmentDueDates(params: GetInstallmentsDueDatesInput): GetInstallmentsDueDatesResponse
 }
@@ -155,6 +156,19 @@ type DeleteCreditCardTransactionResponse {
         Amount of transactions deleted, usefull in installments transactions
     """
     transactionCount: Int!
+}
+
+type GetCreditCardMonthlyBillResponse {
+    bill: [CreditCardMonthlyBill]
+}
+
+type CreditCardMonthlyBill {
+    creditCardId: String!
+    creditCardNickname: String!
+    period: Int!
+    totalAmount: Float!
+    quantityTransactions: Int!
+    transactions: [CreditCardTransaction]!
 }
 
 # Credit card installments

@@ -236,6 +236,18 @@ class CreditCardManager(BaseDataManager):
         return deleted.rowcount
 
     # Bill
+    async def get_period_used_cards(self, period: int) -> list[uuid.UUID]:
+        query = (
+            select(CreditCardTransactionModel.credit_card_id)
+            .where(CreditCardTransactionModel.period == period)
+            .distinct()
+        )
+
+        result = await self.session.execute(query)
+        credit_card_ids = result.scalars().all()
+
+        return list(credit_card_ids)
+
     async def get_bill_history_aggregated(
         self, owner_id: uuid.UUID, start_period: int, end_period: int
     ) -> list[dict[Any, Any]] | None:

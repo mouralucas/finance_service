@@ -41,6 +41,7 @@ class CreditCardService(BaseService):
         self.user = user.model_dump()
         self.credit_card_manager = CreditCardManager(session=self.session)
 
+    # Credit card
     async def create_credit_card(
         self, credit_card: CreateCreditCardRequest
     ) -> CreateCreditCardResponse:
@@ -362,6 +363,46 @@ class CreditCardService(BaseService):
         }
 
         return response
+
+    async def get_credit_card_monthly_bill(self, period: int) -> dict[str, Any]:
+        period_used_cards = await self.credit_card_manager.get_period_used_cards(
+            period=period
+        )
+
+        bill_list: list[dict[str, Any]] = []
+        for credit_card_id in period_used_cards:
+            credit_card = await self.credit_card_manager.get_credit_card_by_id(
+                card_id=credit_card_id
+            )
+            if not credit_card:
+                continue
+
+            transactions = await self.credit_card_manager.get_credit_card_transactions(
+                owner_id=self.user["user_id"],
+                credit_card_id=credit_card_id,
+                start_period=period,
+                end_period=period,
+            )
+
+            # For monthly bill we care only by the abs value of the sum
+            total: float = (
+                abs(sum(i["amount"] for i in transactions)) if transactions else 0
+            )
+
+            bill_list.append(
+                {
+                    "credit_card_id": credit_card_id,
+                    "credit_card_nickname": credit_card.nickname,
+                    "period": period,
+                    "total_amount": total,
+                    "quantity_transactions": len(transactions) if transactions else 0,
+                    "transactions": transactions if transactions else [],
+                }
+            )
+
+        return {
+            "bill": bill_list,
+        }
 
     async def get_credit_card_bill_evolution(
         self, params: GetCreditCardBillRequest

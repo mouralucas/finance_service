@@ -60,6 +60,14 @@ async def get_credit_card_transaction_resolver(
     ).get_transactions(params)
 
 
+async def get_credit_card_monthly_bill_resolver(
+    _, info: GraphQLResolveInfo, period: int
+):
+    return await CreditCardService(
+        session=info.context["session"], user=info.context["user"]
+    ).get_credit_card_monthly_bill(period=period)
+
+
 # Helper to get credit card installment due dates
 @validate_graphql_input(GetInstallmentsDueDatesRequest)
 async def get_installments_due_dates_resolver(
@@ -90,10 +98,12 @@ def bind_credit_card_resolvers(query: QueryType, mutation: MutationType):
     query.set_field(
         "getCreditCardInstallmentDueDates", resolver=get_installments_due_dates_resolver
     )
-
     query.set_field(
         "getCreditCardTransactionMetadataById",
         resolver=get_credit_card_transaction_metadata_by_id_resolver,
+    )
+    query.set_field(
+        "getCreditCardMonthlyBill", resolver=get_credit_card_monthly_bill_resolver
     )
 
     mutation.set_field(
