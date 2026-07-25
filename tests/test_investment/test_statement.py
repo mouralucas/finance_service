@@ -314,19 +314,3 @@ class TestStatement:
         assert "contribution" in data["data"]["getStatementMetadata"]
         assert data["data"]["getStatementMetadata"]["contribution"] == amount
         # TODO: add validation to the period and reference date
-
-    @pytest.mark.asyncio
-    async def test_get_investment_type(
-        self, client, create_fixed_income_br_investment_type
-    ):
-        response = await client.get("/investment/type")
-
-        assert response.status_code == status.HTTP_200_OK
-        data = response.json()
-
-        assert type(data) is dict
-        assert "investmentTypes" in data
-        assert type(data["investmentTypes"]) is list
-
-        for investment_type in data["investmentTypes"]:
-            assert "investmentTypeName" in investment_type

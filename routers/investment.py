@@ -19,7 +19,6 @@ from schemas.response.investment import (
     CreateInvestmentResponse,
     CreateObjectiveResponse,
     GetInvestmentAllocationResponse,
-    GetInvestmentTypeResponse,
     GetInvestmentWithoutObjectives,
     GetObjectiveSummaryResponse,
     SettleInvestmentResponse,
@@ -92,14 +91,14 @@ async def settle(
     return response
 
 
-@router.get("/type", summary="Get investment types")
-async def get_investment_types(
-    session: AsyncSession = Depends(get_session),
-    user: RequiredUser = Security(get_user),
-) -> GetInvestmentTypeResponse:
-    return await InvestmentServiceDeprecated(
-        session=session, user=user
-    ).get_investment_types()
+# @router.get("/type", summary="Get investment types")
+# async def get_investment_types(
+#     session: AsyncSession = Depends(get_session),
+#     user: RequiredUser = Security(get_user),
+# ) -> GetInvestmentTypeResponse:
+#     return await InvestmentServiceDeprecated(
+#         session=session, user=user
+#     ).get_investment_types()
 
 
 @router.post(

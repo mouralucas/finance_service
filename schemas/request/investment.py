@@ -217,6 +217,9 @@ class GetInvestmentRequest(BaseModel):
     is_settled: bool | None = Field(
         None, description="Whether the investment is settled"
     )
+    investment_type_id: uuid.UUID | None = Field(
+        None, description="The investiment type id"
+    )
 
 
 class SettleInvestmentRequest(BaseModel):

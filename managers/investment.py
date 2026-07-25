@@ -57,7 +57,10 @@ class InvestmentManager(BaseDataManager):
         return cast(InvestmentModel, investment) if investment else None
 
     async def get_investments(
-        self, owner_id: uuid.UUID, is_settled: bool | None
+        self,
+        owner_id: uuid.UUID,
+        is_settled: bool | None,
+        investment_type_id: uuid.UUID | None = None,
     ) -> list[dict[Any, Any]] | None:
         investment_alias = aliased(InvestmentModel)
         currency_alias = aliased(CurrencyModel)
@@ -172,6 +175,9 @@ class InvestmentManager(BaseDataManager):
 
         if is_settled is not None:
             query = query.where(investment_alias.is_settled.is_(is_settled))
+
+        if investment_type_id:
+            query = query.where(investment_alias.type_id == investment_type_id)
 
         investments: list[RowMapping] | None = await self.get_all(query)
 
@@ -297,14 +303,23 @@ class InvestmentManager(BaseDataManager):
 
         return investment_type
 
-    async def get_investment_type(self) -> list[RowMapping]:
-        query: Executable = select(InvestmentTypeModel).order_by(
-            InvestmentTypeModel.name
+    async def get_investment_type(self) -> list[dict[Any, Any]] | None:
+        query: Executable = select(
+            InvestmentTypeModel.id,
+            InvestmentTypeModel.name,
+            InvestmentTypeModel.description,
+            InvestmentTypeModel.parent_id,
+            InvestmentTypeModel.country_id,
+            InvestmentTypeModel.investment_category_id,
+        ).order_by(InvestmentTypeModel.name)
+
+        investment_types: list[RowMapping] | None = await self.get_all(query)
+
+        return (
+            [dict(type.items()) for type in investment_types]
+            if investment_types
+            else None
         )
-
-        investment_types: list[RowMapping] = await self.get_all(query)
-
-        return investment_types
 
     # Investment objectives
     async def create_objective(

@@ -4,7 +4,6 @@ from typing import Any
 from fastapi import HTTPException
 from rolf_common.schemas.auth import RequiredUser
 from rolf_common.services import BaseService
-from sqlalchemy import RowMapping
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
@@ -17,7 +16,6 @@ from models.investment_deprecated import (
 from schemas.investment_deprecated import (
     InvestmentAllocationSchema,
     InvestmentSchema,
-    InvestmentTypeSchema,
 )
 from schemas.request.investment import (
     CreateInvestmentRequest,
@@ -30,7 +28,6 @@ from schemas.response.investment import (
     CreateInvestmentResponse,
     CreateObjectiveResponse,
     GetInvestmentAllocationResponse,
-    GetInvestmentTypeResponse,
     GetInvestmentWithoutObjectives,
     GetObjectiveSummaryResponse,
     UpdateInvestmentResponse,
@@ -115,7 +112,9 @@ class InvestmentServiceDeprecated(BaseService):
         :return:
         """
         investments = await InvestmentManager(self.session).get_investments(
-            owner_id=self.user["user_id"], is_settled=params.is_settled
+            owner_id=self.user["user_id"],
+            is_settled=params.is_settled,
+            investment_type_id=params.investment_type_id,
         )
 
         response = {
@@ -129,28 +128,21 @@ class InvestmentServiceDeprecated(BaseService):
     async def create_investment_type(self):
         pass
 
-    async def get_investment_types(self) -> GetInvestmentTypeResponse:
+    async def get_investment_types(self) -> dict[str, Any]:
         """
         Created by: Lucas Penha de Moura - 21/09/2024
 
             Get investments types
         :return: The list of investment types
         """
-        investment_types: list[RowMapping] = (
+        investment_types: list[dict[Any, Any]] | None = (
             await self.investment_manager.get_investment_type()
         )
 
-        response = GetInvestmentTypeResponse(
-            quantity=len(investment_types) if investment_types else 0,
-            investment_types=(
-                [
-                    InvestmentTypeSchema.model_validate(data["InvestmentTypeModel"])
-                    for data in investment_types
-                ]
-                if investment_types
-                else []
-            ),
-        )
+        response = {
+            "quantity": len(investment_types) if investment_types else 0,
+            "investment_types": investment_types,
+        }
 
         return response
 

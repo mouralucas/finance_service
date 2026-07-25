@@ -166,3 +166,37 @@ class TestInvestments:
         assert float(data["investment"]["settlementAmount"]) == settlement_amount
         assert "isSettled" in data["investment"]
         assert data["investment"]["isSettled"] is True
+
+    @pytest.mark.asyncio
+    async def test_get_investment_type(
+        self, client, create_fixed_income_br_investment_type
+    ):
+
+        query = """
+            query GetInvestmentTypes {
+                getInvestmentTypes {
+                    quantity
+                    investmentTypes {
+                        id
+                        name
+                        description
+                        parentId
+                        investmentCategoryId
+                    }
+                }
+            }
+        """
+        response = await client.post("/graphql/finance", json={"query": query})
+
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert "data" in data
+        assert "getInvestmentTypes" in data["data"]
+        assert "investmentTypes" in data["data"]["getInvestmentTypes"]
+        data = data["data"]["getInvestmentTypes"]
+        assert type(data) is dict
+        assert "investmentTypes" in data
+        assert type(data["investmentTypes"]) is list
+
+        for investment_type in data["investmentTypes"]:
+            assert "name" in investment_type

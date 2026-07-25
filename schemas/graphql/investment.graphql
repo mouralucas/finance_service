@@ -11,6 +11,7 @@ extend type Query {
     getStatementMetadata(params: GetStatementMetadataInput): GetStatementMetadataResponse
 
     getInvestmentObjectives(params: GetInvestmentObjectivesInput): GetInvestmentObjectivesResponse
+    getInvestmentTypes: GetInvestmentTypesResponse
 }
 
 extend type Mutation {
@@ -56,6 +57,7 @@ input GetInvestmentsInput {
     startDate: String
     endDate: String
     isSettled: Boolean
+    investmentTypeId: String
 }
 
 type GetInvestmentsResponse {
@@ -231,4 +233,17 @@ type InvestmentObjective {
     amount: Float!
     currentAmount: Float
     estimateDeadline: Date
+}
+
+type GetInvestmentTypesResponse {
+    quantity: Int!
+    investmentTypes: [InvestmentType]!
+}
+
+type InvestmentType {
+    id: String!
+    name: String!
+    description: String
+    parentId: String
+    investmentCategoryId: String
 }

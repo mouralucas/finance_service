@@ -114,6 +114,13 @@ async def get_investment_objectives(
     return objectives if objectives else []
 
 
+async def get_investment_types(_, info: GraphQLResolveInfo):
+    return await InvestmentServiceDeprecated(
+        session=info.context["session"], user=info.context["user"]
+    ).get_investment_types()
+
+
+# Binders
 def bind_investment_resovlers(query: QueryType, mutation: MutationType):
     query.set_field("getInvestments", resolver=get_investments_resolver)
     query.set_field("getInvestmentById", resolver=get_investment_by_id_resolver)
@@ -126,6 +133,7 @@ def bind_investment_resovlers(query: QueryType, mutation: MutationType):
     )
     query.set_field("getInvestmentStatement", resolver=get_statement)
     query.set_field("getInvestmentObjectives", resolver=get_investment_objectives)
+    query.set_field("getInvestmentTypes", resolver=get_investment_types)
 
     mutation.set_field("createInvestmentStatement", resolver=create_statement_resolver)
     mutation.set_field("updateInvestmentStatement", resolver=update_statement_resolver)
