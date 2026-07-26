@@ -150,6 +150,15 @@ class InvestmentManager(BaseDataManager):
                 ).label("gross_amount"),
                 percentage_change,
                 statement_alias.period,
+                case(
+                    (
+                        literal(get_previous_period())
+                        == latest_statement_cte.c.latest_period,
+                        True,
+                    ),
+                    else_=False,
+                ).label("is_latest_statement_period"),
+                latest_statement_cte.c.latest_period.label("latest_statement_period"),
             )
             .join(currency_alias, investment_alias.currency_id == currency_alias.id)
             .join(type_alias, investment_alias.type_id == type_alias.id)

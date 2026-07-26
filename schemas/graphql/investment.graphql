@@ -96,6 +96,8 @@ type Investment {
     totalContribution: Float
     totalWithdrawn: Float
     percentageChange: Float
+    isLatestStatementPeriod: Boolean
+    latestStatementPeriod: Int
 }
 
 input SettleInvestmentInput {
