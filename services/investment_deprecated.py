@@ -114,6 +114,7 @@ class InvestmentServiceDeprecated(BaseService):
         investments = await InvestmentManager(self.session).get_investments(
             owner_id=self.user["user_id"],
             is_settled=params.is_settled,
+            id=params.id,
             investment_type_id=params.investment_type_id,
         )
 

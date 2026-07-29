@@ -206,7 +206,7 @@ class GetInvestmentRequest(BaseModel):
     )
 
     id: uuid.UUID | None = Field(
-        None, alias="investmentId", description="The id of the investment"
+        None, description="The id of the investment"
     )
     start_date: datetime.date | None = Field(
         None, description="The start date of the filter"

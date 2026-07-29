@@ -53,7 +53,7 @@ type GetInvestmentByIdResponse {
 }
 
 input GetInvestmentsInput {
-    investmentId: String
+    id: String
     startDate: String
     endDate: String
     isSettled: Boolean

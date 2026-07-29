@@ -60,6 +60,7 @@ class InvestmentManager(BaseDataManager):
         self,
         owner_id: uuid.UUID,
         is_settled: bool | None,
+        id: uuid.UUID | None = None,
         investment_type_id: uuid.UUID | None = None,
     ) -> list[dict[Any, Any]] | None:
         investment_alias = aliased(InvestmentModel)
@@ -184,6 +185,9 @@ class InvestmentManager(BaseDataManager):
 
         if is_settled is not None:
             query = query.where(investment_alias.is_settled.is_(is_settled))
+
+        if id is not None:
+            query = query.where(investment_alias.id == id)
 
         if investment_type_id:
             query = query.where(investment_alias.type_id == investment_type_id)
