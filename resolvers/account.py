@@ -1,3 +1,5 @@
+from typing import Any
+
 from ariadne import MutationType, QueryType
 from graphql import GraphQLResolveInfo
 from rolf_common.util.graphql_input_validation import validate_graphql_input
@@ -35,7 +37,7 @@ async def get_account_transactions_resolver(
 @validate_graphql_input(CreateAccountTransactionRequest)
 async def create_account_transactions_resolver(
     _, info: GraphQLResolveInfo, transaction: CreateAccountTransactionRequest
-):
+) -> dict[str, Any]:
     new_transaction = await AccountService(
         session=info.context["session"], user=info.context["user"]
     ).create_transaction(transaction=transaction)
@@ -46,7 +48,7 @@ async def create_account_transactions_resolver(
 @validate_graphql_input(UpdateAccountTransactionRequest)
 async def update_account_transactions_resolver(
     _, info: GraphQLResolveInfo, transaction: UpdateAccountTransactionRequest
-):
+) -> dict[str, Any]:
     new_transaction = await AccountService(
         session=info.context["session"], user=info.context["user"]
     ).update_transaction(transaction=transaction)

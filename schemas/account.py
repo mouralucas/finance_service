@@ -51,7 +51,7 @@ class AccountTransactionSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int = Field(
-        ..., serialization_alias="transactionId", description="Unique transaction ID"
+        ..., description="Unique transaction ID"
     )
     owner_id: uuid.UUID | None = Field(
         ..., serialization_alias="ownerId", description="Account owner"

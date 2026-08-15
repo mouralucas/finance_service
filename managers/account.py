@@ -126,7 +126,7 @@ class AccountManager(BaseDataManager):
         query = (
             select(
                 transaction_alias.owner_id,
-                transaction_alias.id.label("transaction_id"),
+                transaction_alias.id.label("id"),
                 transaction_alias.account_id,
                 account_alias.nickname.label("account_nickname"),
                 transaction_alias.currency_id,

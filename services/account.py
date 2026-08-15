@@ -120,13 +120,16 @@ class AccountService(BaseService):
             statement=new_statement
         )
 
-        response = {"success": True, "transaction_id": str(new_statement.id)}
+        response = {
+            "success": True,
+            "id": str(new_statement.id),
+        }
 
         return response
 
     async def update_transaction(
         self, transaction: UpdateAccountTransactionRequest
-    ) -> UpdateTransactionResponse:
+    ) -> dict[str, Any]:
         changed_fields = transaction.model_dump(exclude_unset=True)
         if "transaction_date" in changed_fields:
             period = get_period(changed_fields["transaction_date"])
@@ -136,9 +139,7 @@ class AccountService(BaseService):
             transaction_id=transaction.id, fields=changed_fields
         )
 
-        response = UpdateTransactionResponse(
-            transaction=AccountTransactionSchema.model_validate(updated_transaction)
-        )
+        response = {"success": True, "id": updated_transaction.id}
 
         return response
 

@@ -88,7 +88,7 @@ type GetAccountTransactionResponse {
 
 
 input CreateAccountTransactionInput {
-    transactionId: Int
+    id: Int
     accountId: String!
     currencyId: String!
     amount: Float!
@@ -110,7 +110,7 @@ input CreateAccountTransactionInput {
 
 input UpdateAccountTransactionInput {
     # Update is the same as create, but without any field required, except transactionId
-    transactionId: Int
+    id: Int
     accountId: String
     currencyId: String
     amount: Float
@@ -131,11 +131,11 @@ input UpdateAccountTransactionInput {
 
 type CreateUpdateAccountTransactionResponse {
     success: Boolean! 
-    transactionId: String! # TODO: why it is string here? - Change to "id"
+    id: String! # TODO: why it is string here? - Change to "id"
 }
 
 type AccountTransaction {
-    transactionId: Int!
+    id: Int!
     ownerId: String!
     accountId: String!
     accountNickname: String

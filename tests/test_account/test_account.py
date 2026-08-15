@@ -107,7 +107,7 @@ class TestAccountsStatement:
 
         new_amount = transaction.amount - 12.35
 
-        payload = {"transactionId": transaction.id, "amount": new_amount}
+        payload = {"id": transaction.id, "amount": new_amount}
         response = await client.patch("/account/transaction", json=payload)
         assert response.status_code == status.HTTP_200_OK
 
@@ -188,7 +188,7 @@ async def test_create_transaction(
                 transaction: $transaction
             ) {
                 success
-                transactionId
+                id
             }
         }
     """
@@ -213,8 +213,8 @@ async def test_create_transaction(
     assert "createAccountTransaction" in data["data"]
     assert "success" in data["data"]["createAccountTransaction"]
     assert data["data"]["createAccountTransaction"]["success"] is True
-    assert "transactionId" in data["data"]["createAccountTransaction"]
-    assert data["data"]["createAccountTransaction"]["transactionId"] is not None
+    assert "id" in data["data"]["createAccountTransaction"]
+    assert data["data"]["createAccountTransaction"]["id"] is not None
 
 
 @pytest.mark.asyncio
@@ -241,7 +241,7 @@ async def test_create_transaction_closed_account(
                 transaction: $transaction
             ) {
                 success
-                transactionId
+                id
             }
         }
     """
@@ -271,7 +271,7 @@ async def test_get_transactions_no_filter(client, create_account_transaction):
             getAccountTransactions {
                 quantity
                 transactions {
-                    transactionId
+                    id
                     ownerId
                 }
             }
