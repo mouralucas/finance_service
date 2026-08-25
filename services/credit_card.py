@@ -32,7 +32,11 @@ from schemas.response.credit_card import (
     GetCreditCardBillHistoryResponse,
     GetCreditCardTransactionResponse,
 )
-from services.utils.datetime import get_installments_due_dates, get_period
+from services.utils.datetime import (
+    get_installments_due_dates,
+    get_period,
+    get_period_range,
+)
 
 
 class CreditCardService(BaseService):
@@ -448,6 +452,52 @@ class CreditCardService(BaseService):
             bill_stacked=list(stacked_bill.values()),
             series=list(series),
         )
+
+        return response
+
+    async def get_credit_card_bill_historical_data(
+        self, params: GetCreditCardBillRequest
+    ) -> dict[str, Any]:
+        period_range = get_period_range(params.start_period, params.end_period)
+
+        bill_consolidated = await self.credit_card_manager.get_bill_historical_data(
+            owner_id=self.user["user_id"],
+            start_period=params.start_period,
+            end_period=params.end_period,
+        )
+
+        totals_by_period: dict[int, dict[str, Any]] = {}
+        nicknames: set[str] = set()
+        for row in bill_consolidated or []:
+            period = row["period"]
+            nickname = row["nickname"]
+            nicknames.add(nickname)
+            totals_by_period.setdefault(period, {})[nickname] = (
+                totals_by_period.get(period, {}).get(nickname, 0) + row["total_amount"]
+            )
+
+        historical_data = []
+        for period in period_range:
+            period_totals = totals_by_period.get(period, {})
+            historical_data.append(
+                {
+                    "period": period,
+                    **{
+                        nickname: float(period_totals.get(nickname, 0))
+                        for nickname in sorted(nicknames)
+                    },
+                }
+            )
+
+        response = {
+            "historical_data": {
+                "period_average": 3000,
+                "historical_average": 2750,
+                "goal": 2500,
+                "historical_data": historical_data,
+                "period_range": period_range,
+            }
+        }
 
         return response
 

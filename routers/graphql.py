@@ -14,7 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.responses import HTMLResponse, JSONResponse
 
 from backend.database import get_session
-from backend.graphql_scalars import date_scalar, datetime_scalar
+from backend.graphql_scalars import date_scalar, datetime_scalar, json_scalar
 from resolvers.account import bind_account_resolvers
 from resolvers.core import bind_core_resolvers
 from resolvers.credit_card import bind_credit_card_resolvers
@@ -44,6 +44,7 @@ schema = make_executable_schema(
     mutation,
     date_scalar,
     datetime_scalar,
+    json_scalar,
     snake_case_fallback_resolvers,
 )
 

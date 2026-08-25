@@ -58,6 +58,32 @@ class TestCreditCards:
 
 
 @pytest.mark.asyncio
+async def test_get_credit_card_bill_evolution_response_shape(client):
+    query = """
+        query GetCreditCardBillEvolution {
+            getCreditCardMonthlyBillEvolution(params: {start_period: 202501, end_period: 202501}) {
+                average
+                goal
+                billStacked
+                series
+            }
+        }
+    """
+
+    response = await client.post("/graphql/finance", json={"query": query})
+
+    assert response.status_code == status.HTTP_200_OK
+    payload = response.json()
+    assert "data" in payload
+    assert "getCreditCardMonthlyBillEvolution" in payload["data"]
+    evolution = payload["data"]["getCreditCardMonthlyBillEvolution"]
+    assert "average" in evolution
+    assert "goal" in evolution
+    assert "billStacked" in evolution
+    assert "series" in evolution
+
+
+@pytest.mark.asyncio
 async def test_create_credit_card(client, create_open_account, create_currency):
     accounts = create_open_account
     currencies = create_currency

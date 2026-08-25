@@ -4,6 +4,7 @@ from rolf_common.util.graphql_input_validation import validate_graphql_input
 
 from schemas.request.credit_card import (
     CreateCreditCardTransactionRequest,
+    GetCreditCardBillRequest,
     GetCreditCardRequest,
     GetCreditCardTransactionsRequest,
     GetInstallmentsDueDatesRequest,
@@ -68,6 +69,15 @@ async def get_credit_card_monthly_bill_resolver(
     ).get_credit_card_monthly_bill(period=period)
 
 
+@validate_graphql_input(GetCreditCardBillRequest)
+async def get_credit_card_bill_historical_data_resolver(
+    _, info: GraphQLResolveInfo, params: GetCreditCardBillRequest
+):
+    return await CreditCardService(
+        session=info.context["session"], user=info.context["user"]
+    ).get_credit_card_bill_historical_data(params=params)
+
+
 # Helper to get credit card installment due dates
 @validate_graphql_input(GetInstallmentsDueDatesRequest)
 async def get_installments_due_dates_resolver(
@@ -91,6 +101,7 @@ async def get_credit_card_transaction_metadata_by_id_resolver(
 
 
 def bind_credit_card_resolvers(query: QueryType, mutation: MutationType):
+    # Queries
     query.set_field("getCreditCards", resolver=get_credit_cards_resolver)
     query.set_field(
         "getCreditCardTransactions", resolver=get_credit_card_transaction_resolver
@@ -105,7 +116,12 @@ def bind_credit_card_resolvers(query: QueryType, mutation: MutationType):
     query.set_field(
         "getCreditCardMonthlyBill", resolver=get_credit_card_monthly_bill_resolver
     )
+    query.set_field(
+        "getCreditCardBillHistoricalData",
+        resolver=get_credit_card_bill_historical_data_resolver,
+    )
 
+    # Mutations
     mutation.set_field(
         "createCreditCardTransaction",
         resolver=create_credit_card_transaction_resolver,

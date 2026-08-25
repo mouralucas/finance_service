@@ -6,7 +6,6 @@ from rolf_common.models.base import SQLModel
 from sqlalchemy import CursorResult, RowMapping, case, delete, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
-
 from models.core import CategoryModel, CurrencyModel
 from models.credit_card import CreditCardModel, CreditCardTransactionModel
 
@@ -282,6 +281,33 @@ class CreditCardManager(BaseDataManager):
         result = await self.get_all(query)
 
         return [dict(i.items()) for i in result] if result else None
+
+    async def get_bill_historical_data(
+        self, owner_id: uuid.UUID, start_period: int, end_period: int
+    ):
+        query = (
+            select(
+                CreditCardModel.nickname,
+                CreditCardTransactionModel.period,
+                func.sum(CreditCardTransactionModel.amount * -1).label("total_amount"),
+            )
+            .outerjoin(
+                CreditCardModel,
+                CreditCardModel.id == CreditCardTransactionModel.credit_card_id,
+            )
+            .where(
+                CreditCardTransactionModel.owner_id == owner_id,
+                CreditCardTransactionModel.period >= start_period,
+                CreditCardTransactionModel.period <= end_period,
+            )
+            .group_by(CreditCardModel.nickname, CreditCardTransactionModel.period)
+            .order_by(CreditCardTransactionModel.period)
+        )
+
+        result = await self.get_all(query)
+        rows = [dict(row) for row in result] if result else None
+
+        return rows
 
     async def get_bill_history_by_card(
         self, owner_id: uuid.UUID, start_period: int, end_period: int

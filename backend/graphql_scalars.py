@@ -28,3 +28,17 @@ def serialize_datetime(value: datetime) -> str | None:
 @datetime_scalar.value_parser
 def parse_datetime_value(value: str) -> datetime | None:
     return datetime.fromisoformat(value) if value else None
+
+
+# === Scalar JSON ===
+json_scalar = ScalarType("JSON")
+
+
+@json_scalar.serializer
+def serialize_json(value):
+    return value
+
+
+@json_scalar.value_parser
+def parse_json_value(value):
+    return value

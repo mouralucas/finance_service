@@ -1,7 +1,8 @@
 extend type Query {
     getCreditCards(params: GetCreditCardsInput): GetCreditCardsResponse
     getCreditCardTransactions(params: GetCreditCardTransactionsInput): GetCreditCardTransactionsResponse
-    getCreditCardMonthlyBill(period: Int!): GetCreditCardMonthlyBillResponse
+    getCreditCardMonthlyBill(period: Int!): GetCreditCardMonthlyBillResponse!
+    getCreditCardBillHistoricalData(params: GetCreditCardMonthlyBillEvolutionInput): GetCreditCardBillHistoricalDataResponse!
     getCreditCardTransactionMetadataById(id: Int!): GetTransactionMetadataById
     getCreditCardInstallmentDueDates(params: GetInstallmentsDueDatesInput): GetInstallmentsDueDatesResponse
 }
@@ -160,6 +161,23 @@ type DeleteCreditCardTransactionResponse {
 
 type GetCreditCardMonthlyBillResponse {
     bill: [CreditCardMonthlyBill]
+}
+
+input GetCreditCardMonthlyBillEvolutionInput {
+    startPeriod: Int!
+    endPeriod: Int
+}
+
+type GetCreditCardBillHistoricalDataResponse {
+    historicalData: HistoricalData
+}
+
+type HistoricalData {
+    periodAverage: Float
+    historicalAverage: Float
+    goal: Float
+    periodRange: [Int]
+    historicalData: [JSON]
 }
 
 type CreditCardMonthlyBill {

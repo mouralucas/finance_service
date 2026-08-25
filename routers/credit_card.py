@@ -58,8 +58,8 @@ async def get_bill_evolution(
     params: GetCreditCardBillRequest = Depends(),
     session: AsyncSession = Depends(get_session),
     user: RequiredUser = Security(get_user),
-) -> GetCreditCardBillConsolidatedResponse:
-    return await CreditCardService(session, user).get_credit_card_bill_evolution(
+):
+    return await CreditCardService(session, user).get_credit_card_bill_historical_data(
         params=params
     )
 
