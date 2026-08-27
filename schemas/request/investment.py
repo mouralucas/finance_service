@@ -205,9 +205,7 @@ class GetInvestmentRequest(BaseModel):
         from_attributes=True, alias_generator=AliasGenerator(alias=to_camel)
     )
 
-    id: uuid.UUID | None = Field(
-        None, description="The id of the investment"
-    )
+    id: uuid.UUID | None = Field(None, description="The id of the investment")
     start_date: datetime.date | None = Field(
         None, description="The start date of the filter"
     )

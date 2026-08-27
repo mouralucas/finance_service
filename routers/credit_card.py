@@ -12,7 +12,6 @@ from schemas.request.credit_card import (
 )
 from schemas.response.credit_card import (
     CreateCreditCardResponse,
-    GetCreditCardBillConsolidatedResponse,
     GetCreditCardBillHistoryResponse,
 )
 from services.credit_card import CreditCardService

@@ -12,7 +12,6 @@ from models.account import AccountModel, AccountTransactionModel
 from models.credit_card import CreditCardModel
 from schemas.account import (
     AccountSchema,
-    AccountTransactionSchema,
 )
 from schemas.request.account import (
     CloseAccountRequest,
@@ -26,7 +25,6 @@ from schemas.request.account import (
 from schemas.response.account import (
     CloseAccountResponse,
     CreateAccountResponse,
-    UpdateTransactionResponse,
 )
 from services.utils.datetime import get_period
 

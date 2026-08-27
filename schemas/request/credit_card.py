@@ -140,12 +140,9 @@ class GetCreditCardBillRequest(BaseModel):
     model_config = ConfigDict(
         from_attributes=True, alias_generator=AliasGenerator(alias=to_camel)
     )
-        
+
     investment_id: uuid.UUID | None = Field(
         None, description="The id of the investment"
     )
-    start_period: int = Field(..., description="The start period of the bill"
-    )
-    end_period: int = Field(
-        ..., description="The end period of the bill"
-    )
+    start_period: int = Field(..., description="The start period of the bill")
+    end_period: int = Field(..., description="The end period of the bill")

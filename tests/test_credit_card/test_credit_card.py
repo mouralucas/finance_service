@@ -83,7 +83,7 @@ async def test_get_credit_card_bill_evolution_response_shape(client):
     assert "getCreditCardBillHistoricalData" in payload["data"]
     assert "historicalData" in payload["data"]["getCreditCardBillHistoricalData"]
     data = payload["data"]["getCreditCardBillHistoricalData"]["historicalData"]
-    
+
     assert "periodAverage" in data
     assert "goal" in data
     assert "historicalData" in data
