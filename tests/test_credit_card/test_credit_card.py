@@ -60,12 +60,17 @@ class TestCreditCards:
 @pytest.mark.asyncio
 async def test_get_credit_card_bill_evolution_response_shape(client):
     query = """
-        query GetCreditCardBillEvolution {
-            getCreditCardMonthlyBillEvolution(params: {start_period: 202501, end_period: 202501}) {
-                average
-                goal
-                billStacked
-                series
+        query GetCreditCardMonthlyBillHistoricalData {
+            getCreditCardBillHistoricalData(
+                params: { startPeriod: 202601, endPeriod: 202612 }
+            ) {
+                historicalData {
+                    periodAverage
+                    historicalAverage
+                    goal
+                    periodRange
+                    historicalData
+                }
             }
         }
     """
@@ -75,12 +80,14 @@ async def test_get_credit_card_bill_evolution_response_shape(client):
     assert response.status_code == status.HTTP_200_OK
     payload = response.json()
     assert "data" in payload
-    assert "getCreditCardMonthlyBillEvolution" in payload["data"]
-    evolution = payload["data"]["getCreditCardMonthlyBillEvolution"]
-    assert "average" in evolution
-    assert "goal" in evolution
-    assert "billStacked" in evolution
-    assert "series" in evolution
+    assert "getCreditCardBillHistoricalData" in payload["data"]
+    assert "historicalData" in payload["data"]["getCreditCardBillHistoricalData"]
+    data = payload["data"]["getCreditCardBillHistoricalData"]["historicalData"]
+    
+    assert "periodAverage" in data
+    assert "goal" in data
+    assert "historicalData" in data
+    assert "periodRange" in data
 
 
 @pytest.mark.asyncio

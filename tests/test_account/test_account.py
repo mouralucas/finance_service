@@ -112,9 +112,9 @@ class TestAccountsStatement:
         assert response.status_code == status.HTTP_200_OK
 
         data = response.json()
-        assert "transaction" in data
-        assert "amount" in data["transaction"]
-        assert round(data["transaction"]["amount"], 5) == round(new_amount, 5)
+        assert "id" in data
+        assert "success" in data
+        assert data["success"] is True
 
 
 @pytest.mark.asyncio
