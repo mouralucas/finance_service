@@ -90,13 +90,6 @@ type InvestmentSummary {
     lastMonthGrowthPercentage: Float!
 }
 
-type InvestmentPerformance {
-    grossAmount: Float!
-    contribution: Float!
-    withdrawn: Float!
-    percentage: Float!
-}
-
 # Integration schemas
 input SyncIndexerSeriesRequest {
     indexerId: String!

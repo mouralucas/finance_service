@@ -2,6 +2,7 @@ extend type Query {
     getCreditCards(params: GetCreditCardsInput): GetCreditCardsResponse
     getCreditCardTransactions(params: GetCreditCardTransactionsInput): GetCreditCardTransactionsResponse
     getCreditCardMonthlyBill(period: Int!): GetCreditCardMonthlyBillResponse!
+    # Fix naming for input
     getCreditCardBillHistoricalData(params: GetCreditCardMonthlyBillEvolutionInput): GetCreditCardBillHistoricalDataResponse!
     getCreditCardTransactionMetadataById(id: Int!): GetTransactionMetadataById
     getCreditCardInstallmentDueDates(params: GetInstallmentsDueDatesInput): GetInstallmentsDueDatesResponse

@@ -269,15 +269,22 @@ class InvestmentService(BaseService):
 
         if not performance_portfolio:
             return {
-                "x_label": [],
-                "data": [],
+                "period_range": [],
+                "investment_serie": [],
+                "indexer_serie": [],
                 "indexer_name": "",
             }
 
         # Get indexer information
         indexer = await FinanceManager(session=self.session).get_indexer_by_id(
-            indexer_id=params.indexer_id, raise_exception=True
+            indexer_id=params.indexer_id
         )
+
+        if not indexer:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Indexer not found",
+            )
 
         # accumulated variation calculation
         accumulated_indexer = 1.0
@@ -303,19 +310,18 @@ class InvestmentService(BaseService):
                 }
             )
 
-        x_value = [item["period"] for item in period_performance]
-        indexer_variation_data = [
-            item["indexer_variation"] for item in period_performance
-        ]
-        variation_data = [item["variation"] for item in period_performance]
+        period_range = [item["period"] for item in period_performance]
+        indexer_serie = [item["indexer_variation"] for item in period_performance]
+        investment_serie = [item["variation"] for item in period_performance]
 
-        indexer_name = indexer.name if indexer else ""
-        series = [
-            {"data": indexer_variation_data, "label": f"Variação do {indexer_name}"},
-            {"data": variation_data, "label": "Variação"},
-        ]
-
-        response = {"x_label": x_value, "data": series, "indexer_name": indexer.name}
+        response = {
+            "performance": {
+                "period_range": period_range,
+                "investment_serie": investment_serie,
+                "indexer_serie": indexer_serie,
+                "indexer_name": indexer.name,
+            }
+        }
 
         return response
 

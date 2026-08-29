@@ -33,9 +33,14 @@ input GetInvestmentPerformanceInput {
 }
 
 type GetInvestmentPerformanceResponse {
-    indexer_name: String!
-    xLabel: [Int]!
-    data: [ChartSeries]!
+    performance: InvestmentPerformance!
+}
+
+type InvestmentPerformance {
+    indexerSerie: [Float]
+    investmentSerie: [Float]
+    periodRange: [Int]
+    indexerName: String!
 }
 
 type ChartSeries {
