@@ -131,7 +131,7 @@ def bind_investment_resovlers(query: QueryType, mutation: MutationType):
     query.set_field(
         "getInvestmentStatements", resolver=get_investment_statements_resolver
     )
-    query.set_field("getInvestmentStatement", resolver=get_statement)
+    query.set_field("getInvestmentStatement", resolver=get_statement) # TODO Change to *ById
     query.set_field("getInvestmentObjectives", resolver=get_investment_objectives)
     query.set_field("getInvestmentTypes", resolver=get_investment_types)
 
