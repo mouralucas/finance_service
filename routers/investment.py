@@ -91,16 +91,6 @@ async def settle(
     return response
 
 
-# @router.get("/type", summary="Get investment types")
-# async def get_investment_types(
-#     session: AsyncSession = Depends(get_session),
-#     user: RequiredUser = Security(get_user),
-# ) -> GetInvestmentTypeResponse:
-#     return await InvestmentServiceDeprecated(
-#         session=session, user=user
-#     ).get_investment_types()
-
-
 @router.post(
     "/objective",
     status_code=status.HTTP_201_CREATED,
@@ -154,18 +144,3 @@ async def get_allocation(
     return await InvestmentServiceDeprecated(
         session=session, user=user
     ).get_investment_allocation()
-
-
-# @router.get(
-#     "/performance",
-#     summary="Get investment performance",
-#     description="Get investment performance",
-# )
-# async def get_performance(
-#     params: GetPerformanceRequest = Depends(),
-#     session: AsyncSession = Depends(get_session),
-#     user: RequiredUser = Security(get_user),
-# ) -> GetInvestmentPerformanceResponseV2:
-#     return await InvestmentService(session=session, user=user).get_performance(
-#         params=params
-#     )

@@ -740,7 +740,6 @@ class InvestmentManager(BaseDataManager):
         # ---------------------------
         # 3) Final  query with joins and filters
         # ---------------------------
-
         query = (
             select(
                 sq.c.period,

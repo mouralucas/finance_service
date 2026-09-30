@@ -142,6 +142,7 @@ input CreateInvestmentStatementInput {
     percentageChange: Float
     taxDetails: [TaxFeeDetail]
     feeDetails: [TaxFeeDetail]
+    atMaturity: Boolean!
 }
 
 type CreateInvestmentStatementResponse {
@@ -201,6 +202,7 @@ type GetStatementMetadataResponse {
     investmentName: String
     investmentTransactionDate: Date
     investmentMaturityDate: Date
+    atMaturity: Boolean!
 }
 
 type Statement {

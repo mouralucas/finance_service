@@ -124,7 +124,7 @@ class InvestmentService(BaseService):
             )
 
         # Set the model with the new statement
-        new_statement = InvestmentStatementModel(
+        new_statement: InvestmentStatementModel = InvestmentStatementModel(
             **input_statement.model_dump(exclude={"tax_details", "fee_details"})
         )
         # Denormilize currency_id
@@ -160,6 +160,9 @@ class InvestmentService(BaseService):
 
         # Persist data
         new_statement = await self.investment_manager.create_statement(new_statement)
+        
+        if new_statement.at_maturity:
+            investment.is_settled = True
 
         response = {
             "created": True,
@@ -227,9 +230,9 @@ class InvestmentService(BaseService):
         previous_statements = await self.investment_manager.get_statements(
             investment_id=investment_id
         )
-        last_statement = previous_statements[0] if previous_statements else None
-
-        if not last_statement:
+        lastest_statement = previous_statements[0] if previous_statements else None
+        
+        if not lastest_statement:
             return {
                 "period": get_period(investment.transaction_date),
                 "reference_date": get_last_business_day(investment.transaction_date),
@@ -237,17 +240,26 @@ class InvestmentService(BaseService):
                 "investment_name": investment.name,
                 "investment_transaction_date": investment.transaction_date,
                 "investment_maturity_date": investment.maturity_date,
+                "at_maturity": False,
             }
 
-        next_month = last_statement["reference_date"] + relativedelta(months=1)
+        next_month = lastest_statement["reference_date"] + relativedelta(months=1)
+        
+        investment_settlement_period = get_period(investment.maturity_date)
+        at_maturity = get_period(next_month) == investment_settlement_period if investment_settlement_period else False
+        if at_maturity:
+            reference_date = investment.maturity_date
+        else: 
+            reference_date = get_last_business_day(next_month)
 
         return {
             "period": get_period(next_month),
-            "reference_date": get_last_business_day(next_month),
+            "reference_date": reference_date,
             "contribution": 0,
             "investment_name": investment.name,
             "investment_transaction_date": investment.transaction_date,
             "investment_maturity_date": investment.maturity_date,
+            "at_maturity": at_maturity
         }
 
     # Outro

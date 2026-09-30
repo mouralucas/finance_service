@@ -81,12 +81,11 @@ async def get_statement(_, info: GraphQLResolveInfo, params: GetStatementByIdReq
     return statement
 
 
-async def get_statement_metadata_resolver(_, info: GraphQLResolveInfo, params: dict):
-    params_ = GetStatementMetadata.model_validate(params)
-
+@validate_graphql_input(GetStatementMetadata)
+async def get_statement_metadata_resolver(_, info: GraphQLResolveInfo, params: GetStatementMetadata):
     metadata = await InvestmentService(
         session=info.context["session"], user=info.context["user"]
-    ).get_statement_metadata(investment_id=params_.investment_id)
+    ).get_statement_metadata(investment_id=params.investment_id)
 
     return metadata
 
@@ -131,7 +130,8 @@ def bind_investment_resovlers(query: QueryType, mutation: MutationType):
     query.set_field(
         "getInvestmentStatements", resolver=get_investment_statements_resolver
     )
-    query.set_field("getInvestmentStatement", resolver=get_statement) # TODO Change to *ById
+    # TODO Change to *ById
+    query.set_field("getInvestmentStatement", resolver=get_statement)
     query.set_field("getInvestmentObjectives", resolver=get_investment_objectives)
     query.set_field("getInvestmentTypes", resolver=get_investment_types)
 

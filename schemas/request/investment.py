@@ -54,6 +54,7 @@ class CreateInvestmentStatementBaseRequest(BaseModel):
     )
     gross_amount: float = Field(..., description="The gross amount of the period")
     net_amount: float = Field(..., description="The net amount of the period")
+    at_maturity: bool = Field(False)
     tax_detail: list[TaxFeeRequest] | None = Field(
         None, description="The tax details of the investment tax"
     )
@@ -186,6 +187,7 @@ class UpdateStatementRequest(BaseModel):
     contribution: Decimal | None = Field(None)
     withdrawn: Decimal | None = Field(None)
     gross_amount: Decimal | None = Field(None)
+    at_maturity: bool = Field(False)
     net_amount: Decimal | None = Field(None)
     tax_detail: list[TaxFeeRequest] | None = Field(None)
     fee_detail: list[TaxFeeRequest] | None = Field(None)
@@ -280,6 +282,7 @@ class CreateStatementRequest(BaseModel):
     fee_details: list[TaxFeeRequest] | None = Field(
         None, description="The fee details of the investment fee"
     )
+    at_maturity: bool = Field(False)
 
 
 class CreateBatchStatementRequest(BaseModel):
