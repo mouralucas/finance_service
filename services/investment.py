@@ -160,9 +160,13 @@ class InvestmentService(BaseService):
 
         # Persist data
         new_statement = await self.investment_manager.create_statement(new_statement)
-        
+
         if new_statement.at_maturity:
+            # If at maturity update investment with the date and amount (net)
+            #   that was settled
             investment.is_settled = True
+            investment.settlement_date = new_statement.reference_date
+            investment.settlement_amount = new_statement.net_amount
 
         response = {
             "created": True,
@@ -231,7 +235,7 @@ class InvestmentService(BaseService):
             investment_id=investment_id
         )
         lastest_statement = previous_statements[0] if previous_statements else None
-        
+
         if not lastest_statement:
             return {
                 "period": get_period(investment.transaction_date),
@@ -244,12 +248,18 @@ class InvestmentService(BaseService):
             }
 
         next_month = lastest_statement["reference_date"] + relativedelta(months=1)
-        
-        investment_settlement_period = get_period(investment.maturity_date)
-        at_maturity = get_period(next_month) == investment_settlement_period if investment_settlement_period else False
+
+        investment_settlement_period = (
+            get_period(investment.maturity_date) if investment.maturity_date else None
+        )
+        at_maturity = (
+            get_period(next_month) == investment_settlement_period
+            if investment_settlement_period
+            else False
+        )
         if at_maturity:
             reference_date = investment.maturity_date
-        else: 
+        else:
             reference_date = get_last_business_day(next_month)
 
         return {
@@ -259,7 +269,7 @@ class InvestmentService(BaseService):
             "investment_name": investment.name,
             "investment_transaction_date": investment.transaction_date,
             "investment_maturity_date": investment.maturity_date,
-            "at_maturity": at_maturity
+            "at_maturity": at_maturity,
         }
 
     # Outro

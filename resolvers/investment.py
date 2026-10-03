@@ -82,7 +82,9 @@ async def get_statement(_, info: GraphQLResolveInfo, params: GetStatementByIdReq
 
 
 @validate_graphql_input(GetStatementMetadata)
-async def get_statement_metadata_resolver(_, info: GraphQLResolveInfo, params: GetStatementMetadata):
+async def get_statement_metadata_resolver(
+    _, info: GraphQLResolveInfo, params: GetStatementMetadata
+):
     metadata = await InvestmentService(
         session=info.context["session"], user=info.context["user"]
     ).get_statement_metadata(investment_id=params.investment_id)

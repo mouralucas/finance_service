@@ -1,5 +1,5 @@
 import uuid
-from typing import Any, cast
+from typing import Any, TypeVar, cast
 
 from fastapi import HTTPException
 from rolf_common.managers import BaseDataManager
@@ -18,6 +18,8 @@ from models.investment_deprecated import (
 )
 from services.utils.datetime import get_previous_period
 
+
+T = TypeVar("T", bound=SQLModel)
 
 class InvestmentManager(BaseDataManager):
     def __init__(self, session: AsyncSession):
@@ -201,7 +203,9 @@ class InvestmentManager(BaseDataManager):
         )
 
     # Investment statement
-    async def create_statement(self, statement: InvestmentStatementModel) -> SQLModel:
+    async def create_statement(
+        self, statement: InvestmentStatementModel
+    ) -> InvestmentStatementModel:
         await self.add_one(statement)
 
         return statement

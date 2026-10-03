@@ -53,6 +53,7 @@ class TestStatement:
             "contribution": investments[0].amount,
             "grossAmount": gross_amount,
             "netAmount": net_amount,
+            "atMaturity": False,
         }
 
         response = await client.post(
@@ -149,7 +150,7 @@ class TestStatement:
                 "netAmount": (investments[0].amount * 1.05) - 3.60,
                 "withdrawn": 0,
                 "contribution": investments[0].amount,
-                # TODO: add taxDetails and feeDetails
+                "atMaturity": False,
             }
         }
 
