@@ -18,8 +18,8 @@ from models.investment_deprecated import (
 )
 from services.utils.datetime import get_previous_period
 
-
 T = TypeVar("T", bound=SQLModel)
+
 
 class InvestmentManager(BaseDataManager):
     def __init__(self, session: AsyncSession):
